@@ -56,9 +56,22 @@ const XTREAM_CONFIG = {
 
 const XTREAM_CHANNELS = {
   'tv_canal_foot': '180946',
+  '463': '180946',
+  'canal_foot': '180946',
+  'canal+ foot': '180946',
+  'canal foot': '180946',
+  '180946': '180946',
   'tv_canal_sport': '14156',
+  '464': '14156',
+  'canal_sport': '14156',
+  'canal+ sport': '14156',
+  'canal sport': '14156',
   'tv_canal_360': '180947',
+  'canal+ sport 360': '180947',
+  'canal 360': '180947',
   'tv_canal_france': '14155',
+  'canal+': '14155',
+  'canal+ france': '14155',
   'tv_canal_live1': '327340',
   'tv_canal_live2': '327339',
   'tv_canal_live3': '327338',
@@ -79,6 +92,50 @@ const XTREAM_CHANNELS = {
   'tv_dazn1': '180948',
   'tv_dazn_ligue1': '180948'
 };
+
+function fetchXtreamPlaylist(targetUrl, headers = {}, hops = 0) {
+  if (hops > 5) return Promise.reject(new Error('Trop de redirections Xtream'));
+  return new Promise((resolve, reject) => {
+    let parsed;
+    try {
+      parsed = new URL(targetUrl);
+    } catch (e) {
+      return reject(new Error('URL Xtream invalide: ' + targetUrl));
+    }
+    const client = parsed.protocol === 'https:' ? https : http;
+    const req = client.get(targetUrl, {
+      headers: Object.assign({
+        'User-Agent': 'IPTVSmartersPro/1.0',
+        'Accept': '*/*'
+      }, headers),
+      timeout: 10000
+    }, (res) => {
+      if (res.statusCode === 301 || res.statusCode === 302 || res.statusCode === 307 || res.statusCode === 308) {
+        const loc = res.headers.location;
+        if (!loc) return reject(new Error('Redirection sans en-tête location'));
+        const nextUrl = loc.startsWith('http') ? loc : new URL(loc, targetUrl).href;
+        return resolve(fetchXtreamPlaylist(nextUrl, headers, hops + 1));
+      }
+      let chunks = [];
+      res.on('data', c => chunks.push(c));
+      res.on('end', () => {
+        const buf = Buffer.concat(chunks);
+        resolve({
+          statusCode: res.statusCode,
+          headers: res.headers,
+          finalUrl: targetUrl,
+          body: buf.toString('utf8'),
+          buffer: buf
+        });
+      });
+    });
+    req.on('error', reject);
+    req.on('timeout', () => {
+      req.destroy();
+      reject(new Error('Timeout de connexion Xtream'));
+    });
+  });
+}
 
 global.activeXtreamSocket = null;
 
@@ -1597,89 +1654,180 @@ const server = http.createServer((req, res) => {
   }
 
   // ================= ROUTE DIRECT XTREAM VIP PROXY (/api/stream/xtream) =================
-  // Infrastructure Résiliente pour Xtream Codes :
-  // 1. Single-Connection Supervisor (Évite l'erreur max_connections = 1 en fermant immédiatement l'ancien socket)
-  // 2. Gestion automatique des redirections 302 vers les nœuds edge
-  // 3. Bypass CORS & Compatibilité HTTPS / Mixed-Content
+  // Infrastructure Haute Résilience pour Xtream Codes :
+  // 1. Suivi transparent des redirections 302 vers les serveurs edge de diffusion
+  // 2. Réécriture dynamique des segments HLS (.ts) vers le proxy local /api/stream/xtream-chunk
+  // 3. Élimination des erreurs Mixed-Content (HTTP -> HTTPS) et contournement CORS total
+  // 4. Compatible nativement avec le lecteur Netflix HLS.js
   if (pathname === '/api/stream/xtream' && req.method === 'GET') {
-    const channel = parsedUrl.query.channel || 'tv_canal_foot';
-    const streamId = XTREAM_CHANNELS[channel] || parsedUrl.query.stream_id || '180946';
+    const rawChannel = (parsedUrl.query.channel || '').toString().toLowerCase().trim();
+    const streamId = XTREAM_CHANNELS[rawChannel] 
+      || XTREAM_CHANNELS[rawChannel.replace(/^tv_/, '')] 
+      || parsedUrl.query.stream_id 
+      || (rawChannel.match(/^\d+$/) ? rawChannel : '180946');
 
-    // Libérer immédiatement toute connexion résiduelle pour respecter le max_connections: 1
-    if (global.activeXtreamSocket) {
-      try { global.activeXtreamSocket.destroy(); } catch (e) {}
-      global.activeXtreamSocket = null;
-    }
+    const targetUrl = parsedUrl.query.target
+      ? parsedUrl.query.target
+      : `http://${XTREAM_CONFIG.host}:${XTREAM_CONFIG.port}/live/${XTREAM_CONFIG.username}/${XTREAM_CONFIG.password}/${streamId}.m3u8`;
 
-    const targetUrl = `http://${XTREAM_CONFIG.host}:${XTREAM_CONFIG.port}/live/${XTREAM_CONFIG.username}/${XTREAM_CONFIG.password}/${streamId}`;
-
-    function pipeXtreamStream(url, hops = 0) {
-      if (hops > 4) {
-        res.writeHead(502, { 'Content-Type': 'text/plain', 'Access-Control-Allow-Origin': '*' });
-        res.end('Trop de redirections Xtream');
-        return;
-      }
-
-      const clientReq = http.get(url, {
-        headers: {
-          'User-Agent': 'IPTVSmartersPro/1.0',
-          'Accept': '*/*'
-        },
-        timeout: 15000
-      }, (upstreamRes) => {
-        if (upstreamRes.statusCode === 301 || upstreamRes.statusCode === 302) {
-          const loc = upstreamRes.headers.location;
-          if (loc) {
-            return pipeXtreamStream(loc, hops + 1);
-          }
-        }
-
-        if (upstreamRes.statusCode !== 200) {
-          res.writeHead(upstreamRes.statusCode, {
+    fetchXtreamPlaylist(targetUrl)
+      .then(({ statusCode, finalUrl, body, buffer }) => {
+        if (statusCode !== 200) {
+          res.writeHead(statusCode || 502, {
             'Content-Type': 'text/plain',
             'Access-Control-Allow-Origin': '*'
           });
-          res.end(`Erreur Xtream: HTTP ${upstreamRes.statusCode}`);
-          return;
+          return res.end(`Erreur Xtream: HTTP ${statusCode}`);
         }
 
-        global.activeXtreamSocket = clientReq;
+        // Si le contenu est une playlist HLS
+        if (body.includes('#EXTM3U')) {
+          let edgeOrigin = '';
+          let edgeBase = '';
+          try {
+            const urlObj = new URL(finalUrl);
+            edgeOrigin = urlObj.origin;
+            edgeBase = finalUrl.substring(0, finalUrl.lastIndexOf('/') + 1);
+          } catch (e) {}
 
+          const lines = body.split(/\r?\n/);
+          const rewrittenLines = lines.map(line => {
+            const trimmed = line.trim();
+            if (!trimmed) return line;
+
+            // Réécriture des clés de chiffrement si présentes (#EXT-X-KEY)
+            if (trimmed.startsWith('#EXT-X-KEY:')) {
+              return trimmed.replace(/URI="([^"]+)"/, (m, keyUri) => {
+                let absKeyUrl = keyUri;
+                if (!keyUri.startsWith('http://') && !keyUri.startsWith('https://')) {
+                  absKeyUrl = keyUri.startsWith('/') ? `${edgeOrigin}${keyUri}` : `${edgeBase}${keyUri}`;
+                }
+                return `URI="/api/stream/xtream-chunk?url=${encodeURIComponent(absKeyUrl)}"`;
+              });
+            }
+
+            if (trimmed.startsWith('#')) return line;
+
+            // Résoudre l'URL absolue de la ressource
+            let absUrl = trimmed;
+            if (!trimmed.startsWith('http://') && !trimmed.startsWith('https://')) {
+              absUrl = trimmed.startsWith('/') ? `${edgeOrigin}${trimmed}` : `${edgeBase}${trimmed}`;
+            }
+
+            // Si c'est une sous-playlist (variant stream)
+            if (trimmed.includes('.m3u8')) {
+              return `/api/stream/xtream?target=${encodeURIComponent(absUrl)}`;
+            }
+
+            // Segment média (.ts)
+            return `/api/stream/xtream-chunk?url=${encodeURIComponent(absUrl)}`;
+          });
+
+          const rewrittenManifest = rewrittenLines.join('\n');
+          res.writeHead(200, {
+            'Content-Type': 'application/vnd.apple.mpegurl',
+            'Access-Control-Allow-Origin': '*',
+            'Access-Control-Allow-Headers': '*',
+            'Cache-Control': 'no-cache, no-store, must-revalidate',
+            'Pragma': 'no-cache',
+            'Expires': '0'
+          });
+          return res.end(rewrittenManifest);
+        }
+
+        // Fallback: flux binaire direct
         res.writeHead(200, {
-          'Content-Type': upstreamRes.headers['content-type'] || 'video/mp2t',
+          'Content-Type': 'video/mp2t',
           'Access-Control-Allow-Origin': '*',
           'Access-Control-Allow-Headers': '*',
           'Cache-Control': 'no-cache, no-store',
           'Connection': 'keep-alive'
         });
-
-        upstreamRes.pipe(res);
-
-        upstreamRes.on('error', (err) => {
-          console.warn('[Xtream Upstream Error]:', err.message);
-          if (!res.headersSent) res.writeHead(502);
-          res.end();
-        });
-      });
-
-      clientReq.on('error', (err) => {
-        console.warn('[Xtream Request Error]:', err.message);
+        return res.end(buffer);
+      })
+      .catch(err => {
+        console.warn('[Xtream Manifest Error]:', err.message);
         if (!res.headersSent) {
           res.writeHead(502, { 'Content-Type': 'text/plain', 'Access-Control-Allow-Origin': '*' });
           res.end('Erreur de connexion Xtream: ' + err.message);
         }
       });
+    return;
+  }
 
-      // Fermeture immédiate dès que l'utilisateur quitte ou change de chaîne
+  // ================= ROUTE XTREAM CHUNK PROXY (/api/stream/xtream-chunk) =================
+  // Proxy de streaming pour chaque segment .ts de l'infrastructure Xtream :
+  // - Envoi du User-Agent IPTVSmartersPro/1.0
+  // - Headers CORS complets & Content-Type video/mp2t
+  // - Mise en cache HTTP immuable pour éliminer les saccades et micro-coupures
+  if (pathname === '/api/stream/xtream-chunk' && req.method === 'GET') {
+    const chunkUrl = parsedUrl.query.url;
+    if (!chunkUrl) {
+      res.writeHead(400, { 'Content-Type': 'text/plain', 'Access-Control-Allow-Origin': '*' });
+      return res.end('URL de chunk manquante');
+    }
+
+    function pipeChunk(urlToFetch, hops = 0) {
+      if (hops > 4) {
+        res.writeHead(502, { 'Content-Type': 'text/plain', 'Access-Control-Allow-Origin': '*' });
+        return res.end('Trop de redirections de chunk Xtream');
+      }
+
+      let parsed;
+      try {
+        parsed = new URL(urlToFetch);
+      } catch (e) {
+        res.writeHead(400, { 'Content-Type': 'text/plain', 'Access-Control-Allow-Origin': '*' });
+        return res.end('URL de chunk invalide');
+      }
+
+      const client = parsed.protocol === 'https:' ? https : http;
+      const clientReq = client.get(urlToFetch, {
+        headers: {
+          'User-Agent': 'IPTVSmartersPro/1.0',
+          'Accept': '*/*'
+        },
+        timeout: 15000
+      }, (chunkRes) => {
+        if (chunkRes.statusCode === 301 || chunkRes.statusCode === 302 || chunkRes.statusCode === 307) {
+          const loc = chunkRes.headers.location;
+          if (loc) {
+            const nextUrl = loc.startsWith('http') ? loc : new URL(loc, urlToFetch).href;
+            return pipeChunk(nextUrl, hops + 1);
+          }
+        }
+
+        if (chunkRes.statusCode !== 200 && chunkRes.statusCode !== 206) {
+          res.writeHead(chunkRes.statusCode, { 'Access-Control-Allow-Origin': '*' });
+          return chunkRes.pipe(res);
+        }
+
+        res.writeHead(chunkRes.statusCode, {
+          'Content-Type': chunkRes.headers['content-type'] || 'video/mp2t',
+          'Content-Length': chunkRes.headers['content-length'],
+          'Access-Control-Allow-Origin': '*',
+          'Access-Control-Allow-Headers': '*',
+          'Cache-Control': 'public, max-age=3600',
+          'Connection': 'keep-alive'
+        });
+
+        chunkRes.pipe(res);
+      });
+
+      clientReq.on('error', (err) => {
+        console.warn('[Xtream Chunk Error]:', err.message);
+        if (!res.headersSent) {
+          res.writeHead(502, { 'Content-Type': 'text/plain', 'Access-Control-Allow-Origin': '*' });
+          res.end('Erreur de chargement chunk: ' + err.message);
+        }
+      });
+
       req.on('close', () => {
         try { clientReq.destroy(); } catch (e) {}
-        if (global.activeXtreamSocket === clientReq) {
-          global.activeXtreamSocket = null;
-        }
       });
     }
 
-    pipeXtreamStream(targetUrl);
+    pipeChunk(chunkUrl);
     return;
   }
 
