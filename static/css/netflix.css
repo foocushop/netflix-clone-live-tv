@@ -984,6 +984,61 @@ body {
   gap: 8px;
 }
 
+/* ================= SÉLECTEUR DE SERVEURS AVEC NAVIGATION & DÉFILEMENT ================= */
+.player-server-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-left: auto;
+  position: relative;
+  max-width: calc(100vw - 380px);
+  min-width: 0;
+  flex: 1 1 auto;
+  justify-content: flex-end;
+}
+
+.server-nav-btn {
+  background: rgba(22, 22, 22, 0.95);
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  color: #fff;
+  font-size: 1.4rem;
+  line-height: 1;
+  font-weight: 700;
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  flex-shrink: 0;
+  backdrop-filter: blur(12px);
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.6);
+  user-select: none;
+  z-index: 5;
+  padding: 0;
+  padding-bottom: 2px;
+}
+
+.server-nav-btn:hover:not(:disabled) {
+  background: var(--netflix-red);
+  border-color: var(--netflix-red);
+  transform: scale(1.12);
+  box-shadow: 0 0 16px rgba(229, 9, 20, 0.7);
+}
+
+.server-nav-btn:active:not(:disabled) {
+  transform: scale(0.95);
+}
+
+.server-nav-btn:disabled,
+.server-nav-btn.is-disabled {
+  opacity: 0.18;
+  cursor: default;
+  pointer-events: none;
+}
+
 .player-server-selector {
   display: flex;
   align-items: center;
@@ -993,16 +1048,37 @@ body {
   border-radius: 24px;
   backdrop-filter: blur(12px);
   border: 1px solid rgba(255, 255, 255, 0.18);
-  margin-left: auto;
   box-shadow: 0 4px 18px rgba(0, 0, 0, 0.7);
-  max-width: calc(100vw - 360px);
   overflow-x: auto;
-  scrollbar-width: none;
-  -ms-overflow-style: none;
+  overflow-y: hidden;
+  scroll-behavior: smooth;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(229, 9, 20, 0.5) transparent;
+  cursor: grab;
+}
+
+.player-server-selector.is-dragging {
+  cursor: grabbing;
+  user-select: none;
+  scroll-behavior: auto;
 }
 
 .player-server-selector::-webkit-scrollbar {
-  display: none;
+  height: 4px;
+}
+
+.player-server-selector::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.player-server-selector::-webkit-scrollbar-thumb {
+  background: rgba(229, 9, 20, 0.5);
+  border-radius: 4px;
+}
+
+.player-server-selector::-webkit-scrollbar-thumb:hover {
+  background: var(--netflix-red);
 }
 
 .server-pill {
@@ -1019,6 +1095,8 @@ body {
   gap: 6px;
   transition: all 0.2s ease;
   white-space: nowrap;
+  flex-shrink: 0;
+  user-select: none;
 }
 
 .server-pill:hover {
@@ -1030,6 +1108,20 @@ body {
   background: var(--netflix-red);
   color: #fff;
   box-shadow: 0 0 14px rgba(229, 9, 20, 0.7);
+}
+
+.server-pill .pill-badge {
+  font-size: 0.68rem;
+  padding: 2px 6px;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.18);
+  font-weight: 700;
+  letter-spacing: 0.3px;
+}
+
+.server-pill.active .pill-badge {
+  background: rgba(0, 0, 0, 0.35);
+  color: #fff;
 }
 
 .pill-dot {

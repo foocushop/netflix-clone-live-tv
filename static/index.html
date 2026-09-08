@@ -172,23 +172,27 @@
         </div>
       </div>
 
-      <!-- Sélecteur de 5 Serveurs Réels en Streaming Direct HLS -->
-      <div class="player-server-selector" id="playerServerSelector">
-        <button class="server-pill active" data-server="1" title="Serveur 1 : Direct HLS (Cluster Alpha)">
-          <span class="pill-dot">●</span> ⚡ Serveur 1 (Direct HLS)
-        </button>
-        <button class="server-pill" data-server="2" title="Serveur 2 : Direct HLS (Cluster Bêta)">
-          🎬 Serveur 2 (Direct HD)
-        </button>
-        <button class="server-pill" data-server="3" title="Serveur 3 : Direct HLS Multi-Flux (Cluster Gamma)">
-          🌐 Serveur 3 (Direct Multi)
-        </button>
-        <button class="server-pill" data-server="4" title="Serveur 4 : Direct HLS CDN VIP (Cluster Delta)">
-          📡 Serveur 4 (Direct VIP)
-        </button>
-        <button class="server-pill" data-server="5" title="Serveur 5 : Direct HLS Secours (Cluster Epsilon)">
-          🚀 Serveur 5 (Direct Secours)
-        </button>
+      <!-- Sélecteur de Serveurs avec Boutons de Navigation / Défilement Horizontal -->
+      <div class="player-server-wrapper" id="playerServerWrapper">
+        <button class="server-nav-btn prev is-disabled" id="serverNavPrev" type="button" aria-label="Serveurs précédents" title="Faire défiler vers la gauche">‹</button>
+        <div class="player-server-selector" id="playerServerSelector">
+          <button class="server-pill active" data-server="1" title="Serveur 1 : Direct HLS (Cluster Alpha)">
+            <span class="pill-dot">●</span> ⚡ Serveur 1 (Direct HLS)
+          </button>
+          <button class="server-pill" data-server="2" title="Serveur 2 : Direct HLS (Cluster Bêta)">
+            🎬 Serveur 2 (Direct HD)
+          </button>
+          <button class="server-pill" data-server="3" title="Serveur 3 : Direct HLS Multi-Flux (Cluster Gamma)">
+            🌐 Serveur 3 (Direct Multi)
+          </button>
+          <button class="server-pill" data-server="4" title="Serveur 4 : Direct HLS CDN VIP (Cluster Delta)">
+            📡 Serveur 4 (Direct VIP)
+          </button>
+          <button class="server-pill" data-server="5" title="Serveur 5 : Direct HLS Secours (Cluster Epsilon)">
+            🚀 Serveur 5 (Direct Secours)
+          </button>
+        </div>
+        <button class="server-nav-btn next" id="serverNavNext" type="button" aria-label="Serveurs suivants" title="Faire défiler vers la droite">›</button>
       </div>
 
       <!-- Sélecteur d'Épisodes (pour Séries) -->

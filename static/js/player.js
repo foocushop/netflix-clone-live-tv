@@ -28,7 +28,10 @@ class NetflixPlayer {
     this.langVoBtn = document.getElementById('playerLangVo');
     this.langVfBtn = document.getElementById('playerLangVf');
 
-    // Sélecteur de 5 Serveurs
+    // Sélecteur de Serveurs avec Navigation & Défilement Horizontal
+    this.serverWrapper = document.getElementById('playerServerWrapper');
+    this.serverNavPrev = document.getElementById('serverNavPrev');
+    this.serverNavNext = document.getElementById('serverNavNext');
     this.serverSelector = document.getElementById('playerServerSelector');
     this.serverPills = document.querySelectorAll('.server-pill');
 
@@ -135,8 +138,29 @@ class NetflixPlayer {
       });
     }
 
-    // Sélection dynamique des serveurs (Cinéma 5 serveurs ou TV 9 serveurs)
+    // ================= SÉLECTEUR DE SERVEURS & DÉFILEMENT FLUIDE =================
+    if (this.serverNavPrev) {
+      this.serverNavPrev.addEventListener('click', (e) => {
+        e.stopPropagation();
+        if (this.serverSelector) {
+          this.serverSelector.scrollBy({ left: -240, behavior: 'smooth' });
+          setTimeout(() => this.updateServerNavState(), 320);
+        }
+      });
+    }
+
+    if (this.serverNavNext) {
+      this.serverNavNext.addEventListener('click', (e) => {
+        e.stopPropagation();
+        if (this.serverSelector) {
+          this.serverSelector.scrollBy({ left: 240, behavior: 'smooth' });
+          setTimeout(() => this.updateServerNavState(), 320);
+        }
+      });
+    }
+
     if (this.serverSelector) {
+      // Clic sur une pilule de serveur
       this.serverSelector.addEventListener('click', (e) => {
         const pill = e.target.closest('.server-pill');
         if (!pill) return;
@@ -146,7 +170,56 @@ class NetflixPlayer {
           this.switchServer(serverNum);
         }
       });
+
+      // Défilement horizontal direct à la molette de la souris
+      this.serverSelector.addEventListener('wheel', (e) => {
+        if (e.deltaY !== 0) {
+          e.preventDefault();
+          this.serverSelector.scrollLeft += (e.deltaY * 0.9);
+          this.updateServerNavState();
+        }
+      }, { passive: false });
+
+      // Suivi du défilement pour activer/désactiver les flèches
+      this.serverSelector.addEventListener('scroll', () => {
+        this.updateServerNavState();
+      }, { passive: true });
+
+      // Glisser-déposer (Drag to scroll) à la souris
+      let isDown = false;
+      let startX = 0;
+      let scrollLeft = 0;
+
+      this.serverSelector.addEventListener('mousedown', (e) => {
+        if (e.button !== 0) return;
+        isDown = true;
+        this.serverSelector.classList.add('is-dragging');
+        startX = e.pageX - this.serverSelector.offsetLeft;
+        scrollLeft = this.serverSelector.scrollLeft;
+      });
+
+      window.addEventListener('mouseup', () => {
+        if (isDown) {
+          isDown = false;
+          this.serverSelector.classList.remove('is-dragging');
+        }
+      });
+
+      this.serverSelector.addEventListener('mousemove', (e) => {
+        if (!isDown) return;
+        const x = e.pageX - this.serverSelector.offsetLeft;
+        const walk = (x - startX) * 1.5;
+        if (Math.abs(walk) > 4) {
+          e.preventDefault();
+          this.serverSelector.scrollLeft = scrollLeft - walk;
+          this.updateServerNavState();
+        }
+      });
     }
+
+    window.addEventListener('resize', () => {
+      this.updateServerNavState();
+    });
 
     // Sélecteur de Saisons & Épisodes
     this.seasonSelect.addEventListener('change', (e) => {
@@ -859,6 +932,25 @@ class NetflixPlayer {
     }
   }
 
+  updateServerNavState() {
+    if (!this.serverSelector) return;
+    const sl = this.serverSelector.scrollLeft;
+    const sw = this.serverSelector.scrollWidth;
+    const cw = this.serverSelector.clientWidth;
+
+    const canScrollLeft = sl > 6;
+    const canScrollRight = (sw - sl - cw) > 6;
+
+    if (this.serverNavPrev) {
+      this.serverNavPrev.classList.toggle('is-disabled', !canScrollLeft);
+      this.serverNavPrev.disabled = !canScrollLeft;
+    }
+    if (this.serverNavNext) {
+      this.serverNavNext.classList.toggle('is-disabled', !canScrollRight);
+      this.serverNavNext.disabled = !canScrollRight;
+    }
+  }
+
   updateServerPills() {
     if (!this.serverSelector) return;
     const isChannel = (this.currentMovie?.media_type === 'channel' || this.currentMovie?.is_live);
@@ -868,39 +960,51 @@ class NetflixPlayer {
     let serverList = [];
     if (isChannel) {
       serverList = [
-        { num: 1, label: '⚡ S1: Direct HLS (Principal)', title: 'Serveur 1 : Direct HLS Principal FHD (Cricsfree)' },
-        { num: 2, label: '🎬 S2: Direct HLS (Apex)', title: 'Serveur 2 : Direct HLS Apex FHD' },
-        { num: 3, label: '📡 S3: Direct HLS (DLHD)', title: 'Serveur 3 : Direct HLS DLHD FHD (Daddy2)' },
-        { num: 4, label: '🌐 S4: Nontongo HD', title: 'Serveur 4 : Lecteur Nontongo HD' },
-        { num: 5, label: '🚀 S5: HD1 / Alba', title: 'Serveur 5 : Lecteur HD1 / Alba' },
-        { num: 6, label: '📺 S6: DLive Cast', title: 'Serveur 6 : Lecteur DLive Cast' },
-        { num: 7, label: '🛡️ S7: Merit / CX', title: 'Serveur 7 : Lecteur DaddyLive1 CX / Merit' },
-        { num: 8, label: '🎯 S8: EngStreams', title: 'Serveur 8 : Lecteur EngStreams' },
-        { num: 9, label: '⚡ S9: Miroir Li Hub', title: 'Serveur 9 : Miroir Global DaddyLive Li' }
+        // Flux HLS Directs (Natif Netflix 1080p, 0 pub, lecteur HTML5)
+        { num: 1, label: '⚡ S1: Direct 1080p (Principal)', title: 'Serveur 1 : Direct HLS FHD 1080p (Cricsfree - Lecteur Netflix Natif)', badge: '1080p Natif' },
+        { num: 2, label: '🎬 S2: Direct 1080p (Apex)', title: 'Serveur 2 : Direct HLS Apex FHD 1080p (Lecteur Netflix Natif)', badge: '1080p Natif' },
+        { num: 3, label: '📡 S3: Direct 1080p (DLHD)', title: 'Serveur 3 : Direct HLS DLHD FHD 1080p (Daddy2 - Lecteur Netflix Natif)', badge: '1080p Natif' },
+        // Sous-serveurs DLive internes extraits
+        { num: 4, label: '📺 S4: DLive Cast (Srv 1)', title: 'Serveur 4 : DLive Cast (Serveur 1 interne extrait)', badge: 'DLive 1' },
+        { num: 5, label: '📺 S5: DLive Watch (Srv 2)', title: 'Serveur 5 : DLive Watch (Serveur 2 interne extrait)', badge: 'DLive 2' },
+        { num: 6, label: '📺 S6: DLive Plus (Srv 3)', title: 'Serveur 6 : DLive Plus (Serveur 3 interne extrait)', badge: 'DLive 3' },
+        { num: 7, label: '📺 S7: DLive Casting (Srv 4)', title: 'Serveur 7 : DLive Casting (Serveur 4 interne extrait)', badge: 'DLive 4' },
+        { num: 8, label: '📺 S8: DLive Player (Srv 5)', title: 'Serveur 8 : DLive Player (Serveur 5 interne extrait)', badge: 'DLive 5' },
+        { num: 9, label: '📺 S9: DLive Embed (Srv 6)', title: 'Serveur 9 : DLive Embed (Serveur 6 interne extrait)', badge: 'DLive 6' },
+        // Miroirs Web Distribués
+        { num: 10, label: '🌐 S10: Cricsfree Web', title: 'Serveur 10 : Lecteur Web Cricsfree Direct', badge: 'Miroir' },
+        { num: 11, label: '🌐 S11: Apex Web', title: 'Serveur 11 : Lecteur Web Apex Direct', badge: 'Miroir' },
+        { num: 12, label: '🌐 S12: DLHD Watch', title: 'Serveur 12 : Lecteur Web DLHD Watch Direct', badge: 'Miroir' },
+        { num: 13, label: '🚀 S13: HD1 SBS', title: 'Serveur 13 : Lecteur HD1 Alba SBS Direct', badge: 'Miroir' },
+        { num: 14, label: '🛡️ S14: CX Merit', title: 'Serveur 14 : Lecteur DaddyLive1 CX / Merit Direct', badge: 'Miroir' },
+        { num: 15, label: '🎯 S15: EngStreams', title: 'Serveur 15 : Lecteur EngStreams Direct', badge: 'Miroir' },
+        // Hubs Miroirs
+        { num: 16, label: '⚡ S16: Hub Nontongo', title: 'Serveur 16 : Hub Nontongo Multi-Serveurs', badge: 'Hub' },
+        { num: 17, label: '⚡ S17: Hub DaddyLive Li', title: 'Serveur 17 : Hub Miroir Global DaddyLive Li', badge: 'Hub' }
       ];
     } else if (isSpecialShow) {
       serverList = [
-        { num: 1, label: '⚡ S1: Direct HLS (Principal)', title: 'Serveur 1 : Direct HLS • Flux Principal HD' },
-        { num: 2, label: '🎬 S2: Direct 1080p FHD', title: 'Serveur 2 : Direct 1080p FHD' },
-        { num: 3, label: '🌐 S3: Direct 720p HD', title: 'Serveur 3 : Direct 720p HD' },
-        { num: 4, label: '📡 S4: Miroir CDN Rapide', title: 'Serveur 4 : Miroir CDN Rapide' },
-        { num: 5, label: '🚀 S5: Multi-Débit Secours', title: 'Serveur 5 : Multi-Débit Secours' }
+        { num: 1, label: '⚡ S1: Direct HLS (Principal)', title: 'Serveur 1 : Direct HLS • Flux Principal HD', badge: 'HD' },
+        { num: 2, label: '🎬 S2: Direct 1080p FHD', title: 'Serveur 2 : Direct 1080p FHD', badge: '1080p' },
+        { num: 3, label: '🌐 S3: Direct 720p HD', title: 'Serveur 3 : Direct 720p HD', badge: '720p' },
+        { num: 4, label: '📡 S4: Miroir CDN Rapide', title: 'Serveur 4 : Miroir CDN Rapide', badge: 'CDN' },
+        { num: 5, label: '🚀 S5: Multi-Débit Secours', title: 'Serveur 5 : Multi-Débit Secours', badge: 'Secours' }
       ];
     } else if (isVf) {
       serverList = [
-        { num: 1, label: '⚡ S1: Vidzy HD (VF)', title: 'Serveur 1 : Direct VF • Vidzy HD' },
-        { num: 2, label: '🎬 S2: Fsvid VIP (VF)', title: 'Serveur 2 : Direct VF • Fsvid VIP' },
-        { num: 3, label: '🌐 S3: Uqload (VF)', title: 'Serveur 3 : Direct VF • Uqload' },
-        { num: 4, label: '📡 S4: Secours (VF)', title: 'Serveur 4 : Direct VF • Secours' },
-        { num: 5, label: '🚀 S5: Multi-Flux (VF)', title: 'Serveur 5 : Direct VF • Multi-Flux' }
+        { num: 1, label: '⚡ S1: Vidzy HD (VF)', title: 'Serveur 1 : Direct VF • Vidzy HD', badge: 'VF HD' },
+        { num: 2, label: '🎬 S2: Fsvid VIP (VF)', title: 'Serveur 2 : Direct VF • Fsvid VIP', badge: 'VF VIP' },
+        { num: 3, label: '🌐 S3: Uqload (VF)', title: 'Serveur 3 : Direct VF • Uqload', badge: 'VF' },
+        { num: 4, label: '📡 S4: Secours (VF)', title: 'Serveur 4 : Direct VF • Secours', badge: 'Secours' },
+        { num: 5, label: '🚀 S5: Multi-Flux (VF)', title: 'Serveur 5 : Direct VF • Multi-Flux', badge: 'Multi' }
       ];
     } else {
       serverList = [
-        { num: 1, label: '⚡ S1: Direct HLS', title: 'Serveur 1 : Direct HLS (Cluster Alpha)' },
-        { num: 2, label: '🎬 S2: Direct HD', title: 'Serveur 2 : Direct HD (Cluster Bêta)' },
-        { num: 3, label: '🌐 S3: Direct Multi', title: 'Serveur 3 : Direct Multi (Cluster Gamma)' },
-        { num: 4, label: '📡 S4: Direct VIP', title: 'Serveur 4 : Direct VIP (Cluster Delta)' },
-        { num: 5, label: '🚀 S5: Secours', title: 'Serveur 5 : Direct Secours (Cluster Epsilon)' }
+        { num: 1, label: '⚡ S1: Direct HLS', title: 'Serveur 1 : Direct HLS (Cluster Alpha)', badge: '4K/FHD' },
+        { num: 2, label: '🎬 S2: Direct HD', title: 'Serveur 2 : Direct HD (Cluster Bêta)', badge: '1080p' },
+        { num: 3, label: '🌐 S3: Direct Multi', title: 'Serveur 3 : Direct Multi (Cluster Gamma)', badge: 'Multi' },
+        { num: 4, label: '📡 S4: Direct VIP', title: 'Serveur 4 : Direct VIP (Cluster Delta)', badge: 'VIP' },
+        { num: 5, label: '🚀 S5: Secours', title: 'Serveur 5 : Direct Secours (Cluster Epsilon)', badge: 'Secours' }
       ];
     }
 
@@ -917,9 +1021,24 @@ class NetflixPlayer {
         dot.textContent = '● ';
         btn.appendChild(dot);
       }
-      btn.appendChild(document.createTextNode(s.label));
+      btn.appendChild(document.createTextNode(s.label + ' '));
+      if (s.badge) {
+        const badge = document.createElement('span');
+        badge.className = 'pill-badge';
+        badge.textContent = s.badge;
+        btn.appendChild(badge);
+      }
       this.serverSelector.appendChild(btn);
     });
+
+    // Défiler automatiquement la pilule active au centre et rafraîchir les boutons
+    setTimeout(() => {
+      const activePill = this.serverSelector.querySelector('.server-pill.active');
+      if (activePill) {
+        activePill.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
+      }
+      this.updateServerNavState();
+    }, 60);
   }
 
   updateMetaDisplay() {
@@ -930,15 +1049,23 @@ class NetflixPlayer {
     let serverNames;
     if (isChannel) {
       serverNames = {
-        1: 'Serveur 1 (⚡ Direct HLS Principal FHD)',
-        2: 'Serveur 2 (🎬 Direct HLS Apex FHD)',
-        3: 'Serveur 3 (📡 Direct HLS DLHD FHD)',
-        4: 'Serveur 4 (🌐 Lecteur Nontongo HD)',
-        5: 'Serveur 5 (🚀 Lecteur HD1 / Alba)',
-        6: 'Serveur 6 (📺 Lecteur DLive Cast)',
-        7: 'Serveur 7 (🛡️ Lecteur CX / Merit)',
-        8: 'Serveur 8 (🎯 Lecteur EngStreams)',
-        9: 'Serveur 9 (⚡ Hub Miroir Li)'
+        1: 'Serveur 1 (⚡ Direct HLS Principal 1080p)',
+        2: 'Serveur 2 (🎬 Direct HLS Apex 1080p)',
+        3: 'Serveur 3 (📡 Direct HLS DLHD 1080p)',
+        4: 'Serveur 4 (📺 DLive Cast • Srv 1 interne)',
+        5: 'Serveur 5 (📺 DLive Watch • Srv 2 interne)',
+        6: 'Serveur 6 (📺 DLive Plus • Srv 3 interne)',
+        7: 'Serveur 7 (📺 DLive Casting • Srv 4 interne)',
+        8: 'Serveur 8 (📺 DLive Player • Srv 5 interne)',
+        9: 'Serveur 9 (📺 DLive Embed • Srv 6 interne)',
+        10: 'Serveur 10 (🌐 Lecteur Cricsfree Web)',
+        11: 'Serveur 11 (🌐 Lecteur Apex Web)',
+        12: 'Serveur 12 (🌐 Lecteur DLHD Watch)',
+        13: 'Serveur 13 (🚀 Lecteur HD1 Alba SBS)',
+        14: 'Serveur 14 (🛡️ Lecteur CX / Merit)',
+        15: 'Serveur 15 (🎯 Lecteur EngStreams)',
+        16: 'Serveur 16 (⚡ Hub Nontongo)',
+        17: 'Serveur 17 (⚡ Hub DaddyLive Li)'
       };
       const sName = serverNames[this.currentServer] || `Serveur ${this.currentServer}`;
       const chNum = this.currentMovie.channel_number ? `Canal ${this.currentMovie.channel_number} • ` : '';
