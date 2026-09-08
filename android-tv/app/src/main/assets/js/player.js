@@ -1148,6 +1148,23 @@ class NetflixPlayer {
       this.hls = null;
     }
 
+    // Accélération 0ms : Si l'objet possède déjà une URL directe Xtream VIP (Cas de l'onglet Xtream)
+    if (this.currentMovie && this.currentMovie.stream_url && (this.currentMovie.is_xtream || this.currentMovie.stream_url.includes('/api/stream/xtream'))) {
+      const baseUrl = window.API_BASE || '';
+      let targetStreamUrl = this.currentMovie.stream_url;
+      if (targetStreamUrl && targetStreamUrl.startsWith('/')) {
+        targetStreamUrl = baseUrl + targetStreamUrl;
+      }
+      this.showLoader(`⚡ Connexion au flux direct ${this.currentMovie.title} (💎 Xtream VIP)...`);
+      this.resetSteps();
+      this.setStep(1, 'done', `1. Chaîne Xtream validée (${this.currentMovie.title})`);
+      this.setStep(2, 'done', `2. Flux direct obtenu (💎 Xtream VIP 1080p)`);
+      this.setStep(3, 'done', `3. Déchiffrement direct & Proxy local anti-pub`);
+      this.setStep(4, 'active', `4. Injection dans le lecteur Netflix...`);
+      this.playDirectHls(targetStreamUrl);
+      return;
+    }
+
     const id = this.currentMovie.tmdb_id || this.currentMovie.id;
     const isChannel = (this.currentMovie.media_type === 'channel' || this.currentMovie.is_live);
     const isMovie = (this.currentMovie.media_type === 'movie');
@@ -1366,6 +1383,11 @@ class NetflixPlayer {
               this.hls = null;
               this.showStatusBanner(`Erreur de segment sur Serveur ${this.currentServer}. Basculement...`);
               setTimeout(() => {
+                const isXtream = (this.currentMovie?.is_xtream || this.currentMovie?.stream_url?.includes('/api/stream/xtream'));
+                if (isXtream) {
+                  this.loadStream();
+                  return;
+                }
                 const isChannel = (this.currentMovie?.media_type === 'channel' || this.currentMovie?.is_live);
                 const maxSrv = isChannel ? 8 : 5;
                 const next = (this.currentServer % maxSrv) + 1;

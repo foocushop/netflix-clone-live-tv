@@ -684,6 +684,35 @@ async function getLiveM3u8Url(daddyId, mirror = 'premium_vip', channelId = null,
 }
 
 async function extractChannelMultiProvider(channelId, serverNum) {
+  // Support direct des chaînes du catalogue Xtream (ex: xtream_13847 ou 13847)
+  let xtreamStreamId = null;
+  if (channelId && String(channelId).startsWith('xtream_')) {
+    xtreamStreamId = String(channelId).replace('xtream_', '');
+  } else if (channelId && /^\d+$/.test(String(channelId)) && parseInt(channelId, 10) > 1000) {
+    xtreamStreamId = String(channelId);
+  }
+
+  if (xtreamStreamId) {
+    const xtreamItem = XTREAM_FR_CATALOG.find(c => String(c.stream_id) === String(xtreamStreamId));
+    const chTitle = xtreamItem ? xtreamItem.name : `Chaîne Xtream ${xtreamStreamId}`;
+    const qBadge = xtreamItem ? xtreamItem.quality_badge : '1080p FHD Direct VIP';
+    return {
+      success: true,
+      server: 1,
+      server_name: 'Serveur 1 (💎 Direct Xtream VIP)',
+      hoster: `💎 Direct Xtream VIP • ${chTitle}`,
+      quality: qBadge,
+      title: `${chTitle} • 🔴 EN DIRECT`,
+      stream_url: `/api/stream/xtream?stream_id=${xtreamStreamId}`,
+      raw_stream_url: `/api/stream/xtream?stream_id=${xtreamStreamId}`,
+      player_type: 'direct_hls',
+      is_embed: false,
+      is_live: true,
+      sources_count: 1,
+      lang: 'vf'
+    };
+  }
+
   const channel = catalog.movies.find(m => m.id === channelId || m.tmdb_id === channelId || String(m.daddy_id) === String(channelId));
   const title = channel ? channel.title : 'Chaîne Sport Direct';
   let daddyId = channel?.daddy_id || channel?.sources?.daddylive_id;

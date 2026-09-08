@@ -762,7 +762,8 @@ class NetflixApp {
       </div>
     `;
 
-    card.addEventListener('click', () => {
+    card.addEventListener('click', (e) => {
+      e.stopPropagation();
       this.player.open(movieObj, 1);
     });
 
@@ -814,7 +815,9 @@ class NetflixApp {
         poster_url: featured.icon || 'assets/hero/live-tv-banner.webp',
         media_type: 'channel',
         is_live: true,
+        is_xtream: true,
         stream_url: `/api/stream/xtream?stream_id=${featured.stream_id}`,
+        player_type: 'direct_hls',
         quality_badges: ['💎 Xtream Direct VIP', featured.quality_badge, 'Anti-Saccades Turbo']
       });
     }
