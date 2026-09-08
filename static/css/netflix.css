@@ -1124,6 +1124,22 @@ body {
   color: #fff;
 }
 
+.server-pill .pill-badge.vip {
+  background: linear-gradient(135deg, #ffd700, #ff8c00);
+  color: #111;
+  font-weight: 800;
+  box-shadow: 0 0 8px rgba(255, 215, 0, 0.6);
+}
+
+.server-pill.is-vip-server {
+  border: 1px solid rgba(255, 215, 0, 0.35);
+}
+
+.server-pill.is-vip-server:hover {
+  border-color: rgba(255, 215, 0, 0.7);
+  box-shadow: 0 0 10px rgba(255, 215, 0, 0.4);
+}
+
 .pill-dot {
   color: #46d369;
   font-size: 0.65rem;

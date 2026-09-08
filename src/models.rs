@@ -11,17 +11,31 @@ pub struct Movie {
     pub backdrop_url: String,
     pub video_url: String,
     pub categories: Vec<String>,
+    #[serde(default)]
     pub release_year: u32,
+    #[serde(default)]
     pub match_score: u32,
+    #[serde(default)]
     pub age_rating: String,
+    #[serde(default)]
     pub duration: String,
+    #[serde(default)]
     pub cast: Vec<String>,
     pub director: Option<String>,
+    #[serde(default)]
     pub quality_badges: Vec<String>,
+    #[serde(default)]
     pub is_hero: bool,
+    #[serde(default)]
     pub created_at: String,
     #[serde(default)]
     pub tmdb_id: Option<String>,
+    #[serde(default)]
+    pub daddy_id: Option<serde_json::Value>,
+    #[serde(default)]
+    pub channel_number: Option<serde_json::Value>,
+    #[serde(default)]
+    pub is_live: Option<bool>,
     #[serde(default)]
     pub sources: Option<serde_json::Value>,
     #[serde(default)]

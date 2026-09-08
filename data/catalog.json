@@ -201,7 +201,8 @@
             }
           ]
         }
-      ]
+      ],
+      "created_at": "2026-09-08T12:53:58.891Z"
     },
     {
       "id": "68628",
@@ -6626,7 +6627,9 @@
         "DIRECT",
         "Anti-Pubs 🛡️"
       ],
-      "is_hero": true
+      "is_hero": true,
+      "created_at": "2026-09-08T12:53:58.891Z",
+      "cast": []
     },
     {
       "id": "tv_canal_foot",
@@ -6702,7 +6705,9 @@
         "DIRECT",
         "Anti-Pubs 🛡️"
       ],
-      "is_hero": false
+      "is_hero": false,
+      "created_at": "2026-09-08T12:53:58.891Z",
+      "cast": []
     },
     {
       "id": "tv_canal_360",
@@ -6778,7 +6783,9 @@
         "DIRECT",
         "Anti-Pubs 🛡️"
       ],
-      "is_hero": false
+      "is_hero": false,
+      "created_at": "2026-09-08T12:53:58.891Z",
+      "cast": []
     },
     {
       "id": "tv_canal_france",
@@ -6854,7 +6861,9 @@
         "DIRECT",
         "Anti-Pubs 🛡️"
       ],
-      "is_hero": false
+      "is_hero": false,
+      "created_at": "2026-09-08T12:53:58.891Z",
+      "cast": []
     },
     {
       "id": "tv_canal_f1",
@@ -6930,7 +6939,9 @@
         "DIRECT",
         "Anti-Pubs 🛡️"
       ],
-      "is_hero": false
+      "is_hero": false,
+      "created_at": "2026-09-08T12:53:58.891Z",
+      "cast": []
     },
     {
       "id": "tv_canal_motogp",
@@ -7006,7 +7017,9 @@
         "DIRECT",
         "Anti-Pubs 🛡️"
       ],
-      "is_hero": false
+      "is_hero": false,
+      "created_at": "2026-09-08T12:53:58.891Z",
+      "cast": []
     },
     {
       "id": "tv_bein1",
@@ -7082,7 +7095,9 @@
         "DIRECT",
         "Anti-Pubs 🛡️"
       ],
-      "is_hero": false
+      "is_hero": false,
+      "created_at": "2026-09-08T12:53:58.891Z",
+      "cast": []
     },
     {
       "id": "tv_bein2",
@@ -7158,7 +7173,9 @@
         "DIRECT",
         "Anti-Pubs 🛡️"
       ],
-      "is_hero": false
+      "is_hero": false,
+      "created_at": "2026-09-08T12:53:58.891Z",
+      "cast": []
     },
     {
       "id": "tv_bein3",
@@ -7234,7 +7251,9 @@
         "DIRECT",
         "Anti-Pubs 🛡️"
       ],
-      "is_hero": false
+      "is_hero": false,
+      "created_at": "2026-09-08T12:53:58.891Z",
+      "cast": []
     },
     {
       "id": "tv_bein_max4",
@@ -7310,7 +7329,9 @@
         "DIRECT",
         "Anti-Pubs 🛡️"
       ],
-      "is_hero": false
+      "is_hero": false,
+      "created_at": "2026-09-08T12:53:58.891Z",
+      "cast": []
     },
     {
       "id": "tv_bein_max5",
@@ -7386,7 +7407,9 @@
         "DIRECT",
         "Anti-Pubs 🛡️"
       ],
-      "is_hero": false
+      "is_hero": false,
+      "created_at": "2026-09-08T12:53:58.891Z",
+      "cast": []
     },
     {
       "id": "tv_bein_max6",
@@ -7462,7 +7485,9 @@
         "DIRECT",
         "Anti-Pubs 🛡️"
       ],
-      "is_hero": false
+      "is_hero": false,
+      "created_at": "2026-09-08T12:53:58.891Z",
+      "cast": []
     },
     {
       "id": "tv_rmc_sport1",
@@ -7538,7 +7563,9 @@
         "DIRECT",
         "Anti-Pubs 🛡️"
       ],
-      "is_hero": false
+      "is_hero": false,
+      "created_at": "2026-09-08T12:53:58.891Z",
+      "cast": []
     },
     {
       "id": "tv_rmc_sport2",
@@ -7614,7 +7641,9 @@
         "DIRECT",
         "Anti-Pubs 🛡️"
       ],
-      "is_hero": false
+      "is_hero": false,
+      "created_at": "2026-09-08T12:53:58.891Z",
+      "cast": []
     },
     {
       "id": "tv_eurosport1",
@@ -7690,7 +7719,9 @@
         "DIRECT",
         "Anti-Pubs 🛡️"
       ],
-      "is_hero": false
+      "is_hero": false,
+      "created_at": "2026-09-08T12:53:58.891Z",
+      "cast": []
     },
     {
       "id": "tv_eurosport2",
@@ -7766,7 +7797,9 @@
         "DIRECT",
         "Anti-Pubs 🛡️"
       ],
-      "is_hero": false
+      "is_hero": false,
+      "created_at": "2026-09-08T12:53:58.891Z",
+      "cast": []
     },
     {
       "id": "tv_lequipe",
@@ -7842,7 +7875,9 @@
         "DIRECT",
         "Anti-Pubs 🛡️"
       ],
-      "is_hero": false
+      "is_hero": false,
+      "created_at": "2026-09-08T12:53:58.891Z",
+      "cast": []
     },
     {
       "id": "tv_dazn1",
@@ -7918,7 +7953,9 @@
         "DIRECT",
         "Anti-Pubs 🛡️"
       ],
-      "is_hero": false
+      "is_hero": false,
+      "created_at": "2026-09-08T12:53:58.891Z",
+      "cast": []
     },
     {
       "id": "tv_dazn_ligue1",
@@ -7994,7 +8031,9 @@
         "DIRECT",
         "Anti-Pubs 🛡️"
       ],
-      "is_hero": false
+      "is_hero": false,
+      "created_at": "2026-09-08T12:53:58.891Z",
+      "cast": []
     },
     {
       "id": "tv_canal_live1",
@@ -8070,7 +8109,9 @@
         "DIRECT",
         "Anti-Pubs 🛡️"
       ],
-      "is_hero": false
+      "is_hero": false,
+      "created_at": "2026-09-08T12:53:58.891Z",
+      "cast": []
     },
     {
       "id": "tv_canal_live2",
@@ -8146,7 +8187,9 @@
         "DIRECT",
         "Anti-Pubs 🛡️"
       ],
-      "is_hero": false
+      "is_hero": false,
+      "created_at": "2026-09-08T12:53:58.891Z",
+      "cast": []
     },
     {
       "id": "tv_canal_live3",
@@ -8222,7 +8265,9 @@
         "DIRECT",
         "Anti-Pubs 🛡️"
       ],
-      "is_hero": false
+      "is_hero": false,
+      "created_at": "2026-09-08T12:53:58.891Z",
+      "cast": []
     },
     {
       "id": "tv_ufc_fightpass",
@@ -8298,7 +8343,9 @@
         "DIRECT",
         "Anti-Pubs 🛡️"
       ],
-      "is_hero": false
+      "is_hero": false,
+      "created_at": "2026-09-08T12:53:58.891Z",
+      "cast": []
     },
     {
       "id": "tv_ufc_channel",
@@ -8374,7 +8421,9 @@
         "DIRECT",
         "Anti-Pubs 🛡️"
       ],
-      "is_hero": false
+      "is_hero": false,
+      "created_at": "2026-09-08T12:53:58.891Z",
+      "cast": []
     },
     {
       "id": "tv_ufc_fightnight",
@@ -8450,7 +8499,9 @@
         "DIRECT",
         "Anti-Pubs 🛡️"
       ],
-      "is_hero": false
+      "is_hero": false,
+      "created_at": "2026-09-08T12:53:58.891Z",
+      "cast": []
     },
     {
       "id": "tv_wwe_network",
@@ -8526,7 +8577,9 @@
         "DIRECT",
         "Anti-Pubs 🛡️"
       ],
-      "is_hero": false
+      "is_hero": false,
+      "created_at": "2026-09-08T12:53:58.891Z",
+      "cast": []
     },
     {
       "id": "tv_wwe_ppv",
@@ -8602,7 +8655,9 @@
         "DIRECT",
         "Anti-Pubs 🛡️"
       ],
-      "is_hero": false
+      "is_hero": false,
+      "created_at": "2026-09-08T12:53:58.891Z",
+      "cast": []
     },
     {
       "id": "tv_dazn_ppv",
@@ -8678,7 +8733,9 @@
         "DIRECT",
         "Anti-Pubs 🛡️"
       ],
-      "is_hero": false
+      "is_hero": false,
+      "created_at": "2026-09-08T12:53:58.891Z",
+      "cast": []
     },
     {
       "id": "tv_event_ppv",
@@ -8754,7 +8811,9 @@
         "DIRECT",
         "Anti-Pubs 🛡️"
       ],
-      "is_hero": false
+      "is_hero": false,
+      "created_at": "2026-09-08T12:53:58.891Z",
+      "cast": []
     },
     {
       "id": "tv_ppv_events",
@@ -8830,7 +8889,9 @@
         "DIRECT",
         "Anti-Pubs 🛡️"
       ],
-      "is_hero": false
+      "is_hero": false,
+      "created_at": "2026-09-08T12:53:58.891Z",
+      "cast": []
     },
     {
       "id": "tv_fight_network",
@@ -8906,7 +8967,9 @@
         "DIRECT",
         "Anti-Pubs 🛡️"
       ],
-      "is_hero": false
+      "is_hero": false,
+      "created_at": "2026-09-08T12:53:58.891Z",
+      "cast": []
     },
     {
       "id": "tv_tf1",
@@ -8982,7 +9045,9 @@
         "DIRECT",
         "Anti-Pubs 🛡️"
       ],
-      "is_hero": false
+      "is_hero": false,
+      "created_at": "2026-09-08T12:53:58.891Z",
+      "cast": []
     },
     {
       "id": "tv_m6",
@@ -9058,7 +9123,9 @@
         "DIRECT",
         "Anti-Pubs 🛡️"
       ],
-      "is_hero": false
+      "is_hero": false,
+      "created_at": "2026-09-08T12:53:58.891Z",
+      "cast": []
     },
     {
       "id": "tv_tmc",
@@ -9134,7 +9201,9 @@
         "DIRECT",
         "Anti-Pubs 🛡️"
       ],
-      "is_hero": false
+      "is_hero": false,
+      "created_at": "2026-09-08T12:53:58.891Z",
+      "cast": []
     },
     {
       "id": "tv_w9",
@@ -9210,7 +9279,9 @@
         "DIRECT",
         "Anti-Pubs 🛡️"
       ],
-      "is_hero": false
+      "is_hero": false,
+      "created_at": "2026-09-08T12:53:58.891Z",
+      "cast": []
     },
     {
       "id": "tv_france2",
@@ -9286,7 +9357,9 @@
         "DIRECT",
         "Anti-Pubs 🛡️"
       ],
-      "is_hero": false
+      "is_hero": false,
+      "created_at": "2026-09-08T12:53:58.891Z",
+      "cast": []
     },
     {
       "id": "tv_france3",
@@ -9362,7 +9435,9 @@
         "DIRECT",
         "Anti-Pubs 🛡️"
       ],
-      "is_hero": false
+      "is_hero": false,
+      "created_at": "2026-09-08T12:53:58.891Z",
+      "cast": []
     },
     {
       "id": "tv_arte",
@@ -9438,7 +9513,9 @@
         "DIRECT",
         "Anti-Pubs 🛡️"
       ],
-      "is_hero": false
+      "is_hero": false,
+      "created_at": "2026-09-08T12:53:58.891Z",
+      "cast": []
     },
     {
       "id": "tv_bfmtv",
@@ -9514,7 +9591,9 @@
         "DIRECT",
         "Anti-Pubs 🛡️"
       ],
-      "is_hero": false
+      "is_hero": false,
+      "created_at": "2026-09-08T12:53:58.891Z",
+      "cast": []
     },
     {
       "id": "tv_cnews",
@@ -9590,7 +9669,9 @@
         "DIRECT",
         "Anti-Pubs 🛡️"
       ],
-      "is_hero": false
+      "is_hero": false,
+      "created_at": "2026-09-08T12:53:58.891Z",
+      "cast": []
     },
     {
       "id": "tv_redbull",
@@ -9614,7 +9695,10 @@
         "1080p FHD",
         "DIRECT",
         "Anti-Pubs 🛡️"
-      ]
+      ],
+      "created_at": "2026-09-08T12:53:58.891Z",
+      "cast": [],
+      "is_hero": false
     },
     {
       "id": "tv_fifa",
@@ -9638,7 +9722,10 @@
         "1080p FHD",
         "DIRECT",
         "Anti-Pubs 🛡️"
-      ]
+      ],
+      "created_at": "2026-09-08T12:53:58.891Z",
+      "cast": [],
+      "is_hero": false
     },
     {
       "id": "tv_freesports",
@@ -9662,7 +9749,10 @@
         "1080p FHD",
         "DIRECT",
         "Anti-Pubs 🛡️"
-      ]
+      ],
+      "created_at": "2026-09-08T12:53:58.891Z",
+      "cast": [],
+      "is_hero": false
     }
   ]
 }
