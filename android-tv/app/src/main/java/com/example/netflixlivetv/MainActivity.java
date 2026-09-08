@@ -34,6 +34,7 @@ import android.widget.Toast;
 public class MainActivity extends Activity {
 
     private static final String TAG = "NetflixLiveTV";
+    private static final String LOCAL_URL = "file:///android_asset/index.html";
     private static final String APP_URL = "https://netflix-clone-live-tv-1.onrender.com/";
 
     private WebView webView;
@@ -59,8 +60,8 @@ public class MainActivity extends Activity {
         try {
             requestWindowFeature(Window.FEATURE_NO_TITLE);
             getWindow().setFlags(
-                WindowManager.LayoutParams.FLAG_FULLSCREEN,
-                WindowManager.LayoutParams.FLAG_FULLSCREEN
+                WindowManager.LayoutParams.FLAG_FULLSCREEN | WindowManager.LayoutParams.FLAG_HARDWARE_ACCELERATED,
+                WindowManager.LayoutParams.FLAG_FULLSCREEN | WindowManager.LayoutParams.FLAG_HARDWARE_ACCELERATED
             );
             getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
         } catch (Throwable ignored) {}
@@ -103,7 +104,7 @@ public class MainActivity extends Activity {
             public void onClick(View v) {
                 hideError();
                 if (webView != null) {
-                    webView.loadUrl(APP_URL);
+                    webView.loadUrl(LOCAL_URL);
                 }
             }
         });
@@ -125,7 +126,7 @@ public class MainActivity extends Activity {
         pbParams.topMargin = 0;
         root.addView(progressBar, pbParams);
 
-        // 4. Initialisation du WebView
+        // 4. Initialisation du WebView avec Accélération Matérielle
         try {
             webView = new WebView(this);
             webView.setLayoutParams(new FrameLayout.LayoutParams(
@@ -136,6 +137,7 @@ public class MainActivity extends Activity {
             webView.setFocusable(true);
             webView.setFocusableInTouchMode(true);
             webView.requestFocus();
+            webView.setLayerType(View.LAYER_TYPE_HARDWARE, null);
 
             WebSettings settings = webView.getSettings();
             settings.setJavaScriptEnabled(true);
@@ -144,6 +146,8 @@ public class MainActivity extends Activity {
             settings.setMediaPlaybackRequiresUserGesture(false);
             settings.setAllowFileAccess(true);
             settings.setAllowContentAccess(true);
+            settings.setAllowFileAccessFromFileURLs(true);
+            settings.setAllowUniversalAccessFromFileURLs(true);
             settings.setLoadWithOverviewMode(true);
             settings.setUseWideViewPort(true);
             settings.setSupportZoom(false);
@@ -186,7 +190,13 @@ public class MainActivity extends Activity {
                 public void onReceivedError(WebView view, WebResourceRequest request, WebResourceError error) {
                     super.onReceivedError(view, request, error);
                     if (request != null && request.isForMainFrame()) {
-                        showError("Impossible de charger le service.\nVérifiez votre connexion Internet.\n\nURL: " + APP_URL);
+                        String failingUrl = (request.getUrl() != null) ? request.getUrl().toString() : "";
+                        if (failingUrl.startsWith("file:///")) {
+                            Log.w(TAG, "Local asset failed, falling back to remote: " + APP_URL);
+                            view.loadUrl(APP_URL);
+                        } else {
+                            showError("Impossible de charger le service.\nVérifiez votre connexion Internet.\n\nURL: " + APP_URL);
+                        }
                     }
                 }
 
@@ -217,7 +227,7 @@ public class MainActivity extends Activity {
             root.bringChildToFront(errorLayout);
 
             setContentView(root);
-            webView.loadUrl(APP_URL);
+            webView.loadUrl(LOCAL_URL);
 
         } catch (Throwable t) {
             Log.e(TAG, "Erreur initialisation WebView", t);
@@ -308,7 +318,7 @@ public class MainActivity extends Activity {
         if (event.getKeyCode() == KeyEvent.KEYCODE_BACK && event.getAction() == KeyEvent.ACTION_DOWN) {
             if (errorLayout != null && errorLayout.getVisibility() == View.VISIBLE) {
                 hideError();
-                if (webView != null) webView.loadUrl(APP_URL);
+                if (webView != null) webView.loadUrl(LOCAL_URL);
                 return true;
             }
 

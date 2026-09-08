@@ -1,0 +1,353 @@
+/* ================= NETFLIX ADMIN STUDIO CSS ================= */
+.admin-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: #0d0d0d;
+  z-index: 250;
+  display: none;
+  flex-direction: column;
+  overflow-y: auto;
+  color: #f0f0f0;
+}
+
+.admin-overlay.active {
+  display: flex;
+}
+
+.admin-navbar {
+  height: 70px;
+  background: #141414;
+  border-bottom: 1px solid #262626;
+  padding: 0 4%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  position: sticky;
+  top: 0;
+  z-index: 50;
+}
+
+.admin-brand {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.admin-badge {
+  background: #e50914;
+  color: #fff;
+  font-size: 0.75rem;
+  font-weight: 800;
+  padding: 4px 8px;
+  border-radius: 3px;
+  letter-spacing: 1px;
+}
+
+.admin-rust-tag {
+  background: #1e1e1e;
+  border: 1px solid #333;
+  color: #f74c00;
+  font-size: 0.78rem;
+  padding: 4px 10px;
+  border-radius: 4px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.admin-actions {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.admin-container {
+  padding: 30px 4% 60px;
+  max-width: 1400px;
+  margin: 0 auto;
+  width: 100%;
+}
+
+/* ================= STATS CARDS ================= */
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 20px;
+  margin-bottom: 35px;
+}
+
+.stat-card {
+  background: #181818;
+  border: 1px solid #282828;
+  border-radius: 8px;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  transition: transform 0.2s ease, border-color 0.2s ease;
+}
+
+.stat-card:hover {
+  transform: translateY(-3px);
+  border-color: #444;
+}
+
+.stat-label {
+  font-size: 0.85rem;
+  color: #888;
+  font-weight: 500;
+}
+
+.stat-value {
+  font-size: 2rem;
+  font-weight: 800;
+  color: #fff;
+}
+
+.stat-highlight {
+  color: #e50914;
+}
+
+/* ================= ADMIN TABS & BUTTONS ================= */
+.admin-section-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 20px;
+}
+
+.admin-section-title {
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: #fff;
+}
+
+.btn-admin {
+  background: #e50914;
+  color: #fff;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 4px;
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  transition: background-color 0.2s ease;
+}
+
+.btn-admin:hover {
+  background: #b81d24;
+}
+
+.btn-admin-outline {
+  background: transparent;
+  color: #ccc;
+  border: 1px solid #444;
+}
+
+.btn-admin-outline:hover {
+  background: #222;
+  color: #fff;
+  border-color: #777;
+}
+
+/* ================= CATALOG TABLE ================= */
+.catalog-table-container {
+  background: #181818;
+  border: 1px solid #262626;
+  border-radius: 8px;
+  overflow-x: auto;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.5);
+}
+
+.catalog-table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+  font-size: 0.9rem;
+}
+
+.catalog-table th {
+  background: #1f1f1f;
+  color: #aaa;
+  font-weight: 600;
+  padding: 14px 18px;
+  border-bottom: 1px solid #2e2e2e;
+}
+
+.catalog-table td {
+  padding: 14px 18px;
+  border-bottom: 1px solid #242424;
+  vertical-align: middle;
+}
+
+.catalog-table tr:hover {
+  background: #1c1c1c;
+}
+
+.table-poster {
+  width: 48px;
+  height: 68px;
+  object-fit: cover;
+  border-radius: 4px;
+}
+
+.badge-type {
+  background: #2a2a2a;
+  color: #ddd;
+  font-size: 0.75rem;
+  padding: 3px 8px;
+  border-radius: 3px;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+.badge-hero {
+  background: #e50914;
+  color: #fff;
+  font-size: 0.75rem;
+  padding: 3px 8px;
+  border-radius: 3px;
+  font-weight: 700;
+}
+
+.table-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.btn-action-sm {
+  background: #262626;
+  border: 1px solid #3a3a3a;
+  color: #ccc;
+  padding: 6px 10px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.8rem;
+  transition: all 0.2s ease;
+}
+
+.btn-action-sm:hover {
+  background: #383838;
+  color: #fff;
+}
+
+.btn-action-sm.btn-danger:hover {
+  background: #e50914;
+  border-color: #e50914;
+  color: #fff;
+}
+
+.btn-action-sm.btn-star:hover {
+  background: #f5c518;
+  border-color: #f5c518;
+  color: #000;
+}
+
+/* ================= ADMIN MODAL FORM ================= */
+.admin-modal-backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0,0,0,0.8);
+  backdrop-filter: blur(5px);
+  display: none;
+  align-items: center;
+  justify-content: center;
+  z-index: 300;
+  padding: 20px;
+}
+
+.admin-modal-backdrop.active {
+  display: flex;
+}
+
+.admin-modal-content {
+  background: #1a1a1a;
+  border: 1px solid #333;
+  border-radius: 8px;
+  width: 100%;
+  max-width: 750px;
+  max-height: 90vh;
+  overflow-y: auto;
+  padding: 30px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.9);
+}
+
+.admin-form-group {
+  margin-bottom: 18px;
+}
+
+.admin-form-group label {
+  display: block;
+  font-size: 0.85rem;
+  color: #bbb;
+  margin-bottom: 6px;
+  font-weight: 500;
+}
+
+.admin-form-input, .admin-form-textarea, .admin-form-select {
+  width: 100%;
+  background: #252525;
+  border: 1px solid #444;
+  color: #fff;
+  padding: 10px 14px;
+  border-radius: 4px;
+  font-size: 0.9rem;
+  outline: none;
+  transition: border-color 0.2s ease;
+}
+
+.admin-form-input:focus, .admin-form-textarea:focus, .admin-form-select:focus {
+  border-color: #e50914;
+}
+
+.admin-form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+.admin-checkbox-label {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  color: #eee;
+  margin-top: 10px;
+}
+
+.toast-container {
+  position: fixed;
+  bottom: 30px;
+  right: 30px;
+  z-index: 400;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.toast {
+  background: #242424;
+  border-left: 4px solid #e50914;
+  color: #fff;
+  padding: 14px 20px;
+  border-radius: 4px;
+  box-shadow: 0 5px 15px rgba(0,0,0,0.8);
+  font-size: 0.9rem;
+  animation: slideInToast 0.3s ease-out;
+}
+
+@keyframes slideInToast {
+  from { transform: translateX(100%); opacity: 0; }
+  to { transform: translateX(0); opacity: 1; }
+}

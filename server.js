@@ -667,51 +667,16 @@ async function extractChannelMultiProvider(channelId, serverNum) {
     };
   }
 
-  // Serveurs Web Intégrés dédiés (Serveurs 6 et 7)
-  if (srvNum === 6 && daddyId) {
-    return {
-      success: true,
-      server: 6,
-      server_name: serverNames[6],
-      hoster: `Lecteur Web Intégré DLive • ${title}`,
-      quality: '1080p HD',
-      title: `${title} • 🔴 EN DIRECT`,
-      stream_url: `https://dlive.sx/player/stream-${daddyId}.php`,
-      embed_url: `https://dlive.sx/player/stream-${daddyId}.php`,
-      player_type: 'iframe',
-      is_embed: true,
-      is_live: true,
-      sources_count: 7,
-      lang: 'vf'
-    };
-  }
-
-  if (srvNum === 7 && daddyId) {
-    return {
-      success: true,
-      server: 7,
-      server_name: serverNames[7],
-      hoster: `Lecteur Web Secours DLHD • ${title}`,
-      quality: '1080p HD',
-      title: `${title} • 🔴 EN DIRECT`,
-      stream_url: `https://dlhd.st/watch/stream-${daddyId}.php`,
-      embed_url: `https://dlhd.st/watch/stream-${daddyId}.php`,
-      player_type: 'iframe',
-      is_embed: true,
-      is_live: true,
-      sources_count: 7,
-      lang: 'vf'
-    };
-  }
-
-  // Traitement pour les chaînes TV Direct HLS
+  // Traitement pour les chaînes TV Direct HLS (100% injecté dans le player Netflix)
   if (daddyId || channelId) {
     const mirrorMap = {
       1: { mirror: 'premium_vip', hoster: '⭐ Dark VIP Ultra HD 1080p/60fps (Bluetier CDN)' },
       2: { mirror: 'daddy2', hoster: '⚡ Direct HLS DLHD Cluster 2 (1080p)' },
       3: { mirror: 'apex', hoster: '🎬 Direct HLS Apex Streams (1080p Alternate)' },
       4: { mirror: 'daddy1', hoster: '📡 Direct HLS DLHD Alpha Cluster 1 (1080p)' },
-      5: { mirror: 'cricsfree', hoster: '🌐 Direct HLS Cricsfree (1080p)' }
+      5: { mirror: 'cricsfree', hoster: '🌐 Direct HLS Cricsfree (1080p)' },
+      6: { mirror: 'wideiptv', hoster: '🚀 Direct HLS WideIPTV Secours (1080p)' },
+      7: { mirror: 'secours', hoster: '🛡️ Direct HLS Secours Multi-Cluster (1080p)' }
     };
 
     const cfg = mirrorMap[srvNum] || mirrorMap[1];
@@ -725,36 +690,17 @@ async function extractChannelMultiProvider(channelId, serverNum) {
     if (!streamUrl && cfg.mirror !== 'cricsfree') streamUrl = await getLiveM3u8Url(daddyId, 'cricsfree', channelId);
     if (!streamUrl && cfg.mirror !== 'wideiptv') streamUrl = await getLiveM3u8Url(daddyId, 'wideiptv', channelId);
 
-    if (streamUrl) {
-      return {
-        success: true,
-        server: srvNum,
-        server_name: serverNames[srvNum],
-        hoster: `${cfg.hoster} • ${title}`,
-        quality: srvNum === 1 ? '⭐ Ultra HD 1080p/60fps Direct' : '1080p FHD Direct',
-        title: `${title} • 🔴 EN DIRECT`,
-        stream_url: `/api/stream/live?channel=${encodeURIComponent(channelId || daddyId)}&mirror=${encodeURIComponent(cfg.mirror)}`,
-        player_type: 'direct_hls',
-        is_embed: false,
-        is_live: true,
-        sources_count: 7,
-        lang: 'vf'
-      };
-    }
-
-    // Ultime fallback vers le lecteur web intégré
-    const fallbackId = daddyId || (channelId ? channelId.replace('tv_', '') : '122');
+    const liveChannelParam = encodeURIComponent(channelId || daddyId);
     return {
       success: true,
       server: srvNum,
       server_name: serverNames[srvNum],
-      hoster: `Lecteur Web Secours • ${title}`,
-      quality: '1080p HD',
+      hoster: `${cfg.hoster} • ${title}`,
+      quality: srvNum === 1 ? '⭐ Ultra HD 1080p/60fps Direct' : '1080p FHD Direct',
       title: `${title} • 🔴 EN DIRECT`,
-      stream_url: `https://dlive.sx/player/stream-${fallbackId}.php`,
-      embed_url: `https://dlive.sx/player/stream-${fallbackId}.php`,
-      player_type: 'iframe',
-      is_embed: true,
+      stream_url: `/api/stream/live?channel=${liveChannelParam}&mirror=${encodeURIComponent(cfg.mirror)}`,
+      player_type: 'direct_hls',
+      is_embed: false,
       is_live: true,
       sources_count: 7,
       lang: 'vf'

@@ -17,6 +17,7 @@ android {
         release {
             isMinifyEnabled = false
             proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
+            signingConfig = signingConfigs.getByName("debug")
         }
     }
     compileOptions {
@@ -32,4 +33,8 @@ android {
 }
 
 dependencies {
+    implementation("androidx.appcompat:appcompat:1.6.1")
+    implementation("androidx.leanback:leanback:1.0.0")
+    implementation("androidx.webkit:webkit:1.10.0")
+    implementation("androidx.annotation:annotation:1.7.1")
 }
