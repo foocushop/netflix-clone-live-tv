@@ -64,19 +64,25 @@
       "id": "c_sports_fr",
       "name": "⚽ Chaînes Sport Françaises",
       "slug": "sports_fr",
-      "description": "Canal+ Sport, beIN SPORTS, RMC Sport, Eurosport, L'Équipe en direct"
+      "description": "Canal+ Sport, beIN SPORTS, RMC Sport, Eurosport, L'Équipe, DAZN en direct"
     },
     {
       "id": "c_ppv_combat",
       "name": "🥊 Chaînes PPV & Sports de Combat",
       "slug": "ppv_combat",
-      "description": "UFC Live, DAZN, WWE Network, Swerve Combat en direct"
+      "description": "UFC Live, DAZN Boxing, WWE Network, Event PPV en direct"
     },
     {
       "id": "c_sports_extreme",
       "name": "🏄 Sports Extrêmes & Découverte",
       "slug": "sports_extreme",
-      "description": "Red Bull TV, FIFA+, World of Freesports, Equidia en direct"
+      "description": "Red Bull TV, FIFA+, World of Freesports en direct"
+    },
+    {
+      "id": "c_tnt_fr",
+      "name": "📺 Chaînes Généralistes & TNT",
+      "slug": "tnt_fr",
+      "description": "TF1, M6, TMC, W9, France 2, France 3, Arte, BFM TV, CNews en direct"
     }
   ],
   "movies": [
@@ -6548,716 +6554,3115 @@
     },
     {
       "id": "tv_canal_sport",
-      "title": "Canal+ Sport HD",
+      "daddy_id": 122,
+      "title": "Canal+ Sport",
       "original_title": "Canal+ Sport France",
-      "overview": "Le grand direct du sport mondial : Ligue des Champions UEFA, Premier League anglaise, Formule 1 en immersion, Top 14 de Rugby et les plus grandes soirées sport.",
+      "overview": "Toute l'actualité sportive en direct : Premier League, Top 14, Formule 1, Moto GP et grands rendez-vous.",
       "media_type": "channel",
-      "channel_number": "Canal 11",
-      "current_program": "Grand Soir Sport • UEFA Champions League & F1",
       "is_live": true,
-      "poster_url": "https://images.unsplash.com/photo-1508098682722-e99c43a406b2?auto=format&fit=crop&w=600&q=80",
+      "channel_number": 1,
+      "poster_url": "https://upload.wikimedia.org/wikipedia/commons/thumb/e/e0/Canal%2B_2013.svg/320px-Canal%2B_2013.svg.png",
       "backdrop_url": "https://images.unsplash.com/photo-1508098682722-e99c43a406b2?auto=format&fit=crop&w=1920&q=80",
-      "logo_url": "https://raw.githubusercontent.com/pigzillaaaaa/iptv-scraper/refs/heads/main/logos/canal-plus-sport-france.png",
       "video_url": "/api/extract?id=tv_canal_sport&type=channel&server=1",
       "sources": {
-        "hls": "/api/extract?id=tv_canal_sport&type=channel&server=1"
+        "server1": "/api/extract?id=tv_canal_sport&type=channel&server=1",
+        "server2": "/api/extract?id=tv_canal_sport&type=channel&server=2",
+        "server3": "/api/extract?id=tv_canal_sport&type=channel&server=3",
+        "server4": "/api/extract?id=tv_canal_sport&type=channel&server=4",
+        "server5": "/api/extract?id=tv_canal_sport&type=channel&server=5",
+        "daddylive_id": 122
       },
+      "players": [
+        {
+          "name": "Player 1 (HD Embed)",
+          "tag": "HD1",
+          "url": "https://daddylivehd1.sbs/embed/stream-122.php"
+        },
+        {
+          "name": "Player 2 (Miroir Li)",
+          "tag": "LI",
+          "url": "https://daddylive.li/player/embed.php?id=122"
+        },
+        {
+          "name": "Player 3 (Nontongo)",
+          "tag": "NT",
+          "url": "https://nontongo.win/livetv/122"
+        },
+        {
+          "name": "Player 4 (Cricsfree)",
+          "tag": "CF",
+          "url": "https://cricsfree.cfd/live/stream-122.php"
+        },
+        {
+          "name": "Player 5 (Apex)",
+          "tag": "AX",
+          "url": "https://apexstreams.cfd/live/stream-122.php"
+        },
+        {
+          "name": "Player 6 (DLive Cast)",
+          "tag": "DL",
+          "url": "https://dlive.sx/cast/stream-122.php"
+        },
+        {
+          "name": "Player 7 (DLHD Watch)",
+          "tag": "ST",
+          "url": "https://dlhd.st/watch/stream-122.php"
+        },
+        {
+          "name": "Player 8 (EngStreams)",
+          "tag": "ES",
+          "url": "https://engstreams.shop/stream/index.php?id=122"
+        }
+      ],
       "categories": [
         "⚽ Chaînes Sport Françaises"
       ],
       "release_year": 2026,
       "match_score": 99,
       "age_rating": "Tous publics",
-      "duration": "🔴 EN DIRECT 24/7",
+      "duration": "DIRECT HD",
       "quality_badges": [
-        "LIVE",
         "1080p FHD",
-        "CANAL+",
-        "VF"
+        "DIRECT",
+        "Anti-Pubs 🛡️"
       ],
-      "cast": [
-        "Hervé Mathoux",
-        "Laure Boulleau",
-        "Julien Fébreau",
-        "Samir Nasri"
-      ],
-      "director": "Groupe Canal+"
+      "is_hero": true
     },
     {
       "id": "tv_canal_foot",
-      "title": "Canal+ Foot HD",
+      "daddy_id": 463,
+      "title": "Canal+ Foot",
       "original_title": "Canal+ Foot France",
-      "overview": "La chaîne 100% football de Canal+ : soirées européennes, Ligue des Champions, Premier League anglaise et les plus grands debriefs d'experts.",
+      "overview": "100% Football : UEFA Champions League, Premier League, Ligue 1 et soirées européennes exclusives.",
       "media_type": "channel",
-      "channel_number": "Canal 12",
-      "current_program": "Champions Club • Multiplex & Grands Matchs",
       "is_live": true,
-      "poster_url": "https://images.unsplash.com/photo-1574629810360-7efbbe195018?auto=format&fit=crop&w=600&q=80",
-      "backdrop_url": "https://images.unsplash.com/photo-1574629810360-7efbbe195018?auto=format&fit=crop&w=1920&q=80",
-      "logo_url": "https://raw.githubusercontent.com/pigzillaaaaa/iptv-scraper/refs/heads/main/logos/canal-plus-foot.png",
+      "channel_number": 2,
+      "poster_url": "https://upload.wikimedia.org/wikipedia/commons/thumb/e/e0/Canal%2B_2013.svg/320px-Canal%2B_2013.svg.png",
+      "backdrop_url": "https://images.unsplash.com/photo-1508098682722-e99c43a406b2?auto=format&fit=crop&w=1920&q=80",
       "video_url": "/api/extract?id=tv_canal_foot&type=channel&server=1",
       "sources": {
-        "hls": "/api/extract?id=tv_canal_foot&type=channel&server=1"
+        "server1": "/api/extract?id=tv_canal_foot&type=channel&server=1",
+        "server2": "/api/extract?id=tv_canal_foot&type=channel&server=2",
+        "server3": "/api/extract?id=tv_canal_foot&type=channel&server=3",
+        "server4": "/api/extract?id=tv_canal_foot&type=channel&server=4",
+        "server5": "/api/extract?id=tv_canal_foot&type=channel&server=5",
+        "daddylive_id": 463
       },
+      "players": [
+        {
+          "name": "Player 1 (HD Embed)",
+          "tag": "HD1",
+          "url": "https://daddylivehd1.sbs/embed/stream-463.php"
+        },
+        {
+          "name": "Player 2 (Miroir Li)",
+          "tag": "LI",
+          "url": "https://daddylive.li/player/embed.php?id=463"
+        },
+        {
+          "name": "Player 3 (Nontongo)",
+          "tag": "NT",
+          "url": "https://nontongo.win/livetv/463"
+        },
+        {
+          "name": "Player 4 (Cricsfree)",
+          "tag": "CF",
+          "url": "https://cricsfree.cfd/live/stream-463.php"
+        },
+        {
+          "name": "Player 5 (Apex)",
+          "tag": "AX",
+          "url": "https://apexstreams.cfd/live/stream-463.php"
+        },
+        {
+          "name": "Player 6 (DLive Cast)",
+          "tag": "DL",
+          "url": "https://dlive.sx/cast/stream-463.php"
+        },
+        {
+          "name": "Player 7 (DLHD Watch)",
+          "tag": "ST",
+          "url": "https://dlhd.st/watch/stream-463.php"
+        },
+        {
+          "name": "Player 8 (EngStreams)",
+          "tag": "ES",
+          "url": "https://engstreams.shop/stream/index.php?id=463"
+        }
+      ],
       "categories": [
         "⚽ Chaînes Sport Françaises"
       ],
       "release_year": 2026,
-      "match_score": 98,
+      "match_score": 99,
       "age_rating": "Tous publics",
-      "duration": "🔴 EN DIRECT 24/7",
+      "duration": "DIRECT HD",
       "quality_badges": [
-        "LIVE",
         "1080p FHD",
-        "CANAL+",
-        "VF"
+        "DIRECT",
+        "Anti-Pubs 🛡️"
       ],
-      "cast": [
-        "Gauthier Kuntzmann",
-        "David Ginola",
-        "Paul Le Guen"
-      ],
-      "director": "Groupe Canal+"
+      "is_hero": false
     },
     {
       "id": "tv_canal_360",
-      "title": "Canal+ Sport 360 HD",
-      "original_title": "Canal+ Sport 360",
-      "overview": "Tous les angles du sport : MotoGP spectaculaire, Championnat du Monde des Rallyes WRC, Padel Tour mondial et documentaires immersifs.",
+      "daddy_id": 464,
+      "title": "Canal+ Sport 360",
+      "original_title": "Canal+ Sport360",
+      "overview": "Sensations fortes et immersion sportive totale : WRC, Moto, SailGP, Padel et documentaires exclusifs.",
       "media_type": "channel",
-      "channel_number": "Canal 13",
-      "current_program": "Grand Prix MotoGP & Soirée Frissons Mécaniques",
       "is_live": true,
-      "poster_url": "https://images.unsplash.com/photo-1568605117036-5fe5e7bab0b7?auto=format&fit=crop&w=600&q=80",
-      "backdrop_url": "https://images.unsplash.com/photo-1568605117036-5fe5e7bab0b7?auto=format&fit=crop&w=1920&q=80",
-      "logo_url": "https://upload.wikimedia.org/wikipedia/commons/6/64/Canal%2BSport_360.png",
+      "channel_number": 3,
+      "poster_url": "https://upload.wikimedia.org/wikipedia/commons/thumb/e/e0/Canal%2B_2013.svg/320px-Canal%2B_2013.svg.png",
+      "backdrop_url": "https://images.unsplash.com/photo-1508098682722-e99c43a406b2?auto=format&fit=crop&w=1920&q=80",
       "video_url": "/api/extract?id=tv_canal_360&type=channel&server=1",
       "sources": {
-        "hls": "/api/extract?id=tv_canal_360&type=channel&server=1"
+        "server1": "/api/extract?id=tv_canal_360&type=channel&server=1",
+        "server2": "/api/extract?id=tv_canal_360&type=channel&server=2",
+        "server3": "/api/extract?id=tv_canal_360&type=channel&server=3",
+        "server4": "/api/extract?id=tv_canal_360&type=channel&server=4",
+        "server5": "/api/extract?id=tv_canal_360&type=channel&server=5",
+        "daddylive_id": 464
       },
+      "players": [
+        {
+          "name": "Player 1 (HD Embed)",
+          "tag": "HD1",
+          "url": "https://daddylivehd1.sbs/embed/stream-464.php"
+        },
+        {
+          "name": "Player 2 (Miroir Li)",
+          "tag": "LI",
+          "url": "https://daddylive.li/player/embed.php?id=464"
+        },
+        {
+          "name": "Player 3 (Nontongo)",
+          "tag": "NT",
+          "url": "https://nontongo.win/livetv/464"
+        },
+        {
+          "name": "Player 4 (Cricsfree)",
+          "tag": "CF",
+          "url": "https://cricsfree.cfd/live/stream-464.php"
+        },
+        {
+          "name": "Player 5 (Apex)",
+          "tag": "AX",
+          "url": "https://apexstreams.cfd/live/stream-464.php"
+        },
+        {
+          "name": "Player 6 (DLive Cast)",
+          "tag": "DL",
+          "url": "https://dlive.sx/cast/stream-464.php"
+        },
+        {
+          "name": "Player 7 (DLHD Watch)",
+          "tag": "ST",
+          "url": "https://dlhd.st/watch/stream-464.php"
+        },
+        {
+          "name": "Player 8 (EngStreams)",
+          "tag": "ES",
+          "url": "https://engstreams.shop/stream/index.php?id=464"
+        }
+      ],
       "categories": [
         "⚽ Chaînes Sport Françaises"
       ],
       "release_year": 2026,
-      "match_score": 97,
+      "match_score": 99,
       "age_rating": "Tous publics",
-      "duration": "🔴 EN DIRECT 24/7",
+      "duration": "DIRECT HD",
       "quality_badges": [
-        "LIVE",
         "1080p FHD",
-        "MOTO",
-        "VF"
+        "DIRECT",
+        "Anti-Pubs 🛡️"
       ],
-      "cast": [
-        "Randy de Puniet",
-        "Laurent Rigal",
-        "Stéphane Genti"
+      "is_hero": false
+    },
+    {
+      "id": "tv_canal_france",
+      "daddy_id": 121,
+      "title": "Canal+ France",
+      "original_title": "Canal+ France",
+      "overview": "Le grand direct cinéma, séries exclusives et grands rendez-vous sportifs de la chaîne premium.",
+      "media_type": "channel",
+      "is_live": true,
+      "channel_number": 4,
+      "poster_url": "https://upload.wikimedia.org/wikipedia/commons/thumb/e/e0/Canal%2B_2013.svg/320px-Canal%2B_2013.svg.png",
+      "backdrop_url": "https://images.unsplash.com/photo-1508098682722-e99c43a406b2?auto=format&fit=crop&w=1920&q=80",
+      "video_url": "/api/extract?id=tv_canal_france&type=channel&server=1",
+      "sources": {
+        "server1": "/api/extract?id=tv_canal_france&type=channel&server=1",
+        "server2": "/api/extract?id=tv_canal_france&type=channel&server=2",
+        "server3": "/api/extract?id=tv_canal_france&type=channel&server=3",
+        "server4": "/api/extract?id=tv_canal_france&type=channel&server=4",
+        "server5": "/api/extract?id=tv_canal_france&type=channel&server=5",
+        "daddylive_id": 121
+      },
+      "players": [
+        {
+          "name": "Player 1 (HD Embed)",
+          "tag": "HD1",
+          "url": "https://daddylivehd1.sbs/embed/stream-121.php"
+        },
+        {
+          "name": "Player 2 (Miroir Li)",
+          "tag": "LI",
+          "url": "https://daddylive.li/player/embed.php?id=121"
+        },
+        {
+          "name": "Player 3 (Nontongo)",
+          "tag": "NT",
+          "url": "https://nontongo.win/livetv/121"
+        },
+        {
+          "name": "Player 4 (Cricsfree)",
+          "tag": "CF",
+          "url": "https://cricsfree.cfd/live/stream-121.php"
+        },
+        {
+          "name": "Player 5 (Apex)",
+          "tag": "AX",
+          "url": "https://apexstreams.cfd/live/stream-121.php"
+        },
+        {
+          "name": "Player 6 (DLive Cast)",
+          "tag": "DL",
+          "url": "https://dlive.sx/cast/stream-121.php"
+        },
+        {
+          "name": "Player 7 (DLHD Watch)",
+          "tag": "ST",
+          "url": "https://dlhd.st/watch/stream-121.php"
+        },
+        {
+          "name": "Player 8 (EngStreams)",
+          "tag": "ES",
+          "url": "https://engstreams.shop/stream/index.php?id=121"
+        }
       ],
-      "director": "Groupe Canal+"
+      "categories": [
+        "⚽ Chaînes Sport Françaises"
+      ],
+      "release_year": 2026,
+      "match_score": 99,
+      "age_rating": "Tous publics",
+      "duration": "DIRECT HD",
+      "quality_badges": [
+        "1080p FHD",
+        "DIRECT",
+        "Anti-Pubs 🛡️"
+      ],
+      "is_hero": false
+    },
+    {
+      "id": "tv_canal_f1",
+      "daddy_id": 273,
+      "title": "Canal+ Formula 1",
+      "original_title": "Canal+ Formula 1",
+      "overview": "Le flux 100% dédié aux Grands Prix de Formule 1 : essais, qualifications, caméras embarquées et courses.",
+      "media_type": "channel",
+      "is_live": true,
+      "channel_number": 5,
+      "poster_url": "https://upload.wikimedia.org/wikipedia/commons/thumb/e/e0/Canal%2B_2013.svg/320px-Canal%2B_2013.svg.png",
+      "backdrop_url": "https://images.unsplash.com/photo-1508098682722-e99c43a406b2?auto=format&fit=crop&w=1920&q=80",
+      "video_url": "/api/extract?id=tv_canal_f1&type=channel&server=1",
+      "sources": {
+        "server1": "/api/extract?id=tv_canal_f1&type=channel&server=1",
+        "server2": "/api/extract?id=tv_canal_f1&type=channel&server=2",
+        "server3": "/api/extract?id=tv_canal_f1&type=channel&server=3",
+        "server4": "/api/extract?id=tv_canal_f1&type=channel&server=4",
+        "server5": "/api/extract?id=tv_canal_f1&type=channel&server=5",
+        "daddylive_id": 273
+      },
+      "players": [
+        {
+          "name": "Player 1 (HD Embed)",
+          "tag": "HD1",
+          "url": "https://daddylivehd1.sbs/embed/stream-273.php"
+        },
+        {
+          "name": "Player 2 (Miroir Li)",
+          "tag": "LI",
+          "url": "https://daddylive.li/player/embed.php?id=273"
+        },
+        {
+          "name": "Player 3 (Nontongo)",
+          "tag": "NT",
+          "url": "https://nontongo.win/livetv/273"
+        },
+        {
+          "name": "Player 4 (Cricsfree)",
+          "tag": "CF",
+          "url": "https://cricsfree.cfd/live/stream-273.php"
+        },
+        {
+          "name": "Player 5 (Apex)",
+          "tag": "AX",
+          "url": "https://apexstreams.cfd/live/stream-273.php"
+        },
+        {
+          "name": "Player 6 (DLive Cast)",
+          "tag": "DL",
+          "url": "https://dlive.sx/cast/stream-273.php"
+        },
+        {
+          "name": "Player 7 (DLHD Watch)",
+          "tag": "ST",
+          "url": "https://dlhd.st/watch/stream-273.php"
+        },
+        {
+          "name": "Player 8 (EngStreams)",
+          "tag": "ES",
+          "url": "https://engstreams.shop/stream/index.php?id=273"
+        }
+      ],
+      "categories": [
+        "⚽ Chaînes Sport Françaises"
+      ],
+      "release_year": 2026,
+      "match_score": 99,
+      "age_rating": "Tous publics",
+      "duration": "DIRECT HD",
+      "quality_badges": [
+        "1080p FHD",
+        "DIRECT",
+        "Anti-Pubs 🛡️"
+      ],
+      "is_hero": false
+    },
+    {
+      "id": "tv_canal_motogp",
+      "daddy_id": 271,
+      "title": "Canal+ MotoGP",
+      "original_title": "Canal+ MotoGP France",
+      "overview": "Tous les Grands Prix MotoGP, Moto2 et Moto3 en direct avec analyses et caméras embarquées.",
+      "media_type": "channel",
+      "is_live": true,
+      "channel_number": 6,
+      "poster_url": "https://upload.wikimedia.org/wikipedia/commons/thumb/e/e0/Canal%2B_2013.svg/320px-Canal%2B_2013.svg.png",
+      "backdrop_url": "https://images.unsplash.com/photo-1508098682722-e99c43a406b2?auto=format&fit=crop&w=1920&q=80",
+      "video_url": "/api/extract?id=tv_canal_motogp&type=channel&server=1",
+      "sources": {
+        "server1": "/api/extract?id=tv_canal_motogp&type=channel&server=1",
+        "server2": "/api/extract?id=tv_canal_motogp&type=channel&server=2",
+        "server3": "/api/extract?id=tv_canal_motogp&type=channel&server=3",
+        "server4": "/api/extract?id=tv_canal_motogp&type=channel&server=4",
+        "server5": "/api/extract?id=tv_canal_motogp&type=channel&server=5",
+        "daddylive_id": 271
+      },
+      "players": [
+        {
+          "name": "Player 1 (HD Embed)",
+          "tag": "HD1",
+          "url": "https://daddylivehd1.sbs/embed/stream-271.php"
+        },
+        {
+          "name": "Player 2 (Miroir Li)",
+          "tag": "LI",
+          "url": "https://daddylive.li/player/embed.php?id=271"
+        },
+        {
+          "name": "Player 3 (Nontongo)",
+          "tag": "NT",
+          "url": "https://nontongo.win/livetv/271"
+        },
+        {
+          "name": "Player 4 (Cricsfree)",
+          "tag": "CF",
+          "url": "https://cricsfree.cfd/live/stream-271.php"
+        },
+        {
+          "name": "Player 5 (Apex)",
+          "tag": "AX",
+          "url": "https://apexstreams.cfd/live/stream-271.php"
+        },
+        {
+          "name": "Player 6 (DLive Cast)",
+          "tag": "DL",
+          "url": "https://dlive.sx/cast/stream-271.php"
+        },
+        {
+          "name": "Player 7 (DLHD Watch)",
+          "tag": "ST",
+          "url": "https://dlhd.st/watch/stream-271.php"
+        },
+        {
+          "name": "Player 8 (EngStreams)",
+          "tag": "ES",
+          "url": "https://engstreams.shop/stream/index.php?id=271"
+        }
+      ],
+      "categories": [
+        "⚽ Chaînes Sport Françaises"
+      ],
+      "release_year": 2026,
+      "match_score": 99,
+      "age_rating": "Tous publics",
+      "duration": "DIRECT HD",
+      "quality_badges": [
+        "1080p FHD",
+        "DIRECT",
+        "Anti-Pubs 🛡️"
+      ],
+      "is_hero": false
     },
     {
       "id": "tv_bein1",
-      "title": "beIN SPORTS 1 HD",
+      "daddy_id": 116,
+      "title": "beIN SPORTS 1",
       "original_title": "beIN SPORTS 1 France",
-      "overview": "La chaîne premium omnisports : Ligue 2 BKT, Liga espagnole, Serie A italienne, Bundesliga allemande, NBA et les plus grands chocs européens.",
+      "overview": "Le meilleur du football européen : Liga, Serie A, Bundesliga, Coupes d'Europe et NBA.",
       "media_type": "channel",
-      "channel_number": "Canal 31",
-      "current_program": "Le Club des Champions • Multiplex Européen",
       "is_live": true,
-      "poster_url": "https://images.unsplash.com/photo-1517649763962-0c623266ddc0?auto=format&fit=crop&w=600&q=80",
-      "backdrop_url": "https://images.unsplash.com/photo-1517649763962-0c623266ddc0?auto=format&fit=crop&w=1920&q=80",
-      "logo_url": "https://raw.githubusercontent.com/pigzillaaaaa/iptv-scraper/refs/heads/main/logos/bein-sports-1-france.png",
+      "channel_number": 7,
+      "poster_url": "https://upload.wikimedia.org/wikipedia/commons/thumb/c/c2/BeIN_Sports_logo.svg/320px-BeIN_Sports_logo.svg.png",
+      "backdrop_url": "https://images.unsplash.com/photo-1508098682722-e99c43a406b2?auto=format&fit=crop&w=1920&q=80",
       "video_url": "/api/extract?id=tv_bein1&type=channel&server=1",
       "sources": {
-        "hls": "/api/extract?id=tv_bein1&type=channel&server=1"
+        "server1": "/api/extract?id=tv_bein1&type=channel&server=1",
+        "server2": "/api/extract?id=tv_bein1&type=channel&server=2",
+        "server3": "/api/extract?id=tv_bein1&type=channel&server=3",
+        "server4": "/api/extract?id=tv_bein1&type=channel&server=4",
+        "server5": "/api/extract?id=tv_bein1&type=channel&server=5",
+        "daddylive_id": 116
       },
+      "players": [
+        {
+          "name": "Player 1 (HD Embed)",
+          "tag": "HD1",
+          "url": "https://daddylivehd1.sbs/embed/stream-116.php"
+        },
+        {
+          "name": "Player 2 (Miroir Li)",
+          "tag": "LI",
+          "url": "https://daddylive.li/player/embed.php?id=116"
+        },
+        {
+          "name": "Player 3 (Nontongo)",
+          "tag": "NT",
+          "url": "https://nontongo.win/livetv/116"
+        },
+        {
+          "name": "Player 4 (Cricsfree)",
+          "tag": "CF",
+          "url": "https://cricsfree.cfd/live/stream-116.php"
+        },
+        {
+          "name": "Player 5 (Apex)",
+          "tag": "AX",
+          "url": "https://apexstreams.cfd/live/stream-116.php"
+        },
+        {
+          "name": "Player 6 (DLive Cast)",
+          "tag": "DL",
+          "url": "https://dlive.sx/cast/stream-116.php"
+        },
+        {
+          "name": "Player 7 (DLHD Watch)",
+          "tag": "ST",
+          "url": "https://dlhd.st/watch/stream-116.php"
+        },
+        {
+          "name": "Player 8 (EngStreams)",
+          "tag": "ES",
+          "url": "https://engstreams.shop/stream/index.php?id=116"
+        }
+      ],
       "categories": [
         "⚽ Chaînes Sport Françaises"
       ],
       "release_year": 2026,
       "match_score": 99,
       "age_rating": "Tous publics",
-      "duration": "🔴 EN DIRECT 24/7",
+      "duration": "DIRECT HD",
       "quality_badges": [
-        "LIVE",
         "1080p FHD",
-        "beIN",
-        "VF"
+        "DIRECT",
+        "Anti-Pubs 🛡️"
       ],
-      "cast": [
-        "Alexandre Ruiz",
-        "Sonny Anderson",
-        "Omar da Fonseca",
-        "Benjamin Da Silva"
-      ],
-      "director": "beIN Media Group"
+      "is_hero": false
     },
     {
       "id": "tv_bein2",
-      "title": "beIN SPORTS 2 HD",
+      "daddy_id": 117,
+      "title": "beIN SPORTS 2",
       "original_title": "beIN SPORTS 2 France",
-      "overview": "Grands matchs de football européen en direct, tournois de tennis ATP / WTA et Ligue des Champions masculine et féminine de handball.",
+      "overview": "La chaîne dédiée aux grands chocs européens, handball international et championnats d'Europe.",
       "media_type": "channel",
-      "channel_number": "Canal 32",
-      "current_program": "Soirée Tennis ATP & Choc Européen",
       "is_live": true,
-      "poster_url": "https://images.unsplash.com/photo-1554068865-24cecd4e34b8?auto=format&fit=crop&w=600&q=80",
-      "backdrop_url": "https://images.unsplash.com/photo-1554068865-24cecd4e34b8?auto=format&fit=crop&w=1920&q=80",
-      "logo_url": "https://raw.githubusercontent.com/pigzillaaaaa/iptv-scraper/refs/heads/main/logos/bein-sports-2-france.png",
+      "channel_number": 8,
+      "poster_url": "https://upload.wikimedia.org/wikipedia/commons/thumb/c/c2/BeIN_Sports_logo.svg/320px-BeIN_Sports_logo.svg.png",
+      "backdrop_url": "https://images.unsplash.com/photo-1508098682722-e99c43a406b2?auto=format&fit=crop&w=1920&q=80",
       "video_url": "/api/extract?id=tv_bein2&type=channel&server=1",
       "sources": {
-        "hls": "/api/extract?id=tv_bein2&type=channel&server=1"
+        "server1": "/api/extract?id=tv_bein2&type=channel&server=1",
+        "server2": "/api/extract?id=tv_bein2&type=channel&server=2",
+        "server3": "/api/extract?id=tv_bein2&type=channel&server=3",
+        "server4": "/api/extract?id=tv_bein2&type=channel&server=4",
+        "server5": "/api/extract?id=tv_bein2&type=channel&server=5",
+        "daddylive_id": 117
       },
+      "players": [
+        {
+          "name": "Player 1 (HD Embed)",
+          "tag": "HD1",
+          "url": "https://daddylivehd1.sbs/embed/stream-117.php"
+        },
+        {
+          "name": "Player 2 (Miroir Li)",
+          "tag": "LI",
+          "url": "https://daddylive.li/player/embed.php?id=117"
+        },
+        {
+          "name": "Player 3 (Nontongo)",
+          "tag": "NT",
+          "url": "https://nontongo.win/livetv/117"
+        },
+        {
+          "name": "Player 4 (Cricsfree)",
+          "tag": "CF",
+          "url": "https://cricsfree.cfd/live/stream-117.php"
+        },
+        {
+          "name": "Player 5 (Apex)",
+          "tag": "AX",
+          "url": "https://apexstreams.cfd/live/stream-117.php"
+        },
+        {
+          "name": "Player 6 (DLive Cast)",
+          "tag": "DL",
+          "url": "https://dlive.sx/cast/stream-117.php"
+        },
+        {
+          "name": "Player 7 (DLHD Watch)",
+          "tag": "ST",
+          "url": "https://dlhd.st/watch/stream-117.php"
+        },
+        {
+          "name": "Player 8 (EngStreams)",
+          "tag": "ES",
+          "url": "https://engstreams.shop/stream/index.php?id=117"
+        }
+      ],
       "categories": [
         "⚽ Chaînes Sport Françaises"
       ],
       "release_year": 2026,
-      "match_score": 96,
+      "match_score": 99,
       "age_rating": "Tous publics",
-      "duration": "🔴 EN DIRECT 24/7",
+      "duration": "DIRECT HD",
       "quality_badges": [
-        "LIVE",
         "1080p FHD",
-        "beIN",
-        "VF"
+        "DIRECT",
+        "Anti-Pubs 🛡️"
       ],
-      "cast": [
-        "Frédéric Viard",
-        "Sébastien Grosjean",
-        "Fabrice Santoro"
-      ],
-      "director": "beIN Media Group"
+      "is_hero": false
     },
     {
       "id": "tv_bein3",
-      "title": "beIN SPORTS 3 HD",
+      "daddy_id": 118,
+      "title": "beIN SPORTS 3",
       "original_title": "beIN SPORTS 3 France",
-      "overview": "La chaîne US & Omnisports de beIN : NBA en direct, NFL football américain, baseball MLB, rugby et sports mécaniques.",
+      "overview": "Omnisports en continu : Tennis ATP/WTA, Wimbledon, natation, athlétisme et sports US.",
       "media_type": "channel",
-      "channel_number": "Canal 33",
-      "current_program": "NBA Extra & Live Game Prime Time",
       "is_live": true,
-      "poster_url": "https://images.unsplash.com/photo-1546519638-68e109498ffc?auto=format&fit=crop&w=600&q=80",
-      "backdrop_url": "https://images.unsplash.com/photo-1546519638-68e109498ffc?auto=format&fit=crop&w=1920&q=80",
-      "logo_url": "https://raw.githubusercontent.com/pigzillaaaaa/iptv-scraper/refs/heads/main/logos/bein-sports-3-france.png",
+      "channel_number": 9,
+      "poster_url": "https://upload.wikimedia.org/wikipedia/commons/thumb/c/c2/BeIN_Sports_logo.svg/320px-BeIN_Sports_logo.svg.png",
+      "backdrop_url": "https://images.unsplash.com/photo-1508098682722-e99c43a406b2?auto=format&fit=crop&w=1920&q=80",
       "video_url": "/api/extract?id=tv_bein3&type=channel&server=1",
       "sources": {
-        "hls": "/api/extract?id=tv_bein3&type=channel&server=1"
+        "server1": "/api/extract?id=tv_bein3&type=channel&server=1",
+        "server2": "/api/extract?id=tv_bein3&type=channel&server=2",
+        "server3": "/api/extract?id=tv_bein3&type=channel&server=3",
+        "server4": "/api/extract?id=tv_bein3&type=channel&server=4",
+        "server5": "/api/extract?id=tv_bein3&type=channel&server=5",
+        "daddylive_id": 118
       },
+      "players": [
+        {
+          "name": "Player 1 (HD Embed)",
+          "tag": "HD1",
+          "url": "https://daddylivehd1.sbs/embed/stream-118.php"
+        },
+        {
+          "name": "Player 2 (Miroir Li)",
+          "tag": "LI",
+          "url": "https://daddylive.li/player/embed.php?id=118"
+        },
+        {
+          "name": "Player 3 (Nontongo)",
+          "tag": "NT",
+          "url": "https://nontongo.win/livetv/118"
+        },
+        {
+          "name": "Player 4 (Cricsfree)",
+          "tag": "CF",
+          "url": "https://cricsfree.cfd/live/stream-118.php"
+        },
+        {
+          "name": "Player 5 (Apex)",
+          "tag": "AX",
+          "url": "https://apexstreams.cfd/live/stream-118.php"
+        },
+        {
+          "name": "Player 6 (DLive Cast)",
+          "tag": "DL",
+          "url": "https://dlive.sx/cast/stream-118.php"
+        },
+        {
+          "name": "Player 7 (DLHD Watch)",
+          "tag": "ST",
+          "url": "https://dlhd.st/watch/stream-118.php"
+        },
+        {
+          "name": "Player 8 (EngStreams)",
+          "tag": "ES",
+          "url": "https://engstreams.shop/stream/index.php?id=118"
+        }
+      ],
       "categories": [
         "⚽ Chaînes Sport Françaises"
       ],
       "release_year": 2026,
-      "match_score": 95,
+      "match_score": 99,
       "age_rating": "Tous publics",
-      "duration": "🔴 EN DIRECT 24/7",
+      "duration": "DIRECT HD",
       "quality_badges": [
-        "LIVE",
         "1080p FHD",
-        "NBA",
-        "VF"
+        "DIRECT",
+        "Anti-Pubs 🛡️"
       ],
-      "cast": [
-        "Xavier Vaution",
-        "Jacques Monclar",
-        "Rémi Reverchon"
+      "is_hero": false
+    },
+    {
+      "id": "tv_bein_max4",
+      "daddy_id": 494,
+      "title": "beIN Sports MAX 4",
+      "original_title": "beIN Sports MAX 4 France",
+      "overview": "Canal multiplex et matches en direct lors des soirées de Coupes d'Europe et championnats.",
+      "media_type": "channel",
+      "is_live": true,
+      "channel_number": 10,
+      "poster_url": "https://upload.wikimedia.org/wikipedia/commons/thumb/c/c2/BeIN_Sports_logo.svg/320px-BeIN_Sports_logo.svg.png",
+      "backdrop_url": "https://images.unsplash.com/photo-1508098682722-e99c43a406b2?auto=format&fit=crop&w=1920&q=80",
+      "video_url": "/api/extract?id=tv_bein_max4&type=channel&server=1",
+      "sources": {
+        "server1": "/api/extract?id=tv_bein_max4&type=channel&server=1",
+        "server2": "/api/extract?id=tv_bein_max4&type=channel&server=2",
+        "server3": "/api/extract?id=tv_bein_max4&type=channel&server=3",
+        "server4": "/api/extract?id=tv_bein_max4&type=channel&server=4",
+        "server5": "/api/extract?id=tv_bein_max4&type=channel&server=5",
+        "daddylive_id": 494
+      },
+      "players": [
+        {
+          "name": "Player 1 (HD Embed)",
+          "tag": "HD1",
+          "url": "https://daddylivehd1.sbs/embed/stream-494.php"
+        },
+        {
+          "name": "Player 2 (Miroir Li)",
+          "tag": "LI",
+          "url": "https://daddylive.li/player/embed.php?id=494"
+        },
+        {
+          "name": "Player 3 (Nontongo)",
+          "tag": "NT",
+          "url": "https://nontongo.win/livetv/494"
+        },
+        {
+          "name": "Player 4 (Cricsfree)",
+          "tag": "CF",
+          "url": "https://cricsfree.cfd/live/stream-494.php"
+        },
+        {
+          "name": "Player 5 (Apex)",
+          "tag": "AX",
+          "url": "https://apexstreams.cfd/live/stream-494.php"
+        },
+        {
+          "name": "Player 6 (DLive Cast)",
+          "tag": "DL",
+          "url": "https://dlive.sx/cast/stream-494.php"
+        },
+        {
+          "name": "Player 7 (DLHD Watch)",
+          "tag": "ST",
+          "url": "https://dlhd.st/watch/stream-494.php"
+        },
+        {
+          "name": "Player 8 (EngStreams)",
+          "tag": "ES",
+          "url": "https://engstreams.shop/stream/index.php?id=494"
+        }
       ],
-      "director": "beIN Media Group"
+      "categories": [
+        "⚽ Chaînes Sport Françaises"
+      ],
+      "release_year": 2026,
+      "match_score": 99,
+      "age_rating": "Tous publics",
+      "duration": "DIRECT HD",
+      "quality_badges": [
+        "1080p FHD",
+        "DIRECT",
+        "Anti-Pubs 🛡️"
+      ],
+      "is_hero": false
+    },
+    {
+      "id": "tv_bein_max5",
+      "daddy_id": 495,
+      "title": "beIN Sports MAX 5",
+      "original_title": "beIN Sports 5 Max France / beIN Sports MAX 5 France",
+      "overview": "Matches en direct multiplex européen et tournois internationaux de tennis.",
+      "media_type": "channel",
+      "is_live": true,
+      "channel_number": 11,
+      "poster_url": "https://upload.wikimedia.org/wikipedia/commons/thumb/c/c2/BeIN_Sports_logo.svg/320px-BeIN_Sports_logo.svg.png",
+      "backdrop_url": "https://images.unsplash.com/photo-1508098682722-e99c43a406b2?auto=format&fit=crop&w=1920&q=80",
+      "video_url": "/api/extract?id=tv_bein_max5&type=channel&server=1",
+      "sources": {
+        "server1": "/api/extract?id=tv_bein_max5&type=channel&server=1",
+        "server2": "/api/extract?id=tv_bein_max5&type=channel&server=2",
+        "server3": "/api/extract?id=tv_bein_max5&type=channel&server=3",
+        "server4": "/api/extract?id=tv_bein_max5&type=channel&server=4",
+        "server5": "/api/extract?id=tv_bein_max5&type=channel&server=5",
+        "daddylive_id": 495
+      },
+      "players": [
+        {
+          "name": "Player 1 (HD Embed)",
+          "tag": "HD1",
+          "url": "https://daddylivehd1.sbs/embed/stream-495.php"
+        },
+        {
+          "name": "Player 2 (Miroir Li)",
+          "tag": "LI",
+          "url": "https://daddylive.li/player/embed.php?id=495"
+        },
+        {
+          "name": "Player 3 (Nontongo)",
+          "tag": "NT",
+          "url": "https://nontongo.win/livetv/495"
+        },
+        {
+          "name": "Player 4 (Cricsfree)",
+          "tag": "CF",
+          "url": "https://cricsfree.cfd/live/stream-495.php"
+        },
+        {
+          "name": "Player 5 (Apex)",
+          "tag": "AX",
+          "url": "https://apexstreams.cfd/live/stream-495.php"
+        },
+        {
+          "name": "Player 6 (DLive Cast)",
+          "tag": "DL",
+          "url": "https://dlive.sx/cast/stream-495.php"
+        },
+        {
+          "name": "Player 7 (DLHD Watch)",
+          "tag": "ST",
+          "url": "https://dlhd.st/watch/stream-495.php"
+        },
+        {
+          "name": "Player 8 (EngStreams)",
+          "tag": "ES",
+          "url": "https://engstreams.shop/stream/index.php?id=495"
+        }
+      ],
+      "categories": [
+        "⚽ Chaînes Sport Françaises"
+      ],
+      "release_year": 2026,
+      "match_score": 99,
+      "age_rating": "Tous publics",
+      "duration": "DIRECT HD",
+      "quality_badges": [
+        "1080p FHD",
+        "DIRECT",
+        "Anti-Pubs 🛡️"
+      ],
+      "is_hero": false
+    },
+    {
+      "id": "tv_bein_max6",
+      "daddy_id": 496,
+      "title": "beIN Sports MAX 6",
+      "original_title": "beIN Sports MAX 6 France",
+      "overview": "Canal événementiel en direct pour les rencontres simultanées de football et sports US.",
+      "media_type": "channel",
+      "is_live": true,
+      "channel_number": 12,
+      "poster_url": "https://upload.wikimedia.org/wikipedia/commons/thumb/c/c2/BeIN_Sports_logo.svg/320px-BeIN_Sports_logo.svg.png",
+      "backdrop_url": "https://images.unsplash.com/photo-1508098682722-e99c43a406b2?auto=format&fit=crop&w=1920&q=80",
+      "video_url": "/api/extract?id=tv_bein_max6&type=channel&server=1",
+      "sources": {
+        "server1": "/api/extract?id=tv_bein_max6&type=channel&server=1",
+        "server2": "/api/extract?id=tv_bein_max6&type=channel&server=2",
+        "server3": "/api/extract?id=tv_bein_max6&type=channel&server=3",
+        "server4": "/api/extract?id=tv_bein_max6&type=channel&server=4",
+        "server5": "/api/extract?id=tv_bein_max6&type=channel&server=5",
+        "daddylive_id": 496
+      },
+      "players": [
+        {
+          "name": "Player 1 (HD Embed)",
+          "tag": "HD1",
+          "url": "https://daddylivehd1.sbs/embed/stream-496.php"
+        },
+        {
+          "name": "Player 2 (Miroir Li)",
+          "tag": "LI",
+          "url": "https://daddylive.li/player/embed.php?id=496"
+        },
+        {
+          "name": "Player 3 (Nontongo)",
+          "tag": "NT",
+          "url": "https://nontongo.win/livetv/496"
+        },
+        {
+          "name": "Player 4 (Cricsfree)",
+          "tag": "CF",
+          "url": "https://cricsfree.cfd/live/stream-496.php"
+        },
+        {
+          "name": "Player 5 (Apex)",
+          "tag": "AX",
+          "url": "https://apexstreams.cfd/live/stream-496.php"
+        },
+        {
+          "name": "Player 6 (DLive Cast)",
+          "tag": "DL",
+          "url": "https://dlive.sx/cast/stream-496.php"
+        },
+        {
+          "name": "Player 7 (DLHD Watch)",
+          "tag": "ST",
+          "url": "https://dlhd.st/watch/stream-496.php"
+        },
+        {
+          "name": "Player 8 (EngStreams)",
+          "tag": "ES",
+          "url": "https://engstreams.shop/stream/index.php?id=496"
+        }
+      ],
+      "categories": [
+        "⚽ Chaînes Sport Françaises"
+      ],
+      "release_year": 2026,
+      "match_score": 99,
+      "age_rating": "Tous publics",
+      "duration": "DIRECT HD",
+      "quality_badges": [
+        "1080p FHD",
+        "DIRECT",
+        "Anti-Pubs 🛡️"
+      ],
+      "is_hero": false
     },
     {
       "id": "tv_rmc_sport1",
-      "title": "RMC Sport 1 HD",
+      "daddy_id": 119,
+      "title": "RMC Sport 1",
       "original_title": "RMC Sport 1 France",
-      "overview": "La chaîne n°1 des sports de combat en France : UFC numérotés, PFL, Bellator, KSW, grandes soirées de Boxe anglaise et championnats mondiaux.",
+      "overview": "La référence des sports de combat : UFC, PFL, Bellator, Boxe anglaise et soirées d'exception.",
       "media_type": "channel",
-      "channel_number": "Canal 41",
-      "current_program": "RMC Fighter Club • Chocs UFC & MMA Mondial",
       "is_live": true,
-      "poster_url": "https://images.unsplash.com/photo-1549719386-74dfcbf7dbed?auto=format&fit=crop&w=600&q=80",
-      "backdrop_url": "https://images.unsplash.com/photo-1549719386-74dfcbf7dbed?auto=format&fit=crop&w=1920&q=80",
-      "logo_url": "https://raw.githubusercontent.com/pigzillaaaaa/iptv-scraper/refs/heads/main/logos/rmc-sport-1-fr.png",
+      "channel_number": 13,
+      "poster_url": "https://upload.wikimedia.org/wikipedia/commons/thumb/8/87/RMC_Sport_logo_2018.svg/320px-RMC_Sport_logo_2018.svg.png",
+      "backdrop_url": "https://images.unsplash.com/photo-1517838277536-f5f99be501cd?auto=format&fit=crop&w=1920&q=80",
       "video_url": "/api/extract?id=tv_rmc_sport1&type=channel&server=1",
       "sources": {
-        "hls": "/api/extract?id=tv_rmc_sport1&type=channel&server=1"
+        "server1": "/api/extract?id=tv_rmc_sport1&type=channel&server=1",
+        "server2": "/api/extract?id=tv_rmc_sport1&type=channel&server=2",
+        "server3": "/api/extract?id=tv_rmc_sport1&type=channel&server=3",
+        "server4": "/api/extract?id=tv_rmc_sport1&type=channel&server=4",
+        "server5": "/api/extract?id=tv_rmc_sport1&type=channel&server=5",
+        "daddylive_id": 119
       },
+      "players": [
+        {
+          "name": "Player 1 (HD Embed)",
+          "tag": "HD1",
+          "url": "https://daddylivehd1.sbs/embed/stream-119.php"
+        },
+        {
+          "name": "Player 2 (Miroir Li)",
+          "tag": "LI",
+          "url": "https://daddylive.li/player/embed.php?id=119"
+        },
+        {
+          "name": "Player 3 (Nontongo)",
+          "tag": "NT",
+          "url": "https://nontongo.win/livetv/119"
+        },
+        {
+          "name": "Player 4 (Cricsfree)",
+          "tag": "CF",
+          "url": "https://cricsfree.cfd/live/stream-119.php"
+        },
+        {
+          "name": "Player 5 (Apex)",
+          "tag": "AX",
+          "url": "https://apexstreams.cfd/live/stream-119.php"
+        },
+        {
+          "name": "Player 6 (DLive Cast)",
+          "tag": "DL",
+          "url": "https://dlive.sx/cast/stream-119.php"
+        },
+        {
+          "name": "Player 7 (DLHD Watch)",
+          "tag": "ST",
+          "url": "https://dlhd.st/watch/stream-119.php"
+        },
+        {
+          "name": "Player 8 (EngStreams)",
+          "tag": "ES",
+          "url": "https://engstreams.shop/stream/index.php?id=119"
+        }
+      ],
       "categories": [
-        "⚽ Chaînes Sport Françaises",
-        "🥊 Chaînes PPV & Sports de Combat"
+        "⚽ Chaînes Sport Françaises"
       ],
       "release_year": 2026,
       "match_score": 99,
-      "age_rating": "16+",
-      "duration": "🔴 EN DIRECT 24/7",
+      "age_rating": "Tous publics",
+      "duration": "DIRECT HD",
       "quality_badges": [
-        "LIVE",
         "1080p FHD",
-        "UFC/MMA",
-        "VF"
+        "DIRECT",
+        "Anti-Pubs 🛡️"
       ],
-      "cast": [
-        "Antoine Simon",
-        "Taylor Lapilus",
-        "Cyrille Diabaté"
+      "is_hero": false
+    },
+    {
+      "id": "tv_rmc_sport2",
+      "daddy_id": 120,
+      "title": "RMC Sport 2",
+      "original_title": "RMC Sport 2 France",
+      "overview": "Grandes compétitions de combat, MMA, kickboxing et documentaires sportifs intenses.",
+      "media_type": "channel",
+      "is_live": true,
+      "channel_number": 14,
+      "poster_url": "https://upload.wikimedia.org/wikipedia/commons/thumb/8/87/RMC_Sport_logo_2018.svg/320px-RMC_Sport_logo_2018.svg.png",
+      "backdrop_url": "https://images.unsplash.com/photo-1517838277536-f5f99be501cd?auto=format&fit=crop&w=1920&q=80",
+      "video_url": "/api/extract?id=tv_rmc_sport2&type=channel&server=1",
+      "sources": {
+        "server1": "/api/extract?id=tv_rmc_sport2&type=channel&server=1",
+        "server2": "/api/extract?id=tv_rmc_sport2&type=channel&server=2",
+        "server3": "/api/extract?id=tv_rmc_sport2&type=channel&server=3",
+        "server4": "/api/extract?id=tv_rmc_sport2&type=channel&server=4",
+        "server5": "/api/extract?id=tv_rmc_sport2&type=channel&server=5",
+        "daddylive_id": 120
+      },
+      "players": [
+        {
+          "name": "Player 1 (HD Embed)",
+          "tag": "HD1",
+          "url": "https://daddylivehd1.sbs/embed/stream-120.php"
+        },
+        {
+          "name": "Player 2 (Miroir Li)",
+          "tag": "LI",
+          "url": "https://daddylive.li/player/embed.php?id=120"
+        },
+        {
+          "name": "Player 3 (Nontongo)",
+          "tag": "NT",
+          "url": "https://nontongo.win/livetv/120"
+        },
+        {
+          "name": "Player 4 (Cricsfree)",
+          "tag": "CF",
+          "url": "https://cricsfree.cfd/live/stream-120.php"
+        },
+        {
+          "name": "Player 5 (Apex)",
+          "tag": "AX",
+          "url": "https://apexstreams.cfd/live/stream-120.php"
+        },
+        {
+          "name": "Player 6 (DLive Cast)",
+          "tag": "DL",
+          "url": "https://dlive.sx/cast/stream-120.php"
+        },
+        {
+          "name": "Player 7 (DLHD Watch)",
+          "tag": "ST",
+          "url": "https://dlhd.st/watch/stream-120.php"
+        },
+        {
+          "name": "Player 8 (EngStreams)",
+          "tag": "ES",
+          "url": "https://engstreams.shop/stream/index.php?id=120"
+        }
       ],
-      "director": "Altice Média"
+      "categories": [
+        "⚽ Chaînes Sport Françaises"
+      ],
+      "release_year": 2026,
+      "match_score": 99,
+      "age_rating": "Tous publics",
+      "duration": "DIRECT HD",
+      "quality_badges": [
+        "1080p FHD",
+        "DIRECT",
+        "Anti-Pubs 🛡️"
+      ],
+      "is_hero": false
     },
     {
       "id": "tv_eurosport1",
-      "title": "Eurosport 1 HD",
+      "daddy_id": 772,
+      "title": "Eurosport 1",
       "original_title": "Eurosport 1 France",
-      "overview": "La référence européenne du sport : Grand Chelem de Tennis (Roland-Garros, Open d'Australie), Tour de France et sports d'hiver en direct.",
+      "overview": "Le foyer des Jeux Olympiques, du cyclisme mondial (Tour de France, Vuelta), ski alpin et tennis.",
       "media_type": "channel",
-      "channel_number": "Canal 51",
-      "current_program": "Les Rois de la Pédale • Grand Direct Cyclisme & Tennis",
       "is_live": true,
-      "poster_url": "https://images.unsplash.com/photo-1517649763962-0c623266ddc0?auto=format&fit=crop&w=600&q=80",
-      "backdrop_url": "https://images.unsplash.com/photo-1517649763962-0c623266ddc0?auto=format&fit=crop&w=1920&q=80",
-      "logo_url": "https://raw.githubusercontent.com/pigzillaaaaa/iptv-scraper/refs/heads/main/logos/eurosport-1.png",
+      "channel_number": 15,
+      "poster_url": "https://upload.wikimedia.org/wikipedia/commons/thumb/9/90/Eurosport_2015_logo.svg/320px-Eurosport_2015_logo.svg.png",
+      "backdrop_url": "https://images.unsplash.com/photo-1508098682722-e99c43a406b2?auto=format&fit=crop&w=1920&q=80",
       "video_url": "/api/extract?id=tv_eurosport1&type=channel&server=1",
       "sources": {
-        "hls": "/api/extract?id=tv_eurosport1&type=channel&server=1"
+        "server1": "/api/extract?id=tv_eurosport1&type=channel&server=1",
+        "server2": "/api/extract?id=tv_eurosport1&type=channel&server=2",
+        "server3": "/api/extract?id=tv_eurosport1&type=channel&server=3",
+        "server4": "/api/extract?id=tv_eurosport1&type=channel&server=4",
+        "server5": "/api/extract?id=tv_eurosport1&type=channel&server=5",
+        "daddylive_id": 772
       },
+      "players": [
+        {
+          "name": "Player 1 (HD Embed)",
+          "tag": "HD1",
+          "url": "https://daddylivehd1.sbs/embed/stream-772.php"
+        },
+        {
+          "name": "Player 2 (Miroir Li)",
+          "tag": "LI",
+          "url": "https://daddylive.li/player/embed.php?id=772"
+        },
+        {
+          "name": "Player 3 (Nontongo)",
+          "tag": "NT",
+          "url": "https://nontongo.win/livetv/772"
+        },
+        {
+          "name": "Player 4 (Cricsfree)",
+          "tag": "CF",
+          "url": "https://cricsfree.cfd/live/stream-772.php"
+        },
+        {
+          "name": "Player 5 (Apex)",
+          "tag": "AX",
+          "url": "https://apexstreams.cfd/live/stream-772.php"
+        },
+        {
+          "name": "Player 6 (DLive Cast)",
+          "tag": "DL",
+          "url": "https://dlive.sx/cast/stream-772.php"
+        },
+        {
+          "name": "Player 7 (DLHD Watch)",
+          "tag": "ST",
+          "url": "https://dlhd.st/watch/stream-772.php"
+        },
+        {
+          "name": "Player 8 (EngStreams)",
+          "tag": "ES",
+          "url": "https://engstreams.shop/stream/index.php?id=772"
+        }
+      ],
       "categories": [
         "⚽ Chaînes Sport Françaises"
       ],
       "release_year": 2026,
-      "match_score": 97,
+      "match_score": 99,
       "age_rating": "Tous publics",
-      "duration": "🔴 EN DIRECT 24/7",
+      "duration": "DIRECT HD",
       "quality_badges": [
-        "LIVE",
         "1080p FHD",
-        "EUROSPORT",
-        "VF"
+        "DIRECT",
+        "Anti-Pubs 🛡️"
       ],
-      "cast": [
-        "Guillaume Di Grazia",
-        "Jacky Durand",
-        "Marc Madiot"
-      ],
-      "director": "Warner Bros. Discovery"
+      "is_hero": false
     },
     {
       "id": "tv_eurosport2",
-      "title": "Eurosport 2 HD",
+      "daddy_id": 773,
+      "title": "Eurosport 2",
       "original_title": "Eurosport 2 France",
-      "overview": "Sports d'action et compétitions internationales : ski alpin, saut à ski, snooker, sports mécaniques et tournois ATP 500 / 250.",
+      "overview": "Sports mécaniques, sports d'hiver, snooker et grands tournois internationaux.",
       "media_type": "channel",
-      "channel_number": "Canal 52",
-      "current_program": "Coupe du Monde de Ski Alpin & Snooker Championship",
       "is_live": true,
-      "poster_url": "https://images.unsplash.com/photo-1551698618-1dfe5d97d256?auto=format&fit=crop&w=600&q=80",
-      "backdrop_url": "https://images.unsplash.com/photo-1551698618-1dfe5d97d256?auto=format&fit=crop&w=1920&q=80",
-      "logo_url": "https://raw.githubusercontent.com/pigzillaaaaa/iptv-scraper/refs/heads/main/logos/eurosport-2.png",
+      "channel_number": 16,
+      "poster_url": "https://upload.wikimedia.org/wikipedia/commons/thumb/9/90/Eurosport_2015_logo.svg/320px-Eurosport_2015_logo.svg.png",
+      "backdrop_url": "https://images.unsplash.com/photo-1508098682722-e99c43a406b2?auto=format&fit=crop&w=1920&q=80",
       "video_url": "/api/extract?id=tv_eurosport2&type=channel&server=1",
       "sources": {
-        "hls": "/api/extract?id=tv_eurosport2&type=channel&server=1"
+        "server1": "/api/extract?id=tv_eurosport2&type=channel&server=1",
+        "server2": "/api/extract?id=tv_eurosport2&type=channel&server=2",
+        "server3": "/api/extract?id=tv_eurosport2&type=channel&server=3",
+        "server4": "/api/extract?id=tv_eurosport2&type=channel&server=4",
+        "server5": "/api/extract?id=tv_eurosport2&type=channel&server=5",
+        "daddylive_id": 773
       },
+      "players": [
+        {
+          "name": "Player 1 (HD Embed)",
+          "tag": "HD1",
+          "url": "https://daddylivehd1.sbs/embed/stream-773.php"
+        },
+        {
+          "name": "Player 2 (Miroir Li)",
+          "tag": "LI",
+          "url": "https://daddylive.li/player/embed.php?id=773"
+        },
+        {
+          "name": "Player 3 (Nontongo)",
+          "tag": "NT",
+          "url": "https://nontongo.win/livetv/773"
+        },
+        {
+          "name": "Player 4 (Cricsfree)",
+          "tag": "CF",
+          "url": "https://cricsfree.cfd/live/stream-773.php"
+        },
+        {
+          "name": "Player 5 (Apex)",
+          "tag": "AX",
+          "url": "https://apexstreams.cfd/live/stream-773.php"
+        },
+        {
+          "name": "Player 6 (DLive Cast)",
+          "tag": "DL",
+          "url": "https://dlive.sx/cast/stream-773.php"
+        },
+        {
+          "name": "Player 7 (DLHD Watch)",
+          "tag": "ST",
+          "url": "https://dlhd.st/watch/stream-773.php"
+        },
+        {
+          "name": "Player 8 (EngStreams)",
+          "tag": "ES",
+          "url": "https://engstreams.shop/stream/index.php?id=773"
+        }
+      ],
       "categories": [
         "⚽ Chaînes Sport Françaises"
       ],
       "release_year": 2026,
-      "match_score": 95,
+      "match_score": 99,
       "age_rating": "Tous publics",
-      "duration": "🔴 EN DIRECT 24/7",
+      "duration": "DIRECT HD",
       "quality_badges": [
-        "LIVE",
         "1080p FHD",
-        "EUROSPORT",
-        "VF"
+        "DIRECT",
+        "Anti-Pubs 🛡️"
       ],
-      "cast": [
-        "Jean-Pierre Vidal",
-        "Florence Masnada"
-      ],
-      "director": "Warner Bros. Discovery"
+      "is_hero": false
     },
     {
       "id": "tv_lequipe",
-      "title": "La Chaîne L'Équipe (Canal 21)",
-      "original_title": "L'Équipe 21",
-      "overview": "La seule chaîne gratuite 100% sport en France : L'Équipe du Soir, Coupe du Monde de Biathlon, Cérémonie du Ballon d'Or et grands debriefs.",
+      "daddy_id": 645,
+      "title": "La Chaîne L'Équipe",
+      "original_title": "L'Equipe France",
+      "overview": "Canal 21 de la TNT : L'Équipe du Soir, biathlon, ballon d'or, cyclisme et grands débats sportifs.",
       "media_type": "channel",
-      "channel_number": "Canal 21",
-      "current_program": "L'Équipe du Soir • Le Grand Débat Sportif",
       "is_live": true,
-      "poster_url": "https://images.unsplash.com/photo-1508098682722-e99c43a406b2?auto=format&fit=crop&w=600&q=80",
+      "channel_number": 17,
+      "poster_url": "https://upload.wikimedia.org/wikipedia/commons/thumb/d/d4/L%27%C3%89quipe_%28logo%29.svg/320px-L%27%C3%89quipe_%28logo%29.svg.png",
       "backdrop_url": "https://images.unsplash.com/photo-1508098682722-e99c43a406b2?auto=format&fit=crop&w=1920&q=80",
-      "logo_url": "https://upload.wikimedia.org/wikipedia/commons/thumb/3/32/L%27%C3%89quipe_wordmark.svg/500px-L%27%C3%89quipe_wordmark.svg.png",
       "video_url": "/api/extract?id=tv_lequipe&type=channel&server=1",
       "sources": {
-        "hls": "/api/extract?id=tv_lequipe&type=channel&server=1"
+        "server1": "/api/extract?id=tv_lequipe&type=channel&server=1",
+        "server2": "/api/extract?id=tv_lequipe&type=channel&server=2",
+        "server3": "/api/extract?id=tv_lequipe&type=channel&server=3",
+        "server4": "/api/extract?id=tv_lequipe&type=channel&server=4",
+        "server5": "/api/extract?id=tv_lequipe&type=channel&server=5",
+        "daddylive_id": 645
       },
+      "players": [
+        {
+          "name": "Player 1 (HD Embed)",
+          "tag": "HD1",
+          "url": "https://daddylivehd1.sbs/embed/stream-645.php"
+        },
+        {
+          "name": "Player 2 (Miroir Li)",
+          "tag": "LI",
+          "url": "https://daddylive.li/player/embed.php?id=645"
+        },
+        {
+          "name": "Player 3 (Nontongo)",
+          "tag": "NT",
+          "url": "https://nontongo.win/livetv/645"
+        },
+        {
+          "name": "Player 4 (Cricsfree)",
+          "tag": "CF",
+          "url": "https://cricsfree.cfd/live/stream-645.php"
+        },
+        {
+          "name": "Player 5 (Apex)",
+          "tag": "AX",
+          "url": "https://apexstreams.cfd/live/stream-645.php"
+        },
+        {
+          "name": "Player 6 (DLive Cast)",
+          "tag": "DL",
+          "url": "https://dlive.sx/cast/stream-645.php"
+        },
+        {
+          "name": "Player 7 (DLHD Watch)",
+          "tag": "ST",
+          "url": "https://dlhd.st/watch/stream-645.php"
+        },
+        {
+          "name": "Player 8 (EngStreams)",
+          "tag": "ES",
+          "url": "https://engstreams.shop/stream/index.php?id=645"
+        }
+      ],
       "categories": [
         "⚽ Chaînes Sport Françaises"
-      ],
-      "release_year": 2026,
-      "match_score": 98,
-      "age_rating": "Tous publics",
-      "duration": "🔴 EN DIRECT 24/7",
-      "quality_badges": [
-        "LIVE",
-        "TNT 21",
-        "GRATUIT",
-        "VF"
-      ],
-      "cast": [
-        "Olivier Ménard",
-        "Carine Galli",
-        "Didier Roustan",
-        "Messaoud Benterki"
-      ],
-      "director": "Groupe Amaury"
-    },
-    {
-      "id": "tv_equidia",
-      "title": "Equidia Live HD",
-      "original_title": "Equidia",
-      "overview": "La chaîne officielle des courses hippiques en France : directs de Vincennes, Longchamp, Chantilly, cotes et analyses d'experts en temps réel.",
-      "media_type": "channel",
-      "channel_number": "Canal 61",
-      "current_program": "Grand Direct Hippique • Quinté+ & Prix d'Amérique",
-      "is_live": true,
-      "poster_url": "https://images.unsplash.com/photo-1534447677768-be436bb09401?auto=format&fit=crop&w=600&q=80",
-      "backdrop_url": "https://images.unsplash.com/photo-1534447677768-be436bb09401?auto=format&fit=crop&w=1920&q=80",
-      "logo_url": "https://i.imgur.com/QPpbRcZ.png",
-      "video_url": "/api/extract?id=tv_equidia&type=channel&server=1",
-      "sources": {
-        "hls": "/api/extract?id=tv_equidia&type=channel&server=1"
-      },
-      "categories": [
-        "⚽ Chaînes Sport Françaises"
-      ],
-      "release_year": 2026,
-      "match_score": 92,
-      "age_rating": "Tous publics",
-      "duration": "🔴 EN DIRECT 24/7",
-      "quality_badges": [
-        "LIVE",
-        "1080p FHD",
-        "EQUIDIA",
-        "VF"
-      ],
-      "cast": [
-        "Experts PMU & France Galop"
-      ],
-      "director": "Equidia"
-    },
-    {
-      "id": "tv_ufc",
-      "title": "UFC TV / Fight Pass HD",
-      "original_title": "UFC Fight Pass Live",
-      "overview": "Le temple mondial des arts martiaux mixtes : cartes principales de l'UFC, cartes préliminaires, Dana White's Contender Series et championnats du monde.",
-      "media_type": "channel",
-      "channel_number": "PPV 1",
-      "current_program": "UFC Main Card • Championnats du Monde MMA",
-      "is_live": true,
-      "poster_url": "https://images.unsplash.com/photo-1517438322307-e67111335449?auto=format&fit=crop&w=600&q=80",
-      "backdrop_url": "https://images.unsplash.com/photo-1517438322307-e67111335449?auto=format&fit=crop&w=1920&q=80",
-      "logo_url": "https://upload.wikimedia.org/wikipedia/commons/thumb/0/0d/UFC_logo.svg/500px-UFC_logo.svg.png",
-      "video_url": "/api/extract?id=tv_ufc&type=channel&server=1",
-      "sources": {
-        "hls": "/api/extract?id=tv_ufc&type=channel&server=1"
-      },
-      "categories": [
-        "🥊 Chaînes PPV & Sports de Combat"
       ],
       "release_year": 2026,
       "match_score": 99,
-      "age_rating": "16+",
-      "duration": "🔴 EN DIRECT PPV",
+      "age_rating": "Tous publics",
+      "duration": "DIRECT HD",
       "quality_badges": [
-        "LIVE",
-        "PPV VIP",
-        "1080p",
-        "UFC"
+        "1080p FHD",
+        "DIRECT",
+        "Anti-Pubs 🛡️"
       ],
-      "cast": [
-        "Dana White",
-        "Jon Jones",
-        "Islam Makhachev",
-        "Ciryl Gane"
-      ],
-      "director": "UFC Endeavor"
+      "is_hero": false
     },
     {
       "id": "tv_dazn1",
-      "title": "DAZN 1 France HD",
-      "original_title": "DAZN 1 France",
-      "overview": "La plateforme de streaming sportif mondial : Ligue 1 McDonald's en exclusivité, grands galas de boxe Matchroom & Golden Boy, et sports de combat.",
+      "daddy_id": 179,
+      "title": "DAZN 1 France",
+      "original_title": "DAZN France",
+      "overview": "La nouvelle maison de la Ligue 1 McDonald's, de la Betclic Élite et des grands combats de boxe.",
       "media_type": "channel",
-      "channel_number": "Canal 81",
-      "current_program": "Ligue 1 McDonald's • Choc du Dimanche Soir",
       "is_live": true,
-      "poster_url": "https://images.unsplash.com/photo-1508098682722-e99c43a406b2?auto=format&fit=crop&w=600&q=80",
+      "channel_number": 18,
+      "poster_url": "https://upload.wikimedia.org/wikipedia/commons/thumb/a/a2/DAZN_Logo_2019.svg/320px-DAZN_Logo_2019.svg.png",
       "backdrop_url": "https://images.unsplash.com/photo-1508098682722-e99c43a406b2?auto=format&fit=crop&w=1920&q=80",
-      "logo_url": "https://raw.githubusercontent.com/pigzillaaaaa/iptv-scraper/refs/heads/main/logos/dazn-1.png",
       "video_url": "/api/extract?id=tv_dazn1&type=channel&server=1",
       "sources": {
-        "hls": "/api/extract?id=tv_dazn1&type=channel&server=1"
+        "server1": "/api/extract?id=tv_dazn1&type=channel&server=1",
+        "server2": "/api/extract?id=tv_dazn1&type=channel&server=2",
+        "server3": "/api/extract?id=tv_dazn1&type=channel&server=3",
+        "server4": "/api/extract?id=tv_dazn1&type=channel&server=4",
+        "server5": "/api/extract?id=tv_dazn1&type=channel&server=5",
+        "daddylive_id": 179
       },
+      "players": [
+        {
+          "name": "Player 1 (HD Embed)",
+          "tag": "HD1",
+          "url": "https://daddylivehd1.sbs/embed/stream-179.php"
+        },
+        {
+          "name": "Player 2 (Miroir Li)",
+          "tag": "LI",
+          "url": "https://daddylive.li/player/embed.php?id=179"
+        },
+        {
+          "name": "Player 3 (Nontongo)",
+          "tag": "NT",
+          "url": "https://nontongo.win/livetv/179"
+        },
+        {
+          "name": "Player 4 (Cricsfree)",
+          "tag": "CF",
+          "url": "https://cricsfree.cfd/live/stream-179.php"
+        },
+        {
+          "name": "Player 5 (Apex)",
+          "tag": "AX",
+          "url": "https://apexstreams.cfd/live/stream-179.php"
+        },
+        {
+          "name": "Player 6 (DLive Cast)",
+          "tag": "DL",
+          "url": "https://dlive.sx/cast/stream-179.php"
+        },
+        {
+          "name": "Player 7 (DLHD Watch)",
+          "tag": "ST",
+          "url": "https://dlhd.st/watch/stream-179.php"
+        },
+        {
+          "name": "Player 8 (EngStreams)",
+          "tag": "ES",
+          "url": "https://engstreams.shop/stream/index.php?id=179"
+        }
+      ],
       "categories": [
-        "🥊 Chaînes PPV & Sports de Combat",
         "⚽ Chaînes Sport Françaises"
-      ],
-      "release_year": 2026,
-      "match_score": 98,
-      "age_rating": "Tous publics",
-      "duration": "🔴 EN DIRECT 24/7",
-      "quality_badges": [
-        "LIVE",
-        "1080p FHD",
-        "DAZN",
-        "VF"
-      ],
-      "cast": [
-        "Smail Bouabdellah",
-        "Benoît Cheyrou",
-        "Julien Brun"
-      ],
-      "director": "DAZN Group"
-    },
-    {
-      "id": "tv_wwe",
-      "title": "WWE Network HD",
-      "original_title": "WWE Network Live",
-      "overview": "Toutes les plus grandes superstars du catch américain en direct : Monday Night Raw, Friday Night SmackDown, WWE NXT et les grands PPV WrestleMania et Royal Rumble.",
-      "media_type": "channel",
-      "channel_number": "PPV 2",
-      "current_program": "WWE Monday Night Raw • Live Event Explosif",
-      "is_live": true,
-      "poster_url": "https://images.unsplash.com/photo-1517838277536-f5f99be501cd?auto=format&fit=crop&w=600&q=80",
-      "backdrop_url": "https://images.unsplash.com/photo-1517838277536-f5f99be501cd?auto=format&fit=crop&w=1920&q=80",
-      "logo_url": "https://raw.githubusercontent.com/pigzillaaaaa/iptv-scraper/refs/heads/main/logos/wwe-network.png",
-      "video_url": "/api/extract?id=tv_wwe&type=channel&server=1",
-      "sources": {
-        "hls": "/api/extract?id=tv_wwe&type=channel&server=1"
-      },
-      "categories": [
-        "🥊 Chaînes PPV & Sports de Combat"
-      ],
-      "release_year": 2026,
-      "match_score": 97,
-      "age_rating": "12+",
-      "duration": "🔴 EN DIRECT PPV",
-      "quality_badges": [
-        "LIVE",
-        "PPV VIP",
-        "1080p",
-        "WWE"
-      ],
-      "cast": [
-        "Roman Reigns",
-        "Cody Rhodes",
-        "Seth Rollins",
-        "Rhea Ripley"
-      ],
-      "director": "World Wrestling Entertainment"
-    },
-    {
-      "id": "tv_swerve_combat",
-      "title": "Swerve Combat HD",
-      "original_title": "Swerve Combat",
-      "overview": "La chaîne 100% action et arts martiaux : championnats de boxe internationale, kickboxing Glory, Muay Thai et galas MMA mondiaux.",
-      "media_type": "channel",
-      "channel_number": "Canal 84",
-      "current_program": "World Championship Kickboxing & Boxing Knockouts",
-      "is_live": true,
-      "poster_url": "https://images.unsplash.com/photo-1549719386-74dfcbf7dbed?auto=format&fit=crop&w=600&q=80",
-      "backdrop_url": "https://images.unsplash.com/photo-1549719386-74dfcbf7dbed?auto=format&fit=crop&w=1920&q=80",
-      "logo_url": "https://upload.wikimedia.org/wikipedia/commons/thumb/1/1a/Boxing_glove_icon.svg/500px-Boxing_glove_icon.svg.png",
-      "video_url": "/api/extract?id=tv_swerve_combat&type=channel&server=1",
-      "sources": {
-        "hls": "/api/extract?id=tv_swerve_combat&type=channel&server=1"
-      },
-      "categories": [
-        "🥊 Chaînes PPV & Sports de Combat"
-      ],
-      "release_year": 2026,
-      "match_score": 94,
-      "age_rating": "16+",
-      "duration": "🔴 EN DIRECT 24/7",
-      "quality_badges": [
-        "LIVE",
-        "1080p FHD",
-        "COMBAT"
-      ],
-      "cast": [
-        "Champions Mondiaux de Boxe & Kickboxing"
-      ],
-      "director": "Swerve TV"
-    },
-    {
-      "id": "tv_redbull",
-      "title": "Red Bull TV Sports Extrêmes HD",
-      "original_title": "Red Bull TV Live",
-      "overview": "L'adrénaline pure : Red Bull Rampage en VTT extrême, championnats de Cliff Diving, coulisses de l'écurie Oracle Red Bull Racing F1, surf géant et breakdance mondial.",
-      "media_type": "channel",
-      "channel_number": "Canal 91",
-      "current_program": "Red Bull Rampage • Descente Extrême VTT & F1 Backstage",
-      "is_live": true,
-      "poster_url": "https://images.unsplash.com/photo-1551698618-1dfe5d97d256?auto=format&fit=crop&w=600&q=80",
-      "backdrop_url": "https://images.unsplash.com/photo-1551698618-1dfe5d97d256?auto=format&fit=crop&w=1920&q=80",
-      "logo_url": "https://upload.wikimedia.org/wikipedia/en/thumb/f/f5/Red_Bull_TV_logo.svg/500px-Red_Bull_TV_logo.svg.png",
-      "video_url": "/api/extract?id=tv_redbull&type=channel&server=1",
-      "sources": {
-        "hls": "/api/extract?id=tv_redbull&type=channel&server=1"
-      },
-      "categories": [
-        "🏄 Sports Extrêmes & Découverte"
       ],
       "release_year": 2026,
       "match_score": 99,
       "age_rating": "Tous publics",
-      "duration": "🔴 EN DIRECT 24/7",
+      "duration": "DIRECT HD",
       "quality_badges": [
-        "LIVE",
         "1080p FHD",
-        "EXTRÊME",
-        "OFFICIEL"
+        "DIRECT",
+        "Anti-Pubs 🛡️"
       ],
-      "cast": [
-        "Max Verstappen",
-        "Travis Pastrana",
-        "Carissa Moore"
-      ],
-      "director": "Red Bull Media House"
+      "is_hero": false
     },
     {
-      "id": "tv_fifa",
-      "title": "FIFA+ Direct Français HD",
-      "original_title": "FIFA+ French Live",
-      "overview": "La chaîne officielle de la FIFA : archives légendaires des Coupes du Monde 1958 à 2022, matchs intégraux, documentaires exclusifs sur Zidane, Pelé et Maradona.",
+      "id": "tv_dazn_ligue1",
+      "daddy_id": 960,
+      "title": "DAZN Ligue 1 / Ligue 1+",
+      "original_title": "Ligue 1+ France / DAZN Ligue 1 France",
+      "overview": "Le canal dédié au championnat de France de football Ligue 1 en direct et en haute définition.",
       "media_type": "channel",
-      "channel_number": "Canal 92",
-      "current_program": "Les Plus Grands Matchs de l'Histoire de la Coupe du Monde",
       "is_live": true,
-      "poster_url": "https://images.unsplash.com/photo-1574629810360-7efbbe195018?auto=format&fit=crop&w=600&q=80",
-      "backdrop_url": "https://images.unsplash.com/photo-1574629810360-7efbbe195018?auto=format&fit=crop&w=1920&q=80",
-      "logo_url": "https://upload.wikimedia.org/wikipedia/commons/thumb/9/9c/FIFA%2B_%282025%29.svg/960px-FIFA%2B_%282025%29.svg.png",
-      "video_url": "/api/extract?id=tv_fifa&type=channel&server=1",
+      "channel_number": 19,
+      "poster_url": "https://upload.wikimedia.org/wikipedia/commons/thumb/a/a2/DAZN_Logo_2019.svg/320px-DAZN_Logo_2019.svg.png",
+      "backdrop_url": "https://images.unsplash.com/photo-1508098682722-e99c43a406b2?auto=format&fit=crop&w=1920&q=80",
+      "video_url": "/api/extract?id=tv_dazn_ligue1&type=channel&server=1",
       "sources": {
-        "hls": "/api/extract?id=tv_fifa&type=channel&server=1"
+        "server1": "/api/extract?id=tv_dazn_ligue1&type=channel&server=1",
+        "server2": "/api/extract?id=tv_dazn_ligue1&type=channel&server=2",
+        "server3": "/api/extract?id=tv_dazn_ligue1&type=channel&server=3",
+        "server4": "/api/extract?id=tv_dazn_ligue1&type=channel&server=4",
+        "server5": "/api/extract?id=tv_dazn_ligue1&type=channel&server=5",
+        "daddylive_id": 960
       },
+      "players": [
+        {
+          "name": "Player 1 (HD Embed)",
+          "tag": "HD1",
+          "url": "https://daddylivehd1.sbs/embed/stream-960.php"
+        },
+        {
+          "name": "Player 2 (Miroir Li)",
+          "tag": "LI",
+          "url": "https://daddylive.li/player/embed.php?id=960"
+        },
+        {
+          "name": "Player 3 (Nontongo)",
+          "tag": "NT",
+          "url": "https://nontongo.win/livetv/960"
+        },
+        {
+          "name": "Player 4 (Cricsfree)",
+          "tag": "CF",
+          "url": "https://cricsfree.cfd/live/stream-960.php"
+        },
+        {
+          "name": "Player 5 (Apex)",
+          "tag": "AX",
+          "url": "https://apexstreams.cfd/live/stream-960.php"
+        },
+        {
+          "name": "Player 6 (DLive Cast)",
+          "tag": "DL",
+          "url": "https://dlive.sx/cast/stream-960.php"
+        },
+        {
+          "name": "Player 7 (DLHD Watch)",
+          "tag": "ST",
+          "url": "https://dlhd.st/watch/stream-960.php"
+        },
+        {
+          "name": "Player 8 (EngStreams)",
+          "tag": "ES",
+          "url": "https://engstreams.shop/stream/index.php?id=960"
+        }
+      ],
+      "categories": [
+        "⚽ Chaînes Sport Françaises"
+      ],
+      "release_year": 2026,
+      "match_score": 99,
+      "age_rating": "Tous publics",
+      "duration": "DIRECT HD",
+      "quality_badges": [
+        "1080p FHD",
+        "DIRECT",
+        "Anti-Pubs 🛡️"
+      ],
+      "is_hero": false
+    },
+    {
+      "id": "tv_canal_live1",
+      "daddy_id": 203,
+      "title": "Canal+ Live 1",
+      "original_title": "Canal+ Live 1 France",
+      "overview": "Canal événementiel multi-écrans pour les soirées de Champions League et Europa League.",
+      "media_type": "channel",
+      "is_live": true,
+      "channel_number": 20,
+      "poster_url": "https://upload.wikimedia.org/wikipedia/commons/thumb/e/e0/Canal%2B_2013.svg/320px-Canal%2B_2013.svg.png",
+      "backdrop_url": "https://images.unsplash.com/photo-1508098682722-e99c43a406b2?auto=format&fit=crop&w=1920&q=80",
+      "video_url": "/api/extract?id=tv_canal_live1&type=channel&server=1",
+      "sources": {
+        "server1": "/api/extract?id=tv_canal_live1&type=channel&server=1",
+        "server2": "/api/extract?id=tv_canal_live1&type=channel&server=2",
+        "server3": "/api/extract?id=tv_canal_live1&type=channel&server=3",
+        "server4": "/api/extract?id=tv_canal_live1&type=channel&server=4",
+        "server5": "/api/extract?id=tv_canal_live1&type=channel&server=5",
+        "daddylive_id": 203
+      },
+      "players": [
+        {
+          "name": "Player 1 (HD Embed)",
+          "tag": "HD1",
+          "url": "https://daddylivehd1.sbs/embed/stream-203.php"
+        },
+        {
+          "name": "Player 2 (Miroir Li)",
+          "tag": "LI",
+          "url": "https://daddylive.li/player/embed.php?id=203"
+        },
+        {
+          "name": "Player 3 (Nontongo)",
+          "tag": "NT",
+          "url": "https://nontongo.win/livetv/203"
+        },
+        {
+          "name": "Player 4 (Cricsfree)",
+          "tag": "CF",
+          "url": "https://cricsfree.cfd/live/stream-203.php"
+        },
+        {
+          "name": "Player 5 (Apex)",
+          "tag": "AX",
+          "url": "https://apexstreams.cfd/live/stream-203.php"
+        },
+        {
+          "name": "Player 6 (DLive Cast)",
+          "tag": "DL",
+          "url": "https://dlive.sx/cast/stream-203.php"
+        },
+        {
+          "name": "Player 7 (DLHD Watch)",
+          "tag": "ST",
+          "url": "https://dlhd.st/watch/stream-203.php"
+        },
+        {
+          "name": "Player 8 (EngStreams)",
+          "tag": "ES",
+          "url": "https://engstreams.shop/stream/index.php?id=203"
+        }
+      ],
+      "categories": [
+        "⚽ Chaînes Sport Françaises"
+      ],
+      "release_year": 2026,
+      "match_score": 99,
+      "age_rating": "Tous publics",
+      "duration": "DIRECT HD",
+      "quality_badges": [
+        "1080p FHD",
+        "DIRECT",
+        "Anti-Pubs 🛡️"
+      ],
+      "is_hero": false
+    },
+    {
+      "id": "tv_canal_live2",
+      "daddy_id": 194,
+      "title": "Canal+ Live 2",
+      "original_title": "Canal+ Live 2 France",
+      "overview": "Diffusion en direct des rencontres européennes simultanées de l'UEFA.",
+      "media_type": "channel",
+      "is_live": true,
+      "channel_number": 21,
+      "poster_url": "https://upload.wikimedia.org/wikipedia/commons/thumb/e/e0/Canal%2B_2013.svg/320px-Canal%2B_2013.svg.png",
+      "backdrop_url": "https://images.unsplash.com/photo-1508098682722-e99c43a406b2?auto=format&fit=crop&w=1920&q=80",
+      "video_url": "/api/extract?id=tv_canal_live2&type=channel&server=1",
+      "sources": {
+        "server1": "/api/extract?id=tv_canal_live2&type=channel&server=1",
+        "server2": "/api/extract?id=tv_canal_live2&type=channel&server=2",
+        "server3": "/api/extract?id=tv_canal_live2&type=channel&server=3",
+        "server4": "/api/extract?id=tv_canal_live2&type=channel&server=4",
+        "server5": "/api/extract?id=tv_canal_live2&type=channel&server=5",
+        "daddylive_id": 194
+      },
+      "players": [
+        {
+          "name": "Player 1 (HD Embed)",
+          "tag": "HD1",
+          "url": "https://daddylivehd1.sbs/embed/stream-194.php"
+        },
+        {
+          "name": "Player 2 (Miroir Li)",
+          "tag": "LI",
+          "url": "https://daddylive.li/player/embed.php?id=194"
+        },
+        {
+          "name": "Player 3 (Nontongo)",
+          "tag": "NT",
+          "url": "https://nontongo.win/livetv/194"
+        },
+        {
+          "name": "Player 4 (Cricsfree)",
+          "tag": "CF",
+          "url": "https://cricsfree.cfd/live/stream-194.php"
+        },
+        {
+          "name": "Player 5 (Apex)",
+          "tag": "AX",
+          "url": "https://apexstreams.cfd/live/stream-194.php"
+        },
+        {
+          "name": "Player 6 (DLive Cast)",
+          "tag": "DL",
+          "url": "https://dlive.sx/cast/stream-194.php"
+        },
+        {
+          "name": "Player 7 (DLHD Watch)",
+          "tag": "ST",
+          "url": "https://dlhd.st/watch/stream-194.php"
+        },
+        {
+          "name": "Player 8 (EngStreams)",
+          "tag": "ES",
+          "url": "https://engstreams.shop/stream/index.php?id=194"
+        }
+      ],
+      "categories": [
+        "⚽ Chaînes Sport Françaises"
+      ],
+      "release_year": 2026,
+      "match_score": 99,
+      "age_rating": "Tous publics",
+      "duration": "DIRECT HD",
+      "quality_badges": [
+        "1080p FHD",
+        "DIRECT",
+        "Anti-Pubs 🛡️"
+      ],
+      "is_hero": false
+    },
+    {
+      "id": "tv_canal_live3",
+      "daddy_id": 68,
+      "title": "Canal+ Live 3",
+      "original_title": "Canal+ Live 3 France",
+      "overview": "Diffusion en direct multi-flux des rencontres simultanées de football.",
+      "media_type": "channel",
+      "is_live": true,
+      "channel_number": 22,
+      "poster_url": "https://upload.wikimedia.org/wikipedia/commons/thumb/e/e0/Canal%2B_2013.svg/320px-Canal%2B_2013.svg.png",
+      "backdrop_url": "https://images.unsplash.com/photo-1508098682722-e99c43a406b2?auto=format&fit=crop&w=1920&q=80",
+      "video_url": "/api/extract?id=tv_canal_live3&type=channel&server=1",
+      "sources": {
+        "server1": "/api/extract?id=tv_canal_live3&type=channel&server=1",
+        "server2": "/api/extract?id=tv_canal_live3&type=channel&server=2",
+        "server3": "/api/extract?id=tv_canal_live3&type=channel&server=3",
+        "server4": "/api/extract?id=tv_canal_live3&type=channel&server=4",
+        "server5": "/api/extract?id=tv_canal_live3&type=channel&server=5",
+        "daddylive_id": 68
+      },
+      "players": [
+        {
+          "name": "Player 1 (HD Embed)",
+          "tag": "HD1",
+          "url": "https://daddylivehd1.sbs/embed/stream-68.php"
+        },
+        {
+          "name": "Player 2 (Miroir Li)",
+          "tag": "LI",
+          "url": "https://daddylive.li/player/embed.php?id=68"
+        },
+        {
+          "name": "Player 3 (Nontongo)",
+          "tag": "NT",
+          "url": "https://nontongo.win/livetv/68"
+        },
+        {
+          "name": "Player 4 (Cricsfree)",
+          "tag": "CF",
+          "url": "https://cricsfree.cfd/live/stream-68.php"
+        },
+        {
+          "name": "Player 5 (Apex)",
+          "tag": "AX",
+          "url": "https://apexstreams.cfd/live/stream-68.php"
+        },
+        {
+          "name": "Player 6 (DLive Cast)",
+          "tag": "DL",
+          "url": "https://dlive.sx/cast/stream-68.php"
+        },
+        {
+          "name": "Player 7 (DLHD Watch)",
+          "tag": "ST",
+          "url": "https://dlhd.st/watch/stream-68.php"
+        },
+        {
+          "name": "Player 8 (EngStreams)",
+          "tag": "ES",
+          "url": "https://engstreams.shop/stream/index.php?id=68"
+        }
+      ],
+      "categories": [
+        "⚽ Chaînes Sport Françaises"
+      ],
+      "release_year": 2026,
+      "match_score": 99,
+      "age_rating": "Tous publics",
+      "duration": "DIRECT HD",
+      "quality_badges": [
+        "1080p FHD",
+        "DIRECT",
+        "Anti-Pubs 🛡️"
+      ],
+      "is_hero": false
+    },
+    {
+      "id": "tv_ufc_fightpass",
+      "daddy_id": 250,
+      "title": "UFC Fight Pass",
+      "original_title": "UFC Fight Pass",
+      "overview": "Le pass officiel UFC : toutes les archives, les combats préliminaires et championnats mondiaux de MMA.",
+      "media_type": "channel",
+      "is_live": true,
+      "channel_number": 30,
+      "poster_url": "https://upload.wikimedia.org/wikipedia/commons/thumb/0/0d/UFC_logo.svg/640px-UFC_logo.svg.png",
+      "backdrop_url": "https://images.unsplash.com/photo-1517838277536-f5f99be501cd?auto=format&fit=crop&w=1920&q=80",
+      "video_url": "/api/extract?id=tv_ufc_fightpass&type=channel&server=1",
+      "sources": {
+        "server1": "/api/extract?id=tv_ufc_fightpass&type=channel&server=1",
+        "server2": "/api/extract?id=tv_ufc_fightpass&type=channel&server=2",
+        "server3": "/api/extract?id=tv_ufc_fightpass&type=channel&server=3",
+        "server4": "/api/extract?id=tv_ufc_fightpass&type=channel&server=4",
+        "server5": "/api/extract?id=tv_ufc_fightpass&type=channel&server=5",
+        "daddylive_id": 250
+      },
+      "players": [
+        {
+          "name": "Player 1 (HD Embed)",
+          "tag": "HD1",
+          "url": "https://daddylivehd1.sbs/embed/stream-250.php"
+        },
+        {
+          "name": "Player 2 (Miroir Li)",
+          "tag": "LI",
+          "url": "https://daddylive.li/player/embed.php?id=250"
+        },
+        {
+          "name": "Player 3 (Nontongo)",
+          "tag": "NT",
+          "url": "https://nontongo.win/livetv/250"
+        },
+        {
+          "name": "Player 4 (Cricsfree)",
+          "tag": "CF",
+          "url": "https://cricsfree.cfd/live/stream-250.php"
+        },
+        {
+          "name": "Player 5 (Apex)",
+          "tag": "AX",
+          "url": "https://apexstreams.cfd/live/stream-250.php"
+        },
+        {
+          "name": "Player 6 (DLive Cast)",
+          "tag": "DL",
+          "url": "https://dlive.sx/cast/stream-250.php"
+        },
+        {
+          "name": "Player 7 (DLHD Watch)",
+          "tag": "ST",
+          "url": "https://dlhd.st/watch/stream-250.php"
+        },
+        {
+          "name": "Player 8 (EngStreams)",
+          "tag": "ES",
+          "url": "https://engstreams.shop/stream/index.php?id=250"
+        }
+      ],
+      "categories": [
+        "🥊 Chaînes PPV & Sports de Combat"
+      ],
+      "release_year": 2026,
+      "match_score": 99,
+      "age_rating": "Tous publics",
+      "duration": "DIRECT HD",
+      "quality_badges": [
+        "1080p FHD",
+        "DIRECT",
+        "Anti-Pubs 🛡️"
+      ],
+      "is_hero": false
+    },
+    {
+      "id": "tv_ufc_channel",
+      "daddy_id": 2003,
+      "title": "UFC Channel HD",
+      "original_title": "UFC Channel",
+      "overview": "Canal 24/7 dédié à l'Ultimate Fighting Championship avec les combats historiques et analyses.",
+      "media_type": "channel",
+      "is_live": true,
+      "channel_number": 31,
+      "poster_url": "https://upload.wikimedia.org/wikipedia/commons/thumb/0/0d/UFC_logo.svg/640px-UFC_logo.svg.png",
+      "backdrop_url": "https://images.unsplash.com/photo-1517838277536-f5f99be501cd?auto=format&fit=crop&w=1920&q=80",
+      "video_url": "/api/extract?id=tv_ufc_channel&type=channel&server=1",
+      "sources": {
+        "server1": "/api/extract?id=tv_ufc_channel&type=channel&server=1",
+        "server2": "/api/extract?id=tv_ufc_channel&type=channel&server=2",
+        "server3": "/api/extract?id=tv_ufc_channel&type=channel&server=3",
+        "server4": "/api/extract?id=tv_ufc_channel&type=channel&server=4",
+        "server5": "/api/extract?id=tv_ufc_channel&type=channel&server=5",
+        "daddylive_id": 2003
+      },
+      "players": [
+        {
+          "name": "Player 1 (HD Embed)",
+          "tag": "HD1",
+          "url": "https://daddylivehd1.sbs/embed/stream-2003.php"
+        },
+        {
+          "name": "Player 2 (Miroir Li)",
+          "tag": "LI",
+          "url": "https://daddylive.li/player/embed.php?id=2003"
+        },
+        {
+          "name": "Player 3 (Nontongo)",
+          "tag": "NT",
+          "url": "https://nontongo.win/livetv/2003"
+        },
+        {
+          "name": "Player 4 (Cricsfree)",
+          "tag": "CF",
+          "url": "https://cricsfree.cfd/live/stream-2003.php"
+        },
+        {
+          "name": "Player 5 (Apex)",
+          "tag": "AX",
+          "url": "https://apexstreams.cfd/live/stream-2003.php"
+        },
+        {
+          "name": "Player 6 (DLive Cast)",
+          "tag": "DL",
+          "url": "https://dlive.sx/cast/stream-2003.php"
+        },
+        {
+          "name": "Player 7 (DLHD Watch)",
+          "tag": "ST",
+          "url": "https://dlhd.st/watch/stream-2003.php"
+        },
+        {
+          "name": "Player 8 (EngStreams)",
+          "tag": "ES",
+          "url": "https://engstreams.shop/stream/index.php?id=2003"
+        }
+      ],
+      "categories": [
+        "🥊 Chaînes PPV & Sports de Combat"
+      ],
+      "release_year": 2026,
+      "match_score": 99,
+      "age_rating": "Tous publics",
+      "duration": "DIRECT HD",
+      "quality_badges": [
+        "1080p FHD",
+        "DIRECT",
+        "Anti-Pubs 🛡️"
+      ],
+      "is_hero": false
+    },
+    {
+      "id": "tv_ufc_fightnight",
+      "daddy_id": 5015,
+      "title": "UFC Fight Night Live",
+      "original_title": "UFC Fight Night",
+      "overview": "Diffusion exclusive des soirées UFC Fight Night en direct chaque week-end.",
+      "media_type": "channel",
+      "is_live": true,
+      "channel_number": 32,
+      "poster_url": "https://upload.wikimedia.org/wikipedia/commons/thumb/0/0d/UFC_logo.svg/640px-UFC_logo.svg.png",
+      "backdrop_url": "https://images.unsplash.com/photo-1517838277536-f5f99be501cd?auto=format&fit=crop&w=1920&q=80",
+      "video_url": "/api/extract?id=tv_ufc_fightnight&type=channel&server=1",
+      "sources": {
+        "server1": "/api/extract?id=tv_ufc_fightnight&type=channel&server=1",
+        "server2": "/api/extract?id=tv_ufc_fightnight&type=channel&server=2",
+        "server3": "/api/extract?id=tv_ufc_fightnight&type=channel&server=3",
+        "server4": "/api/extract?id=tv_ufc_fightnight&type=channel&server=4",
+        "server5": "/api/extract?id=tv_ufc_fightnight&type=channel&server=5",
+        "daddylive_id": 5015
+      },
+      "players": [
+        {
+          "name": "Player 1 (HD Embed)",
+          "tag": "HD1",
+          "url": "https://daddylivehd1.sbs/embed/stream-5015.php"
+        },
+        {
+          "name": "Player 2 (Miroir Li)",
+          "tag": "LI",
+          "url": "https://daddylive.li/player/embed.php?id=5015"
+        },
+        {
+          "name": "Player 3 (Nontongo)",
+          "tag": "NT",
+          "url": "https://nontongo.win/livetv/5015"
+        },
+        {
+          "name": "Player 4 (Cricsfree)",
+          "tag": "CF",
+          "url": "https://cricsfree.cfd/live/stream-5015.php"
+        },
+        {
+          "name": "Player 5 (Apex)",
+          "tag": "AX",
+          "url": "https://apexstreams.cfd/live/stream-5015.php"
+        },
+        {
+          "name": "Player 6 (DLive Cast)",
+          "tag": "DL",
+          "url": "https://dlive.sx/cast/stream-5015.php"
+        },
+        {
+          "name": "Player 7 (DLHD Watch)",
+          "tag": "ST",
+          "url": "https://dlhd.st/watch/stream-5015.php"
+        },
+        {
+          "name": "Player 8 (EngStreams)",
+          "tag": "ES",
+          "url": "https://engstreams.shop/stream/index.php?id=5015"
+        }
+      ],
+      "categories": [
+        "🥊 Chaînes PPV & Sports de Combat"
+      ],
+      "release_year": 2026,
+      "match_score": 99,
+      "age_rating": "Tous publics",
+      "duration": "DIRECT HD",
+      "quality_badges": [
+        "1080p FHD",
+        "DIRECT",
+        "Anti-Pubs 🛡️"
+      ],
+      "is_hero": false
+    },
+    {
+      "id": "tv_wwe_network",
+      "daddy_id": 376,
+      "title": "WWE Network HD",
+      "original_title": "WWE Network",
+      "overview": "Le réseau officiel de catch : Monday Night RAW, SmackDown, NXT et documentaires cultes.",
+      "media_type": "channel",
+      "is_live": true,
+      "channel_number": 33,
+      "poster_url": "https://upload.wikimedia.org/wikipedia/commons/thumb/c/cd/WWE_Network_Logo.svg/640px-WWE_Network_Logo.svg.png",
+      "backdrop_url": "https://images.unsplash.com/photo-1517838277536-f5f99be501cd?auto=format&fit=crop&w=1920&q=80",
+      "video_url": "/api/extract?id=tv_wwe_network&type=channel&server=1",
+      "sources": {
+        "server1": "/api/extract?id=tv_wwe_network&type=channel&server=1",
+        "server2": "/api/extract?id=tv_wwe_network&type=channel&server=2",
+        "server3": "/api/extract?id=tv_wwe_network&type=channel&server=3",
+        "server4": "/api/extract?id=tv_wwe_network&type=channel&server=4",
+        "server5": "/api/extract?id=tv_wwe_network&type=channel&server=5",
+        "daddylive_id": 376
+      },
+      "players": [
+        {
+          "name": "Player 1 (HD Embed)",
+          "tag": "HD1",
+          "url": "https://daddylivehd1.sbs/embed/stream-376.php"
+        },
+        {
+          "name": "Player 2 (Miroir Li)",
+          "tag": "LI",
+          "url": "https://daddylive.li/player/embed.php?id=376"
+        },
+        {
+          "name": "Player 3 (Nontongo)",
+          "tag": "NT",
+          "url": "https://nontongo.win/livetv/376"
+        },
+        {
+          "name": "Player 4 (Cricsfree)",
+          "tag": "CF",
+          "url": "https://cricsfree.cfd/live/stream-376.php"
+        },
+        {
+          "name": "Player 5 (Apex)",
+          "tag": "AX",
+          "url": "https://apexstreams.cfd/live/stream-376.php"
+        },
+        {
+          "name": "Player 6 (DLive Cast)",
+          "tag": "DL",
+          "url": "https://dlive.sx/cast/stream-376.php"
+        },
+        {
+          "name": "Player 7 (DLHD Watch)",
+          "tag": "ST",
+          "url": "https://dlhd.st/watch/stream-376.php"
+        },
+        {
+          "name": "Player 8 (EngStreams)",
+          "tag": "ES",
+          "url": "https://engstreams.shop/stream/index.php?id=376"
+        }
+      ],
+      "categories": [
+        "🥊 Chaînes PPV & Sports de Combat"
+      ],
+      "release_year": 2026,
+      "match_score": 99,
+      "age_rating": "Tous publics",
+      "duration": "DIRECT HD",
+      "quality_badges": [
+        "1080p FHD",
+        "DIRECT",
+        "Anti-Pubs 🛡️"
+      ],
+      "is_hero": false
+    },
+    {
+      "id": "tv_wwe_ppv",
+      "daddy_id": 5005,
+      "title": "WWE PPV Live",
+      "original_title": "WWE PPV",
+      "overview": "Les plus grands shows de pay-per-view : WrestleMania, Royal Rumble, SummerSlam et Survivor Series.",
+      "media_type": "channel",
+      "is_live": true,
+      "channel_number": 34,
+      "poster_url": "https://upload.wikimedia.org/wikipedia/commons/thumb/c/cd/WWE_Network_Logo.svg/640px-WWE_Network_Logo.svg.png",
+      "backdrop_url": "https://images.unsplash.com/photo-1517838277536-f5f99be501cd?auto=format&fit=crop&w=1920&q=80",
+      "video_url": "/api/extract?id=tv_wwe_ppv&type=channel&server=1",
+      "sources": {
+        "server1": "/api/extract?id=tv_wwe_ppv&type=channel&server=1",
+        "server2": "/api/extract?id=tv_wwe_ppv&type=channel&server=2",
+        "server3": "/api/extract?id=tv_wwe_ppv&type=channel&server=3",
+        "server4": "/api/extract?id=tv_wwe_ppv&type=channel&server=4",
+        "server5": "/api/extract?id=tv_wwe_ppv&type=channel&server=5",
+        "daddylive_id": 5005
+      },
+      "players": [
+        {
+          "name": "Player 1 (HD Embed)",
+          "tag": "HD1",
+          "url": "https://daddylivehd1.sbs/embed/stream-5005.php"
+        },
+        {
+          "name": "Player 2 (Miroir Li)",
+          "tag": "LI",
+          "url": "https://daddylive.li/player/embed.php?id=5005"
+        },
+        {
+          "name": "Player 3 (Nontongo)",
+          "tag": "NT",
+          "url": "https://nontongo.win/livetv/5005"
+        },
+        {
+          "name": "Player 4 (Cricsfree)",
+          "tag": "CF",
+          "url": "https://cricsfree.cfd/live/stream-5005.php"
+        },
+        {
+          "name": "Player 5 (Apex)",
+          "tag": "AX",
+          "url": "https://apexstreams.cfd/live/stream-5005.php"
+        },
+        {
+          "name": "Player 6 (DLive Cast)",
+          "tag": "DL",
+          "url": "https://dlive.sx/cast/stream-5005.php"
+        },
+        {
+          "name": "Player 7 (DLHD Watch)",
+          "tag": "ST",
+          "url": "https://dlhd.st/watch/stream-5005.php"
+        },
+        {
+          "name": "Player 8 (EngStreams)",
+          "tag": "ES",
+          "url": "https://engstreams.shop/stream/index.php?id=5005"
+        }
+      ],
+      "categories": [
+        "🥊 Chaînes PPV & Sports de Combat"
+      ],
+      "release_year": 2026,
+      "match_score": 99,
+      "age_rating": "Tous publics",
+      "duration": "DIRECT HD",
+      "quality_badges": [
+        "1080p FHD",
+        "DIRECT",
+        "Anti-Pubs 🛡️"
+      ],
+      "is_hero": false
+    },
+    {
+      "id": "tv_dazn_ppv",
+      "daddy_id": 161,
+      "title": "DAZN PPV Boxing",
+      "original_title": "DAZN PPV",
+      "overview": "Les championnats du monde de boxe anglaise des poids lourds et méga-combats en direct.",
+      "media_type": "channel",
+      "is_live": true,
+      "channel_number": 35,
+      "poster_url": "https://upload.wikimedia.org/wikipedia/commons/thumb/a/a2/DAZN_Logo_2019.svg/320px-DAZN_Logo_2019.svg.png",
+      "backdrop_url": "https://images.unsplash.com/photo-1517838277536-f5f99be501cd?auto=format&fit=crop&w=1920&q=80",
+      "video_url": "/api/extract?id=tv_dazn_ppv&type=channel&server=1",
+      "sources": {
+        "server1": "/api/extract?id=tv_dazn_ppv&type=channel&server=1",
+        "server2": "/api/extract?id=tv_dazn_ppv&type=channel&server=2",
+        "server3": "/api/extract?id=tv_dazn_ppv&type=channel&server=3",
+        "server4": "/api/extract?id=tv_dazn_ppv&type=channel&server=4",
+        "server5": "/api/extract?id=tv_dazn_ppv&type=channel&server=5",
+        "daddylive_id": 161
+      },
+      "players": [
+        {
+          "name": "Player 1 (HD Embed)",
+          "tag": "HD1",
+          "url": "https://daddylivehd1.sbs/embed/stream-161.php"
+        },
+        {
+          "name": "Player 2 (Miroir Li)",
+          "tag": "LI",
+          "url": "https://daddylive.li/player/embed.php?id=161"
+        },
+        {
+          "name": "Player 3 (Nontongo)",
+          "tag": "NT",
+          "url": "https://nontongo.win/livetv/161"
+        },
+        {
+          "name": "Player 4 (Cricsfree)",
+          "tag": "CF",
+          "url": "https://cricsfree.cfd/live/stream-161.php"
+        },
+        {
+          "name": "Player 5 (Apex)",
+          "tag": "AX",
+          "url": "https://apexstreams.cfd/live/stream-161.php"
+        },
+        {
+          "name": "Player 6 (DLive Cast)",
+          "tag": "DL",
+          "url": "https://dlive.sx/cast/stream-161.php"
+        },
+        {
+          "name": "Player 7 (DLHD Watch)",
+          "tag": "ST",
+          "url": "https://dlhd.st/watch/stream-161.php"
+        },
+        {
+          "name": "Player 8 (EngStreams)",
+          "tag": "ES",
+          "url": "https://engstreams.shop/stream/index.php?id=161"
+        }
+      ],
+      "categories": [
+        "🥊 Chaînes PPV & Sports de Combat"
+      ],
+      "release_year": 2026,
+      "match_score": 99,
+      "age_rating": "Tous publics",
+      "duration": "DIRECT HD",
+      "quality_badges": [
+        "1080p FHD",
+        "DIRECT",
+        "Anti-Pubs 🛡️"
+      ],
+      "is_hero": false
+    },
+    {
+      "id": "tv_event_ppv",
+      "daddy_id": 228,
+      "title": "Event PPV Direct",
+      "original_title": "Event PPV",
+      "overview": "Canal dédié aux événements spéciaux pay-per-view de sports de combat et soirées mondiales.",
+      "media_type": "channel",
+      "is_live": true,
+      "channel_number": 36,
+      "poster_url": "https://upload.wikimedia.org/wikipedia/commons/thumb/9/93/Pay-per-view_logo.svg/640px-Pay-per-view_logo.svg.png",
+      "backdrop_url": "https://images.unsplash.com/photo-1517838277536-f5f99be501cd?auto=format&fit=crop&w=1920&q=80",
+      "video_url": "/api/extract?id=tv_event_ppv&type=channel&server=1",
+      "sources": {
+        "server1": "/api/extract?id=tv_event_ppv&type=channel&server=1",
+        "server2": "/api/extract?id=tv_event_ppv&type=channel&server=2",
+        "server3": "/api/extract?id=tv_event_ppv&type=channel&server=3",
+        "server4": "/api/extract?id=tv_event_ppv&type=channel&server=4",
+        "server5": "/api/extract?id=tv_event_ppv&type=channel&server=5",
+        "daddylive_id": 228
+      },
+      "players": [
+        {
+          "name": "Player 1 (HD Embed)",
+          "tag": "HD1",
+          "url": "https://daddylivehd1.sbs/embed/stream-228.php"
+        },
+        {
+          "name": "Player 2 (Miroir Li)",
+          "tag": "LI",
+          "url": "https://daddylive.li/player/embed.php?id=228"
+        },
+        {
+          "name": "Player 3 (Nontongo)",
+          "tag": "NT",
+          "url": "https://nontongo.win/livetv/228"
+        },
+        {
+          "name": "Player 4 (Cricsfree)",
+          "tag": "CF",
+          "url": "https://cricsfree.cfd/live/stream-228.php"
+        },
+        {
+          "name": "Player 5 (Apex)",
+          "tag": "AX",
+          "url": "https://apexstreams.cfd/live/stream-228.php"
+        },
+        {
+          "name": "Player 6 (DLive Cast)",
+          "tag": "DL",
+          "url": "https://dlive.sx/cast/stream-228.php"
+        },
+        {
+          "name": "Player 7 (DLHD Watch)",
+          "tag": "ST",
+          "url": "https://dlhd.st/watch/stream-228.php"
+        },
+        {
+          "name": "Player 8 (EngStreams)",
+          "tag": "ES",
+          "url": "https://engstreams.shop/stream/index.php?id=228"
+        }
+      ],
+      "categories": [
+        "🥊 Chaînes PPV & Sports de Combat"
+      ],
+      "release_year": 2026,
+      "match_score": 99,
+      "age_rating": "Tous publics",
+      "duration": "DIRECT HD",
+      "quality_badges": [
+        "1080p FHD",
+        "DIRECT",
+        "Anti-Pubs 🛡️"
+      ],
+      "is_hero": false
+    },
+    {
+      "id": "tv_ppv_events",
+      "daddy_id": 5000,
+      "title": "PPV Events VIP",
+      "original_title": "PPV Events",
+      "overview": "Accès exclusif aux flux mondiaux de pay-per-view sportifs et galas de boxe/MMA.",
+      "media_type": "channel",
+      "is_live": true,
+      "channel_number": 37,
+      "poster_url": "https://upload.wikimedia.org/wikipedia/commons/thumb/9/93/Pay-per-view_logo.svg/640px-Pay-per-view_logo.svg.png",
+      "backdrop_url": "https://images.unsplash.com/photo-1517838277536-f5f99be501cd?auto=format&fit=crop&w=1920&q=80",
+      "video_url": "/api/extract?id=tv_ppv_events&type=channel&server=1",
+      "sources": {
+        "server1": "/api/extract?id=tv_ppv_events&type=channel&server=1",
+        "server2": "/api/extract?id=tv_ppv_events&type=channel&server=2",
+        "server3": "/api/extract?id=tv_ppv_events&type=channel&server=3",
+        "server4": "/api/extract?id=tv_ppv_events&type=channel&server=4",
+        "server5": "/api/extract?id=tv_ppv_events&type=channel&server=5",
+        "daddylive_id": 5000
+      },
+      "players": [
+        {
+          "name": "Player 1 (HD Embed)",
+          "tag": "HD1",
+          "url": "https://daddylivehd1.sbs/embed/stream-5000.php"
+        },
+        {
+          "name": "Player 2 (Miroir Li)",
+          "tag": "LI",
+          "url": "https://daddylive.li/player/embed.php?id=5000"
+        },
+        {
+          "name": "Player 3 (Nontongo)",
+          "tag": "NT",
+          "url": "https://nontongo.win/livetv/5000"
+        },
+        {
+          "name": "Player 4 (Cricsfree)",
+          "tag": "CF",
+          "url": "https://cricsfree.cfd/live/stream-5000.php"
+        },
+        {
+          "name": "Player 5 (Apex)",
+          "tag": "AX",
+          "url": "https://apexstreams.cfd/live/stream-5000.php"
+        },
+        {
+          "name": "Player 6 (DLive Cast)",
+          "tag": "DL",
+          "url": "https://dlive.sx/cast/stream-5000.php"
+        },
+        {
+          "name": "Player 7 (DLHD Watch)",
+          "tag": "ST",
+          "url": "https://dlhd.st/watch/stream-5000.php"
+        },
+        {
+          "name": "Player 8 (EngStreams)",
+          "tag": "ES",
+          "url": "https://engstreams.shop/stream/index.php?id=5000"
+        }
+      ],
+      "categories": [
+        "🥊 Chaînes PPV & Sports de Combat"
+      ],
+      "release_year": 2026,
+      "match_score": 99,
+      "age_rating": "Tous publics",
+      "duration": "DIRECT HD",
+      "quality_badges": [
+        "1080p FHD",
+        "DIRECT",
+        "Anti-Pubs 🛡️"
+      ],
+      "is_hero": false
+    },
+    {
+      "id": "tv_fight_network",
+      "daddy_id": 757,
+      "title": "Fight Network",
+      "original_title": "Fight Network",
+      "overview": "La chaîne internationale 100% consacrée aux arts martiaux, kickboxing, jiu-jitsu et MMA.",
+      "media_type": "channel",
+      "is_live": true,
+      "channel_number": 38,
+      "poster_url": "https://upload.wikimedia.org/wikipedia/en/thumb/f/f6/Fight_Network_logo.svg/640px-Fight_Network_logo.svg.png",
+      "backdrop_url": "https://images.unsplash.com/photo-1517838277536-f5f99be501cd?auto=format&fit=crop&w=1920&q=80",
+      "video_url": "/api/extract?id=tv_fight_network&type=channel&server=1",
+      "sources": {
+        "server1": "/api/extract?id=tv_fight_network&type=channel&server=1",
+        "server2": "/api/extract?id=tv_fight_network&type=channel&server=2",
+        "server3": "/api/extract?id=tv_fight_network&type=channel&server=3",
+        "server4": "/api/extract?id=tv_fight_network&type=channel&server=4",
+        "server5": "/api/extract?id=tv_fight_network&type=channel&server=5",
+        "daddylive_id": 757
+      },
+      "players": [
+        {
+          "name": "Player 1 (HD Embed)",
+          "tag": "HD1",
+          "url": "https://daddylivehd1.sbs/embed/stream-757.php"
+        },
+        {
+          "name": "Player 2 (Miroir Li)",
+          "tag": "LI",
+          "url": "https://daddylive.li/player/embed.php?id=757"
+        },
+        {
+          "name": "Player 3 (Nontongo)",
+          "tag": "NT",
+          "url": "https://nontongo.win/livetv/757"
+        },
+        {
+          "name": "Player 4 (Cricsfree)",
+          "tag": "CF",
+          "url": "https://cricsfree.cfd/live/stream-757.php"
+        },
+        {
+          "name": "Player 5 (Apex)",
+          "tag": "AX",
+          "url": "https://apexstreams.cfd/live/stream-757.php"
+        },
+        {
+          "name": "Player 6 (DLive Cast)",
+          "tag": "DL",
+          "url": "https://dlive.sx/cast/stream-757.php"
+        },
+        {
+          "name": "Player 7 (DLHD Watch)",
+          "tag": "ST",
+          "url": "https://dlhd.st/watch/stream-757.php"
+        },
+        {
+          "name": "Player 8 (EngStreams)",
+          "tag": "ES",
+          "url": "https://engstreams.shop/stream/index.php?id=757"
+        }
+      ],
+      "categories": [
+        "🥊 Chaînes PPV & Sports de Combat"
+      ],
+      "release_year": 2026,
+      "match_score": 99,
+      "age_rating": "Tous publics",
+      "duration": "DIRECT HD",
+      "quality_badges": [
+        "1080p FHD",
+        "DIRECT",
+        "Anti-Pubs 🛡️"
+      ],
+      "is_hero": false
+    },
+    {
+      "id": "tv_tf1",
+      "daddy_id": 469,
+      "title": "TF1 France",
+      "original_title": "TF1 France",
+      "overview": "Première chaîne de France : grands événements sportifs (Équipe de France, Coupe du Monde), divertissement et infos.",
+      "media_type": "channel",
+      "is_live": true,
+      "channel_number": 50,
+      "poster_url": "https://upload.wikimedia.org/wikipedia/commons/thumb/8/82/TF1_logo_2013.svg/640px-TF1_logo_2013.svg.png",
+      "backdrop_url": "https://images.unsplash.com/photo-1522869635100-9f4c5e86aa37?auto=format&fit=crop&w=1920&q=80",
+      "video_url": "/api/extract?id=tv_tf1&type=channel&server=1",
+      "sources": {
+        "server1": "/api/extract?id=tv_tf1&type=channel&server=1",
+        "server2": "/api/extract?id=tv_tf1&type=channel&server=2",
+        "server3": "/api/extract?id=tv_tf1&type=channel&server=3",
+        "server4": "/api/extract?id=tv_tf1&type=channel&server=4",
+        "server5": "/api/extract?id=tv_tf1&type=channel&server=5",
+        "daddylive_id": 469
+      },
+      "players": [
+        {
+          "name": "Player 1 (HD Embed)",
+          "tag": "HD1",
+          "url": "https://daddylivehd1.sbs/embed/stream-469.php"
+        },
+        {
+          "name": "Player 2 (Miroir Li)",
+          "tag": "LI",
+          "url": "https://daddylive.li/player/embed.php?id=469"
+        },
+        {
+          "name": "Player 3 (Nontongo)",
+          "tag": "NT",
+          "url": "https://nontongo.win/livetv/469"
+        },
+        {
+          "name": "Player 4 (Cricsfree)",
+          "tag": "CF",
+          "url": "https://cricsfree.cfd/live/stream-469.php"
+        },
+        {
+          "name": "Player 5 (Apex)",
+          "tag": "AX",
+          "url": "https://apexstreams.cfd/live/stream-469.php"
+        },
+        {
+          "name": "Player 6 (DLive Cast)",
+          "tag": "DL",
+          "url": "https://dlive.sx/cast/stream-469.php"
+        },
+        {
+          "name": "Player 7 (DLHD Watch)",
+          "tag": "ST",
+          "url": "https://dlhd.st/watch/stream-469.php"
+        },
+        {
+          "name": "Player 8 (EngStreams)",
+          "tag": "ES",
+          "url": "https://engstreams.shop/stream/index.php?id=469"
+        }
+      ],
+      "categories": [
+        "📺 Chaînes Généralistes & TNT"
+      ],
+      "release_year": 2026,
+      "match_score": 99,
+      "age_rating": "Tous publics",
+      "duration": "DIRECT HD",
+      "quality_badges": [
+        "1080p FHD",
+        "DIRECT",
+        "Anti-Pubs 🛡️"
+      ],
+      "is_hero": false
+    },
+    {
+      "id": "tv_m6",
+      "daddy_id": 470,
+      "title": "M6 France",
+      "original_title": "M6 France",
+      "overview": "La grande chaîne nationale : matches des Bleus, Europa League, magazines et divertissements phares.",
+      "media_type": "channel",
+      "is_live": true,
+      "channel_number": 51,
+      "poster_url": "https://upload.wikimedia.org/wikipedia/commons/thumb/2/25/M6_logo_2020.svg/640px-M6_logo_2020.svg.png",
+      "backdrop_url": "https://images.unsplash.com/photo-1522869635100-9f4c5e86aa37?auto=format&fit=crop&w=1920&q=80",
+      "video_url": "/api/extract?id=tv_m6&type=channel&server=1",
+      "sources": {
+        "server1": "/api/extract?id=tv_m6&type=channel&server=1",
+        "server2": "/api/extract?id=tv_m6&type=channel&server=2",
+        "server3": "/api/extract?id=tv_m6&type=channel&server=3",
+        "server4": "/api/extract?id=tv_m6&type=channel&server=4",
+        "server5": "/api/extract?id=tv_m6&type=channel&server=5",
+        "daddylive_id": 470
+      },
+      "players": [
+        {
+          "name": "Player 1 (HD Embed)",
+          "tag": "HD1",
+          "url": "https://daddylivehd1.sbs/embed/stream-470.php"
+        },
+        {
+          "name": "Player 2 (Miroir Li)",
+          "tag": "LI",
+          "url": "https://daddylive.li/player/embed.php?id=470"
+        },
+        {
+          "name": "Player 3 (Nontongo)",
+          "tag": "NT",
+          "url": "https://nontongo.win/livetv/470"
+        },
+        {
+          "name": "Player 4 (Cricsfree)",
+          "tag": "CF",
+          "url": "https://cricsfree.cfd/live/stream-470.php"
+        },
+        {
+          "name": "Player 5 (Apex)",
+          "tag": "AX",
+          "url": "https://apexstreams.cfd/live/stream-470.php"
+        },
+        {
+          "name": "Player 6 (DLive Cast)",
+          "tag": "DL",
+          "url": "https://dlive.sx/cast/stream-470.php"
+        },
+        {
+          "name": "Player 7 (DLHD Watch)",
+          "tag": "ST",
+          "url": "https://dlhd.st/watch/stream-470.php"
+        },
+        {
+          "name": "Player 8 (EngStreams)",
+          "tag": "ES",
+          "url": "https://engstreams.shop/stream/index.php?id=470"
+        }
+      ],
+      "categories": [
+        "📺 Chaînes Généralistes & TNT"
+      ],
+      "release_year": 2026,
+      "match_score": 99,
+      "age_rating": "Tous publics",
+      "duration": "DIRECT HD",
+      "quality_badges": [
+        "1080p FHD",
+        "DIRECT",
+        "Anti-Pubs 🛡️"
+      ],
+      "is_hero": false
+    },
+    {
+      "id": "tv_tmc",
+      "daddy_id": 955,
+      "title": "TMC France",
+      "original_title": "TMC France",
+      "overview": "Quotidien, cinéma blockbusters, rencontres sportives événementielles et documentaires de société.",
+      "media_type": "channel",
+      "is_live": true,
+      "channel_number": 52,
+      "poster_url": "https://upload.wikimedia.org/wikipedia/commons/thumb/8/87/TMC_logo_2016.svg/640px-TMC_logo_2016.svg.png",
+      "backdrop_url": "https://images.unsplash.com/photo-1522869635100-9f4c5e86aa37?auto=format&fit=crop&w=1920&q=80",
+      "video_url": "/api/extract?id=tv_tmc&type=channel&server=1",
+      "sources": {
+        "server1": "/api/extract?id=tv_tmc&type=channel&server=1",
+        "server2": "/api/extract?id=tv_tmc&type=channel&server=2",
+        "server3": "/api/extract?id=tv_tmc&type=channel&server=3",
+        "server4": "/api/extract?id=tv_tmc&type=channel&server=4",
+        "server5": "/api/extract?id=tv_tmc&type=channel&server=5",
+        "daddylive_id": 955
+      },
+      "players": [
+        {
+          "name": "Player 1 (HD Embed)",
+          "tag": "HD1",
+          "url": "https://daddylivehd1.sbs/embed/stream-955.php"
+        },
+        {
+          "name": "Player 2 (Miroir Li)",
+          "tag": "LI",
+          "url": "https://daddylive.li/player/embed.php?id=955"
+        },
+        {
+          "name": "Player 3 (Nontongo)",
+          "tag": "NT",
+          "url": "https://nontongo.win/livetv/955"
+        },
+        {
+          "name": "Player 4 (Cricsfree)",
+          "tag": "CF",
+          "url": "https://cricsfree.cfd/live/stream-955.php"
+        },
+        {
+          "name": "Player 5 (Apex)",
+          "tag": "AX",
+          "url": "https://apexstreams.cfd/live/stream-955.php"
+        },
+        {
+          "name": "Player 6 (DLive Cast)",
+          "tag": "DL",
+          "url": "https://dlive.sx/cast/stream-955.php"
+        },
+        {
+          "name": "Player 7 (DLHD Watch)",
+          "tag": "ST",
+          "url": "https://dlhd.st/watch/stream-955.php"
+        },
+        {
+          "name": "Player 8 (EngStreams)",
+          "tag": "ES",
+          "url": "https://engstreams.shop/stream/index.php?id=955"
+        }
+      ],
+      "categories": [
+        "📺 Chaînes Généralistes & TNT"
+      ],
+      "release_year": 2026,
+      "match_score": 99,
+      "age_rating": "Tous publics",
+      "duration": "DIRECT HD",
+      "quality_badges": [
+        "1080p FHD",
+        "DIRECT",
+        "Anti-Pubs 🛡️"
+      ],
+      "is_hero": false
+    },
+    {
+      "id": "tv_w9",
+      "daddy_id": 959,
+      "title": "W9 France",
+      "original_title": "W9 France",
+      "overview": "Matches de football européen UEFA, musique, séries cultes et grands spectacles.",
+      "media_type": "channel",
+      "is_live": true,
+      "channel_number": 53,
+      "poster_url": "https://upload.wikimedia.org/wikipedia/commons/thumb/9/9a/W9_logo_2018.svg/640px-W9_logo_2018.svg.png",
+      "backdrop_url": "https://images.unsplash.com/photo-1522869635100-9f4c5e86aa37?auto=format&fit=crop&w=1920&q=80",
+      "video_url": "/api/extract?id=tv_w9&type=channel&server=1",
+      "sources": {
+        "server1": "/api/extract?id=tv_w9&type=channel&server=1",
+        "server2": "/api/extract?id=tv_w9&type=channel&server=2",
+        "server3": "/api/extract?id=tv_w9&type=channel&server=3",
+        "server4": "/api/extract?id=tv_w9&type=channel&server=4",
+        "server5": "/api/extract?id=tv_w9&type=channel&server=5",
+        "daddylive_id": 959
+      },
+      "players": [
+        {
+          "name": "Player 1 (HD Embed)",
+          "tag": "HD1",
+          "url": "https://daddylivehd1.sbs/embed/stream-959.php"
+        },
+        {
+          "name": "Player 2 (Miroir Li)",
+          "tag": "LI",
+          "url": "https://daddylive.li/player/embed.php?id=959"
+        },
+        {
+          "name": "Player 3 (Nontongo)",
+          "tag": "NT",
+          "url": "https://nontongo.win/livetv/959"
+        },
+        {
+          "name": "Player 4 (Cricsfree)",
+          "tag": "CF",
+          "url": "https://cricsfree.cfd/live/stream-959.php"
+        },
+        {
+          "name": "Player 5 (Apex)",
+          "tag": "AX",
+          "url": "https://apexstreams.cfd/live/stream-959.php"
+        },
+        {
+          "name": "Player 6 (DLive Cast)",
+          "tag": "DL",
+          "url": "https://dlive.sx/cast/stream-959.php"
+        },
+        {
+          "name": "Player 7 (DLHD Watch)",
+          "tag": "ST",
+          "url": "https://dlhd.st/watch/stream-959.php"
+        },
+        {
+          "name": "Player 8 (EngStreams)",
+          "tag": "ES",
+          "url": "https://engstreams.shop/stream/index.php?id=959"
+        }
+      ],
+      "categories": [
+        "📺 Chaînes Généralistes & TNT"
+      ],
+      "release_year": 2026,
+      "match_score": 99,
+      "age_rating": "Tous publics",
+      "duration": "DIRECT HD",
+      "quality_badges": [
+        "1080p FHD",
+        "DIRECT",
+        "Anti-Pubs 🛡️"
+      ],
+      "is_hero": false
+    },
+    {
+      "id": "tv_france2",
+      "daddy_id": 950,
+      "title": "France 2",
+      "original_title": "France 2",
+      "overview": "Tournoi des Six Nations de rugby, Tour de France, Roland-Garros et grands directs.",
+      "media_type": "channel",
+      "is_live": true,
+      "channel_number": 54,
+      "poster_url": "https://upload.wikimedia.org/wikipedia/commons/thumb/9/9f/France_2_2018.svg/640px-France_2_2018.svg.png",
+      "backdrop_url": "https://images.unsplash.com/photo-1522869635100-9f4c5e86aa37?auto=format&fit=crop&w=1920&q=80",
+      "video_url": "/api/extract?id=tv_france2&type=channel&server=1",
+      "sources": {
+        "server1": "/api/extract?id=tv_france2&type=channel&server=1",
+        "server2": "/api/extract?id=tv_france2&type=channel&server=2",
+        "server3": "/api/extract?id=tv_france2&type=channel&server=3",
+        "server4": "/api/extract?id=tv_france2&type=channel&server=4",
+        "server5": "/api/extract?id=tv_france2&type=channel&server=5",
+        "daddylive_id": 950
+      },
+      "players": [
+        {
+          "name": "Player 1 (HD Embed)",
+          "tag": "HD1",
+          "url": "https://daddylivehd1.sbs/embed/stream-950.php"
+        },
+        {
+          "name": "Player 2 (Miroir Li)",
+          "tag": "LI",
+          "url": "https://daddylive.li/player/embed.php?id=950"
+        },
+        {
+          "name": "Player 3 (Nontongo)",
+          "tag": "NT",
+          "url": "https://nontongo.win/livetv/950"
+        },
+        {
+          "name": "Player 4 (Cricsfree)",
+          "tag": "CF",
+          "url": "https://cricsfree.cfd/live/stream-950.php"
+        },
+        {
+          "name": "Player 5 (Apex)",
+          "tag": "AX",
+          "url": "https://apexstreams.cfd/live/stream-950.php"
+        },
+        {
+          "name": "Player 6 (DLive Cast)",
+          "tag": "DL",
+          "url": "https://dlive.sx/cast/stream-950.php"
+        },
+        {
+          "name": "Player 7 (DLHD Watch)",
+          "tag": "ST",
+          "url": "https://dlhd.st/watch/stream-950.php"
+        },
+        {
+          "name": "Player 8 (EngStreams)",
+          "tag": "ES",
+          "url": "https://engstreams.shop/stream/index.php?id=950"
+        }
+      ],
+      "categories": [
+        "📺 Chaînes Généralistes & TNT"
+      ],
+      "release_year": 2026,
+      "match_score": 99,
+      "age_rating": "Tous publics",
+      "duration": "DIRECT HD",
+      "quality_badges": [
+        "1080p FHD",
+        "DIRECT",
+        "Anti-Pubs 🛡️"
+      ],
+      "is_hero": false
+    },
+    {
+      "id": "tv_france3",
+      "daddy_id": 951,
+      "title": "France 3",
+      "original_title": "France 3",
+      "overview": "Sports régionaux, Coupe de France, cyclisme et programmation culturelle.",
+      "media_type": "channel",
+      "is_live": true,
+      "channel_number": 55,
+      "poster_url": "https://upload.wikimedia.org/wikipedia/commons/thumb/d/d7/France_3_2018.svg/640px-France_3_2018.svg.png",
+      "backdrop_url": "https://images.unsplash.com/photo-1522869635100-9f4c5e86aa37?auto=format&fit=crop&w=1920&q=80",
+      "video_url": "/api/extract?id=tv_france3&type=channel&server=1",
+      "sources": {
+        "server1": "/api/extract?id=tv_france3&type=channel&server=1",
+        "server2": "/api/extract?id=tv_france3&type=channel&server=2",
+        "server3": "/api/extract?id=tv_france3&type=channel&server=3",
+        "server4": "/api/extract?id=tv_france3&type=channel&server=4",
+        "server5": "/api/extract?id=tv_france3&type=channel&server=5",
+        "daddylive_id": 951
+      },
+      "players": [
+        {
+          "name": "Player 1 (HD Embed)",
+          "tag": "HD1",
+          "url": "https://daddylivehd1.sbs/embed/stream-951.php"
+        },
+        {
+          "name": "Player 2 (Miroir Li)",
+          "tag": "LI",
+          "url": "https://daddylive.li/player/embed.php?id=951"
+        },
+        {
+          "name": "Player 3 (Nontongo)",
+          "tag": "NT",
+          "url": "https://nontongo.win/livetv/951"
+        },
+        {
+          "name": "Player 4 (Cricsfree)",
+          "tag": "CF",
+          "url": "https://cricsfree.cfd/live/stream-951.php"
+        },
+        {
+          "name": "Player 5 (Apex)",
+          "tag": "AX",
+          "url": "https://apexstreams.cfd/live/stream-951.php"
+        },
+        {
+          "name": "Player 6 (DLive Cast)",
+          "tag": "DL",
+          "url": "https://dlive.sx/cast/stream-951.php"
+        },
+        {
+          "name": "Player 7 (DLHD Watch)",
+          "tag": "ST",
+          "url": "https://dlhd.st/watch/stream-951.php"
+        },
+        {
+          "name": "Player 8 (EngStreams)",
+          "tag": "ES",
+          "url": "https://engstreams.shop/stream/index.php?id=951"
+        }
+      ],
+      "categories": [
+        "📺 Chaînes Généralistes & TNT"
+      ],
+      "release_year": 2026,
+      "match_score": 99,
+      "age_rating": "Tous publics",
+      "duration": "DIRECT HD",
+      "quality_badges": [
+        "1080p FHD",
+        "DIRECT",
+        "Anti-Pubs 🛡️"
+      ],
+      "is_hero": false
+    },
+    {
+      "id": "tv_arte",
+      "daddy_id": 958,
+      "title": "Arte France",
+      "original_title": "Arte France",
+      "overview": "La chaîne culturelle européenne : documentaires exceptionnels, cinéma d'auteur et séries internationales.",
+      "media_type": "channel",
+      "is_live": true,
+      "channel_number": 56,
+      "poster_url": "https://upload.wikimedia.org/wikipedia/commons/thumb/b/b5/Arte_logo_2017.svg/640px-Arte_logo_2017.svg.png",
+      "backdrop_url": "https://images.unsplash.com/photo-1522869635100-9f4c5e86aa37?auto=format&fit=crop&w=1920&q=80",
+      "video_url": "/api/extract?id=tv_arte&type=channel&server=1",
+      "sources": {
+        "server1": "/api/extract?id=tv_arte&type=channel&server=1",
+        "server2": "/api/extract?id=tv_arte&type=channel&server=2",
+        "server3": "/api/extract?id=tv_arte&type=channel&server=3",
+        "server4": "/api/extract?id=tv_arte&type=channel&server=4",
+        "server5": "/api/extract?id=tv_arte&type=channel&server=5",
+        "daddylive_id": 958
+      },
+      "players": [
+        {
+          "name": "Player 1 (HD Embed)",
+          "tag": "HD1",
+          "url": "https://daddylivehd1.sbs/embed/stream-958.php"
+        },
+        {
+          "name": "Player 2 (Miroir Li)",
+          "tag": "LI",
+          "url": "https://daddylive.li/player/embed.php?id=958"
+        },
+        {
+          "name": "Player 3 (Nontongo)",
+          "tag": "NT",
+          "url": "https://nontongo.win/livetv/958"
+        },
+        {
+          "name": "Player 4 (Cricsfree)",
+          "tag": "CF",
+          "url": "https://cricsfree.cfd/live/stream-958.php"
+        },
+        {
+          "name": "Player 5 (Apex)",
+          "tag": "AX",
+          "url": "https://apexstreams.cfd/live/stream-958.php"
+        },
+        {
+          "name": "Player 6 (DLive Cast)",
+          "tag": "DL",
+          "url": "https://dlive.sx/cast/stream-958.php"
+        },
+        {
+          "name": "Player 7 (DLHD Watch)",
+          "tag": "ST",
+          "url": "https://dlhd.st/watch/stream-958.php"
+        },
+        {
+          "name": "Player 8 (EngStreams)",
+          "tag": "ES",
+          "url": "https://engstreams.shop/stream/index.php?id=958"
+        }
+      ],
+      "categories": [
+        "📺 Chaînes Généralistes & TNT"
+      ],
+      "release_year": 2026,
+      "match_score": 99,
+      "age_rating": "Tous publics",
+      "duration": "DIRECT HD",
+      "quality_badges": [
+        "1080p FHD",
+        "DIRECT",
+        "Anti-Pubs 🛡️"
+      ],
+      "is_hero": false
+    },
+    {
+      "id": "tv_bfmtv",
+      "daddy_id": 957,
+      "title": "BFM TV",
+      "original_title": "BFM TV France",
+      "overview": "Première chaîne info de France en continu 24h/24.",
+      "media_type": "channel",
+      "is_live": true,
+      "channel_number": 57,
+      "poster_url": "https://upload.wikimedia.org/wikipedia/commons/thumb/6/6f/BFM_TV_logo_2022.svg/640px-BFM_TV_logo_2022.svg.png",
+      "backdrop_url": "https://images.unsplash.com/photo-1522869635100-9f4c5e86aa37?auto=format&fit=crop&w=1920&q=80",
+      "video_url": "/api/extract?id=tv_bfmtv&type=channel&server=1",
+      "sources": {
+        "server1": "/api/extract?id=tv_bfmtv&type=channel&server=1",
+        "server2": "/api/extract?id=tv_bfmtv&type=channel&server=2",
+        "server3": "/api/extract?id=tv_bfmtv&type=channel&server=3",
+        "server4": "/api/extract?id=tv_bfmtv&type=channel&server=4",
+        "server5": "/api/extract?id=tv_bfmtv&type=channel&server=5",
+        "daddylive_id": 957
+      },
+      "players": [
+        {
+          "name": "Player 1 (HD Embed)",
+          "tag": "HD1",
+          "url": "https://daddylivehd1.sbs/embed/stream-957.php"
+        },
+        {
+          "name": "Player 2 (Miroir Li)",
+          "tag": "LI",
+          "url": "https://daddylive.li/player/embed.php?id=957"
+        },
+        {
+          "name": "Player 3 (Nontongo)",
+          "tag": "NT",
+          "url": "https://nontongo.win/livetv/957"
+        },
+        {
+          "name": "Player 4 (Cricsfree)",
+          "tag": "CF",
+          "url": "https://cricsfree.cfd/live/stream-957.php"
+        },
+        {
+          "name": "Player 5 (Apex)",
+          "tag": "AX",
+          "url": "https://apexstreams.cfd/live/stream-957.php"
+        },
+        {
+          "name": "Player 6 (DLive Cast)",
+          "tag": "DL",
+          "url": "https://dlive.sx/cast/stream-957.php"
+        },
+        {
+          "name": "Player 7 (DLHD Watch)",
+          "tag": "ST",
+          "url": "https://dlhd.st/watch/stream-957.php"
+        },
+        {
+          "name": "Player 8 (EngStreams)",
+          "tag": "ES",
+          "url": "https://engstreams.shop/stream/index.php?id=957"
+        }
+      ],
+      "categories": [
+        "📺 Chaînes Généralistes & TNT"
+      ],
+      "release_year": 2026,
+      "match_score": 99,
+      "age_rating": "Tous publics",
+      "duration": "DIRECT HD",
+      "quality_badges": [
+        "1080p FHD",
+        "DIRECT",
+        "Anti-Pubs 🛡️"
+      ],
+      "is_hero": false
+    },
+    {
+      "id": "tv_cnews",
+      "daddy_id": 964,
+      "title": "CNews",
+      "original_title": "CNews France",
+      "overview": "L'information en direct 24h/24 avec débats et analyses politiques et sociétales.",
+      "media_type": "channel",
+      "is_live": true,
+      "channel_number": 58,
+      "poster_url": "https://upload.wikimedia.org/wikipedia/commons/thumb/7/75/CNews_logo_2017.svg/640px-CNews_logo_2017.svg.png",
+      "backdrop_url": "https://images.unsplash.com/photo-1522869635100-9f4c5e86aa37?auto=format&fit=crop&w=1920&q=80",
+      "video_url": "/api/extract?id=tv_cnews&type=channel&server=1",
+      "sources": {
+        "server1": "/api/extract?id=tv_cnews&type=channel&server=1",
+        "server2": "/api/extract?id=tv_cnews&type=channel&server=2",
+        "server3": "/api/extract?id=tv_cnews&type=channel&server=3",
+        "server4": "/api/extract?id=tv_cnews&type=channel&server=4",
+        "server5": "/api/extract?id=tv_cnews&type=channel&server=5",
+        "daddylive_id": 964
+      },
+      "players": [
+        {
+          "name": "Player 1 (HD Embed)",
+          "tag": "HD1",
+          "url": "https://daddylivehd1.sbs/embed/stream-964.php"
+        },
+        {
+          "name": "Player 2 (Miroir Li)",
+          "tag": "LI",
+          "url": "https://daddylive.li/player/embed.php?id=964"
+        },
+        {
+          "name": "Player 3 (Nontongo)",
+          "tag": "NT",
+          "url": "https://nontongo.win/livetv/964"
+        },
+        {
+          "name": "Player 4 (Cricsfree)",
+          "tag": "CF",
+          "url": "https://cricsfree.cfd/live/stream-964.php"
+        },
+        {
+          "name": "Player 5 (Apex)",
+          "tag": "AX",
+          "url": "https://apexstreams.cfd/live/stream-964.php"
+        },
+        {
+          "name": "Player 6 (DLive Cast)",
+          "tag": "DL",
+          "url": "https://dlive.sx/cast/stream-964.php"
+        },
+        {
+          "name": "Player 7 (DLHD Watch)",
+          "tag": "ST",
+          "url": "https://dlhd.st/watch/stream-964.php"
+        },
+        {
+          "name": "Player 8 (EngStreams)",
+          "tag": "ES",
+          "url": "https://engstreams.shop/stream/index.php?id=964"
+        }
+      ],
+      "categories": [
+        "📺 Chaînes Généralistes & TNT"
+      ],
+      "release_year": 2026,
+      "match_score": 99,
+      "age_rating": "Tous publics",
+      "duration": "DIRECT HD",
+      "quality_badges": [
+        "1080p FHD",
+        "DIRECT",
+        "Anti-Pubs 🛡️"
+      ],
+      "is_hero": false
+    },
+    {
+      "id": "tv_redbull",
+      "title": "Red Bull TV Sports Extrêmes",
+      "original_title": "Red Bull TV",
+      "overview": "Plongez au cœur des sports extrêmes, VTT freeride, surf de grosses vagues, F1 et exploits Red Bull.",
+      "media_type": "channel",
+      "is_live": true,
+      "channel_number": 40,
+      "poster_url": "https://upload.wikimedia.org/wikipedia/en/thumb/f/f5/Red_Bull_TV_logo.svg/640px-Red_Bull_TV_logo.svg.png",
+      "backdrop_url": "https://images.unsplash.com/photo-1508098682722-e99c43a406b2?auto=format&fit=crop&w=1920&q=80",
+      "video_url": "/api/extract?id=tv_redbull&type=channel&server=1",
       "categories": [
         "🏄 Sports Extrêmes & Découverte"
       ],
       "release_year": 2026,
       "match_score": 98,
       "age_rating": "Tous publics",
-      "duration": "🔴 EN DIRECT 24/7",
+      "duration": "DIRECT HD",
       "quality_badges": [
-        "LIVE",
-        "720p HD",
-        "FIFA+",
-        "VF"
-      ],
-      "cast": [
-        "Légendes de la FIFA"
-      ],
-      "director": "FIFA Media"
+        "1080p FHD",
+        "DIRECT",
+        "Anti-Pubs 🛡️"
+      ]
     },
     {
-      "id": "tv_trace_sport",
-      "title": "Trace Sport Stars HD",
-      "original_title": "Trace Sport Stars",
-      "overview": "La vie intime, le style et les secrets d'entraînement des plus grands sportifs de la planète : Cristiano Ronaldo, Lewis Hamilton, LeBron James et Kylian Mbappé.",
+      "id": "tv_fifa",
+      "title": "FIFA+ Direct HD",
+      "original_title": "FIFA+ French",
+      "overview": "Archives des Coupes du Monde FIFA, documentaires exclusifs et matches internationaux en direct.",
       "media_type": "channel",
-      "channel_number": "Canal 93",
-      "current_program": "Stars du Football • La Vie des Milliardaires du Sport",
       "is_live": true,
-      "poster_url": "https://images.unsplash.com/photo-1508098682722-e99c43a406b2?auto=format&fit=crop&w=600&q=80",
+      "channel_number": 41,
+      "poster_url": "https://upload.wikimedia.org/wikipedia/commons/thumb/1/10/FIFA_logo_without_slogan.svg/640px-FIFA_logo_without_slogan.svg.png",
       "backdrop_url": "https://images.unsplash.com/photo-1508098682722-e99c43a406b2?auto=format&fit=crop&w=1920&q=80",
-      "logo_url": "https://i.imgur.com/FabFP5A.png",
-      "video_url": "/api/extract?id=tv_trace_sport&type=channel&server=1",
-      "sources": {
-        "hls": "/api/extract?id=tv_trace_sport&type=channel&server=1"
-      },
+      "video_url": "/api/extract?id=tv_fifa&type=channel&server=1",
       "categories": [
         "🏄 Sports Extrêmes & Découverte"
       ],
       "release_year": 2026,
-      "match_score": 93,
+      "match_score": 97,
       "age_rating": "Tous publics",
-      "duration": "🔴 EN DIRECT 24/7",
+      "duration": "DIRECT HD",
       "quality_badges": [
-        "LIVE",
         "1080p FHD",
-        "STARS",
-        "VF"
-      ],
-      "cast": [
-        "Stars Mondiales du Sport"
-      ],
-      "director": "Trace Global"
+        "DIRECT",
+        "Anti-Pubs 🛡️"
+      ]
     },
     {
       "id": "tv_freesports",
       "title": "World of Freesports HD",
       "original_title": "World of Freesports",
-      "overview": "Le tour du monde des sports de glisse et de plein air : surf sur les vagues géantes de Nazaré, ski freestyle en Alaska, skateboard et escalade extrême.",
+      "overview": "Ski freeride, snowboard, escalade et aventures outdoor à couper le souffle.",
       "media_type": "channel",
-      "channel_number": "Canal 94",
-      "current_program": "Big Wave Nazaré & Snowboard Freeride Tour",
       "is_live": true,
-      "poster_url": "https://images.unsplash.com/photo-1502680390469-be75c86b636f?auto=format&fit=crop&w=600&q=80",
-      "backdrop_url": "https://images.unsplash.com/photo-1502680390469-be75c86b636f?auto=format&fit=crop&w=1920&q=80",
-      "logo_url": "https://upload.wikimedia.org/wikipedia/commons/thumb/c/ca/Surfing_pictogram.svg/500px-Surfing_pictogram.svg.png",
+      "channel_number": 42,
+      "poster_url": "https://upload.wikimedia.org/wikipedia/commons/thumb/a/a2/Arena_Sport_logo_2019.svg/320px-Arena_Sport_logo_2019.svg.png",
+      "backdrop_url": "https://images.unsplash.com/photo-1508098682722-e99c43a406b2?auto=format&fit=crop&w=1920&q=80",
       "video_url": "/api/extract?id=tv_freesports&type=channel&server=1",
-      "sources": {
-        "hls": "/api/extract?id=tv_freesports&type=channel&server=1"
-      },
       "categories": [
         "🏄 Sports Extrêmes & Découverte"
       ],
       "release_year": 2026,
-      "match_score": 94,
+      "match_score": 95,
       "age_rating": "Tous publics",
-      "duration": "🔴 EN DIRECT 24/7",
+      "duration": "DIRECT HD",
       "quality_badges": [
-        "LIVE",
         "1080p FHD",
-        "SURF/SKI"
-      ],
-      "cast": [
-        "Athlètes Freeride & Glisse"
-      ],
-      "director": "Mainstream Media"
-    },
-    {
-      "id": "tv_kozoom",
-      "title": "Kozoom TV Sports HD",
-      "original_title": "Kozoom TV",
-      "overview": "La chaîne mondiale des sports de précision : championnats du monde de billard 3 bandes, carambole, pool américain et snooker d'élite en direct.",
-      "media_type": "channel",
-      "channel_number": "Canal 95",
-      "current_program": "World 3-Cushion Championship • Finale Directe",
-      "is_live": true,
-      "poster_url": "https://images.unsplash.com/photo-1615461066841-6116e61058f4?auto=format&fit=crop&w=600&q=80",
-      "backdrop_url": "https://images.unsplash.com/photo-1615461066841-6116e61058f4?auto=format&fit=crop&w=1920&q=80",
-      "logo_url": "https://i.imgur.com/M1Ee79b.png",
-      "video_url": "/api/extract?id=tv_kozoom&type=channel&server=1",
-      "sources": {
-        "hls": "/api/extract?id=tv_kozoom&type=channel&server=1"
-      },
-      "categories": [
-        "🏄 Sports Extrêmes & Découverte"
-      ],
-      "release_year": 2026,
-      "match_score": 91,
-      "age_rating": "Tous publics",
-      "duration": "🔴 EN DIRECT 24/7",
-      "quality_badges": [
-        "LIVE",
-        "1080p FHD",
-        "BILLARD"
-      ],
-      "cast": [
-        "Torbjörn Blomdahl",
-        "Dick Jaspers",
-        "Dani Sánchez"
-      ],
-      "director": "Kozoom Group"
+        "DIRECT",
+        "Anti-Pubs 🛡️"
+      ]
     }
   ]
 }

@@ -19,13 +19,13 @@ if (!fs.existsSync(path.join(__dirname, 'data'))) {
 // ================= EXTRACTEUR DE FLUX DIRECT (FETCHV-STYLE) =================
 function httpsGet(urlStr, headers = {}) {
   return new Promise((resolve, reject) => {
+    const defaultHeaders = {
+      'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36',
+      'Referer': 'https://cloudorchestranova.com/'
+    };
+    const finalHeaders = Object.assign({}, defaultHeaders, headers);
     https.get(urlStr, {
-      headers: {
-        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
-        'Referer': 'https://cloudorchestranova.com/',
-        'Origin': 'https://cloudorchestranova.com',
-        ...headers
-      },
+      headers: finalHeaders,
       timeout: 8000
     }, res => {
       let chunks = [];
@@ -311,96 +311,274 @@ async function extractShowMultiProvider(showType, season, episode, serverIndex) 
   };
 }
 
-// ================= EXTRACTEUR DE CHAÎNES TV EN DIRECT (SPORTS & PPV) =================
-// ─── DaddyLive Channel System ─────────────────────────────────────────────
-// Génère les 8 URLs de serveurs DaddyLive pour un ID de channel donné
-function buildDaddyLivePlayers(dlId) {
-  return [
-    { tag: 'HD1', name: '🔴 Serveur 1 — HD Direct',       url: `https://daddylivehd1.sbs/embed/stream-${dlId}.php` },
-    { tag: 'LI',  name: '🎬 Serveur 2 — Miroir Li',       url: `https://daddylive.li/player/embed.php?id=${dlId}` },
-    { tag: 'NT',  name: '📡 Serveur 3 — Nontongo',        url: `https://nontongo.win/livetv/${dlId}` },
-    { tag: 'CF',  name: '⚡ Serveur 4 — Cricsfree',        url: `https://cricsfree.cfd/live/stream-${dlId}.php` },
-    { tag: 'AX',  name: '🚀 Serveur 5 — Apex',            url: `https://apexstreams.cfd/live/stream-${dlId}.php` },
-    { tag: 'DL',  name: '🌐 Serveur 6 — DLive Cast',      url: `https://dlive.sx/cast/stream-${dlId}.php` },
-    { tag: 'ST',  name: '📺 Serveur 7 — DLHD Watch',      url: `https://dlhd.st/watch/stream-${dlId}.php` },
-    { tag: 'ES',  name: '🔥 Serveur 8 — EngStreams',       url: `https://engstreams.shop/stream/index.php?id=${dlId}` },
-  ];
+// ================= EXTRACTEUR DE CHAÎNES TV EN DIRECT (DADDYLIVE & MULTI-SERVEURS) =================
+// Résolution dynamique des flux HLS directs, contournement Referer & Proxy intelligent
+
+const liveStreamCache = new Map();
+
+async function getLiveM3u8Url(daddyId, mirror = 'cricsfree') {
+  const cacheKey = `${daddyId}_${mirror}`;
+  const now = Date.now();
+  if (liveStreamCache.has(cacheKey)) {
+    const item = liveStreamCache.get(cacheKey);
+    if (now < item.expiresAt) {
+      return item.streamUrl;
+    }
+  }
+
+  const sources = [];
+  if (mirror === 'apex') {
+    sources.push({ url: `https://hamis.romponalis.st/premiumtv/apexstreams2.php?id=${daddyId}`, ref: 'https://apexstreams.cfd/' });
+    sources.push({ url: `https://hamis.romponalis.st/premiumtv/cricsfree2.php?id=${daddyId}`, ref: 'https://cricsfree.cfd/' });
+  } else {
+    sources.push({ url: `https://hamis.romponalis.st/premiumtv/cricsfree2.php?id=${daddyId}`, ref: 'https://cricsfree.cfd/' });
+    sources.push({ url: `https://hamis.romponalis.st/premiumtv/apexstreams2.php?id=${daddyId}`, ref: 'https://apexstreams.cfd/' });
+  }
+
+  for (const s of sources) {
+    try {
+      const res = await httpsGet(s.url, { 'Referer': s.ref });
+      if (res.status === 200 && res.text) {
+        const m = res.text.match(/source:\s*window\.atob\(['"]([A-Za-z0-9+/=]+)['"]\)/i);
+        if (m) {
+          const streamUrl = Buffer.from(m[1], 'base64').toString('utf8');
+          try {
+            const testM3u8 = await httpsGet(streamUrl, { 'Referer': 'https://hamis.romponalis.st/' });
+            if (testM3u8.status === 200 && testM3u8.text && testM3u8.text.includes('#EXTM3U')) {
+              liveStreamCache.set(cacheKey, { streamUrl, expiresAt: now + (180 * 1000) });
+              return streamUrl;
+            }
+          } catch (e) {}
+        }
+      }
+    } catch (e) {}
+  }
+  return null;
 }
 
-// Mapping ID catalogue → ID DaddyLive + titre affiché
-const DADDYLIVE_MAP = {
-  // ── Sport France ──────────────────────────────────
-  'tv_canal_sport':    { dlId: 122,  title: 'Canal+ Sport France' },
-  'tv_canal_foot':     { dlId: 463,  title: 'Canal+ Foot France' },
-  'tv_canal_360':      { dlId: 464,  title: 'Canal+ Sport 360' },
-  'tv_canal_moto':     { dlId: 271,  title: 'Canal+ MotoGP France' },
-  'tv_canal_f1':       { dlId: 273,  title: 'Canal+ Formule 1 France' },
-  'tv_bein1':          { dlId: 116,  title: 'beIN Sports 1 France' },
-  'tv_bein2':          { dlId: 117,  title: 'beIN Sports 2 France' },
-  'tv_bein3':          { dlId: 118,  title: 'beIN Sports 3 France' },
-  'tv_rmc_sport1':     { dlId: 119,  title: 'RMC Sport 1 France' },
-  'tv_rmc_sport2':     { dlId: 120,  title: 'RMC Sport 2 France' },
-  'tv_eurosport1':     { dlId: 772,  title: 'Eurosport 1 France' },
-  'tv_eurosport2':     { dlId: 773,  title: 'Eurosport 2 France' },
-  'tv_lequipe':        { dlId: 645,  title: "L'Équipe TV France" },
-  'tv_equidia':        { dlId: 965,  title: 'Sport en France' },
-  'tv_ligue1':         { dlId: 960,  title: 'Ligue 1+ France / DAZN' },
-  'tv_ligue1_3':       { dlId: 222,  title: 'Ligue 1+ 3 France' },
-  'tv_sport_fr':       { dlId: 965,  title: 'Sport en France' },
-  // ── PPV & Combat ──────────────────────────────────
-  'tv_ufc':            { dlId: 250,  title: 'UFC Fight Pass' },
-  'tv_ufc_night':      { dlId: 5015, title: 'UFC Fight Night' },
-  'tv_wwe':            { dlId: 376,  title: 'WWE Network' },
-  'tv_wwe_ppv':        { dlId: 5005, title: 'WWE PPV' },
-  'tv_dazn1':          { dlId: 179,  title: 'DAZN France' },
-  'tv_ppv':            { dlId: 5000, title: 'PPV Events' },
-  'tv_ppv_boxing':     { dlId: 5022, title: 'PPV Boxing' },
-  'tv_event_ppv':      { dlId: 228,  title: 'Event PPV' },
-  'tv_swerve_combat':  { dlId: 228,  title: 'Event PPV Combat' },
-  // ── Sports Extrêmes / Autres ──────────────────────
-  'tv_redbull':        { dlId: 965,  title: 'Sport en France (Red Bull)' },
-  'tv_fifa':           { dlId: 960,  title: 'Ligue 1+ / FIFA+' },
-  'tv_trace_sport':    { dlId: 965,  title: 'Sport en France' },
-  'tv_freesports':     { dlId: 5000, title: 'PPV Events / Freesports' },
-  'tv_kozoom':         { dlId: 222,  title: 'Ligue 1+ 3 France' },
-};
-
 async function extractChannelMultiProvider(channelId, serverIndex) {
-  const channel = catalog.movies.find(m => m.id === channelId);
-  const mapping = DADDYLIVE_MAP[channelId];
+  const channel = catalog.movies.find(m => m.id === channelId || m.tmdb_id === channelId || String(m.daddy_id) === String(channelId));
+  const title = channel ? channel.title : 'Chaîne Sport Direct';
+  let daddyId = channel?.daddy_id || channel?.sources?.daddylive_id;
+  if (!daddyId && channelId && channelId.startsWith('tv_')) {
+    const raw = channelId.replace('tv_', '');
+    if (/^\d+$/.test(raw)) daddyId = parseInt(raw, 10);
+  }
 
-  const title = mapping ? mapping.title : (channel ? channel.title : 'Chaîne Sport Direct');
-  const dlId  = mapping ? mapping.dlId  : 121; // fallback Canal+ France
+  const srvIdx = (parseInt(serverIndex) || 0) % 5;
+  const srvNum = srvIdx + 1;
 
-  const players = buildDaddyLivePlayers(dlId);
-  const srvIdx  = Math.abs(parseInt(serverIndex) || 0) % players.length;
-  const chosen  = players[srvIdx];
+  const serverNames = {
+    1: 'Serveur 1 (⚡ Direct HLS Principal FHD)',
+    2: 'Serveur 2 (🎬 Miroir Direct HLS / Apex)',
+    3: 'Serveur 3 (🌐 Nontongo Multi-Flux HD)',
+    4: 'Serveur 4 (📡 Lecteur HD1 Secours)',
+    5: 'Serveur 5 (🚀 Miroir DLHD Watch)'
+  };
 
+  // Chaînes FAST Sport ouvertes
+  if (channelId === 'tv_redbull') {
+    const urls = [
+      'https://46cfeb23c7f74853bba7a256655a3119.mediatailor.us-west-2.amazonaws.com/v1/master/ba62fe743df0fe93366eba3a257d792884136c7f/LINEAR-582-WORBDACHDEFAST-WHALETVPLUS/582/whaletvplus/hls/master/playlist.m3u8',
+      'https://1a3566cb46914c5499fbc86fbc4ac87e.mediatailor.us-west-2.amazonaws.com/v1/master/ba62fe743df0fe93366eba3a257d792884136c7f/LINEAR-932-WORBUKENFAST-WHALETVPLUS/932/whaletvplus/hls/master/playlist.m3u8',
+      'https://0b73ace69ebb45eaa249bb87837cb958.mediatailor.us-west-2.amazonaws.com/v1/master/ba62fe743df0fe93366eba3a257d792884136c7f/LINEAR-644-WORBUSENFAST-LG_US/644/lgtv/hls/master/playlist.m3u8',
+      'https://886bd3fbc782459f8de7555d32d7e9ce.mediatailor.us-west-2.amazonaws.com/v1/master/ba62fe743df0fe93366eba3a257d792884136c7f/LINEAR-957-WORBLATAMESFAST-WHALETVPLUS/957/whaletvplus/hls/master/playlist.m3u8',
+      'https://46cfeb23c7f74853bba7a256655a3119.mediatailor.us-west-2.amazonaws.com/v1/master/ba62fe743df0fe93366eba3a257d792884136c7f/LINEAR-582-WORBDACHDEFAST-WHALETVPLUS/582/whaletvplus/hls/master/playlist.m3u8'
+    ];
+    return {
+      success: true,
+      server: srvNum,
+      server_name: serverNames[srvNum],
+      hoster: 'Red Bull TV Direct',
+      quality: '1080p FHD Direct',
+      title: `${title} • 🔴 EN DIRECT`,
+      stream_url: urls[srvIdx % urls.length],
+      player_type: 'direct_hls',
+      is_embed: false,
+      is_live: true,
+      sources_count: 5,
+      lang: 'vf'
+    };
+  }
+
+  if (channelId === 'tv_fifa') {
+    return {
+      success: true,
+      server: srvNum,
+      server_name: serverNames[srvNum],
+      hoster: 'FIFA+ Direct Français',
+      quality: '1080p FHD Direct',
+      title: `${title} • 🔴 EN DIRECT`,
+      stream_url: 'https://37b4c228.wurl.com/master/f36d25e7e52f1ba8d7e56eb859c636563214f541/UmFrdXRlblRWLWZyX0ZJRkFQbHVzRnJlbmNoX0hMUw/playlist.m3u8',
+      player_type: 'direct_hls',
+      is_embed: false,
+      is_live: true,
+      sources_count: 5,
+      lang: 'vf'
+    };
+  }
+
+  if (channelId === 'tv_freesports') {
+    return {
+      success: true,
+      server: srvNum,
+      server_name: serverNames[srvNum],
+      hoster: 'World of Freesports',
+      quality: '1080p FHD Direct',
+      title: `${title} • 🔴 EN DIRECT`,
+      stream_url: 'https://mainstreammedia-worldoffreesportsintl-rakuten.amagi.tv/playlist.m3u8',
+      player_type: 'direct_hls',
+      is_embed: false,
+      is_live: true,
+      sources_count: 5,
+      lang: 'vf'
+    };
+  }
+
+  // Traitement pour les chaînes DaddyLive
+  if (daddyId) {
+    if (srvNum === 1) {
+      const liveM3u8 = await getLiveM3u8Url(daddyId, 'cricsfree');
+      if (liveM3u8) {
+        return {
+          success: true,
+          server: 1,
+          server_name: serverNames[1],
+          hoster: `Direct HLS • ${title}`,
+          quality: '1080p FHD Direct',
+          title: `${title} • 🔴 EN DIRECT`,
+          stream_url: `/api/stream/live?channel=${encodeURIComponent(daddyId)}`,
+          player_type: 'direct_hls',
+          is_embed: false,
+          is_live: true,
+          sources_count: 5,
+          lang: 'vf'
+        };
+      }
+      // Secours propre si pas de flux HLS actif à cet instant (avant match)
+      return {
+        success: true,
+        server: 1,
+        server_name: serverNames[1],
+        hoster: `Lecteur Nontongo • ${title}`,
+        quality: '1080p HD',
+        title: `${title} • 🔴 EN DIRECT`,
+        stream_url: `https://nontongo.win/livetv/${daddyId}`,
+        embed_url: `https://nontongo.win/livetv/${daddyId}`,
+        player_type: 'iframe',
+        is_embed: true,
+        is_live: true,
+        sources_count: 5,
+        lang: 'vf'
+      };
+    }
+
+    if (srvNum === 2) {
+      const liveApex = await getLiveM3u8Url(daddyId, 'apex');
+      if (liveApex) {
+        return {
+          success: true,
+          server: 2,
+          server_name: serverNames[2],
+          hoster: `Direct Apex • ${title}`,
+          quality: '1080p FHD Direct',
+          title: `${title} • 🔴 EN DIRECT`,
+          stream_url: `/api/stream/live?channel=${encodeURIComponent(daddyId)}&mirror=apex`,
+          player_type: 'direct_hls',
+          is_embed: false,
+          is_live: true,
+          sources_count: 5,
+          lang: 'vf'
+        };
+      }
+      return {
+        success: true,
+        server: 2,
+        server_name: serverNames[2],
+        hoster: `Lecteur Cricsfree • ${title}`,
+        quality: '1080p HD',
+        title: `${title} • 🔴 EN DIRECT`,
+        stream_url: `https://cricsfree.cfd/live/stream-${daddyId}.php`,
+        embed_url: `https://cricsfree.cfd/live/stream-${daddyId}.php`,
+        player_type: 'iframe',
+        is_embed: true,
+        is_live: true,
+        sources_count: 5,
+        lang: 'vf'
+      };
+    }
+
+    if (srvNum === 3) {
+      return {
+        success: true,
+        server: 3,
+        server_name: serverNames[3],
+        hoster: `Lecteur Nontongo HD • ${title}`,
+        quality: '1080p HD',
+        title: `${title} • 🔴 EN DIRECT`,
+        stream_url: `https://nontongo.win/livetv/${daddyId}`,
+        embed_url: `https://nontongo.win/livetv/${daddyId}`,
+        player_type: 'iframe',
+        is_embed: true,
+        is_live: true,
+        sources_count: 5,
+        lang: 'vf'
+      };
+    }
+
+    if (srvNum === 4) {
+      return {
+        success: true,
+        server: 4,
+        server_name: serverNames[4],
+        hoster: `Lecteur HD1 Secours • ${title}`,
+        quality: '1080p HD',
+        title: `${title} • 🔴 EN DIRECT`,
+        stream_url: `https://daddylivehd1.sbs/embed/stream-${daddyId}.php`,
+        embed_url: `https://daddylivehd1.sbs/embed/stream-${daddyId}.php`,
+        player_type: 'iframe',
+        is_embed: true,
+        is_live: true,
+        sources_count: 5,
+        lang: 'vf'
+      };
+    }
+
+    if (srvNum === 5) {
+      return {
+        success: true,
+        server: 5,
+        server_name: serverNames[5],
+        hoster: `Lecteur DLHD Watch • ${title}`,
+        quality: '1080p HD',
+        title: `${title} • 🔴 EN DIRECT`,
+        stream_url: `https://dlhd.st/watch/stream-${daddyId}.php`,
+        embed_url: `https://dlhd.st/watch/stream-${daddyId}.php`,
+        player_type: 'iframe',
+        is_embed: true,
+        is_live: true,
+        sources_count: 5,
+        lang: 'vf'
+      };
+    }
+  }
+
+  // Fallback
   return {
-    success:       true,
-    server:        srvIdx + 1,
-    server_name:   chosen.name,
-    hoster:        `DaddyLive • ${title}`,
-    quality:       '1080p FHD Direct',
-    title:         `${title} • 🔴 EN DIRECT`,
-    stream_url:    chosen.url,
-    embed_url:     chosen.url,
-    player_type:   'iframe',
-    is_embed:      true,
-    is_live:       true,
-    sources_count: players.length,
-    all_servers:   players.map((p, i) => ({
-      index: i,
-      tag:   p.tag,
-      name:  p.name,
-      url:   p.url,
-      type:  'iframe'
-    })),
+    success: true,
+    server: srvNum,
+    server_name: serverNames[srvNum],
+    hoster: `Direct TV • ${title}`,
+    quality: '1080p HD',
+    title: `${title} • 🔴 EN DIRECT`,
+    stream_url: 'https://mainstreammedia-worldoffreesportsintl-rakuten.amagi.tv/playlist.m3u8',
+    player_type: 'direct_hls',
+    is_embed: false,
+    is_live: true,
+    sources_count: 5,
     lang: 'vf'
   };
 }
-
-// ─────────────────────────────────────────────────────────────────────────
 
 // ================= EXTRACTEUR DE FLUX FRANÇAIS (VF / VOSTFR) =================
 function unpackDeanEdwards(p, a, c, k, e, d) {
@@ -1136,6 +1314,73 @@ const server = http.createServer((req, res) => {
           fallback: true,
           message: err.message || 'Flux direct temporairement indisponible'
         }));
+      });
+    return;
+  }
+
+  // ================= ROUTE DIRECT LIVE STREAM HLS PROXY (/api/stream/live) =================
+  if (pathname === '/api/stream/live' && req.method === 'GET') {
+    const channelId = parsedUrl.query.channel;
+    const track = parsedUrl.query.track;
+    const mirror = parsedUrl.query.mirror || 'cricsfree';
+
+    if (!channelId) {
+      res.writeHead(400, { 'Content-Type': 'text/plain', 'Access-Control-Allow-Origin': '*' });
+      res.end('Paramètre channel manquant');
+      return;
+    }
+
+    getLiveM3u8Url(channelId, mirror)
+      .then(async masterUrl => {
+        if (!masterUrl) {
+          res.writeHead(503, { 'Content-Type': 'text/plain', 'Access-Control-Allow-Origin': '*' });
+          res.end('Flux en direct temporairement indisponible (diffusion active uniquement lors des événements)');
+          return;
+        }
+
+        let targetUrl = masterUrl;
+        if (track) {
+          targetUrl = resolveProxyUrl(masterUrl, track);
+        }
+
+        const hlsRes = await httpsGet(targetUrl, {
+          'Referer': 'https://hamis.romponalis.st/',
+          'Origin': 'https://hamis.romponalis.st'
+        });
+
+        if (hlsRes.status !== 200 || !hlsRes.text || !hlsRes.text.includes('#EXTM3U')) {
+          res.writeHead(hlsRes.status === 200 ? 502 : hlsRes.status, {
+            'Content-Type': 'text/plain',
+            'Access-Control-Allow-Origin': '*'
+          });
+          res.end('Erreur de chargement du flux direct');
+          return;
+        }
+
+        let outputBody = hlsRes.text;
+        if (!track) {
+          const lines = outputBody.split(/\r?\n/);
+          outputBody = lines.map(line => {
+            const trimmed = line.trim();
+            if (!trimmed || trimmed.startsWith('#')) return line;
+            return `/api/stream/live?channel=${encodeURIComponent(channelId)}&mirror=${encodeURIComponent(mirror)}&track=${encodeURIComponent(trimmed)}`;
+          }).join('\n');
+        }
+
+        res.writeHead(200, {
+          'Content-Type': 'application/vnd.apple.mpegurl',
+          'Access-Control-Allow-Origin': '*',
+          'Access-Control-Allow-Headers': '*',
+          'Cache-Control': 'no-cache, no-store'
+        });
+        res.end(outputBody);
+      })
+      .catch(err => {
+        console.warn('[Live Stream Error]:', err.message);
+        if (!res.headersSent) {
+          res.writeHead(502, { 'Content-Type': 'text/plain', 'Access-Control-Allow-Origin': '*' });
+          res.end('Erreur live stream: ' + err.message);
+        }
       });
     return;
   }

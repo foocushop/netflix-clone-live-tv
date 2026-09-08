@@ -558,7 +558,8 @@ class NetflixApp {
     if (filter === 'channels') {
       this.catalogRowsContainer.innerHTML = '';
       const channelCategorySlugs = [
-        'c_sports_fr', 'c_ppv_combat', 'c_sports_extreme',
+        'c_sports_fr', 'c_ppv_combat', 'c_sports_extreme', 'c_tnt_fr',
+        'sports_fr', 'ppv_combat', 'tnt_fr', 'sports_extreme',
         'sport-direct-hd', 'ppv-combat-direct', 'sports-extremes-decouverte'
       ];
 
@@ -568,6 +569,7 @@ class NetflixApp {
         row.category.name.toLowerCase().includes('chaîne') ||
         row.category.name.toLowerCase().includes('sport') ||
         row.category.name.toLowerCase().includes('combat') ||
+        row.category.name.toLowerCase().includes('tnt') ||
         row.movies.some(m => m.media_type === 'channel' || m.is_live)
       ).map(row => ({
         category: row.category,
