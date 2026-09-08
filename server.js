@@ -84,19 +84,20 @@ const XTREAM_STREAM_FALLBACKS = {
 };
 
 // Agents HTTP/HTTPS persistants avec réutilisation de sockets (Keep-Alive Pool)
+// keepAliveMsecs réglé à 10s pour concorder avec les timeouts des reverse-proxies Nginx IPTV
 const xtreamHttpAgent = new http.Agent({
   keepAlive: true,
   maxSockets: 100,
-  maxFreeSockets: 30,
-  keepAliveMsecs: 60000,
+  maxFreeSockets: 20,
+  keepAliveMsecs: 10000,
   timeout: 15000
 });
 
 const xtreamHttpsAgent = new https.Agent({
   keepAlive: true,
   maxSockets: 100,
-  maxFreeSockets: 30,
-  keepAliveMsecs: 60000,
+  maxFreeSockets: 20,
+  keepAliveMsecs: 10000,
   timeout: 15000
 });
 
@@ -105,7 +106,7 @@ const xtreamEdgeCache = new Map();
 // Cache ultra-rapide des manifests réécrits (TTL 1500ms) pour démarrage immédiat (0ms)
 const xtreamManifestCache = new Map();
 
-function fetchXtreamPlaylist(targetUrl, headers = {}, hops = 0) {
+function fetchXtreamPlaylist(targetUrl, headers = {}, hops = 0, retry = 0) {
   if (hops > 5) return Promise.reject(new Error('Trop de redirections Xtream'));
   return new Promise((resolve, reject) => {
     let parsed;
@@ -128,7 +129,7 @@ function fetchXtreamPlaylist(targetUrl, headers = {}, hops = 0) {
         const loc = res.headers.location;
         if (!loc) return reject(new Error('Redirection sans en-tête location'));
         const nextUrl = loc.startsWith('http') ? loc : new URL(loc, targetUrl).href;
-        return resolve(fetchXtreamPlaylist(nextUrl, headers, hops + 1));
+        return resolve(fetchXtreamPlaylist(nextUrl, headers, hops + 1, retry));
       }
       let chunks = [];
       res.on('data', c => chunks.push(c));
@@ -143,9 +144,18 @@ function fetchXtreamPlaylist(targetUrl, headers = {}, hops = 0) {
         });
       });
     });
-    req.on('error', reject);
+    req.on('error', (err) => {
+      // Auto-retry transparent sur socket hang up / ECONNRESET
+      if (retry < 2 && (err.message.includes('socket hang up') || err.code === 'ECONNRESET' || err.code === 'ETIMEDOUT')) {
+        return resolve(fetchXtreamPlaylist(targetUrl, headers, hops, retry + 1));
+      }
+      reject(err);
+    });
     req.on('timeout', () => {
       req.destroy();
+      if (retry < 2) {
+        return resolve(fetchXtreamPlaylist(targetUrl, headers, hops, retry + 1));
+      }
       reject(new Error('Timeout de connexion Xtream'));
     });
   });
@@ -1884,22 +1894,34 @@ const server = http.createServer((req, res) => {
       return res.end('URL de chunk manquante');
     }
 
-    function pipeChunk(urlToFetch, hops = 0) {
+    function pipeChunk(urlToFetch, hops = 0, retry = 0) {
       if (hops > 4) {
-        res.writeHead(502, { 'Content-Type': 'text/plain', 'Access-Control-Allow-Origin': '*' });
-        return res.end('Trop de redirections de chunk Xtream');
+        if (!res.headersSent) {
+          res.writeHead(502, { 'Content-Type': 'text/plain', 'Access-Control-Allow-Origin': '*' });
+          res.end('Trop de redirections de chunk Xtream');
+        }
+        return;
+      }
+
+      if (req.destroyed || res.writableEnded) {
+        return;
       }
 
       let parsed;
       try {
         parsed = new URL(urlToFetch);
       } catch (e) {
-        res.writeHead(400, { 'Content-Type': 'text/plain', 'Access-Control-Allow-Origin': '*' });
-        return res.end('URL de chunk invalide');
+        if (!res.headersSent) {
+          res.writeHead(400, { 'Content-Type': 'text/plain', 'Access-Control-Allow-Origin': '*' });
+          res.end('URL de chunk invalide');
+        }
+        return;
       }
 
       const client = parsed.protocol === 'https:' ? https : http;
       const agent = parsed.protocol === 'https:' ? xtreamHttpsAgent : xtreamHttpAgent;
+      let isClientAborted = false;
+
       const clientReq = client.get(urlToFetch, {
         agent,
         headers: {
@@ -1908,16 +1930,23 @@ const server = http.createServer((req, res) => {
         },
         timeout: 15000
       }, (chunkRes) => {
+        if (isClientAborted || req.destroyed || res.writableEnded) {
+          try { chunkRes.destroy(); } catch (e) {}
+          return;
+        }
+
         if (chunkRes.statusCode === 301 || chunkRes.statusCode === 302 || chunkRes.statusCode === 307) {
           const loc = chunkRes.headers.location;
           if (loc) {
             const nextUrl = loc.startsWith('http') ? loc : new URL(loc, urlToFetch).href;
-            return pipeChunk(nextUrl, hops + 1);
+            return pipeChunk(nextUrl, hops + 1, retry);
           }
         }
 
         if (chunkRes.statusCode !== 200 && chunkRes.statusCode !== 206) {
-          res.writeHead(chunkRes.statusCode, { 'Access-Control-Allow-Origin': '*' });
+          if (!res.headersSent) {
+            res.writeHead(chunkRes.statusCode, { 'Access-Control-Allow-Origin': '*' });
+          }
           return chunkRes.pipe(res);
         }
 
@@ -1934,6 +1963,17 @@ const server = http.createServer((req, res) => {
       });
 
       clientReq.on('error', (err) => {
+        // 1. Si la connexion client a déjà été coupée (zapping, seek, fermeture d'onglet)
+        if (isClientAborted || req.destroyed || res.writableEnded) {
+          return;
+        }
+
+        // 2. Si le serveur distant a fermé une socket inactive (socket hang up / ECONNRESET / ETIMEDOUT),
+        // on relance automatiquement une tentative sur une socket neuve
+        if (retry < 2 && !res.headersSent && (err.message.includes('socket hang up') || err.code === 'ECONNRESET' || err.code === 'ETIMEDOUT')) {
+          return pipeChunk(urlToFetch, hops, retry + 1);
+        }
+
         console.warn('[Xtream Chunk Error]:', err.message);
         if (!res.headersSent) {
           res.writeHead(502, { 'Content-Type': 'text/plain', 'Access-Control-Allow-Origin': '*' });
@@ -1942,6 +1982,7 @@ const server = http.createServer((req, res) => {
       });
 
       req.on('close', () => {
+        isClientAborted = true;
         try { clientReq.destroy(); } catch (e) {}
       });
     }
