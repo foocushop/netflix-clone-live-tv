@@ -312,251 +312,95 @@ async function extractShowMultiProvider(showType, season, episode, serverIndex) 
 }
 
 // ================= EXTRACTEUR DE CHAÎNES TV EN DIRECT (SPORTS & PPV) =================
-const CHANNELS_REAL_STREAMS = {
-  'tv_canal_sport': {
-    title: 'Canal+ Sport HD',
-    servers: [
-      { type: 'hls', url: 'https://linear-253.frequency.stream/mt/roku/253/hls/master/playlist.m3u8' },
-      { type: 'hls', url: 'https://raw.githubusercontent.com/Paradise-91/ParaTV/main/streams/equidia/live2.m3u8' },
-      { type: 'hls', url: 'https://d03ae6b5c6724c24867e97a3dc04934a.mediatailor.us-west-2.amazonaws.com/v1/master/ba62fe743df0fe93366eba3a257d792884136c7f/LINEAR-1026-WORBBRPTFAST-WHALETVPLUS/1026/hls/master/playlist.m3u8' },
-      { type: 'embed', url: 'https://embed.st/embed/delta/live-event_monday-night-raw-live-stream/1' },
-      { type: 'hls', url: 'https://37b4c228.wurl.com/master/f36d25e7e52f1ba8d7e56eb859c636563214f541/UmFrdXRlblRWLWZyX0ZJRkFQbHVzRnJlbmNoX0hMUw/playlist.m3u8' }
-    ]
-  },
-  'tv_canal_foot': {
-    title: 'Canal+ Foot HD',
-    servers: [
-      { type: 'hls', url: 'https://37b4c228.wurl.com/master/f36d25e7e52f1ba8d7e56eb859c636563214f541/UmFrdXRlblRWLWZyX0ZJRkFQbHVzRnJlbmNoX0hMUw/playlist.m3u8' },
-      { type: 'hls', url: 'https://raw.githubusercontent.com/Paradise-91/ParaTV/main/streams/equidia/live2.m3u8' },
-      { type: 'hls', url: 'https://lightning-tracesport-samsungau.amagi.tv/playlist.m3u8' },
-      { type: 'embed', url: 'https://embed.st/embed/delta/live-event_monday-night-raw-live-stream/1' },
-      { type: 'hls', url: 'https://d03ae6b5c6724c24867e97a3dc04934a.mediatailor.us-west-2.amazonaws.com/v1/master/ba62fe743df0fe93366eba3a257d792884136c7f/LINEAR-1026-WORBBRPTFAST-WHALETVPLUS/1026/hls/master/playlist.m3u8' }
-    ]
-  },
-  'tv_canal_360': {
-    title: 'Canal+ Sport 360 HD',
-    servers: [
-      { type: 'hls', url: 'https://d03ae6b5c6724c24867e97a3dc04934a.mediatailor.us-west-2.amazonaws.com/v1/master/ba62fe743df0fe93366eba3a257d792884136c7f/LINEAR-1026-WORBBRPTFAST-WHALETVPLUS/1026/hls/master/playlist.m3u8' },
-      { type: 'hls', url: 'https://mainstreammedia-worldoffreesportsintl-rakuten.amagi.tv/playlist.m3u8' },
-      { type: 'hls', url: 'https://lightning-tracesport-samsungau.amagi.tv/playlist.m3u8' },
-      { type: 'embed', url: 'https://embed.st/embed/delta/live-event_monday-night-raw-live-stream/1' },
-      { type: 'hls', url: 'https://37b4c228.wurl.com/master/f36d25e7e52f1ba8d7e56eb859c636563214f541/UmFrdXRlblRWLWZyX0ZJRkFQbHVzRnJlbmNoX0hMUw/playlist.m3u8' }
-    ]
-  },
-  'tv_bein1': {
-    title: 'beIN SPORTS 1 HD',
-    servers: [
-      { type: 'hls', url: 'https://37b4c228.wurl.com/master/f36d25e7e52f1ba8d7e56eb859c636563214f541/UmFrdXRlblRWLWZyX0ZJRkFQbHVzRnJlbmNoX0hMUw/playlist.m3u8' },
-      { type: 'hls', url: 'https://lightning-tracesport-samsungau.amagi.tv/playlist.m3u8' },
-      { type: 'hls', url: 'https://linear-253.frequency.stream/mt/roku/253/hls/master/playlist.m3u8' },
-      { type: 'embed', url: 'https://embed.st/embed/delta/live-event_monday-night-raw-live-stream/1' },
-      { type: 'hls', url: 'https://d03ae6b5c6724c24867e97a3dc04934a.mediatailor.us-west-2.amazonaws.com/v1/master/ba62fe743df0fe93366eba3a257d792884136c7f/LINEAR-1026-WORBBRPTFAST-WHALETVPLUS/1026/hls/master/playlist.m3u8' }
-    ]
-  },
-  'tv_bein2': {
-    title: 'beIN SPORTS 2 HD',
-    servers: [
-      { type: 'hls', url: 'https://lightning-tracesport-samsungau.amagi.tv/playlist.m3u8' },
-      { type: 'hls', url: 'https://37b4c228.wurl.com/master/f36d25e7e52f1ba8d7e56eb859c636563214f541/UmFrdXRlblRWLWZyX0ZJRkFQbHVzRnJlbmNoX0hMUw/playlist.m3u8' },
-      { type: 'hls', url: 'https://mainstreammedia-worldoffreesportsintl-rakuten.amagi.tv/playlist.m3u8' },
-      { type: 'embed', url: 'https://embed.st/embed/delta/live-event_monday-night-raw-live-stream/1' },
-      { type: 'hls', url: 'https://linear-253.frequency.stream/mt/roku/253/hls/master/playlist.m3u8' }
-    ]
-  },
-  'tv_bein3': {
-    title: 'beIN SPORTS 3 HD',
-    servers: [
-      { type: 'hls', url: 'https://d03ae6b5c6724c24867e97a3dc04934a.mediatailor.us-west-2.amazonaws.com/v1/master/ba62fe743df0fe93366eba3a257d792884136c7f/LINEAR-1026-WORBBRPTFAST-WHALETVPLUS/1026/hls/master/playlist.m3u8' },
-      { type: 'hls', url: 'https://lightning-tracesport-samsungau.amagi.tv/playlist.m3u8' },
-      { type: 'hls', url: 'https://37b4c228.wurl.com/master/f36d25e7e52f1ba8d7e56eb859c636563214f541/UmFrdXRlblRWLWZyX0ZJRkFQbHVzRnJlbmNoX0hMUw/playlist.m3u8' },
-      { type: 'embed', url: 'https://embed.st/embed/delta/live-event_monday-night-raw-live-stream/1' },
-      { type: 'hls', url: 'https://mainstreammedia-worldoffreesportsintl-rakuten.amagi.tv/playlist.m3u8' }
-    ]
-  },
-  'tv_rmc_sport1': {
-    title: 'RMC Sport 1 HD',
-    servers: [
-      { type: 'hls', url: 'https://linear-253.frequency.stream/mt/roku/253/hls/master/playlist.m3u8' },
-      { type: 'embed', url: 'https://embed.st/embed/delta/live-event_lfc-63-legacy-fighting-championship-63-live-stream/1' },
-      { type: 'hls', url: 'https://d03ae6b5c6724c24867e97a3dc04934a.mediatailor.us-west-2.amazonaws.com/v1/master/ba62fe743df0fe93366eba3a257d792884136c7f/LINEAR-1026-WORBBRPTFAST-WHALETVPLUS/1026/hls/master/playlist.m3u8' },
-      { type: 'embed', url: 'https://embed.st/embed/delta/live-event_monday-night-raw-live-stream/1' },
-      { type: 'hls', url: 'https://lightning-tracesport-samsungau.amagi.tv/playlist.m3u8' }
-    ]
-  },
-  'tv_eurosport1': {
-    title: 'Eurosport 1 HD',
-    servers: [
-      { type: 'hls', url: 'https://mainstreammedia-worldoffreesportsintl-rakuten.amagi.tv/playlist.m3u8' },
-      { type: 'hls', url: 'https://lightning-tracesport-samsungau.amagi.tv/playlist.m3u8' },
-      { type: 'hls', url: 'https://37b4c228.wurl.com/master/f36d25e7e52f1ba8d7e56eb859c636563214f541/UmFrdXRlblRWLWZyX0ZJRkFQbHVzRnJlbmNoX0hMUw/playlist.m3u8' },
-      { type: 'embed', url: 'https://embed.st/embed/delta/live-event_monday-night-raw-live-stream/1' },
-      { type: 'hls', url: 'https://d03ae6b5c6724c24867e97a3dc04934a.mediatailor.us-west-2.amazonaws.com/v1/master/ba62fe743df0fe93366eba3a257d792884136c7f/LINEAR-1026-WORBBRPTFAST-WHALETVPLUS/1026/hls/master/playlist.m3u8' }
-    ]
-  },
-  'tv_eurosport2': {
-    title: 'Eurosport 2 HD',
-    servers: [
-      { type: 'hls', url: 'https://d03ae6b5c6724c24867e97a3dc04934a.mediatailor.us-west-2.amazonaws.com/v1/master/ba62fe743df0fe93366eba3a257d792884136c7f/LINEAR-1026-WORBBRPTFAST-WHALETVPLUS/1026/hls/master/playlist.m3u8' },
-      { type: 'hls', url: 'https://mainstreammedia-worldoffreesportsintl-rakuten.amagi.tv/playlist.m3u8' },
-      { type: 'hls', url: 'https://streams2.sofast.tv/v1/master/611d79b11b77e2f571934fd80ca1413453772ac7/fdd6f243-f971-4a1a-9510-97ac01d6b37f/manifest.m3u8' },
-      { type: 'embed', url: 'https://embed.st/embed/delta/live-event_monday-night-raw-live-stream/1' },
-      { type: 'hls', url: 'https://lightning-tracesport-samsungau.amagi.tv/playlist.m3u8' }
-    ]
-  },
-  'tv_lequipe': {
-    title: "La Chaîne L'Équipe (Canal 21)",
-    servers: [
-      { type: 'hls', url: 'https://raw.githubusercontent.com/Paradise-91/ParaTV/main/streams/equidia/live2.m3u8' },
-      { type: 'hls', url: 'https://37b4c228.wurl.com/master/f36d25e7e52f1ba8d7e56eb859c636563214f541/UmFrdXRlblRWLWZyX0ZJRkFQbHVzRnJlbmNoX0hMUw/playlist.m3u8' },
-      { type: 'hls', url: 'https://mainstreammedia-worldoffreesportsintl-rakuten.amagi.tv/playlist.m3u8' },
-      { type: 'embed', url: 'https://embed.st/embed/delta/live-event_monday-night-raw-live-stream/1' },
-      { type: 'hls', url: 'https://lightning-tracesport-samsungau.amagi.tv/playlist.m3u8' }
-    ]
-  },
-  'tv_equidia': {
-    title: 'Equidia Live HD',
-    servers: [
-      { type: 'hls', url: 'https://raw.githubusercontent.com/Paradise-91/ParaTV/main/streams/equidia/live2.m3u8' },
-      { type: 'hls', url: 'https://raw.githubusercontent.com/Paradise-91/ParaTV/main/streams/equidia/live2.m3u8' },
-      { type: 'hls', url: 'https://raw.githubusercontent.com/Paradise-91/ParaTV/main/streams/equidia/live2.m3u8' },
-      { type: 'embed', url: 'https://embed.st/embed/delta/live-event_monday-night-raw-live-stream/1' },
-      { type: 'hls', url: 'https://raw.githubusercontent.com/Paradise-91/ParaTV/main/streams/equidia/live2.m3u8' }
-    ]
-  },
-  'tv_ufc': {
-    title: 'UFC TV / Fight Pass HD',
-    servers: [
-      { type: 'embed', url: 'https://embed.st/embed/delta/live-event_lfc-63-legacy-fighting-championship-63-live-stream/1' },
-      { type: 'hls', url: 'https://linear-253.frequency.stream/mt/roku/253/hls/master/playlist.m3u8' },
-      { type: 'embed', url: 'https://embed.st/embed/delta/ppv-dana-white-s-contender-series/1' },
-      { type: 'embed', url: 'https://embed.st/embed/echo/ppv-event-01-wwe-monday-night-raw-ppv-01/1' },
-      { type: 'hls', url: 'https://linear-253.frequency.stream/mt/roku/253/hls/master/playlist.m3u8' }
-    ]
-  },
-  'tv_dazn1': {
-    title: 'DAZN 1 France HD',
-    servers: [
-      { type: 'embed', url: 'https://embed.st/embed/delta/live-event_monday-night-raw-live-stream/1' },
-      { type: 'hls', url: 'https://linear-253.frequency.stream/mt/roku/253/hls/master/playlist.m3u8' },
-      { type: 'hls', url: 'https://37b4c228.wurl.com/master/f36d25e7e52f1ba8d7e56eb859c636563214f541/UmFrdXRlblRWLWZyX0ZJRkFQbHVzRnJlbmNoX0hMUw/playlist.m3u8' },
-      { type: 'embed', url: 'https://embed.st/embed/delta/live-event_monday-night-raw-live-stream/1' },
-      { type: 'hls', url: 'https://d03ae6b5c6724c24867e97a3dc04934a.mediatailor.us-west-2.amazonaws.com/v1/master/ba62fe743df0fe93366eba3a257d792884136c7f/LINEAR-1026-WORBBRPTFAST-WHALETVPLUS/1026/hls/master/playlist.m3u8' }
-    ]
-  },
-  'tv_wwe': {
-    title: 'WWE Network HD',
-    servers: [
-      { type: 'embed', url: 'https://embed.st/embed/delta/live-event_monday-night-raw-live-stream/1' },
-      { type: 'embed', url: 'https://embed.st/embed/echo/ppv-event-01-wwe-monday-night-raw-ppv-01/1' },
-      { type: 'hls', url: 'https://linear-253.frequency.stream/mt/roku/253/hls/master/playlist.m3u8' },
-      { type: 'embed', url: 'https://embed.st/embed/delta/ppv-wwe-nxt/1' },
-      { type: 'hls', url: 'https://d03ae6b5c6724c24867e97a3dc04934a.mediatailor.us-west-2.amazonaws.com/v1/master/ba62fe743df0fe93366eba3a257d792884136c7f/LINEAR-1026-WORBBRPTFAST-WHALETVPLUS/1026/hls/master/playlist.m3u8' }
-    ]
-  },
-  'tv_swerve_combat': {
-    title: 'Swerve Combat HD',
-    servers: [
-      { type: 'hls', url: 'https://linear-253.frequency.stream/mt/roku/253/hls/master/playlist.m3u8' },
-      { type: 'embed', url: 'https://embed.st/embed/delta/live-event_lfc-63-legacy-fighting-championship-63-live-stream/1' },
-      { type: 'hls', url: 'https://linear-253.frequency.stream/mt/roku/253/hls/master/playlist.m3u8' },
-      { type: 'embed', url: 'https://embed.st/embed/delta/live-event_monday-night-raw-live-stream/1' },
-      { type: 'hls', url: 'https://linear-253.frequency.stream/mt/roku/253/hls/master/playlist.m3u8' }
-    ]
-  },
-  'tv_redbull': {
-    title: 'Red Bull TV Sports Extrêmes HD',
-    servers: [
-      { type: 'hls', url: 'https://d03ae6b5c6724c24867e97a3dc04934a.mediatailor.us-west-2.amazonaws.com/v1/master/ba62fe743df0fe93366eba3a257d792884136c7f/LINEAR-1026-WORBBRPTFAST-WHALETVPLUS/1026/hls/master/playlist.m3u8' },
-      { type: 'hls', url: 'https://46cfeb23c7f74853bba7a256655a3119.mediatailor.us-west-2.amazonaws.com/v1/master/ba62fe743df0fe93366eba3a257d792884136c7f/LINEAR-582-WORBDACHDEFAST-WHALETVPLUS/582/whaletvplus/hls/master/playlist.m3u8' },
-      { type: 'hls', url: 'https://1a3566cb46914c5499fbc86fbc4ac87e.mediatailor.us-west-2.amazonaws.com/v1/master/ba62fe743df0fe93366eba3a257d792884136c7f/LINEAR-932-WORBUKENFAST-WHALETVPLUS/932/whaletvplus/hls/master/playlist.m3u8' },
-      { type: 'hls', url: 'https://0b73ace69ebb45eaa249bb87837cb958.mediatailor.us-west-2.amazonaws.com/v1/master/ba62fe743df0fe93366eba3a257d792884136c7f/LINEAR-644-WORBUSENFAST-LG_US/644/lgtv/hls/master/playlist.m3u8' },
-      { type: 'hls', url: 'https://886bd3fbc782459f8de7555d32d7e9ce.mediatailor.us-west-2.amazonaws.com/v1/master/ba62fe743df0fe93366eba3a257d792884136c7f/LINEAR-957-WORBLATAMESFAST-WHALETVPLUS/957/whaletvplus/hls/master/playlist.m3u8' }
-    ]
-  },
-  'tv_fifa': {
-    title: 'FIFA+ Direct Français HD',
-    servers: [
-      { type: 'hls', url: 'https://37b4c228.wurl.com/master/f36d25e7e52f1ba8d7e56eb859c636563214f541/UmFrdXRlblRWLWZyX0ZJRkFQbHVzRnJlbmNoX0hMUw/playlist.m3u8' },
-      { type: 'hls', url: 'https://lightning-tracesport-samsungau.amagi.tv/playlist.m3u8' },
-      { type: 'hls', url: 'https://mainstreammedia-worldoffreesportsintl-rakuten.amagi.tv/playlist.m3u8' },
-      { type: 'embed', url: 'https://embed.st/embed/delta/live-event_monday-night-raw-live-stream/1' },
-      { type: 'hls', url: 'https://37b4c228.wurl.com/master/f36d25e7e52f1ba8d7e56eb859c636563214f541/UmFrdXRlblRWLWZyX0ZJRkFQbHVzRnJlbmNoX0hMUw/playlist.m3u8' }
-    ]
-  },
-  'tv_trace_sport': {
-    title: 'Trace Sport Stars HD',
-    servers: [
-      { type: 'hls', url: 'https://lightning-tracesport-samsungau.amagi.tv/playlist.m3u8' },
-      { type: 'hls', url: 'https://d03ae6b5c6724c24867e97a3dc04934a.mediatailor.us-west-2.amazonaws.com/v1/master/ba62fe743df0fe93366eba3a257d792884136c7f/LINEAR-1026-WORBBRPTFAST-WHALETVPLUS/1026/hls/master/playlist.m3u8' },
-      { type: 'hls', url: 'https://37b4c228.wurl.com/master/f36d25e7e52f1ba8d7e56eb859c636563214f541/UmFrdXRlblRWLWZyX0ZJRkFQbHVzRnJlbmNoX0hMUw/playlist.m3u8' },
-      { type: 'embed', url: 'https://embed.st/embed/delta/live-event_monday-night-raw-live-stream/1' },
-      { type: 'hls', url: 'https://lightning-tracesport-samsungau.amagi.tv/playlist.m3u8' }
-    ]
-  },
-  'tv_freesports': {
-    title: 'World of Freesports HD',
-    servers: [
-      { type: 'hls', url: 'https://mainstreammedia-worldoffreesportsintl-rakuten.amagi.tv/playlist.m3u8' },
-      { type: 'hls', url: 'https://d03ae6b5c6724c24867e97a3dc04934a.mediatailor.us-west-2.amazonaws.com/v1/master/ba62fe743df0fe93366eba3a257d792884136c7f/LINEAR-1026-WORBBRPTFAST-WHALETVPLUS/1026/hls/master/playlist.m3u8' },
-      { type: 'hls', url: 'https://lightning-tracesport-samsungau.amagi.tv/playlist.m3u8' },
-      { type: 'embed', url: 'https://embed.st/embed/delta/live-event_monday-night-raw-live-stream/1' },
-      { type: 'hls', url: 'https://mainstreammedia-worldoffreesportsintl-rakuten.amagi.tv/playlist.m3u8' }
-    ]
-  },
-  'tv_kozoom': {
-    title: 'Kozoom TV Sports HD',
-    servers: [
-      { type: 'hls', url: 'https://streams2.sofast.tv/v1/master/611d79b11b77e2f571934fd80ca1413453772ac7/fdd6f243-f971-4a1a-9510-97ac01d6b37f/manifest.m3u8' },
-      { type: 'hls', url: 'https://lightning-tracesport-samsungau.amagi.tv/playlist.m3u8' },
-      { type: 'hls', url: 'https://d03ae6b5c6724c24867e97a3dc04934a.mediatailor.us-west-2.amazonaws.com/v1/master/ba62fe743df0fe93366eba3a257d792884136c7f/LINEAR-1026-WORBBRPTFAST-WHALETVPLUS/1026/hls/master/playlist.m3u8' },
-      { type: 'embed', url: 'https://embed.st/embed/delta/live-event_monday-night-raw-live-stream/1' },
-      { type: 'hls', url: 'https://streams2.sofast.tv/v1/master/611d79b11b77e2f571934fd80ca1413453772ac7/fdd6f243-f971-4a1a-9510-97ac01d6b37f/manifest.m3u8' }
-    ]
-  }
+// ─── DaddyLive Channel System ─────────────────────────────────────────────
+// Génère les 8 URLs de serveurs DaddyLive pour un ID de channel donné
+function buildDaddyLivePlayers(dlId) {
+  return [
+    { tag: 'HD1', name: '🔴 Serveur 1 — HD Direct',       url: `https://daddylivehd1.sbs/embed/stream-${dlId}.php` },
+    { tag: 'LI',  name: '🎬 Serveur 2 — Miroir Li',       url: `https://daddylive.li/player/embed.php?id=${dlId}` },
+    { tag: 'NT',  name: '📡 Serveur 3 — Nontongo',        url: `https://nontongo.win/livetv/${dlId}` },
+    { tag: 'CF',  name: '⚡ Serveur 4 — Cricsfree',        url: `https://cricsfree.cfd/live/stream-${dlId}.php` },
+    { tag: 'AX',  name: '🚀 Serveur 5 — Apex',            url: `https://apexstreams.cfd/live/stream-${dlId}.php` },
+    { tag: 'DL',  name: '🌐 Serveur 6 — DLive Cast',      url: `https://dlive.sx/cast/stream-${dlId}.php` },
+    { tag: 'ST',  name: '📺 Serveur 7 — DLHD Watch',      url: `https://dlhd.st/watch/stream-${dlId}.php` },
+    { tag: 'ES',  name: '🔥 Serveur 8 — EngStreams',       url: `https://engstreams.shop/stream/index.php?id=${dlId}` },
+  ];
+}
+
+// Mapping ID catalogue → ID DaddyLive + titre affiché
+const DADDYLIVE_MAP = {
+  // ── Sport France ──────────────────────────────────
+  'tv_canal_sport':    { dlId: 122,  title: 'Canal+ Sport France' },
+  'tv_canal_foot':     { dlId: 463,  title: 'Canal+ Foot France' },
+  'tv_canal_360':      { dlId: 464,  title: 'Canal+ Sport 360' },
+  'tv_canal_moto':     { dlId: 271,  title: 'Canal+ MotoGP France' },
+  'tv_canal_f1':       { dlId: 273,  title: 'Canal+ Formule 1 France' },
+  'tv_bein1':          { dlId: 116,  title: 'beIN Sports 1 France' },
+  'tv_bein2':          { dlId: 117,  title: 'beIN Sports 2 France' },
+  'tv_bein3':          { dlId: 118,  title: 'beIN Sports 3 France' },
+  'tv_rmc_sport1':     { dlId: 119,  title: 'RMC Sport 1 France' },
+  'tv_rmc_sport2':     { dlId: 120,  title: 'RMC Sport 2 France' },
+  'tv_eurosport1':     { dlId: 772,  title: 'Eurosport 1 France' },
+  'tv_eurosport2':     { dlId: 773,  title: 'Eurosport 2 France' },
+  'tv_lequipe':        { dlId: 645,  title: "L'Équipe TV France" },
+  'tv_equidia':        { dlId: 965,  title: 'Sport en France' },
+  'tv_ligue1':         { dlId: 960,  title: 'Ligue 1+ France / DAZN' },
+  'tv_ligue1_3':       { dlId: 222,  title: 'Ligue 1+ 3 France' },
+  'tv_sport_fr':       { dlId: 965,  title: 'Sport en France' },
+  // ── PPV & Combat ──────────────────────────────────
+  'tv_ufc':            { dlId: 250,  title: 'UFC Fight Pass' },
+  'tv_ufc_night':      { dlId: 5015, title: 'UFC Fight Night' },
+  'tv_wwe':            { dlId: 376,  title: 'WWE Network' },
+  'tv_wwe_ppv':        { dlId: 5005, title: 'WWE PPV' },
+  'tv_dazn1':          { dlId: 179,  title: 'DAZN France' },
+  'tv_ppv':            { dlId: 5000, title: 'PPV Events' },
+  'tv_ppv_boxing':     { dlId: 5022, title: 'PPV Boxing' },
+  'tv_event_ppv':      { dlId: 228,  title: 'Event PPV' },
+  'tv_swerve_combat':  { dlId: 228,  title: 'Event PPV Combat' },
+  // ── Sports Extrêmes / Autres ──────────────────────
+  'tv_redbull':        { dlId: 965,  title: 'Sport en France (Red Bull)' },
+  'tv_fifa':           { dlId: 960,  title: 'Ligue 1+ / FIFA+' },
+  'tv_trace_sport':    { dlId: 965,  title: 'Sport en France' },
+  'tv_freesports':     { dlId: 5000, title: 'PPV Events / Freesports' },
+  'tv_kozoom':         { dlId: 222,  title: 'Ligue 1+ 3 France' },
 };
 
 async function extractChannelMultiProvider(channelId, serverIndex) {
   const channel = catalog.movies.find(m => m.id === channelId);
-  const title = channel ? channel.title : 'Chaîne Sport Direct';
-  const srvIdx = (parseInt(serverIndex) || 0) % 5;
-  const srvNum = srvIdx + 1;
+  const mapping = DADDYLIVE_MAP[channelId];
 
-  const serverNames = {
-    1: 'Serveur 1 (⚡ Direct HLS Principal HD)',
-    2: 'Serveur 2 (🎬 Miroir CDN Haute Vitesse)',
-    3: 'Serveur 3 (🌐 Flux Direct Secours)',
-    4: 'Serveur 4 (📡 Lecteur Événementiel Multi-Flux)',
-    5: 'Serveur 5 (🚀 Multi-Débit Adaptatif)'
-  };
+  const title = mapping ? mapping.title : (channel ? channel.title : 'Chaîne Sport Direct');
+  const dlId  = mapping ? mapping.dlId  : 121; // fallback Canal+ France
 
-  const channelConfig = CHANNELS_REAL_STREAMS[channelId];
-  let chosen = null;
-  if (channelConfig && channelConfig.servers && channelConfig.servers[srvIdx]) {
-    chosen = channelConfig.servers[srvIdx];
-  } else {
-    // Fallback par défaut vers un flux sport garanti
-    chosen = { type: 'hls', url: 'https://d03ae6b5c6724c24867e97a3dc04934a.mediatailor.us-west-2.amazonaws.com/v1/master/ba62fe743df0fe93366eba3a257d792884136c7f/LINEAR-1026-WORBBRPTFAST-WHALETVPLUS/1026/hls/master/playlist.m3u8' };
-  }
-
-  const isEmbed = (chosen.type === 'embed');
-  const streamUrl = isEmbed ? chosen.url : chosen.url;
+  const players = buildDaddyLivePlayers(dlId);
+  const srvIdx  = Math.abs(parseInt(serverIndex) || 0) % players.length;
+  const chosen  = players[srvIdx];
 
   return {
-    success: true,
-    server: srvNum,
-    server_name: serverNames[srvNum],
-    hoster: `Direct TV • ${title}`,
-    quality: '1080p FHD Direct',
-    title: `${title} • 🔴 EN DIRECT`,
-    stream_url: streamUrl,
-    embed_url: isEmbed ? chosen.url : null,
-    player_type: isEmbed ? 'iframe' : 'direct_hls',
-    is_embed: isEmbed,
-    is_live: true,
-    sources_count: 5,
+    success:       true,
+    server:        srvIdx + 1,
+    server_name:   chosen.name,
+    hoster:        `DaddyLive • ${title}`,
+    quality:       '1080p FHD Direct',
+    title:         `${title} • 🔴 EN DIRECT`,
+    stream_url:    chosen.url,
+    embed_url:     chosen.url,
+    player_type:   'iframe',
+    is_embed:      true,
+    is_live:       true,
+    sources_count: players.length,
+    all_servers:   players.map((p, i) => ({
+      index: i,
+      tag:   p.tag,
+      name:  p.name,
+      url:   p.url,
+      type:  'iframe'
+    })),
     lang: 'vf'
   };
 }
+
+// ─────────────────────────────────────────────────────────────────────────
 
 // ================= EXTRACTEUR DE FLUX FRANÇAIS (VF / VOSTFR) =================
 function unpackDeanEdwards(p, a, c, k, e, d) {

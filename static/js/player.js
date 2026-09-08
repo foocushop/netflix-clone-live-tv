@@ -857,46 +857,38 @@ class NetflixPlayer {
 
   updateServerPills() {
     const isChannel = (this.currentMovie?.media_type === 'channel' || this.currentMovie?.is_live);
-    const isSpecialShow = (this.currentMovie?.id === '68628' || this.currentMovie?.tmdb_id === '68628' || this.currentMovie?.id === 'telefoot_tf1' || this.currentMovie?.tmdb_id === 'telefoot_tf1');
+    const isSpecialShow = (this.currentMovie?.id === '68628' || this.currentMovie?.tmdb_id === '68628' ||
+                           this.currentMovie?.id === 'telefoot_tf1' || this.currentMovie?.tmdb_id === 'telefoot_tf1');
     const isVf = (this.currentLang === 'vf');
+
+    const daddyLiveNames = {
+      1: '🔴 Serveur 1 — HD Direct',
+      2: '🎬 Serveur 2 — Miroir Li',
+      3: '📡 Serveur 3 — Nontongo',
+      4: '⚡ Serveur 4 — Cricsfree',
+      5: '🚀 Serveur 5 — Apex',
+      6: '🌐 Serveur 6 — DLive Cast',
+      7: '📺 Serveur 7 — DLHD Watch',
+      8: '🔥 Serveur 8 — EngStreams'
+    };
+
     let names;
-    if (isChannel) {
-      names = {
-        1: '⚡ Serveur 1 (Direct HLS • Principal FHD)',
-        2: '🎬 Serveur 2 (Miroir CDN Haute Vitesse)',
-        3: '🌐 Serveur 3 (Flux Direct Secours)',
-        4: '📡 Serveur 4 (Lecteur Événementiel Multi-Flux)',
-        5: '🚀 Serveur 5 (Multi-Débit Adaptatif)'
-      };
-    } else if (isSpecialShow) {
-      names = {
-        1: '⚡ Serveur 1 (Direct HLS • Flux Principal HD)',
-        2: '🎬 Serveur 2 (Direct 1080p FHD)',
-        3: '🌐 Serveur 3 (Direct 720p HD)',
-        4: '📡 Serveur 4 (Miroir CDN Rapide)',
-        5: '🚀 Serveur 5 (Multi-Débit Secours)'
-      };
+    if (isSpecialShow) {
+      names = {1:'Serveur 1 (HLS HD)',2:'Serveur 2 (1080p)',3:'Serveur 3 (720p)',4:'Serveur 4 (CDN)',5:'Serveur 5 (Secours)'};
     } else if (isVf) {
-      names = {
-        1: '⚡ Serveur 1 (Direct VF • Vidzy HD)',
-        2: '🎬 Serveur 2 (Direct VF • Fsvid VIP)',
-        3: '🌐 Serveur 3 (Direct VF • Uqload)',
-        4: '📡 Serveur 4 (Direct VF • Secours)',
-        5: '🚀 Serveur 5 (Direct VF • Multi-Flux)'
-      };
+      names = {1:'Serveur 1 (VF Vidzy)',2:'Serveur 2 (VF Fsvid)',3:'Serveur 3 (VF Uqload)',4:'Serveur 4 (VF Secours)',5:'Serveur 5 (VF Multi)'};
     } else {
-      names = {
-        1: '⚡ Serveur 1 (Direct HLS)',
-        2: '🎬 Serveur 2 (Direct HD)',
-        3: '🌐 Serveur 3 (Direct Multi)',
-        4: '📡 Serveur 4 (Direct VIP)',
-        5: '🚀 Serveur 5 (Direct Secours)'
-      };
+      names = {1:'Serveur 1 (Direct HLS)',2:'Serveur 2 (Direct HD)',3:'Serveur 3 (Multi)',4:'Serveur 4 (VIP)',5:'Serveur 5 (Secours)'};
     }
+
+    this.serverPills = document.querySelectorAll('.server-pill');
 
     this.serverPills.forEach(p => {
       const pNum = parseInt(p.dataset.server) || 1;
       const active = (pNum === this.currentServer);
+      if (p.classList.contains('server-pill-extra')) {
+        p.classList.toggle('hidden', !isChannel);
+      }
       p.classList.toggle('active', active);
       p.innerHTML = '';
       if (active) {
@@ -905,9 +897,11 @@ class NetflixPlayer {
         dot.textContent = '● ';
         p.appendChild(dot);
       }
-      p.appendChild(document.createTextNode(names[pNum] || `Serveur ${pNum}`));
+      const label = isChannel ? (daddyLiveNames[pNum] || ('Serveur ' + pNum)) : (names[pNum] || ('Serveur ' + pNum));
+      p.appendChild(document.createTextNode(label));
     });
   }
+
 
   updateMetaDisplay() {
     if (!this.currentMovie) return;
