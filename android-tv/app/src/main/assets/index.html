@@ -22,6 +22,7 @@
         <li><a href="#" class="nav-link" data-filter="my-list">Ma liste</a></li>
         <li><a href="#" class="nav-link" data-filter="channels"><span class="live-dot-nav">●</span> Chaînes TV</a></li>
         <li><a href="#" class="nav-link" data-filter="xtream"><span class="xtream-badge-nav">💎</span> Xtream</a></li>
+        <li><a href="#" class="nav-link" data-filter="telerealite"><span class="xtream-badge-nav">📺</span> TV Réalité</a></li>
       </ul>
     </div>
     <div class="header-right">
@@ -112,6 +113,30 @@
       </div>
       <div class="xtream-status-bar">
         <span id="xtreamCountDisplay" class="xtream-count-display">Chargement des chaînes...</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= BARRE DE RECHERCHE & FILTRES TÉLÉ-RÉALITÉ XTREAM ================= -->
+  <section class="xtream-toolbar telerealite-toolbar" id="telerealiteToolbar" style="display: none;">
+    <div class="xtream-toolbar-content">
+      <div class="xtream-search-wrap">
+        <span class="xtream-search-icon">📺 🔍</span>
+        <input type="text" id="telerealiteSearchInput" class="xtream-search-input telerealite-search-input" placeholder="Rechercher une télé-réalité (ex: La Villa, Les Cinquante, Frenchie Shore, Koh-Lanta, Les Traîtres)..." autocomplete="off">
+        <button id="telerealiteSearchClear" class="xtream-search-clear telerealite-search-clear" style="display: none;" title="Effacer">✕</button>
+      </div>
+      <div class="xtream-filter-row">
+        <span class="xtream-filter-label">Sélection :</span>
+        <div class="xtream-chips-scroll" id="telerealiteFilterChips">
+          <button class="xtream-chip telerealite-chip active" data-filter="all">Toutes les émissions (221)</button>
+          <button class="xtream-chip telerealite-chip" data-filter="2026">✨ Nouveautés 2026</button>
+          <button class="xtream-chip telerealite-chip" data-filter="2025">🔥 Saisons 2025</button>
+          <button class="xtream-chip telerealite-chip" data-filter="villa">❤️ La Villa & Romance</button>
+          <button class="xtream-chip telerealite-chip" data-filter="competition">🏆 Compétition & Survie</button>
+        </div>
+      </div>
+      <div class="xtream-status-bar">
+        <span id="telerealiteCountDisplay" class="xtream-count-display">Chargement des télé-réalités...</span>
       </div>
     </div>
   </section>

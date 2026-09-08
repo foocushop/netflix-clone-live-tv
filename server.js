@@ -105,6 +105,18 @@ try {
   console.warn('[Xtream] Impossible de charger xtream_fr_catalog.json:', e.message);
 }
 
+// Catalogue complet des séries Télé-Réalité Xtream (Catégorie 947)
+let XTREAM_TELEREALITE_CATALOG = [];
+try {
+  const trPath = path.join(__dirname, 'data', 'xtream_telerealite_catalog.json');
+  if (fs.existsSync(trPath)) {
+    XTREAM_TELEREALITE_CATALOG = JSON.parse(fs.readFileSync(trPath, 'utf8'));
+    console.log(`[Xtream] ${XTREAM_TELEREALITE_CATALOG.length} séries Télé-Réalité chargées depuis xtream_telerealite_catalog.json`);
+  }
+} catch (e) {
+  console.warn('[Xtream] Impossible de charger xtream_telerealite_catalog.json:', e.message);
+}
+
 
 
 // Fallbacks de sécurité pour les variantes de flux (si un flux FHD est en panne, basculer sur HD ou UHD)
@@ -1622,10 +1634,64 @@ const server = http.createServer((req, res) => {
         return await extractChannelMultiProvider(id || tmdbId, serverNum);
       }
 
-      // ── Cas spécial : La Villa des Cœurs Brisés & Téléfoot via Multi-Fournisseurs Authentiques ──
-      if (tmdbId === '68628' || id === '68628' || tmdbId === 'telefoot_tf1' || id === 'telefoot_tf1') {
-        const showType = (id === 'telefoot_tf1' || tmdbId === 'telefoot_tf1') ? 'telefoot' : 'villa';
-        return await extractShowMultiProvider(showType, season, episode, serverIndex);
+      // ── Cas spécial : Séries Télé-Réalité Xtream (La Villa 68628 & séries Xtream Catégorie 947) ──
+      if (id === '68628' || tmdbId === '68628' || (id && String(id).startsWith('xtream_series_')) || (tmdbId && String(tmdbId).startsWith('xtream_series_'))) {
+        const sNum = parseInt(season) || 1;
+        const eNum = parseInt(episode) || 1;
+        
+        // Chercher d'abord dans catalog.movies
+        const catShow = catalog.movies.find(m => m.id === id || m.tmdb_id === tmdbId || m.id === '68628');
+        let episodeObj = null;
+        let showTitle = catShow?.title || 'Télé-Réalité Xtream';
+
+        if (catShow && catShow.seasons) {
+          const sObj = catShow.seasons.find(s => s.season_number === sNum) || catShow.seasons[0];
+          episodeObj = sObj?.episodes?.find(e => e.episode_number === eNum) || sObj?.episodes?.[0];
+        }
+
+        // Si non trouvé dans catalog.json, chercher dans le cache disque Xtream
+        if (!episodeObj) {
+          const realSeriesId = String(id || tmdbId || '').replace(/^xtream_series_/, '');
+          const cacheFile = path.join(__dirname, 'data', 'cache', `series_${realSeriesId}.json`);
+          if (fs.existsSync(cacheFile)) {
+            try {
+              const rawData = JSON.parse(fs.readFileSync(cacheFile, 'utf8'));
+              showTitle = rawData.info?.name || showTitle;
+              const sEps = (rawData.episodes && rawData.episodes[String(sNum)]) || [];
+              const foundEp = sEps.find(e => parseInt(e.episode_num) === eNum) || sEps[0];
+              if (foundEp) {
+                const ext = foundEp.container_extension || 'mkv';
+                episodeObj = {
+                  episode_number: parseInt(foundEp.episode_num) || eNum,
+                  title: foundEp.title || `Épisode ${eNum}`,
+                  video_url: `/api/stream/xtream-series?episode_id=${foundEp.id}&ext=${ext}`
+                };
+              }
+            } catch (e) {}
+          }
+        }
+
+        if (episodeObj && episodeObj.video_url) {
+          return {
+            success: true,
+            server: serverNum,
+            server_name: `Serveur ${serverNum} (Xtream 1080p FHD Direct)`,
+            hoster: 'Xtream Codes VIP Full HD',
+            quality: '1080p FHD',
+            title: `${showTitle} - S${sNum}:E${episodeObj.episode_number || eNum}`,
+            stream_url: episodeObj.video_url,
+            raw_stream_url: episodeObj.video_url,
+            player_type: 'direct_video',
+            is_embed: false,
+            sources_count: 5,
+            lang: 'vf'
+          };
+        }
+      }
+
+      // ── Cas spécial : Téléfoot ──
+      if (tmdbId === 'telefoot_tf1' || id === 'telefoot_tf1') {
+        return await extractShowMultiProvider('telefoot', season, episode, serverIndex);
       }
 
       if (lang === 'vf') {
@@ -1877,6 +1943,146 @@ const server = http.createServer((req, res) => {
       'Cache-Control': 'public, max-age=60'
     });
     return res.end(JSON.stringify(result));
+  }
+
+  // ================= ROUTE CATALOGUE TÉLÉ-RÉALITÉ XTREAM (/api/xtream/telerealite) =================
+  // Retourne les 221 séries de télé-réalité authentiques de la catégorie 947
+  if (pathname === '/api/xtream/telerealite' && req.method === 'GET') {
+    const q = (parsedUrl.query.q || '').toString().toLowerCase().trim();
+    const limit = parseInt(parsedUrl.query.limit, 10) || 300;
+
+    let filtered = XTREAM_TELEREALITE_CATALOG;
+    if (q) {
+      const terms = q.split(/\s+/).filter(t => t.length > 0);
+      filtered = filtered.filter(s => {
+        const target = `${s.name} ${s.raw_name || ''} ${s.cast || ''} ${s.year || ''}`.toLowerCase();
+        return terms.every(term => target.includes(term));
+      });
+    }
+
+    const result = {
+      success: true,
+      count: filtered.length,
+      total: XTREAM_TELEREALITE_CATALOG.length,
+      data: filtered.slice(0, limit)
+    };
+
+    res.writeHead(200, {
+      'Content-Type': 'application/json; charset=utf-8',
+      'Access-Control-Allow-Origin': '*',
+      'Cache-Control': 'public, max-age=120'
+    });
+    return res.end(JSON.stringify(result));
+  }
+
+  // ================= ROUTE DÉTAILS SÉRIE XTREAM (/api/xtream/series-info) =================
+  // Renvoie les vraies saisons et les vrais épisodes depuis Xtream avec mise en cache disque
+  if (pathname === '/api/xtream/series-info' && req.method === 'GET') {
+    const seriesId = parsedUrl.query.series_id || parsedUrl.query.id;
+    if (!seriesId) {
+      res.writeHead(400, { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' });
+      return res.end(JSON.stringify({ success: false, message: 'Paramètre series_id requis' }));
+    }
+
+    const cacheDir = path.join(__dirname, 'data', 'cache');
+    if (!fs.existsSync(cacheDir)) {
+      fs.mkdirSync(cacheDir, { recursive: true });
+    }
+    const cacheFile = path.join(cacheDir, `series_${seriesId}.json`);
+
+    const serveSeriesData = (rawData) => {
+      // Formater pour le lecteur Netflix : saisons réelles + épisodes réels
+      const episodesMap = rawData.episodes || {};
+      const seasonsList = [];
+
+      const seasonNums = Object.keys(episodesMap).map(n => parseInt(n, 10)).filter(n => !isNaN(n)).sort((a, b) => a - b);
+      
+      seasonNums.forEach(sNum => {
+        const eps = episodesMap[String(sNum)] || [];
+        if (!Array.isArray(eps) || eps.length === 0) return;
+
+        const formattedEpisodes = eps.map((ep, idx) => {
+          const epNum = ep.episode_num ? parseInt(ep.episode_num, 10) : (idx + 1);
+          const ext = ep.container_extension || 'mkv';
+          const epId = ep.id;
+          const streamUrl = `/api/stream/xtream-series?episode_id=${epId}&ext=${ext}`;
+          return {
+            episode_number: epNum,
+            title: ep.title || `Épisode ${epNum}`,
+            overview: ep.info?.plot || ep.info?.overview || '',
+            duration: ep.info?.duration || '45m',
+            video_url: streamUrl,
+            still_url: ep.info?.movie_image || rawData.info?.cover || '',
+            sources: {
+              direct: streamUrl,
+              fhd: streamUrl
+            }
+          };
+        });
+
+        seasonsList.push({
+          season_number: sNum,
+          name: `Saison ${sNum}`,
+          overview: `Saison ${sNum} (${formattedEpisodes.length} épisodes)`,
+          episode_count: formattedEpisodes.length,
+          episodes: formattedEpisodes
+        });
+      });
+
+      const seriesObj = {
+        success: true,
+        series_id: seriesId,
+        id: `xtream_series_${seriesId}`,
+        tmdb_id: rawData.info?.tmdb || `xtream_series_${seriesId}`,
+        title: rawData.info?.name || 'Série Xtream',
+        poster_url: rawData.info?.cover || '',
+        backdrop_url: (Array.isArray(rawData.info?.backdrop_path) && rawData.info.backdrop_path[0]) || rawData.info?.cover || '',
+        overview: rawData.info?.plot || '',
+        rating: parseFloat(rawData.info?.rating || 7.5),
+        release_year: parseInt(rawData.info?.releaseDate || rawData.info?.release_date || 2025, 10) || 2025,
+        genres: [rawData.info?.genre || 'Télé-Réalité'],
+        cast: (rawData.info?.cast || '').split(',').map(s => s.trim()).filter(Boolean),
+        media_type: 'series',
+        is_xtream_series: true,
+        seasons: seasonsList
+      };
+
+      res.writeHead(200, {
+        'Content-Type': 'application/json; charset=utf-8',
+        'Access-Control-Allow-Origin': '*',
+        'Cache-Control': 'public, max-age=300'
+      });
+      return res.end(JSON.stringify(seriesObj));
+    };
+
+    // 1. Vérifier le cache disque
+    if (fs.existsSync(cacheFile)) {
+      try {
+        const cached = JSON.parse(fs.readFileSync(cacheFile, 'utf8'));
+        return serveSeriesData(cached);
+      } catch (e) {}
+    }
+
+    // 2. Récupérer depuis l'API Xtream Codes
+    const apiUrl = `http://${XTREAM_CONFIG.host}:${XTREAM_CONFIG.port}/player_api.php?username=${XTREAM_CONFIG.username}&password=${XTREAM_CONFIG.password}&action=get_series_info&series_id=${seriesId}`;
+    http.get(apiUrl, { timeout: 12000 }, (apiRes) => {
+      let data = '';
+      apiRes.on('data', chunk => data += chunk);
+      apiRes.on('end', () => {
+        try {
+          const parsed = JSON.parse(data);
+          fs.writeFileSync(cacheFile, JSON.stringify(parsed, null, 2), 'utf8');
+          return serveSeriesData(parsed);
+        } catch (e) {
+          res.writeHead(502, { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' });
+          return res.end(JSON.stringify({ success: false, message: 'Erreur parsing Xtream series info: ' + e.message }));
+        }
+      });
+    }).on('error', (err) => {
+      res.writeHead(502, { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' });
+      return res.end(JSON.stringify({ success: false, message: 'Erreur connexion Xtream series info: ' + err.message }));
+    });
+    return;
   }
 
   // ================= ROUTE DIRECT XTREAM VIP PROXY (/api/stream/xtream) =================
@@ -2205,6 +2411,154 @@ const server = http.createServer((req, res) => {
     }
 
     pipeChunk(chunkUrl);
+    return;
+  }
+
+  // ================= ROUTE PROXY STREAMING VOD SÉRIES XTREAM (/api/stream/xtream-series) =================
+  // Support complet des requêtes HTTP Range (206 Partial Content), suivi de redirection 302
+  // et destruction propre des sockets en cas d'interruption par le lecteur Netflix
+  if (pathname === '/api/stream/xtream-series' && req.method === 'GET') {
+    const episodeId = parsedUrl.query.episode_id;
+    const ext = parsedUrl.query.ext || 'mkv';
+
+    if (!episodeId) {
+      res.writeHead(400, { 'Content-Type': 'text/plain', 'Access-Control-Allow-Origin': '*' });
+      return res.end('Paramètre episode_id manquant');
+    }
+
+    const initialUrl = `http://${XTREAM_CONFIG.host}:${XTREAM_CONFIG.port}/series/${XTREAM_CONFIG.username}/${XTREAM_CONFIG.password}/${episodeId}.${ext}`;
+
+    function pipeSeriesStream(targetUrl, hops = 0) {
+      if (hops > 4) {
+        if (!res.headersSent) {
+          res.writeHead(502, { 'Content-Type': 'text/plain', 'Access-Control-Allow-Origin': '*' });
+          res.end('Trop de redirections pour la série Xtream');
+        }
+        return;
+      }
+
+      if (req.destroyed || res.writableEnded || res.destroyed) {
+        return;
+      }
+
+      let parsed;
+      try {
+        parsed = new URL(targetUrl);
+      } catch (e) {
+        if (!res.headersSent) {
+          res.writeHead(400, { 'Content-Type': 'text/plain', 'Access-Control-Allow-Origin': '*' });
+          res.end('URL série Xtream invalide');
+        }
+        return;
+      }
+
+      const client = parsed.protocol === 'https:' ? https : http;
+      const headersToForward = {
+        'User-Agent': 'IPTVSmartersPro/1.0',
+        'Accept': '*/*'
+      };
+
+      if (req.headers['range']) {
+        headersToForward['range'] = req.headers['range'];
+      }
+
+      let activeUpstreamRes = null;
+      let isAborted = false;
+
+      const clientReq = client.get(targetUrl, {
+        headers: headersToForward,
+        timeout: 15000
+      }, (upstreamRes) => {
+        activeUpstreamRes = upstreamRes;
+
+        upstreamRes.on('error', (err) => {
+          if (isAborted || req.destroyed || res.destroyed || res.writableEnded) return;
+          console.warn('[Xtream Series Stream Error]:', err.message);
+          try { upstreamRes.destroy(); } catch (e) {}
+          if (!res.headersSent) {
+            try {
+              res.writeHead(502, { 'Content-Type': 'text/plain', 'Access-Control-Allow-Origin': '*' });
+              res.end('Erreur lecture vidéo série Xtream');
+            } catch (e) {}
+          } else {
+            try { res.end(); } catch (e) {}
+          }
+        });
+
+        // Suivi propre des redirections 301/302/307/308
+        if (upstreamRes.statusCode === 301 || upstreamRes.statusCode === 302 || upstreamRes.statusCode === 307 || upstreamRes.statusCode === 308) {
+          try { upstreamRes.destroy(); } catch (e) {}
+          const loc = upstreamRes.headers.location;
+          if (loc) {
+            cleanupListeners();
+            const nextUrl = loc.startsWith('http') ? loc : new URL(loc, targetUrl).href;
+            return pipeSeriesStream(nextUrl, hops + 1);
+          }
+        }
+
+        const outHeaders = {
+          'Access-Control-Allow-Origin': '*',
+          'Access-Control-Allow-Headers': '*',
+          'Accept-Ranges': 'bytes'
+        };
+
+        if (upstreamRes.headers['content-type']) {
+          outHeaders['Content-Type'] = upstreamRes.headers['content-type'];
+        } else {
+          outHeaders['Content-Type'] = ext === 'mp4' ? 'video/mp4' : 'video/x-matroska';
+        }
+
+        if (upstreamRes.headers['content-length']) {
+          outHeaders['Content-Length'] = upstreamRes.headers['content-length'];
+        }
+        if (upstreamRes.headers['content-range']) {
+          outHeaders['Content-Range'] = upstreamRes.headers['content-range'];
+        }
+
+        res.writeHead(upstreamRes.statusCode || 200, outHeaders);
+        upstreamRes.pipe(res);
+      });
+
+      clientReq.on('error', (err) => {
+        if (isAborted || req.destroyed || res.destroyed || res.writableEnded) return;
+        console.warn('[Xtream Series Request Error]:', err.message);
+        if (!res.headersSent) {
+          try {
+            res.writeHead(502, { 'Content-Type': 'text/plain', 'Access-Control-Allow-Origin': '*' });
+            res.end('Erreur de requête série: ' + err.message);
+          } catch (e) {}
+        }
+      });
+
+      clientReq.on('timeout', () => {
+        try { clientReq.destroy(); } catch (e) {}
+        if (isAborted || req.destroyed || res.destroyed || res.writableEnded) return;
+        if (!res.headersSent) {
+          try {
+            res.writeHead(504, { 'Content-Type': 'text/plain', 'Access-Control-Allow-Origin': '*' });
+            res.end('Timeout vidéo série Xtream');
+          } catch (e) {}
+        }
+      });
+
+      const onClientClose = () => {
+        isAborted = true;
+        try { clientReq.destroy(); } catch (e) {}
+        if (activeUpstreamRes) {
+          try { activeUpstreamRes.destroy(); } catch (e) {}
+        }
+      };
+
+      req.once('close', onClientClose);
+      res.once('close', onClientClose);
+
+      function cleanupListeners() {
+        req.removeListener('close', onClientClose);
+        res.removeListener('close', onClientClose);
+      }
+    }
+
+    pipeSeriesStream(initialUrl);
     return;
   }
 

@@ -48,6 +48,17 @@ class NetflixApp {
     this.xtreamSearchQuery = '';
     this.xtreamInitialized = false;
 
+    // Éléments Télé-Réalité Toolbar & État
+    this.telerealiteToolbar = document.getElementById('telerealiteToolbar');
+    this.telerealiteSearchInput = document.getElementById('telerealiteSearchInput');
+    this.telerealiteSearchClear = document.getElementById('telerealiteSearchClear');
+    this.telerealiteFilterChips = document.getElementById('telerealiteFilterChips');
+    this.telerealiteCountDisplay = document.getElementById('telerealiteCountDisplay');
+    this.telerealiteShows = null;
+    this.telerealiteFilter = 'all';
+    this.telerealiteSearchQuery = '';
+    this.telerealiteInitialized = false;
+
     // Modal
     this.modalBackdrop = document.getElementById('detailsModal');
     this.modalCloseBtn = document.getElementById('modalCloseBtn');
@@ -581,12 +592,21 @@ class NetflixApp {
 
   applyFilter(filter) {
     const xtreamToolbar = document.getElementById('xtreamToolbar');
+    const telerealiteToolbar = document.getElementById('telerealiteToolbar');
+
     if (filter === 'xtream') {
       if (xtreamToolbar) xtreamToolbar.style.display = 'block';
+      if (telerealiteToolbar) telerealiteToolbar.style.display = 'none';
       this.showXtreamView();
+      return;
+    } else if (filter === 'telerealite') {
+      if (xtreamToolbar) xtreamToolbar.style.display = 'none';
+      if (telerealiteToolbar) telerealiteToolbar.style.display = 'block';
+      this.showTeleRealiteView();
       return;
     } else {
       if (xtreamToolbar) xtreamToolbar.style.display = 'none';
+      if (telerealiteToolbar) telerealiteToolbar.style.display = 'none';
     }
 
     if (!this.catalogData) return;
@@ -943,6 +963,284 @@ class NetflixApp {
       slider.appendChild(fragment);
       this.catalogRowsContainer.appendChild(rowEl);
     });
+  }
+
+  // ================= MÉTHODES TÉLÉ-RÉALITÉ XTREAM (CATÉGORIE 947) =================
+  initTeleRealiteEvents() {
+    if (!this.telerealiteSearchInput) return;
+
+    let searchDebounce = null;
+    this.telerealiteSearchInput.addEventListener('input', (e) => {
+      clearTimeout(searchDebounce);
+      const val = e.target.value.trim();
+      this.telerealiteSearchQuery = val;
+      if (this.telerealiteSearchClear) {
+        this.telerealiteSearchClear.style.display = val.length > 0 ? 'flex' : 'none';
+      }
+      searchDebounce = setTimeout(() => {
+        this.filterAndRenderTeleRealite();
+      }, 180);
+    });
+
+    if (this.telerealiteSearchClear) {
+      this.telerealiteSearchClear.addEventListener('click', () => {
+        this.telerealiteSearchInput.value = '';
+        this.telerealiteSearchQuery = '';
+        this.telerealiteSearchClear.style.display = 'none';
+        this.filterAndRenderTeleRealite();
+        this.telerealiteSearchInput.focus();
+      });
+    }
+
+    if (this.telerealiteFilterChips) {
+      this.telerealiteFilterChips.addEventListener('click', (e) => {
+        const chip = e.target.closest('.telerealite-chip');
+        if (!chip) return;
+        this.telerealiteFilterChips.querySelectorAll('.telerealite-chip').forEach(c => c.classList.remove('active'));
+        chip.classList.add('active');
+        this.telerealiteFilter = chip.getAttribute('data-filter') || 'all';
+        this.filterAndRenderTeleRealite();
+      });
+    }
+  }
+
+  createTeleRealiteCard(show) {
+    const card = document.createElement('div');
+    card.className = 'movie-card focusable';
+    card.setAttribute('tabindex', '0');
+    card.setAttribute('data-id', `xtream_series_${show.series_id}`);
+
+    const badgeYear = show.year ? `<span class="movie-card-badge">${show.year}</span>` : '';
+    const ratingText = show.rating ? `★ ${show.rating}` : '★ 7.5';
+
+    card.innerHTML = `
+      <img src="${show.cover}" alt="${show.name}" class="card-image" loading="lazy" decoding="async" onerror="this.onerror=null; this.src='assets/hero/live-tv-banner.webp'">
+      ${badgeYear}
+      <span class="live-badge-card" style="top: 8px; right: 8px; left: auto; background: linear-gradient(135deg, #e50914, #b20710); font-size: 0.7rem; padding: 2px 6px; border-radius: 3px; font-weight: 800;">📺 FHD</span>
+      <div class="card-overlay">
+        <div class="card-title">${show.name}</div>
+        <div class="card-tags">
+          <span style="color: #46d369; font-weight: 800;">${ratingText}</span>
+          <span>${show.genre || 'Télé-Réalité'}</span>
+          <span>${show.year || '2025'}</span>
+        </div>
+        <div class="card-actions">
+          <button class="action-circle-btn play-btn" title="Regarder les saisons et épisodes">▶</button>
+        </div>
+      </div>
+    `;
+
+    card.addEventListener('click', async (e) => {
+      e.stopPropagation();
+      await this.openTeleRealiteSeries(show);
+    });
+
+    return card;
+  }
+
+  async openTeleRealiteSeries(show) {
+    // Si la série est La Villa (6715 / 68628), elle existe déjà dans catalog.movies avec les vrais épisodes
+    const existingInCatalog = this.catalogData?.movies?.find(m => m.id === '68628' || m.tmdb_id === '68628');
+    if (show.series_id === 6715 && existingInCatalog && existingInCatalog.seasons && existingInCatalog.seasons.length > 0) {
+      this.player.open(existingInCatalog, 1);
+      return;
+    }
+
+    // Afficher le loader sur le player
+    this.player.showLoader(`⚡ Chargement des saisons de ${show.name} (💎 Xtream VIP)...`);
+    this.player.overlay.classList.add('active');
+    this.player.showControls();
+    this.player.resetSteps();
+    this.player.setStep(1, 'active', `1. Récupération des saisons et épisodes (${show.name})...`);
+
+    try {
+      const baseUrl = window.API_BASE || '';
+      const res = await fetch(`${baseUrl}/api/xtream/series-info?series_id=${show.series_id}`);
+      const seriesObj = await res.json();
+
+      if (!seriesObj.success || !seriesObj.seasons || seriesObj.seasons.length === 0) {
+        throw new Error(seriesObj.message || "Aucune saison disponible pour cette émission");
+      }
+
+      this.player.setStep(1, 'done', `1. ${seriesObj.seasons.length} saison(s) chargée(s) avec succès`);
+      this.player.open(seriesObj, 1);
+    } catch (err) {
+      console.warn('[TV Réalité Open Error]:', err.message);
+      this.player.showStatusBanner(`Erreur lors du chargement des épisodes: ${err.message}`);
+      setTimeout(() => {
+        this.player.close();
+      }, 2500);
+    }
+  }
+
+  async showTeleRealiteView() {
+    this.catalogRowsContainer.innerHTML = `
+      <div style="text-align: center; padding: 60px 20px; color: #888;">
+        <div style="font-size: 2.2rem; margin-bottom: 12px; color: #e50914;">📺</div>
+        <div style="font-size: 1.15rem; color: #fff; font-weight: 600;">Chargement des 221 séries de Télé-Réalité Xtream...</div>
+        <div style="font-size: 0.9rem; color: #888; margin-top: 6px;">Vraies saisons, vrais épisodes en 1080p Full HD...</div>
+      </div>
+    `;
+
+    if (!this.telerealiteShows) {
+      try {
+        const baseUrl = window.API_BASE || '';
+        const res = await fetch(`${baseUrl}/api/xtream/telerealite?limit=300`);
+        const json = await res.json();
+        if (json.success && json.data) {
+          this.telerealiteShows = json.data;
+        }
+      } catch (e) {
+        console.error("Erreur chargement télé-réalité", e);
+      }
+    }
+
+    if (!this.telerealiteInitialized) {
+      this.initTeleRealiteEvents();
+      this.telerealiteInitialized = true;
+    }
+
+    // Configurer le Hero Banner avec une émission phare
+    const featured = this.telerealiteShows ? (
+      this.telerealiteShows.find(s => s.name.toLowerCase().includes('la villa')) ||
+      this.telerealiteShows.find(s => s.year === 2026) ||
+      this.telerealiteShows[0]
+    ) : null;
+
+    if (featured) {
+      this.setupHero({
+        id: `xtream_series_${featured.series_id}`,
+        title: `${featured.name}`,
+        overview: featured.plot || `Les épisodes authentiques de télé-réalité en streaming 1080p FHD sans coupure.`,
+        backdrop_url: featured.backdrop || featured.cover,
+        poster_url: featured.cover,
+        media_type: 'series',
+        is_xtream_series: true,
+        quality_badges: ['📺 1080p FHD Natif', 'Saisons Complètes', '💎 Xtream VIP']
+      });
+      if (this.heroPlayBtn) {
+        this.heroPlayBtn.onclick = () => {
+          this.openTeleRealiteSeries(featured);
+        };
+      }
+    }
+
+    this.filterAndRenderTeleRealite();
+  }
+
+  filterAndRenderTeleRealite() {
+    if (!this.telerealiteShows) return;
+    this.catalogRowsContainer.innerHTML = '';
+
+    const q = (this.telerealiteSearchQuery || '').toLowerCase().trim();
+    const filter = this.telerealiteFilter || 'all';
+
+    let filtered = this.telerealiteShows;
+
+    if (filter === '2026') {
+      filtered = filtered.filter(s => s.year === 2026);
+    } else if (filter === '2025') {
+      filtered = filtered.filter(s => s.year === 2025);
+    } else if (filter === 'villa') {
+      filtered = filtered.filter(s => {
+        const n = (s.name + ' ' + (s.plot || '')).toLowerCase();
+        return n.includes('villa') || n.includes('tentation') || n.includes('séduction') || n.includes('love') || n.includes('amoureuse') || n.includes('princes');
+      });
+    } else if (filter === 'competition') {
+      filtered = filtered.filter(s => {
+        const n = (s.name + ' ' + (s.plot || '')).toLowerCase();
+        return n.includes('cinquante') || n.includes('traîtres') || n.includes('lanta') || n.includes('ferme') || n.includes('sauce') || n.includes('defi');
+      });
+    }
+
+    if (q) {
+      const terms = q.split(/\s+/).filter(t => t.length > 0);
+      filtered = filtered.filter(s => {
+        const target = `${s.name} ${s.raw_name || ''} ${s.cast || ''} ${s.year || ''}`.toLowerCase();
+        return terms.every(term => target.includes(term));
+      });
+    }
+
+    // Mettre à jour le compteur
+    if (this.telerealiteCountDisplay) {
+      this.telerealiteCountDisplay.textContent = `${filtered.length} émission${filtered.length > 1 ? 's' : ''} trouvée${filtered.length > 1 ? 's' : ''} sur ${this.telerealiteShows.length} séries de Télé-Réalité`;
+    }
+
+    if (filtered.length === 0) {
+      this.catalogRowsContainer.innerHTML = `
+        <div style="text-align: center; padding: 60px 20px; color: #888;">
+          <div style="font-size: 2.5rem; margin-bottom: 12px;">🔍</div>
+          <div style="font-size: 1.2rem; color: #fff; font-weight: 600;">Aucune émission de télé-réalité ne correspond à votre recherche</div>
+          <div style="font-size: 0.9rem; color: #888; margin-top: 6px;">Essayez d'autres mots-clés (ex: "La Villa", "Les Cinquante", "Traîtres", "2026")...</div>
+        </div>
+      `;
+      return;
+    }
+
+    // Si recherche active ou filtre spécifique : afficher en carrousel direct des résultats
+    if (q || filter !== 'all') {
+      const filterLabels = {
+        '2026': '✨ Nouveautés 2026',
+        '2025': '🔥 Saisons 2025',
+        'villa': '❤️ La Villa des Cœurs Brisés & Séduction',
+        'competition': '🏆 Compétition & Survie'
+      };
+      const title = q ? `Résultats pour "${q}" (${filtered.length})` : `${filterLabels[filter] || 'Sélection'} (${filtered.length})`;
+      this.renderTeleRealiteRow(title, filtered);
+      return;
+    }
+
+    // Mode "Toutes les émissions" : Générer des carrousels thématiques Netflix
+    const s2026 = filtered.filter(s => s.year === 2026);
+    const sVilla = filtered.filter(s => {
+      const n = (s.name + ' ' + (s.plot || '')).toLowerCase();
+      return n.includes('villa') || n.includes('tentation') || n.includes('séduction') || n.includes('love');
+    });
+    const sCompetition = filtered.filter(s => {
+      const n = (s.name + ' ' + (s.plot || '')).toLowerCase();
+      return n.includes('cinquante') || n.includes('traîtres') || n.includes('lanta') || n.includes('ferme') || n.includes('island');
+    });
+
+    if (s2026.length > 0) {
+      this.renderTeleRealiteRow(`✨ Nouveautés Télé-Réalité 2026 (${s2026.length})`, s2026);
+    }
+    if (sVilla.length > 0) {
+      this.renderTeleRealiteRow(`❤️ Romance, La Villa & Séduction (${sVilla.length})`, sVilla);
+    }
+    if (sCompetition.length > 0) {
+      this.renderTeleRealiteRow(`🏆 Compétition, Stratégie & Survie (${sCompetition.length})`, sCompetition);
+    }
+    this.renderTeleRealiteRow(`📺 Toutes les Émissions de Télé-Réalité (${filtered.length})`, filtered);
+  }
+
+  renderTeleRealiteRow(title, shows) {
+    const rowEl = document.createElement('section');
+    rowEl.className = 'catalog-row';
+    rowEl.innerHTML = `
+      <h2 class="row-title">${title}</h2>
+      <div class="row-slider-container">
+        <button class="slider-arrow left" aria-label="Précédent">‹</button>
+        <div class="row-slider"></div>
+        <button class="slider-arrow right" aria-label="Suivant">›</button>
+      </div>
+    `;
+    const slider = rowEl.querySelector('.row-slider');
+    const leftArrow = rowEl.querySelector('.slider-arrow.left');
+    const rightArrow = rowEl.querySelector('.slider-arrow.right');
+
+    leftArrow.addEventListener('click', () => {
+      slider.scrollBy({ left: -slider.clientWidth * 0.75, behavior: 'smooth' });
+    });
+    rightArrow.addEventListener('click', () => {
+      slider.scrollBy({ left: slider.clientWidth * 0.75, behavior: 'smooth' });
+    });
+
+    const fragment = document.createDocumentFragment();
+    shows.forEach(show => {
+      fragment.appendChild(this.createTeleRealiteCard(show));
+    });
+    slider.appendChild(fragment);
+    this.catalogRowsContainer.appendChild(rowEl);
   }
 }
 

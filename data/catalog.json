@@ -206,174 +206,1059 @@
     },
     {
       "id": "68628",
+      "tmdb_id": "68628",
+      "series_id": 6715,
       "title": "La Villa des Cœurs Brisés",
       "original_title": "La Villa des Cœurs Brisés",
-      "overview": "Les célibataires de la télé-réalité partent en quête de l'amour avec la love coach Lucie Mariotti. Découvrez les saisons intégrales vérifiées et disponibles en streaming direct haute définition.",
+      "overview": "D'anciens candidats de télé-réalité célibataires ayant essuyé des déceptions amoureuses se retrouvent dans une somptueuse villa sous le regard bienveillant de Lucie Mariotti, la Love Coach légendaire. Chaque semaine, coachings intensifs, rendez-vous et vérités explosives permettent aux cœurs brisés de se reconstruire.",
+      "poster_url": "https://image.tmdb.org/t/p/w600_and_h900_bestv2/5xlxVueaXHxWLSoOaBVCv4s3PZV.jpg",
+      "backdrop_url": "https://image.tmdb.org/t/p/w1280/qSJmzqBvb4hGCTw9i9y0GzFLDzN.jpg",
+      "poster_path": "https://image.tmdb.org/t/p/w600_and_h900_bestv2/5xlxVueaXHxWLSoOaBVCv4s3PZV.jpg",
+      "backdrop_path": "https://image.tmdb.org/t/p/w1280/qSJmzqBvb4hGCTw9i9y0GzFLDzN.jpg",
+      "video_url": "/api/stream/xtream-series?episode_id=385622&ext=mkv",
       "media_type": "series",
-      "tmdb_id": "68628",
-      "poster_url": "https://image.tmdb.org/t/p/w500/5xlxVueaXHxWLSoOaBVCv4s3PZV.jpg",
-      "backdrop_url": "https://image.tmdb.org/t/p/original/qSJmzqBvb4hGCTw9i9y0GzFLDzN.jpg",
-      "video_url": "/api/stream/dm?video=x6bls11",
-      "sources": {
-        "hls": "/api/stream/dm?video=x6bls11",
-        "server": "/api/stream/68628"
-      },
-      "categories": [
-        "Tendances actuelles",
-        "Séries dramatiques & Thrillers",
-        "Comédies populaires"
+      "release_year": 2026,
+      "duration": "45 min / ép.",
+      "quality": "1080p FHD Direct",
+      "quality_badge": "1080p FHD VIP",
+      "quality_badges": [
+        "1080p FHD Direct",
+        "💎 Xtream VIP"
       ],
-      "release_year": 2015,
-      "match_score": 96,
-      "age_rating": "12+",
-      "duration": "3 Saisons vérifiées (Épisodes complets 35-48 min)",
+      "is_xtream_series": true,
+      "age_rating": "Tous publics",
+      "match_score": 99,
+      "genres": [
+        "Télé-Réalité",
+        "Romance",
+        "Divertissement"
+      ],
+      "categories": [
+        "Series Tendances",
+        "Télé-Réalité"
+      ],
       "cast": [
         "Lucie Mariotti",
-        "Les Cœurs Brisés",
-        "Les Prétendants"
+        "Candidats Cœurs Brisés"
       ],
-      "director": "Ah! Production / TFX",
-      "quality_badges": [
-        "HD",
-        "5.1",
-        "VF"
-      ],
-      "is_hero": false,
-      "created_at": "2026-09-07T19:54:51.174Z",
+      "director": "TF1 / TFX",
       "seasons": [
         {
-          "season_number": 2,
-          "name": "Saison 2 (Mexique & Samaná)",
-          "episode_count": 6,
-          "overview": "Saison 2 complète tournée sous le soleil de la République Dominicaine. Retrouvez les épisodes intégraux de 34 à 44 minutes.",
+          "season_number": 10,
+          "title": "Saison 10",
+          "episode_count": 63,
+          "overview": "Saison 10 intégrale de La Villa des Cœurs Brisés en direct du flux officiel Xtream 1080p FHD.",
+          "poster_path": "https://image.tmdb.org/t/p/w600_and_h900_bestv2/5xlxVueaXHxWLSoOaBVCv4s3PZV.jpg",
           "episodes": [
             {
+              "id": "385622",
               "episode_number": 1,
-              "title": "Le Débrief & Grand Lancement",
-              "duration": "39 min",
-              "overview": "Le grand coup d'envoi de la saison 2 et l'arrivée des premiers cœurs brisés dans la somptueuse villa.",
-              "still_url": "https://image.tmdb.org/t/p/w500/qSJmzqBvb4hGCTw9i9y0GzFLDzN.jpg"
+              "title": "Épisode 01 du 11 août 2025",
+              "overview": "La Villa des Cœurs Brisés - Saison 10 Épisode 1 en qualité 1080p FHD Direct.",
+              "duration": "45:04",
+              "rating": 8.5,
+              "still_path": "assets/hero/live-tv-banner.webp",
+              "stream_url": "/api/stream/xtream-series?episode_id=385622&ext=mkv",
+              "sources": {
+                "vf": "/api/stream/xtream-series?episode_id=385622&ext=mkv"
+              }
             },
             {
+              "id": "385623",
               "episode_number": 2,
-              "title": "L'aventure commence : Premiers tête-à-tête",
-              "duration": "34 min",
-              "overview": "Installation des célibataires et premiers rendez-vous sous haute tension organisés par Lucie.",
-              "still_url": "https://image.tmdb.org/t/p/w500/5xlxVueaXHxWLSoOaBVCv4s3PZV.jpg"
+              "title": "Épisode 02 du 11 août 2025",
+              "overview": "La Villa des Cœurs Brisés - Saison 10 Épisode 2 en qualité 1080p FHD Direct.",
+              "duration": "45:47",
+              "rating": 8.5,
+              "still_path": "assets/hero/live-tv-banner.webp",
+              "stream_url": "/api/stream/xtream-series?episode_id=385623&ext=mkv",
+              "sources": {
+                "vf": "/api/stream/xtream-series?episode_id=385623&ext=mkv"
+              }
             },
             {
+              "id": "385624",
               "episode_number": 3,
-              "title": "Premiers rapprochements et doutes",
-              "duration": "37 min",
-              "overview": "Des affinités inattendues se créent, mais les blessures du passé refont surface.",
-              "still_url": "https://image.tmdb.org/t/p/w500/qSJmzqBvb4hGCTw9i9y0GzFLDzN.jpg"
+              "title": "Épisode 03 du 12 août 2025",
+              "overview": "La Villa des Cœurs Brisés - Saison 10 Épisode 3 en qualité 1080p FHD Direct.",
+              "duration": "49:35",
+              "rating": 8.5,
+              "still_path": "assets/hero/live-tv-banner.webp",
+              "stream_url": "/api/stream/xtream-series?episode_id=385624&ext=mkv",
+              "sources": {
+                "vf": "/api/stream/xtream-series?episode_id=385624&ext=mkv"
+              }
             },
             {
+              "id": "385625",
+              "episode_number": 4,
+              "title": "Épisode 04 du 13 août 2025",
+              "overview": "La Villa des Cœurs Brisés - Saison 10 Épisode 4 en qualité 1080p FHD Direct.",
+              "duration": "46:53",
+              "rating": 8.5,
+              "still_path": "assets/hero/live-tv-banner.webp",
+              "stream_url": "/api/stream/xtream-series?episode_id=385625&ext=mkv",
+              "sources": {
+                "vf": "/api/stream/xtream-series?episode_id=385625&ext=mkv"
+              }
+            },
+            {
+              "id": "385626",
+              "episode_number": 5,
+              "title": "Épisode 05 du 14 août 2025",
+              "overview": "La Villa des Cœurs Brisés - Saison 10 Épisode 5 en qualité 1080p FHD Direct.",
+              "duration": "47:21",
+              "rating": 8.5,
+              "still_path": "assets/hero/live-tv-banner.webp",
+              "stream_url": "/api/stream/xtream-series?episode_id=385626&ext=mkv",
+              "sources": {
+                "vf": "/api/stream/xtream-series?episode_id=385626&ext=mkv"
+              }
+            },
+            {
+              "id": "385627",
               "episode_number": 6,
-              "title": "Tensions et confidences avec Lucie",
-              "duration": "36 min",
-              "overview": "Lucie convoque les candidats pour un coaching choc sur la confiance en soi.",
-              "still_url": "https://image.tmdb.org/t/p/w500/5xlxVueaXHxWLSoOaBVCv4s3PZV.jpg"
+              "title": "Épisode 06 du 15 août 2025",
+              "overview": "La Villa des Cœurs Brisés - Saison 10 Épisode 6 en qualité 1080p FHD Direct.",
+              "duration": "48:13",
+              "rating": 8.5,
+              "still_path": "assets/hero/live-tv-banner.webp",
+              "stream_url": "/api/stream/xtream-series?episode_id=385627&ext=mkv",
+              "sources": {
+                "vf": "/api/stream/xtream-series?episode_id=385627&ext=mkv"
+              }
             },
             {
-              "episode_number": 55,
-              "title": "Révélations et fin de parcours",
-              "duration": "30 min",
-              "overview": "L'heure des grandes explications et du bilan pour les cœurs brisés en fin d'aventure.",
-              "still_url": "https://image.tmdb.org/t/p/w500/qSJmzqBvb4hGCTw9i9y0GzFLDzN.jpg"
-            },
-            {
-              "episode_number": 56,
-              "title": "Spécial : Les touchantes retrouvailles",
-              "duration": "44 min",
-              "overview": "Émission spéciale consacrée aux retrouvailles émouvantes d'Antony et Mélanie.",
-              "still_url": "https://image.tmdb.org/t/p/w500/5xlxVueaXHxWLSoOaBVCv4s3PZV.jpg"
-            }
-          ]
-        },
-        {
-          "season_number": 3,
-          "name": "Saison 3 (Saint-Martin)",
-          "episode_count": 9,
-          "overview": "Saison 3 culte à Saint-Martin. Épisodes complets de 38 à 48 minutes sans interruption.",
-          "episodes": [
-            {
-              "episode_number": 1,
-              "title": "Le Grand Lancement à Saint-Martin",
-              "duration": "48 min",
-              "overview": "Arrivée grandiose des nouveaux cœurs brisés dans l'incroyable villa de Saint-Martin.",
-              "still_url": "https://image.tmdb.org/t/p/w500/qSJmzqBvb4hGCTw9i9y0GzFLDzN.jpg"
-            },
-            {
+              "id": "385628",
               "episode_number": 7,
-              "title": "Doutes et explications entre célibataires",
-              "duration": "38 min",
-              "overview": "Les premières incompréhensions apparaissent lors des soirées et sorties à la plage.",
-              "still_url": "https://image.tmdb.org/t/p/w500/5xlxVueaXHxWLSoOaBVCv4s3PZV.jpg"
+              "title": "Épisode 07 du 18 août 2025",
+              "overview": "La Villa des Cœurs Brisés - Saison 10 Épisode 7 en qualité 1080p FHD Direct.",
+              "duration": "43:43",
+              "rating": 8.5,
+              "still_path": "assets/hero/live-tv-banner.webp",
+              "stream_url": "/api/stream/xtream-series?episode_id=385628&ext=mkv",
+              "sources": {
+                "vf": "/api/stream/xtream-series?episode_id=385628&ext=mkv"
+              }
             },
             {
+              "id": "385629",
               "episode_number": 8,
-              "title": "Soirée vérité et confessions intimes",
-              "duration": "39 min",
-              "overview": "Les candidats mettent cartes sur table lors d'un exercice vérité bouleversant.",
-              "still_url": "https://image.tmdb.org/t/p/w500/qSJmzqBvb4hGCTw9i9y0GzFLDzN.jpg"
+              "title": "Épisode 08 du 19 août 2025",
+              "overview": "La Villa des Cœurs Brisés - Saison 10 Épisode 8 en qualité 1080p FHD Direct.",
+              "duration": "45:03",
+              "rating": 8.5,
+              "still_path": "assets/hero/live-tv-banner.webp",
+              "stream_url": "/api/stream/xtream-series?episode_id=385629&ext=mkv",
+              "sources": {
+                "vf": "/api/stream/xtream-series?episode_id=385629&ext=mkv"
+              }
             },
             {
+              "id": "385630",
+              "episode_number": 9,
+              "title": "Épisode 09 du 20 août 2025",
+              "overview": "La Villa des Cœurs Brisés - Saison 10 Épisode 9 en qualité 1080p FHD Direct.",
+              "duration": "47:03",
+              "rating": 8.5,
+              "still_path": "assets/hero/live-tv-banner.webp",
+              "stream_url": "/api/stream/xtream-series?episode_id=385630&ext=mkv",
+              "sources": {
+                "vf": "/api/stream/xtream-series?episode_id=385630&ext=mkv"
+              }
+            },
+            {
+              "id": "385631",
+              "episode_number": 10,
+              "title": "Épisode 10 du 21 août 2025",
+              "overview": "La Villa des Cœurs Brisés - Saison 10 Épisode 10 en qualité 1080p FHD Direct.",
+              "duration": "45:30",
+              "rating": 8.5,
+              "still_path": "assets/hero/live-tv-banner.webp",
+              "stream_url": "/api/stream/xtream-series?episode_id=385631&ext=mkv",
+              "sources": {
+                "vf": "/api/stream/xtream-series?episode_id=385631&ext=mkv"
+              }
+            },
+            {
+              "id": "385632",
+              "episode_number": 11,
+              "title": "La Villa des cœurs brisés (2015) - S10E11",
+              "overview": "La Villa des Cœurs Brisés - Saison 10 Épisode 11 en qualité 1080p FHD Direct.",
+              "duration": "48:25",
+              "rating": 8.5,
+              "still_path": "assets/hero/live-tv-banner.webp",
+              "stream_url": "/api/stream/xtream-series?episode_id=385632&ext=mkv",
+              "sources": {
+                "vf": "/api/stream/xtream-series?episode_id=385632&ext=mkv"
+              }
+            },
+            {
+              "id": "385633",
+              "episode_number": 12,
+              "title": "La Villa des cœurs brisés (2015) - S10E12",
+              "overview": "La Villa des Cœurs Brisés - Saison 10 Épisode 12 en qualité 1080p FHD Direct.",
+              "duration": "41:59",
+              "rating": 8.5,
+              "still_path": "assets/hero/live-tv-banner.webp",
+              "stream_url": "/api/stream/xtream-series?episode_id=385633&ext=mkv",
+              "sources": {
+                "vf": "/api/stream/xtream-series?episode_id=385633&ext=mkv"
+              }
+            },
+            {
+              "id": "385634",
+              "episode_number": 13,
+              "title": "La Villa des cœurs brisés (2015) - S10E13",
+              "overview": "La Villa des Cœurs Brisés - Saison 10 Épisode 13 en qualité 1080p FHD Direct.",
+              "duration": "42:49",
+              "rating": 8.5,
+              "still_path": "assets/hero/live-tv-banner.webp",
+              "stream_url": "/api/stream/xtream-series?episode_id=385634&ext=mkv",
+              "sources": {
+                "vf": "/api/stream/xtream-series?episode_id=385634&ext=mkv"
+              }
+            },
+            {
+              "id": "385635",
+              "episode_number": 14,
+              "title": "La Villa des cœurs brisés (2015) - S10E14",
+              "overview": "La Villa des Cœurs Brisés - Saison 10 Épisode 14 en qualité 1080p FHD Direct.",
+              "duration": "44:34",
+              "rating": 8.5,
+              "still_path": "assets/hero/live-tv-banner.webp",
+              "stream_url": "/api/stream/xtream-series?episode_id=385635&ext=mkv",
+              "sources": {
+                "vf": "/api/stream/xtream-series?episode_id=385635&ext=mkv"
+              }
+            },
+            {
+              "id": "385636",
+              "episode_number": 15,
+              "title": "La Villa des cœurs brisés (2015) - S10E15",
+              "overview": "La Villa des Cœurs Brisés - Saison 10 Épisode 15 en qualité 1080p FHD Direct.",
+              "duration": "45:17",
+              "rating": 8.5,
+              "still_path": "assets/hero/live-tv-banner.webp",
+              "stream_url": "/api/stream/xtream-series?episode_id=385636&ext=mkv",
+              "sources": {
+                "vf": "/api/stream/xtream-series?episode_id=385636&ext=mkv"
+              }
+            },
+            {
+              "id": "385637",
               "episode_number": 16,
-              "title": "Nouveaux prétendants à la villa",
-              "duration": "42 min",
-              "overview": "L'arrivée inattendue de nouveaux prétendants bouscule les couples en formation.",
-              "still_url": "https://image.tmdb.org/t/p/w500/5xlxVueaXHxWLSoOaBVCv4s3PZV.jpg"
+              "title": "La Villa des cœurs brisés (2015) - S10E16",
+              "overview": "La Villa des Cœurs Brisés - Saison 10 Épisode 16 en qualité 1080p FHD Direct.",
+              "duration": "46:16",
+              "rating": 8.5,
+              "still_path": "assets/hero/live-tv-banner.webp",
+              "stream_url": "/api/stream/xtream-series?episode_id=385637&ext=mkv",
+              "sources": {
+                "vf": "/api/stream/xtream-series?episode_id=385637&ext=mkv"
+              }
             },
             {
+              "id": "385638",
+              "episode_number": 17,
+              "title": "La Villa des cœurs brisés (2015) - S10E17",
+              "overview": "La Villa des Cœurs Brisés - Saison 10 Épisode 17 en qualité 1080p FHD Direct.",
+              "duration": "43:32",
+              "rating": 8.5,
+              "still_path": "assets/hero/live-tv-banner.webp",
+              "stream_url": "/api/stream/xtream-series?episode_id=385638&ext=mkv",
+              "sources": {
+                "vf": "/api/stream/xtream-series?episode_id=385638&ext=mkv"
+              }
+            },
+            {
+              "id": "385639",
+              "episode_number": 18,
+              "title": "La Villa des cœurs brisés (2015) - S10E18",
+              "overview": "La Villa des Cœurs Brisés - Saison 10 Épisode 18 en qualité 1080p FHD Direct.",
+              "duration": "44:14",
+              "rating": 8.5,
+              "still_path": "assets/hero/live-tv-banner.webp",
+              "stream_url": "/api/stream/xtream-series?episode_id=385639&ext=mkv",
+              "sources": {
+                "vf": "/api/stream/xtream-series?episode_id=385639&ext=mkv"
+              }
+            },
+            {
+              "id": "385640",
+              "episode_number": 19,
+              "title": "La Villa des cœurs brisés (2015) - S10E19",
+              "overview": "La Villa des Cœurs Brisés - Saison 10 Épisode 19 en qualité 1080p FHD Direct.",
+              "duration": "44:28",
+              "rating": 8.5,
+              "still_path": "assets/hero/live-tv-banner.webp",
+              "stream_url": "/api/stream/xtream-series?episode_id=385640&ext=mkv",
+              "sources": {
+                "vf": "/api/stream/xtream-series?episode_id=385640&ext=mkv"
+              }
+            },
+            {
+              "id": "385641",
+              "episode_number": 20,
+              "title": "La Villa des cœurs brisés (2015) - S10E20",
+              "overview": "La Villa des Cœurs Brisés - Saison 10 Épisode 20 en qualité 1080p FHD Direct.",
+              "duration": "42:46",
+              "rating": 8.5,
+              "still_path": "assets/hero/live-tv-banner.webp",
+              "stream_url": "/api/stream/xtream-series?episode_id=385641&ext=mkv",
+              "sources": {
+                "vf": "/api/stream/xtream-series?episode_id=385641&ext=mkv"
+              }
+            },
+            {
+              "id": "385642",
+              "episode_number": 21,
+              "title": "La Villa des cœurs brisés (2015) - S10E21",
+              "overview": "La Villa des Cœurs Brisés - Saison 10 Épisode 21 en qualité 1080p FHD Direct.",
+              "duration": "43:58",
+              "rating": 8.5,
+              "still_path": "assets/hero/live-tv-banner.webp",
+              "stream_url": "/api/stream/xtream-series?episode_id=385642&ext=mkv",
+              "sources": {
+                "vf": "/api/stream/xtream-series?episode_id=385642&ext=mkv"
+              }
+            },
+            {
+              "id": "385643",
+              "episode_number": 22,
+              "title": "La Villa des cœurs brisés (2015) - S10E22",
+              "overview": "La Villa des Cœurs Brisés - Saison 10 Épisode 22 en qualité 1080p FHD Direct.",
+              "duration": "45:24",
+              "rating": 8.5,
+              "still_path": "assets/hero/live-tv-banner.webp",
+              "stream_url": "/api/stream/xtream-series?episode_id=385643&ext=mkv",
+              "sources": {
+                "vf": "/api/stream/xtream-series?episode_id=385643&ext=mkv"
+              }
+            },
+            {
+              "id": "385644",
+              "episode_number": 23,
+              "title": "La Villa des cœurs brisés (2015) - S10E23",
+              "overview": "La Villa des Cœurs Brisés - Saison 10 Épisode 23 en qualité 1080p FHD Direct.",
+              "duration": "46:19",
+              "rating": 8.5,
+              "still_path": "assets/hero/live-tv-banner.webp",
+              "stream_url": "/api/stream/xtream-series?episode_id=385644&ext=mkv",
+              "sources": {
+                "vf": "/api/stream/xtream-series?episode_id=385644&ext=mkv"
+              }
+            },
+            {
+              "id": "385645",
+              "episode_number": 24,
+              "title": "La Villa des cœurs brisés (2015) - S10E24",
+              "overview": "La Villa des Cœurs Brisés - Saison 10 Épisode 24 en qualité 1080p FHD Direct.",
+              "duration": "41:29",
+              "rating": 8.5,
+              "still_path": "assets/hero/live-tv-banner.webp",
+              "stream_url": "/api/stream/xtream-series?episode_id=385645&ext=mkv",
+              "sources": {
+                "vf": "/api/stream/xtream-series?episode_id=385645&ext=mkv"
+              }
+            },
+            {
+              "id": "385646",
+              "episode_number": 25,
+              "title": "La Villa des cœurs brisés (2015) - S10E25",
+              "overview": "La Villa des Cœurs Brisés - Saison 10 Épisode 25 en qualité 1080p FHD Direct.",
+              "duration": "42:17",
+              "rating": 8.5,
+              "still_path": "assets/hero/live-tv-banner.webp",
+              "stream_url": "/api/stream/xtream-series?episode_id=385646&ext=mkv",
+              "sources": {
+                "vf": "/api/stream/xtream-series?episode_id=385646&ext=mkv"
+              }
+            },
+            {
+              "id": "386692",
+              "episode_number": 26,
+              "title": "La Villa des cœurs brisés (2015) - S10E26",
+              "overview": "La Villa des Cœurs Brisés - Saison 10 Épisode 26 en qualité 1080p FHD Direct.",
+              "duration": "42:28",
+              "rating": 8.5,
+              "still_path": "assets/hero/live-tv-banner.webp",
+              "stream_url": "/api/stream/xtream-series?episode_id=386692&ext=mkv",
+              "sources": {
+                "vf": "/api/stream/xtream-series?episode_id=386692&ext=mkv"
+              }
+            },
+            {
+              "id": "387455",
+              "episode_number": 27,
+              "title": "La Villa des cœurs brisés (2015) - S10E27",
+              "overview": "La Villa des Cœurs Brisés - Saison 10 Épisode 27 en qualité 1080p FHD Direct.",
+              "duration": "45:35",
+              "rating": 8.5,
+              "still_path": "assets/hero/live-tv-banner.webp",
+              "stream_url": "/api/stream/xtream-series?episode_id=387455&ext=mkv",
+              "sources": {
+                "vf": "/api/stream/xtream-series?episode_id=387455&ext=mkv"
+              }
+            },
+            {
+              "id": "388483",
+              "episode_number": 28,
+              "title": "La Villa des cœurs brisés (2015) - S10E28",
+              "overview": "La Villa des Cœurs Brisés - Saison 10 Épisode 28 en qualité 1080p FHD Direct.",
+              "duration": "45:56",
+              "rating": 8.5,
+              "still_path": "assets/hero/live-tv-banner.webp",
+              "stream_url": "/api/stream/xtream-series?episode_id=388483&ext=mkv",
+              "sources": {
+                "vf": "/api/stream/xtream-series?episode_id=388483&ext=mkv"
+              }
+            },
+            {
+              "id": "388484",
+              "episode_number": 29,
+              "title": "La Villa des cœurs brisés (2015) - S10E29",
+              "overview": "La Villa des Cœurs Brisés - Saison 10 Épisode 29 en qualité 1080p FHD Direct.",
+              "duration": "46:04",
+              "rating": 8.5,
+              "still_path": "assets/hero/live-tv-banner.webp",
+              "stream_url": "/api/stream/xtream-series?episode_id=388484&ext=mkv",
+              "sources": {
+                "vf": "/api/stream/xtream-series?episode_id=388484&ext=mkv"
+              }
+            },
+            {
+              "id": "389902",
+              "episode_number": 30,
+              "title": "La Villa des cœurs brisés (2015) - S10E30",
+              "overview": "La Villa des Cœurs Brisés - Saison 10 Épisode 30 en qualité 1080p FHD Direct.",
+              "duration": "42:13",
+              "rating": 8.5,
+              "still_path": "assets/hero/live-tv-banner.webp",
+              "stream_url": "/api/stream/xtream-series?episode_id=389902&ext=mkv",
+              "sources": {
+                "vf": "/api/stream/xtream-series?episode_id=389902&ext=mkv"
+              }
+            },
+            {
+              "id": "389903",
+              "episode_number": 31,
+              "title": "La Villa des cœurs brisés (2015) - S10E31",
+              "overview": "La Villa des Cœurs Brisés - Saison 10 Épisode 31 en qualité 1080p FHD Direct.",
+              "duration": "46:30",
+              "rating": 8.5,
+              "still_path": "assets/hero/live-tv-banner.webp",
+              "stream_url": "/api/stream/xtream-series?episode_id=389903&ext=mkv",
+              "sources": {
+                "vf": "/api/stream/xtream-series?episode_id=389903&ext=mkv"
+              }
+            },
+            {
+              "id": "389904",
+              "episode_number": 32,
+              "title": "La Villa des cœurs brisés (2015) - S10E32",
+              "overview": "La Villa des Cœurs Brisés - Saison 10 Épisode 32 en qualité 1080p FHD Direct.",
+              "duration": "44:35",
+              "rating": 8.5,
+              "still_path": "assets/hero/live-tv-banner.webp",
+              "stream_url": "/api/stream/xtream-series?episode_id=389904&ext=mkv",
+              "sources": {
+                "vf": "/api/stream/xtream-series?episode_id=389904&ext=mkv"
+              }
+            },
+            {
+              "id": "389905",
               "episode_number": 33,
-              "title": "Le choc des vérités amoureuses",
-              "duration": "42 min",
-              "overview": "Un coaching intense orchestré par Lucie permet de débloquer les sentiments enfouis.",
-              "still_url": "https://image.tmdb.org/t/p/w500/qSJmzqBvb4hGCTw9i9y0GzFLDzN.jpg"
+              "title": "La Villa des cœurs brisés (2015) - S10E33",
+              "overview": "La Villa des Cœurs Brisés - Saison 10 Épisode 33 en qualité 1080p FHD Direct.",
+              "duration": "42:05",
+              "rating": 8.5,
+              "still_path": "assets/hero/live-tv-banner.webp",
+              "stream_url": "/api/stream/xtream-series?episode_id=389905&ext=mkv",
+              "sources": {
+                "vf": "/api/stream/xtream-series?episode_id=389905&ext=mkv"
+              }
             },
             {
+              "id": "389906",
+              "episode_number": 34,
+              "title": "La Villa des cœurs brisés (2015) - S10E34",
+              "overview": "La Villa des Cœurs Brisés - Saison 10 Épisode 34 en qualité 1080p FHD Direct.",
+              "duration": "43:33",
+              "rating": 8.5,
+              "still_path": "assets/hero/live-tv-banner.webp",
+              "stream_url": "/api/stream/xtream-series?episode_id=389906&ext=mkv",
+              "sources": {
+                "vf": "/api/stream/xtream-series?episode_id=389906&ext=mkv"
+              }
+            },
+            {
+              "id": "390491",
+              "episode_number": 35,
+              "title": "La Villa des cœurs brisés (2015) - S10E35",
+              "overview": "La Villa des Cœurs Brisés - Saison 10 Épisode 35 en qualité 1080p FHD Direct.",
+              "duration": "41:53",
+              "rating": 8.5,
+              "still_path": "assets/hero/live-tv-banner.webp",
+              "stream_url": "/api/stream/xtream-series?episode_id=390491&ext=mkv",
+              "sources": {
+                "vf": "/api/stream/xtream-series?episode_id=390491&ext=mkv"
+              }
+            },
+            {
+              "id": "390492",
+              "episode_number": 36,
+              "title": "La Villa des cœurs brisés (2015) - S10E36",
+              "overview": "La Villa des Cœurs Brisés - Saison 10 Épisode 36 en qualité 1080p FHD Direct.",
+              "duration": "46:24",
+              "rating": 8.5,
+              "still_path": "assets/hero/live-tv-banner.webp",
+              "stream_url": "/api/stream/xtream-series?episode_id=390492&ext=mkv",
+              "sources": {
+                "vf": "/api/stream/xtream-series?episode_id=390492&ext=mkv"
+              }
+            },
+            {
+              "id": "390733",
+              "episode_number": 37,
+              "title": "La Villa des cœurs brisés (2015) - S10E37",
+              "overview": "La Villa des Cœurs Brisés - Saison 10 Épisode 37 en qualité 1080p FHD Direct.",
+              "duration": "45:56",
+              "rating": 8.5,
+              "still_path": "assets/hero/live-tv-banner.webp",
+              "stream_url": "/api/stream/xtream-series?episode_id=390733&ext=mkv",
+              "sources": {
+                "vf": "/api/stream/xtream-series?episode_id=390733&ext=mkv"
+              }
+            },
+            {
+              "id": "390734",
+              "episode_number": 38,
+              "title": "La Villa des cœurs brisés (2015) - S10E38",
+              "overview": "La Villa des Cœurs Brisés - Saison 10 Épisode 38 en qualité 1080p FHD Direct.",
+              "duration": "44:06",
+              "rating": 8.5,
+              "still_path": "assets/hero/live-tv-banner.webp",
+              "stream_url": "/api/stream/xtream-series?episode_id=390734&ext=mkv",
+              "sources": {
+                "vf": "/api/stream/xtream-series?episode_id=390734&ext=mkv"
+              }
+            },
+            {
+              "id": "391097",
+              "episode_number": 39,
+              "title": "La Villa des cœurs brisés (2015) - S10E39",
+              "overview": "La Villa des Cœurs Brisés - Saison 10 Épisode 39 en qualité 1080p FHD Direct.",
+              "duration": "46:12",
+              "rating": 8.5,
+              "still_path": "assets/hero/live-tv-banner.webp",
+              "stream_url": "/api/stream/xtream-series?episode_id=391097&ext=mkv",
+              "sources": {
+                "vf": "/api/stream/xtream-series?episode_id=391097&ext=mkv"
+              }
+            },
+            {
+              "id": "391631",
+              "episode_number": 40,
+              "title": "La Villa des cœurs brisés (2015) - S10E40",
+              "overview": "La Villa des Cœurs Brisés - Saison 10 Épisode 40 en qualité 1080p FHD Direct.",
+              "duration": "46:49",
+              "rating": 8.5,
+              "still_path": "assets/hero/live-tv-banner.webp",
+              "stream_url": "/api/stream/xtream-series?episode_id=391631&ext=mkv",
+              "sources": {
+                "vf": "/api/stream/xtream-series?episode_id=391631&ext=mkv"
+              }
+            },
+            {
+              "id": "391632",
+              "episode_number": 41,
+              "title": "La Villa des cœurs brisés (2015) - S10E41",
+              "overview": "La Villa des Cœurs Brisés - Saison 10 Épisode 41 en qualité 1080p FHD Direct.",
+              "duration": "41:52",
+              "rating": 8.5,
+              "still_path": "assets/hero/live-tv-banner.webp",
+              "stream_url": "/api/stream/xtream-series?episode_id=391632&ext=mkv",
+              "sources": {
+                "vf": "/api/stream/xtream-series?episode_id=391632&ext=mkv"
+              }
+            },
+            {
+              "id": "392512",
+              "episode_number": 43,
+              "title": "La Villa des cœurs brisés (2015) - S10E43",
+              "overview": "La Villa des Cœurs Brisés - Saison 10 Épisode 43 en qualité 1080p FHD Direct.",
+              "duration": "45:12",
+              "rating": 8.5,
+              "still_path": "assets/hero/live-tv-banner.webp",
+              "stream_url": "/api/stream/xtream-series?episode_id=392512&ext=mkv",
+              "sources": {
+                "vf": "/api/stream/xtream-series?episode_id=392512&ext=mkv"
+              }
+            },
+            {
+              "id": "393147",
+              "episode_number": 44,
+              "title": "La Villa des cœurs brisés (2015) - S10E44",
+              "overview": "La Villa des Cœurs Brisés - Saison 10 Épisode 44 en qualité 1080p FHD Direct.",
+              "duration": "46:42",
+              "rating": 8.5,
+              "still_path": "assets/hero/live-tv-banner.webp",
+              "stream_url": "/api/stream/xtream-series?episode_id=393147&ext=mkv",
+              "sources": {
+                "vf": "/api/stream/xtream-series?episode_id=393147&ext=mkv"
+              }
+            },
+            {
+              "id": "393148",
+              "episode_number": 45,
+              "title": "La Villa des cœurs brisés (2015) - S10E45",
+              "overview": "La Villa des Cœurs Brisés - Saison 10 Épisode 45 en qualité 1080p FHD Direct.",
+              "duration": "46:29",
+              "rating": 8.5,
+              "still_path": "assets/hero/live-tv-banner.webp",
+              "stream_url": "/api/stream/xtream-series?episode_id=393148&ext=mkv",
+              "sources": {
+                "vf": "/api/stream/xtream-series?episode_id=393148&ext=mkv"
+              }
+            },
+            {
+              "id": "393149",
+              "episode_number": 46,
+              "title": "La Villa des cœurs brisés (2015) - S10E46",
+              "overview": "La Villa des Cœurs Brisés - Saison 10 Épisode 46 en qualité 1080p FHD Direct.",
+              "duration": "45:28",
+              "rating": 8.5,
+              "still_path": "assets/hero/live-tv-banner.webp",
+              "stream_url": "/api/stream/xtream-series?episode_id=393149&ext=mkv",
+              "sources": {
+                "vf": "/api/stream/xtream-series?episode_id=393149&ext=mkv"
+              }
+            },
+            {
+              "id": "393150",
+              "episode_number": 47,
+              "title": "La Villa des cœurs brisés (2015) - S10E47",
+              "overview": "La Villa des Cœurs Brisés - Saison 10 Épisode 47 en qualité 1080p FHD Direct.",
+              "duration": "45:29",
+              "rating": 8.5,
+              "still_path": "assets/hero/live-tv-banner.webp",
+              "stream_url": "/api/stream/xtream-series?episode_id=393150&ext=mkv",
+              "sources": {
+                "vf": "/api/stream/xtream-series?episode_id=393150&ext=mkv"
+              }
+            },
+            {
+              "id": "393581",
+              "episode_number": 48,
+              "title": "La Villa des cœurs brisés (2015) - S10E48",
+              "overview": "La Villa des Cœurs Brisés - Saison 10 Épisode 48 en qualité 1080p FHD Direct.",
+              "duration": "40:59",
+              "rating": 8.5,
+              "still_path": "assets/hero/live-tv-banner.webp",
+              "stream_url": "/api/stream/xtream-series?episode_id=393581&ext=mkv",
+              "sources": {
+                "vf": "/api/stream/xtream-series?episode_id=393581&ext=mkv"
+              }
+            },
+            {
+              "id": "393771",
+              "episode_number": 49,
+              "title": "La Villa des cœurs brisés (2015) - S10E49",
+              "overview": "La Villa des Cœurs Brisés - Saison 10 Épisode 49 en qualité 1080p FHD Direct.",
+              "duration": "44:39",
+              "rating": 8.5,
+              "still_path": "assets/hero/live-tv-banner.webp",
+              "stream_url": "/api/stream/xtream-series?episode_id=393771&ext=mkv",
+              "sources": {
+                "vf": "/api/stream/xtream-series?episode_id=393771&ext=mkv"
+              }
+            },
+            {
+              "id": "394027",
+              "episode_number": 50,
+              "title": "La Villa des cœurs brisés (2015) - S10E50",
+              "overview": "La Villa des Cœurs Brisés - Saison 10 Épisode 50 en qualité 1080p FHD Direct.",
+              "duration": "44:14",
+              "rating": 8.5,
+              "still_path": "assets/hero/live-tv-banner.webp",
+              "stream_url": "/api/stream/xtream-series?episode_id=394027&ext=mkv",
+              "sources": {
+                "vf": "/api/stream/xtream-series?episode_id=394027&ext=mkv"
+              }
+            },
+            {
+              "id": "394028",
+              "episode_number": 51,
+              "title": "La Villa des cœurs brisés (2015) - S10E51",
+              "overview": "La Villa des Cœurs Brisés - Saison 10 Épisode 51 en qualité 1080p FHD Direct.",
+              "duration": "46:26",
+              "rating": 8.5,
+              "still_path": "assets/hero/live-tv-banner.webp",
+              "stream_url": "/api/stream/xtream-series?episode_id=394028&ext=mkv",
+              "sources": {
+                "vf": "/api/stream/xtream-series?episode_id=394028&ext=mkv"
+              }
+            },
+            {
+              "id": "394785",
+              "episode_number": 52,
+              "title": "La Villa des cœurs brisés (2015) - S10E52",
+              "overview": "La Villa des Cœurs Brisés - Saison 10 Épisode 52 en qualité 1080p FHD Direct.",
+              "duration": "45:03",
+              "rating": 8.5,
+              "still_path": "assets/hero/live-tv-banner.webp",
+              "stream_url": "/api/stream/xtream-series?episode_id=394785&ext=mkv",
+              "sources": {
+                "vf": "/api/stream/xtream-series?episode_id=394785&ext=mkv"
+              }
+            },
+            {
+              "id": "394786",
+              "episode_number": 53,
+              "title": "La Villa des cœurs brisés (2015) - S10E53",
+              "overview": "La Villa des Cœurs Brisés - Saison 10 Épisode 53 en qualité 1080p FHD Direct.",
+              "duration": "44:19",
+              "rating": 8.5,
+              "still_path": "assets/hero/live-tv-banner.webp",
+              "stream_url": "/api/stream/xtream-series?episode_id=394786&ext=mkv",
+              "sources": {
+                "vf": "/api/stream/xtream-series?episode_id=394786&ext=mkv"
+              }
+            },
+            {
+              "id": "395283",
+              "episode_number": 54,
+              "title": "La Villa des cœurs brisés (2015) - S10E54",
+              "overview": "La Villa des Cœurs Brisés - Saison 10 Épisode 54 en qualité 1080p FHD Direct.",
+              "duration": "42:53",
+              "rating": 8.5,
+              "still_path": "assets/hero/live-tv-banner.webp",
+              "stream_url": "/api/stream/xtream-series?episode_id=395283&ext=mkv",
+              "sources": {
+                "vf": "/api/stream/xtream-series?episode_id=395283&ext=mkv"
+              }
+            },
+            {
+              "id": "395284",
+              "episode_number": 55,
+              "title": "La Villa des cœurs brisés (2015) - S10E55",
+              "overview": "La Villa des Cœurs Brisés - Saison 10 Épisode 55 en qualité 1080p FHD Direct.",
+              "duration": "46:00",
+              "rating": 8.5,
+              "still_path": "assets/hero/live-tv-banner.webp",
+              "stream_url": "/api/stream/xtream-series?episode_id=395284&ext=mkv",
+              "sources": {
+                "vf": "/api/stream/xtream-series?episode_id=395284&ext=mkv"
+              }
+            },
+            {
+              "id": "395596",
+              "episode_number": 56,
+              "title": "La Villa des cœurs brisés (2015) - S10E56",
+              "overview": "La Villa des Cœurs Brisés - Saison 10 Épisode 56 en qualité 1080p FHD Direct.",
+              "duration": "43:06",
+              "rating": 8.5,
+              "still_path": "assets/hero/live-tv-banner.webp",
+              "stream_url": "/api/stream/xtream-series?episode_id=395596&ext=mkv",
+              "sources": {
+                "vf": "/api/stream/xtream-series?episode_id=395596&ext=mkv"
+              }
+            },
+            {
+              "id": "396182",
+              "episode_number": 57,
+              "title": "La Villa des cœurs brisés (2015) - S10E57",
+              "overview": "La Villa des Cœurs Brisés - Saison 10 Épisode 57 en qualité 1080p FHD Direct.",
+              "duration": "45:48",
+              "rating": 8.5,
+              "still_path": "assets/hero/live-tv-banner.webp",
+              "stream_url": "/api/stream/xtream-series?episode_id=396182&ext=mkv",
+              "sources": {
+                "vf": "/api/stream/xtream-series?episode_id=396182&ext=mkv"
+              }
+            },
+            {
+              "id": "397846",
+              "episode_number": 59,
+              "title": "La Villa des cœurs brisés (2015) - S10E59",
+              "overview": "La Villa des Cœurs Brisés - Saison 10 Épisode 59 en qualité 1080p FHD Direct.",
+              "duration": "42:55",
+              "rating": 8.5,
+              "still_path": "assets/hero/live-tv-banner.webp",
+              "stream_url": "/api/stream/xtream-series?episode_id=397846&ext=mkv",
+              "sources": {
+                "vf": "/api/stream/xtream-series?episode_id=397846&ext=mkv"
+              }
+            },
+            {
+              "id": "397847",
+              "episode_number": 60,
+              "title": "La Villa des cœurs brisés (2015) - S10E60",
+              "overview": "La Villa des Cœurs Brisés - Saison 10 Épisode 60 en qualité 1080p FHD Direct.",
+              "duration": "41:59",
+              "rating": 8.5,
+              "still_path": "assets/hero/live-tv-banner.webp",
+              "stream_url": "/api/stream/xtream-series?episode_id=397847&ext=mkv",
+              "sources": {
+                "vf": "/api/stream/xtream-series?episode_id=397847&ext=mkv"
+              }
+            },
+            {
+              "id": "399297",
+              "episode_number": 61,
+              "title": "La Villa des cœurs brisés (2015) - S10E61",
+              "overview": "La Villa des Cœurs Brisés - Saison 10 Épisode 61 en qualité 1080p FHD Direct.",
+              "duration": "41:22",
+              "rating": 8.5,
+              "still_path": "assets/hero/live-tv-banner.webp",
+              "stream_url": "/api/stream/xtream-series?episode_id=399297&ext=mkv",
+              "sources": {
+                "vf": "/api/stream/xtream-series?episode_id=399297&ext=mkv"
+              }
+            },
+            {
+              "id": "399712",
               "episode_number": 62,
-              "title": "Révélations amoureuses décisives",
-              "duration": "39 min",
-              "overview": "À quelques semaines de la fin, des déclarations enflammées bouleversent la villa.",
-              "still_url": "https://image.tmdb.org/t/p/w500/5xlxVueaXHxWLSoOaBVCv4s3PZV.jpg"
+              "title": "La Villa des cœurs brisés (2015) - S10E62",
+              "overview": "La Villa des Cœurs Brisés - Saison 10 Épisode 62 en qualité 1080p FHD Direct.",
+              "duration": "41:28",
+              "rating": 8.5,
+              "still_path": "assets/hero/live-tv-banner.webp",
+              "stream_url": "/api/stream/xtream-series?episode_id=399712&ext=mkv",
+              "sources": {
+                "vf": "/api/stream/xtream-series?episode_id=399712&ext=mkv"
+              }
             },
             {
+              "id": "399713",
               "episode_number": 63,
-              "title": "L'heure des bilans avec Lucie",
-              "duration": "39 min",
-              "overview": "Lucie Mariotti fait le point sur les avancées de chaque candidat.",
-              "still_url": "https://image.tmdb.org/t/p/w500/qSJmzqBvb4hGCTw9i9y0GzFLDzN.jpg"
+              "title": "La Villa des cœurs brisés (2015) - S10E63",
+              "overview": "La Villa des Cœurs Brisés - Saison 10 Épisode 63 en qualité 1080p FHD Direct.",
+              "duration": "42:21",
+              "rating": 8.5,
+              "still_path": "assets/hero/live-tv-banner.webp",
+              "stream_url": "/api/stream/xtream-series?episode_id=399713&ext=mkv",
+              "sources": {
+                "vf": "/api/stream/xtream-series?episode_id=399713&ext=mkv"
+              }
             },
             {
-              "episode_number": 78,
-              "title": "Dernières chances de séduction",
-              "duration": "23 min",
-              "overview": "Les ultimes rendez-vous amoureux avant la grande décision.",
-              "still_url": "https://image.tmdb.org/t/p/w500/5xlxVueaXHxWLSoOaBVCv4s3PZV.jpg"
+              "id": "400167",
+              "episode_number": 64,
+              "title": "La Villa des cœurs brisés (2015) - S10E64",
+              "overview": "La Villa des Cœurs Brisés - Saison 10 Épisode 64 en qualité 1080p FHD Direct.",
+              "duration": "43:14",
+              "rating": 8.5,
+              "still_path": "assets/hero/live-tv-banner.webp",
+              "stream_url": "/api/stream/xtream-series?episode_id=400167&ext=mkv",
+              "sources": {
+                "vf": "/api/stream/xtream-series?episode_id=400167&ext=mkv"
+              }
             },
             {
-              "episode_number": 82,
-              "title": "La Cérémonie Finale",
-              "duration": "26 min",
-              "overview": "La cérémonie de clôture : les cœurs brisés ont-ils réussi à réparer leur cœur ?",
-              "still_url": "https://image.tmdb.org/t/p/w500/qSJmzqBvb4hGCTw9i9y0GzFLDzN.jpg"
+              "id": "400743",
+              "episode_number": 66,
+              "title": "La Villa des cœurs brisés (2015) - S10E66",
+              "overview": "La Villa des Cœurs Brisés - Saison 10 Épisode 66 en qualité 1080p FHD Direct.",
+              "duration": "44:37",
+              "rating": 8.5,
+              "still_path": "assets/hero/live-tv-banner.webp",
+              "stream_url": "/api/stream/xtream-series?episode_id=400743&ext=mkv",
+              "sources": {
+                "vf": "/api/stream/xtream-series?episode_id=400743&ext=mkv"
+              }
             }
           ]
         },
         {
-          "season_number": 5,
-          "name": "Saison 5 (Playa del Carmen)",
-          "episode_count": 1,
-          "overview": "Saison 5 à Playa del Carmen au Mexique avec l'incontournable concept de la Boîte Noire.",
+          "season_number": 11,
+          "title": "Saison 11",
+          "episode_count": 14,
+          "overview": "Saison 11 intégrale de La Villa des Cœurs Brisés en direct du flux officiel Xtream 1080p FHD.",
+          "poster_path": "https://image.tmdb.org/t/p/w600_and_h900_bestv2/5xlxVueaXHxWLSoOaBVCv4s3PZV.jpg",
           "episodes": [
             {
-              "episode_number": 35,
-              "title": "Révélations explosives et la Boîte Noire",
-              "duration": "39 min",
-              "overview": "Un épisode pivot où la boîte noire révèle des vérités cachées qui font trembler la villa.",
-              "still_url": "https://image.tmdb.org/t/p/w500/qSJmzqBvb4hGCTw9i9y0GzFLDzN.jpg"
+              "id": "479847",
+              "episode_number": 1,
+              "title": "Episode 1",
+              "overview": "La Villa des Cœurs Brisés - Saison 11 Épisode 1 en qualité 1080p FHD Direct.",
+              "duration": "50:18",
+              "rating": 8.5,
+              "still_path": "assets/hero/live-tv-banner.webp",
+              "stream_url": "/api/stream/xtream-series?episode_id=479847&ext=mkv",
+              "sources": {
+                "vf": "/api/stream/xtream-series?episode_id=479847&ext=mkv"
+              }
+            },
+            {
+              "id": "480104",
+              "episode_number": 2,
+              "title": "Episode 2",
+              "overview": "La Villa des Cœurs Brisés - Saison 11 Épisode 2 en qualité 1080p FHD Direct.",
+              "duration": "49:03",
+              "rating": 8.5,
+              "still_path": "assets/hero/live-tv-banner.webp",
+              "stream_url": "/api/stream/xtream-series?episode_id=480104&ext=mkv",
+              "sources": {
+                "vf": "/api/stream/xtream-series?episode_id=480104&ext=mkv"
+              }
+            },
+            {
+              "id": "480105",
+              "episode_number": 3,
+              "title": "Episode 3",
+              "overview": "La Villa des Cœurs Brisés - Saison 11 Épisode 3 en qualité 1080p FHD Direct.",
+              "duration": "53:14",
+              "rating": 8.5,
+              "still_path": "assets/hero/live-tv-banner.webp",
+              "stream_url": "/api/stream/xtream-series?episode_id=480105&ext=mkv",
+              "sources": {
+                "vf": "/api/stream/xtream-series?episode_id=480105&ext=mkv"
+              }
+            },
+            {
+              "id": "480426",
+              "episode_number": 4,
+              "title": "Episode 4",
+              "overview": "La Villa des Cœurs Brisés - Saison 11 Épisode 4 en qualité 1080p FHD Direct.",
+              "duration": "49:52",
+              "rating": 8.5,
+              "still_path": "assets/hero/live-tv-banner.webp",
+              "stream_url": "/api/stream/xtream-series?episode_id=480426&ext=mkv",
+              "sources": {
+                "vf": "/api/stream/xtream-series?episode_id=480426&ext=mkv"
+              }
+            },
+            {
+              "id": "480497",
+              "episode_number": 5,
+              "title": "Episode 5",
+              "overview": "La Villa des Cœurs Brisés - Saison 11 Épisode 5 en qualité 1080p FHD Direct.",
+              "duration": "49:19",
+              "rating": 8.5,
+              "still_path": "assets/hero/live-tv-banner.webp",
+              "stream_url": "/api/stream/xtream-series?episode_id=480497&ext=mkv",
+              "sources": {
+                "vf": "/api/stream/xtream-series?episode_id=480497&ext=mkv"
+              }
+            },
+            {
+              "id": "480579",
+              "episode_number": 6,
+              "title": "Episode 6",
+              "overview": "La Villa des Cœurs Brisés - Saison 11 Épisode 6 en qualité 1080p FHD Direct.",
+              "duration": "44:03",
+              "rating": 8.5,
+              "still_path": "assets/hero/live-tv-banner.webp",
+              "stream_url": "/api/stream/xtream-series?episode_id=480579&ext=mkv",
+              "sources": {
+                "vf": "/api/stream/xtream-series?episode_id=480579&ext=mkv"
+              }
+            },
+            {
+              "id": "480745",
+              "episode_number": 7,
+              "title": "Episode 7",
+              "overview": "La Villa des Cœurs Brisés - Saison 11 Épisode 7 en qualité 1080p FHD Direct.",
+              "duration": "47:09",
+              "rating": 8.5,
+              "still_path": "assets/hero/live-tv-banner.webp",
+              "stream_url": "/api/stream/xtream-series?episode_id=480745&ext=mkv",
+              "sources": {
+                "vf": "/api/stream/xtream-series?episode_id=480745&ext=mkv"
+              }
+            },
+            {
+              "id": "481239",
+              "episode_number": 8,
+              "title": "Episode 8",
+              "overview": "La Villa des Cœurs Brisés - Saison 11 Épisode 8 en qualité 1080p FHD Direct.",
+              "duration": "46:58",
+              "rating": 8.5,
+              "still_path": "assets/hero/live-tv-banner.webp",
+              "stream_url": "/api/stream/xtream-series?episode_id=481239&ext=mkv",
+              "sources": {
+                "vf": "/api/stream/xtream-series?episode_id=481239&ext=mkv"
+              }
+            },
+            {
+              "id": "481322",
+              "episode_number": 9,
+              "title": "Episode 9",
+              "overview": "La Villa des Cœurs Brisés - Saison 11 Épisode 9 en qualité 1080p FHD Direct.",
+              "duration": "45:50",
+              "rating": 8.5,
+              "still_path": "assets/hero/live-tv-banner.webp",
+              "stream_url": "/api/stream/xtream-series?episode_id=481322&ext=mkv",
+              "sources": {
+                "vf": "/api/stream/xtream-series?episode_id=481322&ext=mkv"
+              }
+            },
+            {
+              "id": "481414",
+              "episode_number": 10,
+              "title": "Episode 10",
+              "overview": "La Villa des Cœurs Brisés - Saison 11 Épisode 10 en qualité 1080p FHD Direct.",
+              "duration": "46:57",
+              "rating": 8.5,
+              "still_path": "assets/hero/live-tv-banner.webp",
+              "stream_url": "/api/stream/xtream-series?episode_id=481414&ext=mkv",
+              "sources": {
+                "vf": "/api/stream/xtream-series?episode_id=481414&ext=mkv"
+              }
+            },
+            {
+              "id": "481584",
+              "episode_number": 11,
+              "title": "La Villa des cœurs brisés (2015) - S11E11",
+              "overview": "La Villa des Cœurs Brisés - Saison 11 Épisode 11 en qualité 1080p FHD Direct.",
+              "duration": "43:28",
+              "rating": 8.5,
+              "still_path": "assets/hero/live-tv-banner.webp",
+              "stream_url": "/api/stream/xtream-series?episode_id=481584&ext=mkv",
+              "sources": {
+                "vf": "/api/stream/xtream-series?episode_id=481584&ext=mkv"
+              }
+            },
+            {
+              "id": "481806",
+              "episode_number": 12,
+              "title": "La Villa des cœurs brisés (2015) - S11E12",
+              "overview": "La Villa des Cœurs Brisés - Saison 11 Épisode 12 en qualité 1080p FHD Direct.",
+              "duration": "43:28",
+              "rating": 8.5,
+              "still_path": "assets/hero/live-tv-banner.webp",
+              "stream_url": "/api/stream/xtream-series?episode_id=481806&ext=mkv",
+              "sources": {
+                "vf": "/api/stream/xtream-series?episode_id=481806&ext=mkv"
+              }
+            },
+            {
+              "id": "482076",
+              "episode_number": 13,
+              "title": "La Villa des cœurs brisés (2015) - S11E13",
+              "overview": "La Villa des Cœurs Brisés - Saison 11 Épisode 13 en qualité 1080p FHD Direct.",
+              "duration": "41:43",
+              "rating": 8.5,
+              "still_path": "assets/hero/live-tv-banner.webp",
+              "stream_url": "/api/stream/xtream-series?episode_id=482076&ext=mkv",
+              "sources": {
+                "vf": "/api/stream/xtream-series?episode_id=482076&ext=mkv"
+              }
+            },
+            {
+              "id": "482404",
+              "episode_number": 14,
+              "title": "Episode 14",
+              "overview": "La Villa des Cœurs Brisés - Saison 11 Épisode 14 en qualité 1080p FHD Direct.",
+              "duration": "47:07",
+              "rating": 8.5,
+              "still_path": "assets/hero/live-tv-banner.webp",
+              "stream_url": "/api/stream/xtream-series?episode_id=482404&ext=mkv",
+              "sources": {
+                "vf": "/api/stream/xtream-series?episode_id=482404&ext=mkv"
+              }
             }
           ]
         }

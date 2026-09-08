@@ -1172,6 +1172,27 @@ class NetflixPlayer {
       return;
     }
 
+    // Accélération Séries Xtream VOD (TV Réalité & La Villa 1080p FHD)
+    if (this.currentMovie && this.currentMovie.seasons && (this.currentMovie.is_xtream_series || this.currentMovie.id === '68628' || String(this.currentMovie.id).startsWith('xtream_series_'))) {
+      const sObj = this.currentMovie.seasons.find(s => s.season_number === this.currentSeason) || this.currentMovie.seasons[0];
+      const epObj = sObj?.episodes?.find(e => e.episode_number === this.currentEpisode) || sObj?.episodes?.[0];
+      if (epObj && epObj.video_url) {
+        const baseUrl = window.API_BASE || '';
+        let targetStreamUrl = epObj.video_url;
+        if (targetStreamUrl && targetStreamUrl.startsWith('/')) {
+          targetStreamUrl = baseUrl + targetStreamUrl;
+        }
+        this.showLoader(`⚡ Connexion au flux direct ${this.currentMovie.title} S${this.currentSeason}:E${this.currentEpisode} (💎 Xtream 1080p)...`);
+        this.resetSteps();
+        this.setStep(1, 'done', `1. Épisode validé (${this.currentMovie.title} S${this.currentSeason}:E${this.currentEpisode})`);
+        this.setStep(2, 'done', `2. Flux direct obtenu (💎 Xtream VIP 1080p FHD)`);
+        this.setStep(3, 'done', `3. Déchiffrement direct & Proxy local anti-pub`);
+        this.setStep(4, 'active', `4. Injection dans le lecteur Netflix...`);
+        this.playDirectVideo(targetStreamUrl);
+        return;
+      }
+    }
+
     const id = this.currentMovie.tmdb_id || this.currentMovie.id;
     const isChannel = (this.currentMovie.media_type === 'channel' || this.currentMovie.is_live);
     const isMovie = (this.currentMovie.media_type === 'movie');
@@ -1222,6 +1243,8 @@ class NetflixPlayer {
       // Pour les chaînes TV en direct, TOUJOURS injecter dans le player Netflix direct HLS
       if (isChannel) {
         this.playDirectHls(targetStreamUrl);
+      } else if (data.player_type === 'direct_video' || targetStreamUrl.includes('/api/stream/xtream-series')) {
+        this.playDirectVideo(targetStreamUrl);
       } else if (data.player_type === 'iframe' || data.is_embed) {
         this.playEmbedIframe(data.embed_url || targetStreamUrl);
       } else {
@@ -1240,6 +1263,57 @@ class NetflixPlayer {
         const next = (this.currentServer % maxSrv) + 1;
         this.switchServer(next);
       }, 1500);
+    }
+  }
+
+  playDirectVideo(videoUrl) {
+    const baseUrl = window.API_BASE || '';
+    if (videoUrl && videoUrl.startsWith('/')) {
+      videoUrl = baseUrl + videoUrl;
+    }
+
+    if (this.hls) {
+      try {
+        this.hls.stopLoad();
+        this.hls.detachMedia();
+        this.hls.destroy();
+      } catch (e) {}
+      this.hls = null;
+    }
+    try {
+      this.video.pause();
+      this.video.removeAttribute('src');
+      this.video.load();
+    } catch (e) {}
+
+    this.iframe.classList.add('hidden');
+    this.iframe.src = 'about:blank';
+    this.video.classList.remove('hidden');
+    if (this.bottomControls) {
+      this.bottomControls.classList.remove('iframe-mode');
+    }
+
+    const onReady = () => {
+      this.setStep(4, 'done', `4. Épisode connecté • Lecture active 1080p FHD`);
+      setTimeout(() => this.hideLoader(), 300);
+    };
+
+    this.video.addEventListener('loadeddata', onReady, { once: true });
+    this.video.addEventListener('playing', onReady, { once: true });
+
+    this.video.src = videoUrl;
+    this.video.load();
+
+    if (this.savedPlaybackTime > 0) {
+      this.video.currentTime = this.savedPlaybackTime;
+      this.savedPlaybackTime = 0;
+    }
+
+    const playPromise = this.video.play();
+    if (playPromise !== undefined) {
+      playPromise.catch(err => {
+        console.warn('[Direct Video Autoplay Warn]:', err.message);
+      });
     }
   }
 
