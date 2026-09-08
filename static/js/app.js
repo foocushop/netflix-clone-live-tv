@@ -232,6 +232,12 @@ class NetflixApp {
     this.catalogRowsContainer.appendChild(fragment);
   }
 
+  renderRow(row) {
+    if (!row || !row.movies || row.movies.length === 0) return;
+    const rowEl = this.buildRowElement(row);
+    this.catalogRowsContainer.appendChild(rowEl);
+  }
+
   buildRowElement(row) {
     const rowEl = document.createElement('div');
     rowEl.className = 'movie-row';

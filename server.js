@@ -316,8 +316,73 @@ async function extractShowMultiProvider(showType, season, episode, serverIndex) 
 
 const liveStreamCache = new Map();
 
-async function getWideIptvM3u8(daddyId) {
-  const cacheKey = `wideiptv_${daddyId}`;
+const wideIptvChannelSlugs = {
+  // Canal+ Group
+  '122': 'CANALSPORTFR',
+  'tv_canal_sport': 'CANALSPORTFR',
+  '463': 'FOOTPLUSFR',
+  'tv_canal_foot': 'FOOTPLUSFR',
+  '464': 'CANALS360',
+  'tv_canal_360': 'CANALS360',
+  '121': 'CANALPLFR',
+  'tv_canal_france': 'CANALPLFR',
+  '273': 'CANALPLF1AF',
+  'tv_canal_f1': 'CANALPLF1AF',
+  '271': 'CANALPLGPAF',
+  'tv_canal_motogp': 'CANALPLGPAF',
+
+  // beIN SPORTS Group
+  '116': 'BEINSPORT1FR',
+  'tv_bein1': 'BEINSPORT1FR',
+  '117': 'BEINSPORT2FR',
+  'tv_bein2': 'BEINSPORT2FR',
+  '118': 'BEINSPORT3FR',
+  'tv_bein3': 'BEINSPORT3FR',
+  '494': 'beINMAX4FR',
+  'tv_bein_max4': 'beINMAX4FR',
+  '495': 'beINMAX5FR',
+  'tv_bein_max5': 'beINMAX5FR',
+  '496': 'beINMAX6FR',
+  'tv_bein_max6': 'beINMAX6FR',
+
+  // RMC Sport Group
+  '119': 'RMCSPORT1FR',
+  'tv_rmc_sport1': 'RMCSPORT1FR',
+  '120': 'RMCSPORT2FR',
+  'tv_rmc_sport2': 'RMCSPORT2FR',
+
+  // Eurosport & L'Équipe
+  '772': 'Euro1FR',
+  'tv_eurosport1': 'Euro1FR',
+  '773': 'Euro2FR',
+  'tv_eurosport2': 'Euro2FR',
+  '645': 'EQUIPEFR',
+  'tv_lequipe': 'EQUIPEFR',
+
+  // DAZN & Combat
+  '179': 'DAZN1FR',
+  'tv_dazn1': 'DAZN1FR',
+  '376': 'WWE',
+  'tv_wwe_network': 'WWE',
+
+  // TNT & Généralistes
+  '469': 'TF1FR',
+  'tv_tf1': 'TF1FR',
+  '470': 'M6FR',
+  'tv_m6': 'M6FR',
+  '950': 'France2',
+  'tv_france2': 'France2',
+  '951': 'France3',
+  'tv_france3': 'France3',
+  '964': 'CNEWSFR',
+  'tv_cnews': 'CNEWSFR',
+  '955': 'TMC',
+  'tv_tmc': 'TMC'
+};
+
+async function getWideIptvM3u8(daddyId, channelId = null) {
+  const key = channelId || daddyId;
+  const cacheKey = `wideiptv_${key}`;
   const now = Date.now();
   if (liveStreamCache.has(cacheKey)) {
     const item = liveStreamCache.get(cacheKey);
@@ -326,34 +391,46 @@ async function getWideIptvM3u8(daddyId) {
     }
   }
 
+  let slug = null;
+  if (channelId && wideIptvChannelSlugs[String(channelId)]) {
+    slug = wideIptvChannelSlugs[String(channelId)];
+  } else if (daddyId && wideIptvChannelSlugs[String(daddyId)]) {
+    slug = wideIptvChannelSlugs[String(daddyId)];
+  }
+
   try {
-    const pageHtml = await httpsGet(`https://dlive.sx/player/stream-${daddyId}.php`, {
-      'Referer': 'https://dlive.sx/'
-    });
-    if (!pageHtml || !pageHtml.text) return null;
+    if (!slug && daddyId) {
+      const pageHtml = await httpsGet(`https://dlive.sx/player/stream-${daddyId}.php`, {
+        'Referer': 'https://dlive.sx/'
+      });
+      if (pageHtml && pageHtml.text) {
+        const slugMatch = pageHtml.text.match(/wideiptv\.top\/(?:daddy\.php\?stream=|player\/)([^"&'\s]+)/i);
+        if (slugMatch) slug = slugMatch[1];
+      }
+    }
 
-    const slugMatch = pageHtml.text.match(/wideiptv\.top\/(?:daddy\.php\?stream=|player\/)([^"&'\s]+)/i);
-    if (!slugMatch) return null;
-
-    const slug = slugMatch[1];
-    const playerHtml = await httpsGet(`https://wideiptv.top/player/${slug}`, {
-      'Referer': `https://wideiptv.top/daddy.php?stream=${slug}`
-    });
-    if (!playerHtml || !playerHtml.text) return null;
-
-    const m3u8Match = playerHtml.text.match(/streamUrl:\s*["']([^"']+\.m3u8[^"']*)["']/i);
-    if (m3u8Match) {
-      const streamUrl = m3u8Match[1].replace(/\\\//g, '/');
-      try {
-        const testRes = await httpsGet(streamUrl, { 'Referer': 'https://wideiptv.top/' });
-        if (testRes.status === 200 && testRes.text && testRes.text.includes('#EXTM3U')) {
+    if (slug) {
+      const playerHtml = await httpsGet(`https://wideiptv.top/player/${slug}`, {
+        'Referer': `https://wideiptv.top/daddy.php?stream=${slug}`
+      });
+      if (playerHtml && playerHtml.text) {
+        const m3u8Match = playerHtml.text.replace(/\\\//g, '/').match(/streamUrl:\s*["']([^"']+\.m3u8[^"']*)["']/i);
+        if (m3u8Match) {
+          const streamUrl = m3u8Match[1];
+          try {
+            const testRes = await httpsGet(streamUrl, { 'Referer': 'https://wideiptv.top/' });
+            if (testRes.status === 200 && testRes.text && testRes.text.includes('#EXTM3U')) {
+              liveStreamCache.set(cacheKey, { streamUrl, expiresAt: now + (240 * 1000) });
+              return streamUrl;
+            }
+          } catch (e) {}
           liveStreamCache.set(cacheKey, { streamUrl, expiresAt: now + (180 * 1000) });
           return streamUrl;
         }
-      } catch (e) {}
+      }
     }
   } catch (e) {
-    console.warn(`[WideIPTV Extraction Error ${daddyId}]:`, e.message);
+    console.warn(`[WideIPTV Extraction Error ${key}]:`, e.message);
   }
   return null;
 }
@@ -366,8 +443,9 @@ const backupChannelIds = {
   '960': [3053, 3054, 3056, 3052] // DAZN Ligue 1 (secours Multi-Canaux 3052-3056)
 };
 
-async function getLiveM3u8Url(daddyId, mirror = 'premium_vip', isRecursive = false) {
-  const cacheKey = `${daddyId}_${mirror}`;
+async function getLiveM3u8Url(daddyId, mirror = 'premium_vip', channelId = null, isRecursive = false) {
+  const key = channelId || daddyId;
+  const cacheKey = `${key}_${mirror}`;
   const now = Date.now();
   if (liveStreamCache.has(cacheKey)) {
     const item = liveStreamCache.get(cacheKey);
@@ -376,28 +454,34 @@ async function getLiveM3u8Url(daddyId, mirror = 'premium_vip', isRecursive = fal
     }
   }
 
-  // Source Premium VIP (⭐ Flux Dark Ultra HD 1080p/60fps)
+  // Source Premium VIP (⭐ Flux Dark Ultra HD 1080p/60fps Bluetier CDN)
   if (mirror === 'premium_vip') {
-    // 1. Priorité 1: WideIPTV Bluetier CDN (très haut débit 1080p sans compression)
-    const wideUrl = await getWideIptvM3u8(daddyId);
+    // 1. Priorité 1: WideIPTV Bluetier CDN (flux haute fluidité 1080p60 direct)
+    const wideUrl = await getWideIptvM3u8(daddyId, channelId);
     if (wideUrl) {
-      liveStreamCache.set(cacheKey, { streamUrl: wideUrl, expiresAt: now + (180 * 1000) });
+      liveStreamCache.set(cacheKey, { streamUrl: wideUrl, expiresAt: now + (240 * 1000) });
       return wideUrl;
     }
-    // 2. Priorité 2: DLHD Daddy1 Alpha (xameleon.phantemlis.top/one/...)
-    const d1 = await getLiveM3u8Url(daddyId, 'daddy1', isRecursive);
-    if (d1) {
-      liveStreamCache.set(cacheKey, { streamUrl: d1, expiresAt: now + (180 * 1000) });
-      return d1;
-    }
-    // 3. Priorité 3: DLHD Cluster 2 (xameleon.phantemlis.top/two/...)
-    const d2 = await getLiveM3u8Url(daddyId, 'daddy2', isRecursive);
+    // 2. Priorité 2: DLHD Cluster 2 (hamis.romponalis.st/premiumtv/daddy2.php)
+    const d2 = await getLiveM3u8Url(daddyId, 'daddy2', channelId, isRecursive);
     if (d2) {
       liveStreamCache.set(cacheKey, { streamUrl: d2, expiresAt: now + (180 * 1000) });
       return d2;
     }
-    // 4. Fallback: Cricsfree
-    const cf = await getLiveM3u8Url(daddyId, 'cricsfree', isRecursive);
+    // 3. Priorité 3: DLHD Daddy1 Alpha
+    const d1 = await getLiveM3u8Url(daddyId, 'daddy1', channelId, isRecursive);
+    if (d1) {
+      liveStreamCache.set(cacheKey, { streamUrl: d1, expiresAt: now + (180 * 1000) });
+      return d1;
+    }
+    // 4. Fallback: Apex Streams
+    const apex = await getLiveM3u8Url(daddyId, 'apex', channelId, isRecursive);
+    if (apex) {
+      liveStreamCache.set(cacheKey, { streamUrl: apex, expiresAt: now + (180 * 1000) });
+      return apex;
+    }
+    // 5. Fallback: Cricsfree
+    const cf = await getLiveM3u8Url(daddyId, 'cricsfree', channelId, isRecursive);
     if (cf) {
       liveStreamCache.set(cacheKey, { streamUrl: cf, expiresAt: now + (180 * 1000) });
       return cf;
@@ -406,9 +490,9 @@ async function getLiveM3u8Url(daddyId, mirror = 'premium_vip', isRecursive = fal
   }
 
   if (mirror === 'wideiptv') {
-    const wideUrl = await getWideIptvM3u8(daddyId);
+    const wideUrl = await getWideIptvM3u8(daddyId, channelId);
     if (wideUrl) {
-      liveStreamCache.set(cacheKey, { streamUrl: wideUrl, expiresAt: now + (180 * 1000) });
+      liveStreamCache.set(cacheKey, { streamUrl: wideUrl, expiresAt: now + (240 * 1000) });
       return wideUrl;
     }
     return null;
@@ -479,16 +563,50 @@ async function extractChannelMultiProvider(channelId, serverNum) {
   const srvNum = Math.max(1, Math.min(7, parseInt(serverNum) || 1));
 
   const serverNames = {
-    1: 'Serveur 1 (⭐ Dark VIP Ultra HD 1080p)',
-    2: 'Serveur 2 (⚡ Direct HLS Principal 1080p)',
+    1: 'Serveur 1 (⭐ Dark VIP Ultra HD 1080p/60fps)',
+    2: 'Serveur 2 (⚡ Direct HLS DLHD Cluster 2 1080p)',
     3: 'Serveur 3 (🎬 Direct HLS Apex Streams 1080p)',
-    4: 'Serveur 4 (📡 Direct HLS DLHD Cluster 2 1080p)',
-    5: 'Serveur 5 (🌐 Direct HLS DLHD Alpha Cluster 1 1080p)',
-    6: 'Serveur 6 (🚀 Direct HLS WideIPTV Bluetier 1080p)',
-    7: 'Serveur 7 (🛡️ Direct HLS Secours 1080p)'
+    4: 'Serveur 4 (📡 Direct HLS DLHD Alpha Cluster 1 1080p)',
+    5: 'Serveur 5 (🌐 Direct HLS Cricsfree 1080p)',
+    6: 'Serveur 6 (📺 Lecteur Web Intégré DLive HD)',
+    7: 'Serveur 7 (🛡️ Lecteur Secours DLHD HD)'
   };
 
-  // Chaînes FAST Sport ouvertes
+  // Chaînes FAST & TNT Officielles Directes HD
+  if (channelId === 'tv_arte' || channelId === '958') {
+    return {
+      success: true,
+      server: srvNum,
+      server_name: serverNames[srvNum],
+      hoster: 'Arte France Direct Akamai CDN 1080p',
+      quality: '1080p FHD Direct',
+      title: `${title} • 🔴 EN DIRECT`,
+      stream_url: 'https://artesimulcast.akamaized.net/hls/live/2031003/artelive_fr/index.m3u8',
+      player_type: 'direct_hls',
+      is_embed: false,
+      is_live: true,
+      sources_count: 7,
+      lang: 'vf'
+    };
+  }
+
+  if (channelId === 'tv_tmc' && srvNum === 3) {
+    return {
+      success: true,
+      server: srvNum,
+      server_name: serverNames[srvNum],
+      hoster: 'TMC Direct HD',
+      quality: '1080p FHD Direct',
+      title: `${title} • 🔴 EN DIRECT`,
+      stream_url: 'http://151.80.18.177:86/TMC/index.m3u8',
+      player_type: 'direct_hls',
+      is_embed: false,
+      is_live: true,
+      sources_count: 7,
+      lang: 'vf'
+    };
+  }
+
   if (channelId === 'tv_redbull') {
     const urls = [
       'https://46cfeb23c7f74853bba7a256655a3119.mediatailor.us-west-2.amazonaws.com/v1/master/ba62fe743df0fe93366eba3a257d792884136c7f/LINEAR-582-WORBDACHDEFAST-WHALETVPLUS/582/whaletvplus/hls/master/playlist.m3u8',
@@ -549,28 +667,63 @@ async function extractChannelMultiProvider(channelId, serverNum) {
     };
   }
 
-  // Traitement pour les chaînes DaddyLive
-  if (daddyId) {
+  // Serveurs Web Intégrés dédiés (Serveurs 6 et 7)
+  if (srvNum === 6 && daddyId) {
+    return {
+      success: true,
+      server: 6,
+      server_name: serverNames[6],
+      hoster: `Lecteur Web Intégré DLive • ${title}`,
+      quality: '1080p HD',
+      title: `${title} • 🔴 EN DIRECT`,
+      stream_url: `https://dlive.sx/player/stream-${daddyId}.php`,
+      embed_url: `https://dlive.sx/player/stream-${daddyId}.php`,
+      player_type: 'iframe',
+      is_embed: true,
+      is_live: true,
+      sources_count: 7,
+      lang: 'vf'
+    };
+  }
+
+  if (srvNum === 7 && daddyId) {
+    return {
+      success: true,
+      server: 7,
+      server_name: serverNames[7],
+      hoster: `Lecteur Web Secours DLHD • ${title}`,
+      quality: '1080p HD',
+      title: `${title} • 🔴 EN DIRECT`,
+      stream_url: `https://dlhd.st/watch/stream-${daddyId}.php`,
+      embed_url: `https://dlhd.st/watch/stream-${daddyId}.php`,
+      player_type: 'iframe',
+      is_embed: true,
+      is_live: true,
+      sources_count: 7,
+      lang: 'vf'
+    };
+  }
+
+  // Traitement pour les chaînes TV Direct HLS
+  if (daddyId || channelId) {
     const mirrorMap = {
-      1: { mirror: 'premium_vip', hoster: '⭐ Dark VIP Ultra HD 1080p/60fps (Brut)' },
-      2: { mirror: 'cricsfree', hoster: '⚡ Direct HLS Principal (Cricsfree 1080p)' },
-      3: { mirror: 'apex', hoster: '🎬 Direct HLS Apex Streams (1080p)' },
-      4: { mirror: 'daddy2', hoster: '📡 Direct HLS DLHD Cluster 2 (1080p)' },
-      5: { mirror: 'daddy1', hoster: '🌐 Direct HLS DLHD Alpha Cluster 1 (1080p)' },
-      6: { mirror: 'wideiptv', hoster: '🚀 Direct HLS WideIPTV (Bluetier CDN 1080p)' },
-      7: { mirror: 'secours', hoster: '🛡️ Direct HLS Miroir Secours (1080p)' }
+      1: { mirror: 'premium_vip', hoster: '⭐ Dark VIP Ultra HD 1080p/60fps (Bluetier CDN)' },
+      2: { mirror: 'daddy2', hoster: '⚡ Direct HLS DLHD Cluster 2 (1080p)' },
+      3: { mirror: 'apex', hoster: '🎬 Direct HLS Apex Streams (1080p Alternate)' },
+      4: { mirror: 'daddy1', hoster: '📡 Direct HLS DLHD Alpha Cluster 1 (1080p)' },
+      5: { mirror: 'cricsfree', hoster: '🌐 Direct HLS Cricsfree (1080p)' }
     };
 
     const cfg = mirrorMap[srvNum] || mirrorMap[1];
-    let streamUrl = await getLiveM3u8Url(daddyId, cfg.mirror);
+    let streamUrl = await getLiveM3u8Url(daddyId, cfg.mirror, channelId);
 
     // Cascade automatique intelligente vers les miroirs alternatifs si la source sélectionnée est hors-ligne
-    if (!streamUrl && cfg.mirror !== 'premium_vip') streamUrl = await getLiveM3u8Url(daddyId, 'premium_vip');
-    if (!streamUrl && cfg.mirror !== 'cricsfree') streamUrl = await getLiveM3u8Url(daddyId, 'cricsfree');
-    if (!streamUrl && cfg.mirror !== 'apex') streamUrl = await getLiveM3u8Url(daddyId, 'apex');
-    if (!streamUrl && cfg.mirror !== 'daddy2') streamUrl = await getLiveM3u8Url(daddyId, 'daddy2');
-    if (!streamUrl && cfg.mirror !== 'daddy1') streamUrl = await getLiveM3u8Url(daddyId, 'daddy1');
-    if (!streamUrl && cfg.mirror !== 'wideiptv') streamUrl = await getLiveM3u8Url(daddyId, 'wideiptv');
+    if (!streamUrl && cfg.mirror !== 'premium_vip') streamUrl = await getLiveM3u8Url(daddyId, 'premium_vip', channelId);
+    if (!streamUrl && cfg.mirror !== 'daddy2') streamUrl = await getLiveM3u8Url(daddyId, 'daddy2', channelId);
+    if (!streamUrl && cfg.mirror !== 'apex') streamUrl = await getLiveM3u8Url(daddyId, 'apex', channelId);
+    if (!streamUrl && cfg.mirror !== 'daddy1') streamUrl = await getLiveM3u8Url(daddyId, 'daddy1', channelId);
+    if (!streamUrl && cfg.mirror !== 'cricsfree') streamUrl = await getLiveM3u8Url(daddyId, 'cricsfree', channelId);
+    if (!streamUrl && cfg.mirror !== 'wideiptv') streamUrl = await getLiveM3u8Url(daddyId, 'wideiptv', channelId);
 
     if (streamUrl) {
       return {
@@ -580,7 +733,7 @@ async function extractChannelMultiProvider(channelId, serverNum) {
         hoster: `${cfg.hoster} • ${title}`,
         quality: srvNum === 1 ? '⭐ Ultra HD 1080p/60fps Direct' : '1080p FHD Direct',
         title: `${title} • 🔴 EN DIRECT`,
-        stream_url: `/api/stream/live?channel=${encodeURIComponent(daddyId)}&mirror=${encodeURIComponent(cfg.mirror)}`,
+        stream_url: `/api/stream/live?channel=${encodeURIComponent(channelId || daddyId)}&mirror=${encodeURIComponent(cfg.mirror)}`,
         player_type: 'direct_hls',
         is_embed: false,
         is_live: true,
@@ -589,7 +742,8 @@ async function extractChannelMultiProvider(channelId, serverNum) {
       };
     }
 
-    // Ultime fallback si tous les miroirs HLS sont indisponibles
+    // Ultime fallback vers le lecteur web intégré
+    const fallbackId = daddyId || (channelId ? channelId.replace('tv_', '') : '122');
     return {
       success: true,
       server: srvNum,
@@ -597,8 +751,8 @@ async function extractChannelMultiProvider(channelId, serverNum) {
       hoster: `Lecteur Web Secours • ${title}`,
       quality: '1080p HD',
       title: `${title} • 🔴 EN DIRECT`,
-      stream_url: `https://dlhd.st/watch/stream-${daddyId}.php`,
-      embed_url: `https://dlhd.st/watch/stream-${daddyId}.php`,
+      stream_url: `https://dlive.sx/player/stream-${fallbackId}.php`,
+      embed_url: `https://dlive.sx/player/stream-${fallbackId}.php`,
       player_type: 'iframe',
       is_embed: true,
       is_live: true,
@@ -619,7 +773,7 @@ async function extractChannelMultiProvider(channelId, serverNum) {
     player_type: 'direct_hls',
     is_embed: false,
     is_live: true,
-    sources_count: 12,
+    sources_count: 7,
     lang: 'vf'
   };
 }
@@ -1610,6 +1764,13 @@ const server = http.createServer((req, res) => {
     if (!movie) {
       res.writeHead(404, { 'Content-Type': 'application/json' });
       res.end(JSON.stringify({ success: false, message: 'Média non trouvé pour le stream' }));
+      return;
+    }
+
+    if (movie.media_type === 'channel' || movie.is_live) {
+      const channelTarget = movie.daddy_id || movie.id;
+      res.writeHead(302, { 'Location': `/api/stream/live?channel=${encodeURIComponent(channelTarget)}&mirror=premium_vip` });
+      res.end();
       return;
     }
 
