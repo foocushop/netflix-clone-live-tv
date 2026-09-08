@@ -976,7 +976,8 @@ class NetflixPlayer {
         { num: 4, label: '📡 S4: Direct 1080p (DLHD)', title: 'Serveur 4 : Direct HLS DLHD Cluster 2 FHD 1080p (Lecteur Netflix Natif)', badge: '1080p Natif' },
         { num: 5, label: '🌐 S5: Direct 1080p (Alpha)', title: 'Serveur 5 : Direct HLS DLHD Alpha Cluster 1 FHD 1080p (Lecteur Netflix Natif)', badge: '1080p Natif' },
         { num: 6, label: '🚀 S6: Direct 1080p (WideIPTV)', title: 'Serveur 6 : Direct HLS WideIPTV Bluetier CDN FHD 1080p (Lecteur Netflix Natif)', badge: '1080p Natif' },
-        { num: 7, label: '🛡️ S7: Direct 1080p (Secours)', title: 'Serveur 7 : Direct HLS Miroir de Secours FHD 1080p (Lecteur Netflix Natif)', badge: 'Secours' }
+        { num: 7, label: '🛡️ S7: Direct 1080p (Secours)', title: 'Serveur 7 : Direct HLS Miroir de Secours FHD 1080p (Lecteur Netflix Natif)', badge: 'Secours' },
+        { num: 8, label: '💎 S8: Xtream VIP (1080p)', title: 'Serveur 8 : Direct Xtream VIP 1080p (Flux Résilient Haute Stabilité)', badge: '💎 Xtream VIP', isVip: true }
       ];
     } else if (isSpecialShow) {
       serverList = [
@@ -1051,7 +1052,8 @@ class NetflixPlayer {
         4: 'Serveur 4 (📡 Direct HLS DLHD Cluster 2 1080p)',
         5: 'Serveur 5 (🌐 Direct HLS DLHD Alpha Cluster 1 1080p)',
         6: 'Serveur 6 (🚀 Direct HLS WideIPTV Bluetier 1080p)',
-        7: 'Serveur 7 (🛡️ Direct HLS Secours 1080p)'
+        7: 'Serveur 7 (🛡️ Direct HLS Secours 1080p)',
+        8: 'Serveur 8 (💎 Direct Xtream VIP 1080p)'
       };
       const sName = serverNames[this.currentServer] || `Serveur ${this.currentServer}`;
       const chNum = this.currentMovie.channel_number ? `Canal ${this.currentMovie.channel_number} • ` : '';
@@ -1210,7 +1212,7 @@ class NetflixPlayer {
       // Basculer automatiquement sur le serveur suivant après 1.5s
       setTimeout(() => {
         const isChannel = (this.currentMovie?.media_type === 'channel' || this.currentMovie?.is_live);
-        const maxSrv = isChannel ? 12 : 5;
+        const maxSrv = isChannel ? 8 : 5;
         const next = (this.currentServer % maxSrv) + 1;
         this.switchServer(next);
       }, 1500);
@@ -1257,6 +1259,28 @@ class NetflixPlayer {
     this.video.addEventListener('loadeddata', onReady, { once: true });
     this.video.addEventListener('playing', onReady, { once: true });
 
+    // Protection Anti-Boucle / Anti-Saccade Xtream :
+    // Empêche le lecteur de revenir en arrière de 5-10 secondes lors des resets PTS/PCR
+    this.lastLiveMaxTime = 0;
+    if (this._antiLoopHandler) {
+      this.video.removeEventListener('timeupdate', this._antiLoopHandler);
+    }
+    this._antiLoopHandler = () => {
+      const isChannel = (this.currentMovie?.media_type === 'channel' || this.currentMovie?.is_live);
+      if (isChannel && !this.video.paused && !this.video.seeking) {
+        const cur = this.video.currentTime;
+        if (this.lastLiveMaxTime > 6 && cur < (this.lastLiveMaxTime - 2.0)) {
+          console.warn(`[Anti-Loop Xtream] Décalage arrière détecté (${cur.toFixed(1)}s < ${this.lastLiveMaxTime.toFixed(1)}s). Repositionnement direct actif.`);
+          this.video.currentTime = this.lastLiveMaxTime + 0.2;
+          return;
+        }
+        if (cur > this.lastLiveMaxTime) {
+          this.lastLiveMaxTime = cur;
+        }
+      }
+    };
+    this.video.addEventListener('timeupdate', this._antiLoopHandler);
+
     if (window.Hls && Hls.isSupported()) {
       const isChannel = (this.currentMovie?.media_type === 'channel' || this.currentMovie?.is_live);
       const hls = new Hls({
@@ -1272,8 +1296,8 @@ class NetflixPlayer {
         maxMaxBufferLength: isChannel ? 45 : 75,
         maxBufferSize: 30 * 1000 * 1000, // 30 MB optimal pour Android TV RAM
         highBufferWatchdogPeriod: 2,
-        nudgeOffset: 0.1,
-        nudgeMaxRetry: 5,
+        nudgeOffset: 0.25,
+        nudgeMaxRetry: 10, // Permet de sauter automatiquement au-delà des trous de timestamp
         maxFragLookUpTolerance: 0.25,
         fragLoadingTimeOut: 20000,
         manifestLoadingTimeOut: 20000,
@@ -1317,6 +1341,14 @@ class NetflixPlayer {
       });
 
       hls.on(Hls.Events.ERROR, (event, data) => {
+        // Détection et saut automatique par-dessus les micro-trous de diffusion (anti-saccade & anti-coupure)
+        if (data.details === Hls.ErrorDetails.BUFFER_STALLED_ERROR || data.details === Hls.ErrorDetails.BUFFER_SEEK_OVER_HOLE || data.details === Hls.ErrorDetails.BUFFER_NUDGE_ON_STALL) {
+          console.warn('[HLS Watchdog] Micro-trou détecté, saut préventif anti-saccade');
+          this.video.currentTime += 0.3;
+          this.video.play().catch(() => {});
+          return;
+        }
+
         if (data.fatal) {
           console.warn('[HLS Fatal Error]', data.type, data.details);
           switch (data.type) {
@@ -1332,7 +1364,7 @@ class NetflixPlayer {
               this.showStatusBanner(`Erreur de segment sur Serveur ${this.currentServer}. Basculement...`);
               setTimeout(() => {
                 const isChannel = (this.currentMovie?.media_type === 'channel' || this.currentMovie?.is_live);
-                const maxSrv = isChannel ? 9 : 5;
+                const maxSrv = isChannel ? 8 : 5;
                 const next = (this.currentServer % maxSrv) + 1;
                 this.switchServer(next);
               }, 1200);

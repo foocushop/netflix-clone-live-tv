@@ -46,6 +46,42 @@ let jwtTokenExpiresAt = 0;
 // Cache des cookies Dailymotion (sessionKey -> cookieHeader) – TTL 10 min
 const dmCookieCache = new Map();
 
+// ================= CONFIGURATION & SUPERVISEUR XTREAM CODES =================
+const XTREAM_CONFIG = {
+  host: 'foxbleu.org',
+  port: 80,
+  username: 'josealbino',
+  password: '21321'
+};
+
+const XTREAM_CHANNELS = {
+  'tv_canal_foot': '180946',
+  'tv_canal_sport': '14156',
+  'tv_canal_360': '180947',
+  'tv_canal_france': '14155',
+  'tv_canal_live1': '327340',
+  'tv_canal_live2': '327339',
+  'tv_canal_live3': '327338',
+  'tv_canal_f1': '14156',
+  'tv_canal_motogp': '180947',
+  'tv_bein1': '14164',
+  'tv_bein2': '14165',
+  'tv_bein3': '14166',
+  'tv_rmc_sport1': '14167',
+  'tv_rmc_sport2': '14168',
+  'tv_tf1': '14150',
+  'tv_france2': '14151',
+  'tv_france3': '14152',
+  'tv_m6': '14153',
+  'tv_w9': '14154',
+  'tv_tmc': '14170',
+  'tv_lequipe': '14169',
+  'tv_dazn1': '180948',
+  'tv_dazn_ligue1': '180948'
+};
+
+global.activeXtreamSocket = null;
+
 async function getWasmModule(wasmUrl, wasmBase64) {
   if (cachedWasmModule && cachedWasmUrl === wasmUrl) {
     return cachedWasmModule;
@@ -560,7 +596,7 @@ async function extractChannelMultiProvider(channelId, serverNum) {
     if (/^\d+$/.test(raw)) daddyId = parseInt(raw, 10);
   }
 
-  const srvNum = Math.max(1, Math.min(7, parseInt(serverNum) || 1));
+  const srvNum = Math.max(1, Math.min(8, parseInt(serverNum) || 1));
 
   const serverNames = {
     1: 'Serveur 1 (⭐ Dark VIP Ultra HD 1080p/60fps)',
@@ -569,7 +605,8 @@ async function extractChannelMultiProvider(channelId, serverNum) {
     4: 'Serveur 4 (📡 Direct HLS DLHD Alpha Cluster 1 1080p)',
     5: 'Serveur 5 (🌐 Direct HLS Cricsfree 1080p)',
     6: 'Serveur 6 (📺 Lecteur Web Intégré DLive HD)',
-    7: 'Serveur 7 (🛡️ Lecteur Secours DLHD HD)'
+    7: 'Serveur 7 (🛡️ Lecteur Secours DLHD HD)',
+    8: 'Serveur 8 (💎 Direct Xtream VIP 1080p)'
   };
 
   // Chaînes FAST & TNT Officielles Directes HD
@@ -676,8 +713,27 @@ async function extractChannelMultiProvider(channelId, serverNum) {
       4: { mirror: 'daddy1', hoster: '📡 Direct HLS DLHD Alpha Cluster 1 (1080p)' },
       5: { mirror: 'cricsfree', hoster: '🌐 Direct HLS Cricsfree (1080p)' },
       6: { mirror: 'wideiptv', hoster: '🚀 Direct HLS WideIPTV Secours (1080p)' },
-      7: { mirror: 'secours', hoster: '🛡️ Direct HLS Secours Multi-Cluster (1080p)' }
+      7: { mirror: 'secours', hoster: '🛡️ Direct HLS Secours Multi-Cluster (1080p)' },
+      8: { mirror: 'xtream', hoster: '💎 Direct Xtream VIP FHD (Flux Résilient Haute Stabilité)' }
     };
+
+    const liveChannelParam = encodeURIComponent(channelId || daddyId);
+    if (srvNum === 8) {
+      return {
+        success: true,
+        server: 8,
+        server_name: serverNames[8],
+        hoster: `${mirrorMap[8].hoster} • ${title}`,
+        quality: '1080p FHD Direct VIP',
+        title: `${title} • 🔴 EN DIRECT`,
+        stream_url: `/api/stream/xtream?channel=${liveChannelParam}`,
+        player_type: 'direct_hls',
+        is_embed: false,
+        is_live: true,
+        sources_count: 8,
+        lang: 'vf'
+      };
+    }
 
     const cfg = mirrorMap[srvNum] || mirrorMap[1];
     let streamUrl = await getLiveM3u8Url(daddyId, cfg.mirror, channelId);
@@ -690,7 +746,6 @@ async function extractChannelMultiProvider(channelId, serverNum) {
     if (!streamUrl && cfg.mirror !== 'cricsfree') streamUrl = await getLiveM3u8Url(daddyId, 'cricsfree', channelId);
     if (!streamUrl && cfg.mirror !== 'wideiptv') streamUrl = await getLiveM3u8Url(daddyId, 'wideiptv', channelId);
 
-    const liveChannelParam = encodeURIComponent(channelId || daddyId);
     return {
       success: true,
       server: srvNum,
@@ -702,7 +757,7 @@ async function extractChannelMultiProvider(channelId, serverNum) {
       player_type: 'direct_hls',
       is_embed: false,
       is_live: true,
-      sources_count: 7,
+      sources_count: 8,
       lang: 'vf'
     };
   }
@@ -1538,6 +1593,93 @@ const server = http.createServer((req, res) => {
           res.end('Erreur live stream: ' + err.message);
         }
       });
+    return;
+  }
+
+  // ================= ROUTE DIRECT XTREAM VIP PROXY (/api/stream/xtream) =================
+  // Infrastructure Résiliente pour Xtream Codes :
+  // 1. Single-Connection Supervisor (Évite l'erreur max_connections = 1 en fermant immédiatement l'ancien socket)
+  // 2. Gestion automatique des redirections 302 vers les nœuds edge
+  // 3. Bypass CORS & Compatibilité HTTPS / Mixed-Content
+  if (pathname === '/api/stream/xtream' && req.method === 'GET') {
+    const channel = parsedUrl.query.channel || 'tv_canal_foot';
+    const streamId = XTREAM_CHANNELS[channel] || parsedUrl.query.stream_id || '180946';
+
+    // Libérer immédiatement toute connexion résiduelle pour respecter le max_connections: 1
+    if (global.activeXtreamSocket) {
+      try { global.activeXtreamSocket.destroy(); } catch (e) {}
+      global.activeXtreamSocket = null;
+    }
+
+    const targetUrl = `http://${XTREAM_CONFIG.host}:${XTREAM_CONFIG.port}/live/${XTREAM_CONFIG.username}/${XTREAM_CONFIG.password}/${streamId}`;
+
+    function pipeXtreamStream(url, hops = 0) {
+      if (hops > 4) {
+        res.writeHead(502, { 'Content-Type': 'text/plain', 'Access-Control-Allow-Origin': '*' });
+        res.end('Trop de redirections Xtream');
+        return;
+      }
+
+      const clientReq = http.get(url, {
+        headers: {
+          'User-Agent': 'IPTVSmartersPro/1.0',
+          'Accept': '*/*'
+        },
+        timeout: 15000
+      }, (upstreamRes) => {
+        if (upstreamRes.statusCode === 301 || upstreamRes.statusCode === 302) {
+          const loc = upstreamRes.headers.location;
+          if (loc) {
+            return pipeXtreamStream(loc, hops + 1);
+          }
+        }
+
+        if (upstreamRes.statusCode !== 200) {
+          res.writeHead(upstreamRes.statusCode, {
+            'Content-Type': 'text/plain',
+            'Access-Control-Allow-Origin': '*'
+          });
+          res.end(`Erreur Xtream: HTTP ${upstreamRes.statusCode}`);
+          return;
+        }
+
+        global.activeXtreamSocket = clientReq;
+
+        res.writeHead(200, {
+          'Content-Type': upstreamRes.headers['content-type'] || 'video/mp2t',
+          'Access-Control-Allow-Origin': '*',
+          'Access-Control-Allow-Headers': '*',
+          'Cache-Control': 'no-cache, no-store',
+          'Connection': 'keep-alive'
+        });
+
+        upstreamRes.pipe(res);
+
+        upstreamRes.on('error', (err) => {
+          console.warn('[Xtream Upstream Error]:', err.message);
+          if (!res.headersSent) res.writeHead(502);
+          res.end();
+        });
+      });
+
+      clientReq.on('error', (err) => {
+        console.warn('[Xtream Request Error]:', err.message);
+        if (!res.headersSent) {
+          res.writeHead(502, { 'Content-Type': 'text/plain', 'Access-Control-Allow-Origin': '*' });
+          res.end('Erreur de connexion Xtream: ' + err.message);
+        }
+      });
+
+      // Fermeture immédiate dès que l'utilisateur quitte ou change de chaîne
+      req.on('close', () => {
+        try { clientReq.destroy(); } catch (e) {}
+        if (global.activeXtreamSocket === clientReq) {
+          global.activeXtreamSocket = null;
+        }
+      });
+    }
+
+    pipeXtreamStream(targetUrl);
     return;
   }
 
