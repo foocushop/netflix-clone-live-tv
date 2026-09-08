@@ -6562,7 +6562,7 @@
       "media_type": "channel",
       "is_live": true,
       "channel_number": 1,
-      "poster_url": "https://upload.wikimedia.org/wikipedia/commons/thumb/e/e0/Canal%2B_2013.svg/320px-Canal%2B_2013.svg.png",
+      "poster_url": "/images/channels/tv_canal_sport.png",
       "backdrop_url": "https://images.unsplash.com/photo-1508098682722-e99c43a406b2?auto=format&fit=crop&w=1920&q=80",
       "video_url": "/api/extract?id=tv_canal_sport&type=channel&server=1",
       "sources": {
@@ -6629,7 +6629,8 @@
       ],
       "is_hero": true,
       "created_at": "2026-09-08T12:53:58.891Z",
-      "cast": []
+      "cast": [],
+      "logo_url": "/images/channels/tv_canal_sport.png"
     },
     {
       "id": "tv_canal_foot",
@@ -6640,7 +6641,7 @@
       "media_type": "channel",
       "is_live": true,
       "channel_number": 2,
-      "poster_url": "https://upload.wikimedia.org/wikipedia/commons/thumb/e/e0/Canal%2B_2013.svg/320px-Canal%2B_2013.svg.png",
+      "poster_url": "/images/channels/tv_canal_foot.png",
       "backdrop_url": "https://images.unsplash.com/photo-1508098682722-e99c43a406b2?auto=format&fit=crop&w=1920&q=80",
       "video_url": "/api/extract?id=tv_canal_foot&type=channel&server=1",
       "sources": {
@@ -6707,7 +6708,8 @@
       ],
       "is_hero": false,
       "created_at": "2026-09-08T12:53:58.891Z",
-      "cast": []
+      "cast": [],
+      "logo_url": "/images/channels/tv_canal_foot.png"
     },
     {
       "id": "tv_canal_360",
@@ -6718,7 +6720,7 @@
       "media_type": "channel",
       "is_live": true,
       "channel_number": 3,
-      "poster_url": "https://upload.wikimedia.org/wikipedia/commons/thumb/e/e0/Canal%2B_2013.svg/320px-Canal%2B_2013.svg.png",
+      "poster_url": "/images/channels/tv_canal_360.png",
       "backdrop_url": "https://images.unsplash.com/photo-1508098682722-e99c43a406b2?auto=format&fit=crop&w=1920&q=80",
       "video_url": "/api/extract?id=tv_canal_360&type=channel&server=1",
       "sources": {
@@ -6785,7 +6787,8 @@
       ],
       "is_hero": false,
       "created_at": "2026-09-08T12:53:58.891Z",
-      "cast": []
+      "cast": [],
+      "logo_url": "/images/channels/tv_canal_360.png"
     },
     {
       "id": "tv_canal_france",
@@ -6796,7 +6799,7 @@
       "media_type": "channel",
       "is_live": true,
       "channel_number": 4,
-      "poster_url": "https://upload.wikimedia.org/wikipedia/commons/thumb/e/e0/Canal%2B_2013.svg/320px-Canal%2B_2013.svg.png",
+      "poster_url": "/images/channels/tv_canal_france.png",
       "backdrop_url": "https://images.unsplash.com/photo-1508098682722-e99c43a406b2?auto=format&fit=crop&w=1920&q=80",
       "video_url": "/api/extract?id=tv_canal_france&type=channel&server=1",
       "sources": {
@@ -6863,7 +6866,8 @@
       ],
       "is_hero": false,
       "created_at": "2026-09-08T12:53:58.891Z",
-      "cast": []
+      "cast": [],
+      "logo_url": "/images/channels/tv_canal_france.png"
     },
     {
       "id": "tv_canal_f1",
@@ -6874,7 +6878,7 @@
       "media_type": "channel",
       "is_live": true,
       "channel_number": 5,
-      "poster_url": "https://upload.wikimedia.org/wikipedia/commons/thumb/e/e0/Canal%2B_2013.svg/320px-Canal%2B_2013.svg.png",
+      "poster_url": "/images/channels/tv_canal_f1.png",
       "backdrop_url": "https://images.unsplash.com/photo-1508098682722-e99c43a406b2?auto=format&fit=crop&w=1920&q=80",
       "video_url": "/api/extract?id=tv_canal_f1&type=channel&server=1",
       "sources": {
@@ -6941,7 +6945,8 @@
       ],
       "is_hero": false,
       "created_at": "2026-09-08T12:53:58.891Z",
-      "cast": []
+      "cast": [],
+      "logo_url": "/images/channels/tv_canal_f1.png"
     },
     {
       "id": "tv_canal_motogp",
@@ -6952,7 +6957,7 @@
       "media_type": "channel",
       "is_live": true,
       "channel_number": 6,
-      "poster_url": "https://upload.wikimedia.org/wikipedia/commons/thumb/e/e0/Canal%2B_2013.svg/320px-Canal%2B_2013.svg.png",
+      "poster_url": "/images/channels/tv_canal_motogp.png",
       "backdrop_url": "https://images.unsplash.com/photo-1508098682722-e99c43a406b2?auto=format&fit=crop&w=1920&q=80",
       "video_url": "/api/extract?id=tv_canal_motogp&type=channel&server=1",
       "sources": {
@@ -7019,7 +7024,8 @@
       ],
       "is_hero": false,
       "created_at": "2026-09-08T12:53:58.891Z",
-      "cast": []
+      "cast": [],
+      "logo_url": "/images/channels/tv_canal_motogp.png"
     },
     {
       "id": "tv_bein1",
@@ -7030,7 +7036,7 @@
       "media_type": "channel",
       "is_live": true,
       "channel_number": 7,
-      "poster_url": "https://upload.wikimedia.org/wikipedia/commons/thumb/c/c2/BeIN_Sports_logo.svg/320px-BeIN_Sports_logo.svg.png",
+      "poster_url": "/images/channels/tv_bein1.png",
       "backdrop_url": "https://images.unsplash.com/photo-1508098682722-e99c43a406b2?auto=format&fit=crop&w=1920&q=80",
       "video_url": "/api/extract?id=tv_bein1&type=channel&server=1",
       "sources": {
@@ -7097,7 +7103,8 @@
       ],
       "is_hero": false,
       "created_at": "2026-09-08T12:53:58.891Z",
-      "cast": []
+      "cast": [],
+      "logo_url": "/images/channels/tv_bein1.png"
     },
     {
       "id": "tv_bein2",
@@ -7108,7 +7115,7 @@
       "media_type": "channel",
       "is_live": true,
       "channel_number": 8,
-      "poster_url": "https://upload.wikimedia.org/wikipedia/commons/thumb/c/c2/BeIN_Sports_logo.svg/320px-BeIN_Sports_logo.svg.png",
+      "poster_url": "/images/channels/tv_bein2.png",
       "backdrop_url": "https://images.unsplash.com/photo-1508098682722-e99c43a406b2?auto=format&fit=crop&w=1920&q=80",
       "video_url": "/api/extract?id=tv_bein2&type=channel&server=1",
       "sources": {
@@ -7175,7 +7182,8 @@
       ],
       "is_hero": false,
       "created_at": "2026-09-08T12:53:58.891Z",
-      "cast": []
+      "cast": [],
+      "logo_url": "/images/channels/tv_bein2.png"
     },
     {
       "id": "tv_bein3",
@@ -7186,7 +7194,7 @@
       "media_type": "channel",
       "is_live": true,
       "channel_number": 9,
-      "poster_url": "https://upload.wikimedia.org/wikipedia/commons/thumb/c/c2/BeIN_Sports_logo.svg/320px-BeIN_Sports_logo.svg.png",
+      "poster_url": "/images/channels/tv_bein3.png",
       "backdrop_url": "https://images.unsplash.com/photo-1508098682722-e99c43a406b2?auto=format&fit=crop&w=1920&q=80",
       "video_url": "/api/extract?id=tv_bein3&type=channel&server=1",
       "sources": {
@@ -7253,7 +7261,8 @@
       ],
       "is_hero": false,
       "created_at": "2026-09-08T12:53:58.891Z",
-      "cast": []
+      "cast": [],
+      "logo_url": "/images/channels/tv_bein3.png"
     },
     {
       "id": "tv_bein_max4",
@@ -7264,7 +7273,7 @@
       "media_type": "channel",
       "is_live": true,
       "channel_number": 10,
-      "poster_url": "https://upload.wikimedia.org/wikipedia/commons/thumb/c/c2/BeIN_Sports_logo.svg/320px-BeIN_Sports_logo.svg.png",
+      "poster_url": "/images/channels/tv_bein_max4.png",
       "backdrop_url": "https://images.unsplash.com/photo-1508098682722-e99c43a406b2?auto=format&fit=crop&w=1920&q=80",
       "video_url": "/api/extract?id=tv_bein_max4&type=channel&server=1",
       "sources": {
@@ -7331,7 +7340,8 @@
       ],
       "is_hero": false,
       "created_at": "2026-09-08T12:53:58.891Z",
-      "cast": []
+      "cast": [],
+      "logo_url": "/images/channels/tv_bein_max4.png"
     },
     {
       "id": "tv_bein_max5",
@@ -7342,7 +7352,7 @@
       "media_type": "channel",
       "is_live": true,
       "channel_number": 11,
-      "poster_url": "https://upload.wikimedia.org/wikipedia/commons/thumb/c/c2/BeIN_Sports_logo.svg/320px-BeIN_Sports_logo.svg.png",
+      "poster_url": "/images/channels/tv_bein_max5.png",
       "backdrop_url": "https://images.unsplash.com/photo-1508098682722-e99c43a406b2?auto=format&fit=crop&w=1920&q=80",
       "video_url": "/api/extract?id=tv_bein_max5&type=channel&server=1",
       "sources": {
@@ -7409,7 +7419,8 @@
       ],
       "is_hero": false,
       "created_at": "2026-09-08T12:53:58.891Z",
-      "cast": []
+      "cast": [],
+      "logo_url": "/images/channels/tv_bein_max5.png"
     },
     {
       "id": "tv_bein_max6",
@@ -7420,7 +7431,7 @@
       "media_type": "channel",
       "is_live": true,
       "channel_number": 12,
-      "poster_url": "https://upload.wikimedia.org/wikipedia/commons/thumb/c/c2/BeIN_Sports_logo.svg/320px-BeIN_Sports_logo.svg.png",
+      "poster_url": "/images/channels/tv_bein_max6.png",
       "backdrop_url": "https://images.unsplash.com/photo-1508098682722-e99c43a406b2?auto=format&fit=crop&w=1920&q=80",
       "video_url": "/api/extract?id=tv_bein_max6&type=channel&server=1",
       "sources": {
@@ -7487,7 +7498,8 @@
       ],
       "is_hero": false,
       "created_at": "2026-09-08T12:53:58.891Z",
-      "cast": []
+      "cast": [],
+      "logo_url": "/images/channels/tv_bein_max6.png"
     },
     {
       "id": "tv_rmc_sport1",
@@ -7498,7 +7510,7 @@
       "media_type": "channel",
       "is_live": true,
       "channel_number": 13,
-      "poster_url": "https://upload.wikimedia.org/wikipedia/commons/thumb/8/87/RMC_Sport_logo_2018.svg/320px-RMC_Sport_logo_2018.svg.png",
+      "poster_url": "/images/channels/tv_rmc_sport1.png",
       "backdrop_url": "https://images.unsplash.com/photo-1517838277536-f5f99be501cd?auto=format&fit=crop&w=1920&q=80",
       "video_url": "/api/extract?id=tv_rmc_sport1&type=channel&server=1",
       "sources": {
@@ -7565,7 +7577,8 @@
       ],
       "is_hero": false,
       "created_at": "2026-09-08T12:53:58.891Z",
-      "cast": []
+      "cast": [],
+      "logo_url": "/images/channels/tv_rmc_sport1.png"
     },
     {
       "id": "tv_rmc_sport2",
@@ -7576,7 +7589,7 @@
       "media_type": "channel",
       "is_live": true,
       "channel_number": 14,
-      "poster_url": "https://upload.wikimedia.org/wikipedia/commons/thumb/8/87/RMC_Sport_logo_2018.svg/320px-RMC_Sport_logo_2018.svg.png",
+      "poster_url": "/images/channels/tv_rmc_sport2.png",
       "backdrop_url": "https://images.unsplash.com/photo-1517838277536-f5f99be501cd?auto=format&fit=crop&w=1920&q=80",
       "video_url": "/api/extract?id=tv_rmc_sport2&type=channel&server=1",
       "sources": {
@@ -7643,7 +7656,8 @@
       ],
       "is_hero": false,
       "created_at": "2026-09-08T12:53:58.891Z",
-      "cast": []
+      "cast": [],
+      "logo_url": "/images/channels/tv_rmc_sport2.png"
     },
     {
       "id": "tv_eurosport1",
@@ -7654,7 +7668,7 @@
       "media_type": "channel",
       "is_live": true,
       "channel_number": 15,
-      "poster_url": "https://upload.wikimedia.org/wikipedia/commons/thumb/9/90/Eurosport_2015_logo.svg/320px-Eurosport_2015_logo.svg.png",
+      "poster_url": "/images/channels/tv_eurosport1.png",
       "backdrop_url": "https://images.unsplash.com/photo-1508098682722-e99c43a406b2?auto=format&fit=crop&w=1920&q=80",
       "video_url": "/api/extract?id=tv_eurosport1&type=channel&server=1",
       "sources": {
@@ -7721,7 +7735,8 @@
       ],
       "is_hero": false,
       "created_at": "2026-09-08T12:53:58.891Z",
-      "cast": []
+      "cast": [],
+      "logo_url": "/images/channels/tv_eurosport1.png"
     },
     {
       "id": "tv_eurosport2",
@@ -7732,7 +7747,7 @@
       "media_type": "channel",
       "is_live": true,
       "channel_number": 16,
-      "poster_url": "https://upload.wikimedia.org/wikipedia/commons/thumb/9/90/Eurosport_2015_logo.svg/320px-Eurosport_2015_logo.svg.png",
+      "poster_url": "/images/channels/tv_eurosport2.png",
       "backdrop_url": "https://images.unsplash.com/photo-1508098682722-e99c43a406b2?auto=format&fit=crop&w=1920&q=80",
       "video_url": "/api/extract?id=tv_eurosport2&type=channel&server=1",
       "sources": {
@@ -7799,7 +7814,8 @@
       ],
       "is_hero": false,
       "created_at": "2026-09-08T12:53:58.891Z",
-      "cast": []
+      "cast": [],
+      "logo_url": "/images/channels/tv_eurosport2.png"
     },
     {
       "id": "tv_lequipe",
@@ -7810,7 +7826,7 @@
       "media_type": "channel",
       "is_live": true,
       "channel_number": 17,
-      "poster_url": "https://upload.wikimedia.org/wikipedia/commons/thumb/d/d4/L%27%C3%89quipe_%28logo%29.svg/320px-L%27%C3%89quipe_%28logo%29.svg.png",
+      "poster_url": "/images/channels/tv_lequipe.png",
       "backdrop_url": "https://images.unsplash.com/photo-1508098682722-e99c43a406b2?auto=format&fit=crop&w=1920&q=80",
       "video_url": "/api/extract?id=tv_lequipe&type=channel&server=1",
       "sources": {
@@ -7877,7 +7893,8 @@
       ],
       "is_hero": false,
       "created_at": "2026-09-08T12:53:58.891Z",
-      "cast": []
+      "cast": [],
+      "logo_url": "/images/channels/tv_lequipe.png"
     },
     {
       "id": "tv_dazn1",
@@ -7888,7 +7905,7 @@
       "media_type": "channel",
       "is_live": true,
       "channel_number": 18,
-      "poster_url": "https://upload.wikimedia.org/wikipedia/commons/thumb/a/a2/DAZN_Logo_2019.svg/320px-DAZN_Logo_2019.svg.png",
+      "poster_url": "/images/channels/tv_dazn1.png",
       "backdrop_url": "https://images.unsplash.com/photo-1508098682722-e99c43a406b2?auto=format&fit=crop&w=1920&q=80",
       "video_url": "/api/extract?id=tv_dazn1&type=channel&server=1",
       "sources": {
@@ -7955,7 +7972,8 @@
       ],
       "is_hero": false,
       "created_at": "2026-09-08T12:53:58.891Z",
-      "cast": []
+      "cast": [],
+      "logo_url": "/images/channels/tv_dazn1.png"
     },
     {
       "id": "tv_dazn_ligue1",
@@ -7966,7 +7984,7 @@
       "media_type": "channel",
       "is_live": true,
       "channel_number": 19,
-      "poster_url": "https://upload.wikimedia.org/wikipedia/commons/thumb/a/a2/DAZN_Logo_2019.svg/320px-DAZN_Logo_2019.svg.png",
+      "poster_url": "/images/channels/tv_dazn_ligue1.png",
       "backdrop_url": "https://images.unsplash.com/photo-1508098682722-e99c43a406b2?auto=format&fit=crop&w=1920&q=80",
       "video_url": "/api/extract?id=tv_dazn_ligue1&type=channel&server=1",
       "sources": {
@@ -8033,7 +8051,8 @@
       ],
       "is_hero": false,
       "created_at": "2026-09-08T12:53:58.891Z",
-      "cast": []
+      "cast": [],
+      "logo_url": "/images/channels/tv_dazn_ligue1.png"
     },
     {
       "id": "tv_canal_live1",
@@ -8044,7 +8063,7 @@
       "media_type": "channel",
       "is_live": true,
       "channel_number": 20,
-      "poster_url": "https://upload.wikimedia.org/wikipedia/commons/thumb/e/e0/Canal%2B_2013.svg/320px-Canal%2B_2013.svg.png",
+      "poster_url": "/images/channels/tv_canal_live1.png",
       "backdrop_url": "https://images.unsplash.com/photo-1508098682722-e99c43a406b2?auto=format&fit=crop&w=1920&q=80",
       "video_url": "/api/extract?id=tv_canal_live1&type=channel&server=1",
       "sources": {
@@ -8111,7 +8130,8 @@
       ],
       "is_hero": false,
       "created_at": "2026-09-08T12:53:58.891Z",
-      "cast": []
+      "cast": [],
+      "logo_url": "/images/channels/tv_canal_live1.png"
     },
     {
       "id": "tv_canal_live2",
@@ -8122,7 +8142,7 @@
       "media_type": "channel",
       "is_live": true,
       "channel_number": 21,
-      "poster_url": "https://upload.wikimedia.org/wikipedia/commons/thumb/e/e0/Canal%2B_2013.svg/320px-Canal%2B_2013.svg.png",
+      "poster_url": "/images/channels/tv_canal_live2.png",
       "backdrop_url": "https://images.unsplash.com/photo-1508098682722-e99c43a406b2?auto=format&fit=crop&w=1920&q=80",
       "video_url": "/api/extract?id=tv_canal_live2&type=channel&server=1",
       "sources": {
@@ -8189,7 +8209,8 @@
       ],
       "is_hero": false,
       "created_at": "2026-09-08T12:53:58.891Z",
-      "cast": []
+      "cast": [],
+      "logo_url": "/images/channels/tv_canal_live2.png"
     },
     {
       "id": "tv_canal_live3",
@@ -8200,7 +8221,7 @@
       "media_type": "channel",
       "is_live": true,
       "channel_number": 22,
-      "poster_url": "https://upload.wikimedia.org/wikipedia/commons/thumb/e/e0/Canal%2B_2013.svg/320px-Canal%2B_2013.svg.png",
+      "poster_url": "/images/channels/tv_canal_live3.png",
       "backdrop_url": "https://images.unsplash.com/photo-1508098682722-e99c43a406b2?auto=format&fit=crop&w=1920&q=80",
       "video_url": "/api/extract?id=tv_canal_live3&type=channel&server=1",
       "sources": {
@@ -8267,7 +8288,8 @@
       ],
       "is_hero": false,
       "created_at": "2026-09-08T12:53:58.891Z",
-      "cast": []
+      "cast": [],
+      "logo_url": "/images/channels/tv_canal_live3.png"
     },
     {
       "id": "tv_ufc_fightpass",
@@ -8278,7 +8300,7 @@
       "media_type": "channel",
       "is_live": true,
       "channel_number": 30,
-      "poster_url": "https://upload.wikimedia.org/wikipedia/commons/thumb/0/0d/UFC_logo.svg/640px-UFC_logo.svg.png",
+      "poster_url": "/images/channels/tv_ufc_fightpass.png",
       "backdrop_url": "https://images.unsplash.com/photo-1517838277536-f5f99be501cd?auto=format&fit=crop&w=1920&q=80",
       "video_url": "/api/extract?id=tv_ufc_fightpass&type=channel&server=1",
       "sources": {
@@ -8345,7 +8367,8 @@
       ],
       "is_hero": false,
       "created_at": "2026-09-08T12:53:58.891Z",
-      "cast": []
+      "cast": [],
+      "logo_url": "/images/channels/tv_ufc_fightpass.png"
     },
     {
       "id": "tv_ufc_channel",
@@ -8356,7 +8379,7 @@
       "media_type": "channel",
       "is_live": true,
       "channel_number": 31,
-      "poster_url": "https://upload.wikimedia.org/wikipedia/commons/thumb/0/0d/UFC_logo.svg/640px-UFC_logo.svg.png",
+      "poster_url": "/images/channels/tv_ufc_channel.png",
       "backdrop_url": "https://images.unsplash.com/photo-1517838277536-f5f99be501cd?auto=format&fit=crop&w=1920&q=80",
       "video_url": "/api/extract?id=tv_ufc_channel&type=channel&server=1",
       "sources": {
@@ -8423,7 +8446,8 @@
       ],
       "is_hero": false,
       "created_at": "2026-09-08T12:53:58.891Z",
-      "cast": []
+      "cast": [],
+      "logo_url": "/images/channels/tv_ufc_channel.png"
     },
     {
       "id": "tv_ufc_fightnight",
@@ -8434,7 +8458,7 @@
       "media_type": "channel",
       "is_live": true,
       "channel_number": 32,
-      "poster_url": "https://upload.wikimedia.org/wikipedia/commons/thumb/0/0d/UFC_logo.svg/640px-UFC_logo.svg.png",
+      "poster_url": "/images/channels/tv_ufc_fightnight.png",
       "backdrop_url": "https://images.unsplash.com/photo-1517838277536-f5f99be501cd?auto=format&fit=crop&w=1920&q=80",
       "video_url": "/api/extract?id=tv_ufc_fightnight&type=channel&server=1",
       "sources": {
@@ -8501,7 +8525,8 @@
       ],
       "is_hero": false,
       "created_at": "2026-09-08T12:53:58.891Z",
-      "cast": []
+      "cast": [],
+      "logo_url": "/images/channels/tv_ufc_fightnight.png"
     },
     {
       "id": "tv_wwe_network",
@@ -8512,7 +8537,7 @@
       "media_type": "channel",
       "is_live": true,
       "channel_number": 33,
-      "poster_url": "https://upload.wikimedia.org/wikipedia/commons/thumb/c/cd/WWE_Network_Logo.svg/640px-WWE_Network_Logo.svg.png",
+      "poster_url": "/images/channels/tv_wwe_network.png",
       "backdrop_url": "https://images.unsplash.com/photo-1517838277536-f5f99be501cd?auto=format&fit=crop&w=1920&q=80",
       "video_url": "/api/extract?id=tv_wwe_network&type=channel&server=1",
       "sources": {
@@ -8579,7 +8604,8 @@
       ],
       "is_hero": false,
       "created_at": "2026-09-08T12:53:58.891Z",
-      "cast": []
+      "cast": [],
+      "logo_url": "/images/channels/tv_wwe_network.png"
     },
     {
       "id": "tv_wwe_ppv",
@@ -8590,7 +8616,7 @@
       "media_type": "channel",
       "is_live": true,
       "channel_number": 34,
-      "poster_url": "https://upload.wikimedia.org/wikipedia/commons/thumb/c/cd/WWE_Network_Logo.svg/640px-WWE_Network_Logo.svg.png",
+      "poster_url": "/images/channels/tv_wwe_ppv.png",
       "backdrop_url": "https://images.unsplash.com/photo-1517838277536-f5f99be501cd?auto=format&fit=crop&w=1920&q=80",
       "video_url": "/api/extract?id=tv_wwe_ppv&type=channel&server=1",
       "sources": {
@@ -8657,7 +8683,8 @@
       ],
       "is_hero": false,
       "created_at": "2026-09-08T12:53:58.891Z",
-      "cast": []
+      "cast": [],
+      "logo_url": "/images/channels/tv_wwe_ppv.png"
     },
     {
       "id": "tv_dazn_ppv",
@@ -8668,7 +8695,7 @@
       "media_type": "channel",
       "is_live": true,
       "channel_number": 35,
-      "poster_url": "https://upload.wikimedia.org/wikipedia/commons/thumb/a/a2/DAZN_Logo_2019.svg/320px-DAZN_Logo_2019.svg.png",
+      "poster_url": "/images/channels/tv_dazn_ppv.png",
       "backdrop_url": "https://images.unsplash.com/photo-1517838277536-f5f99be501cd?auto=format&fit=crop&w=1920&q=80",
       "video_url": "/api/extract?id=tv_dazn_ppv&type=channel&server=1",
       "sources": {
@@ -8735,7 +8762,8 @@
       ],
       "is_hero": false,
       "created_at": "2026-09-08T12:53:58.891Z",
-      "cast": []
+      "cast": [],
+      "logo_url": "/images/channels/tv_dazn_ppv.png"
     },
     {
       "id": "tv_event_ppv",
@@ -8746,7 +8774,7 @@
       "media_type": "channel",
       "is_live": true,
       "channel_number": 36,
-      "poster_url": "https://upload.wikimedia.org/wikipedia/commons/thumb/9/93/Pay-per-view_logo.svg/640px-Pay-per-view_logo.svg.png",
+      "poster_url": "/images/channels/tv_event_ppv.png",
       "backdrop_url": "https://images.unsplash.com/photo-1517838277536-f5f99be501cd?auto=format&fit=crop&w=1920&q=80",
       "video_url": "/api/extract?id=tv_event_ppv&type=channel&server=1",
       "sources": {
@@ -8813,7 +8841,8 @@
       ],
       "is_hero": false,
       "created_at": "2026-09-08T12:53:58.891Z",
-      "cast": []
+      "cast": [],
+      "logo_url": "/images/channels/tv_event_ppv.png"
     },
     {
       "id": "tv_ppv_events",
@@ -8824,7 +8853,7 @@
       "media_type": "channel",
       "is_live": true,
       "channel_number": 37,
-      "poster_url": "https://upload.wikimedia.org/wikipedia/commons/thumb/9/93/Pay-per-view_logo.svg/640px-Pay-per-view_logo.svg.png",
+      "poster_url": "/images/channels/tv_ppv_events.png",
       "backdrop_url": "https://images.unsplash.com/photo-1517838277536-f5f99be501cd?auto=format&fit=crop&w=1920&q=80",
       "video_url": "/api/extract?id=tv_ppv_events&type=channel&server=1",
       "sources": {
@@ -8891,7 +8920,8 @@
       ],
       "is_hero": false,
       "created_at": "2026-09-08T12:53:58.891Z",
-      "cast": []
+      "cast": [],
+      "logo_url": "/images/channels/tv_ppv_events.png"
     },
     {
       "id": "tv_fight_network",
@@ -8902,7 +8932,7 @@
       "media_type": "channel",
       "is_live": true,
       "channel_number": 38,
-      "poster_url": "https://upload.wikimedia.org/wikipedia/en/thumb/f/f6/Fight_Network_logo.svg/640px-Fight_Network_logo.svg.png",
+      "poster_url": "/images/channels/tv_fight_network.png",
       "backdrop_url": "https://images.unsplash.com/photo-1517838277536-f5f99be501cd?auto=format&fit=crop&w=1920&q=80",
       "video_url": "/api/extract?id=tv_fight_network&type=channel&server=1",
       "sources": {
@@ -8969,7 +8999,8 @@
       ],
       "is_hero": false,
       "created_at": "2026-09-08T12:53:58.891Z",
-      "cast": []
+      "cast": [],
+      "logo_url": "/images/channels/tv_fight_network.png"
     },
     {
       "id": "tv_tf1",
@@ -8980,7 +9011,7 @@
       "media_type": "channel",
       "is_live": true,
       "channel_number": 50,
-      "poster_url": "https://upload.wikimedia.org/wikipedia/commons/thumb/8/82/TF1_logo_2013.svg/640px-TF1_logo_2013.svg.png",
+      "poster_url": "/images/channels/tv_tf1.png",
       "backdrop_url": "https://images.unsplash.com/photo-1522869635100-9f4c5e86aa37?auto=format&fit=crop&w=1920&q=80",
       "video_url": "/api/extract?id=tv_tf1&type=channel&server=1",
       "sources": {
@@ -9047,7 +9078,8 @@
       ],
       "is_hero": false,
       "created_at": "2026-09-08T12:53:58.891Z",
-      "cast": []
+      "cast": [],
+      "logo_url": "/images/channels/tv_tf1.png"
     },
     {
       "id": "tv_m6",
@@ -9058,7 +9090,7 @@
       "media_type": "channel",
       "is_live": true,
       "channel_number": 51,
-      "poster_url": "https://upload.wikimedia.org/wikipedia/commons/thumb/2/25/M6_logo_2020.svg/640px-M6_logo_2020.svg.png",
+      "poster_url": "/images/channels/tv_m6.png",
       "backdrop_url": "https://images.unsplash.com/photo-1522869635100-9f4c5e86aa37?auto=format&fit=crop&w=1920&q=80",
       "video_url": "/api/extract?id=tv_m6&type=channel&server=1",
       "sources": {
@@ -9125,7 +9157,8 @@
       ],
       "is_hero": false,
       "created_at": "2026-09-08T12:53:58.891Z",
-      "cast": []
+      "cast": [],
+      "logo_url": "/images/channels/tv_m6.png"
     },
     {
       "id": "tv_tmc",
@@ -9136,7 +9169,7 @@
       "media_type": "channel",
       "is_live": true,
       "channel_number": 52,
-      "poster_url": "https://upload.wikimedia.org/wikipedia/commons/thumb/8/87/TMC_logo_2016.svg/640px-TMC_logo_2016.svg.png",
+      "poster_url": "/images/channels/tv_tmc.png",
       "backdrop_url": "https://images.unsplash.com/photo-1522869635100-9f4c5e86aa37?auto=format&fit=crop&w=1920&q=80",
       "video_url": "/api/extract?id=tv_tmc&type=channel&server=1",
       "sources": {
@@ -9203,7 +9236,8 @@
       ],
       "is_hero": false,
       "created_at": "2026-09-08T12:53:58.891Z",
-      "cast": []
+      "cast": [],
+      "logo_url": "/images/channels/tv_tmc.png"
     },
     {
       "id": "tv_w9",
@@ -9214,7 +9248,7 @@
       "media_type": "channel",
       "is_live": true,
       "channel_number": 53,
-      "poster_url": "https://upload.wikimedia.org/wikipedia/commons/thumb/9/9a/W9_logo_2018.svg/640px-W9_logo_2018.svg.png",
+      "poster_url": "/images/channels/tv_w9.png",
       "backdrop_url": "https://images.unsplash.com/photo-1522869635100-9f4c5e86aa37?auto=format&fit=crop&w=1920&q=80",
       "video_url": "/api/extract?id=tv_w9&type=channel&server=1",
       "sources": {
@@ -9281,7 +9315,8 @@
       ],
       "is_hero": false,
       "created_at": "2026-09-08T12:53:58.891Z",
-      "cast": []
+      "cast": [],
+      "logo_url": "/images/channels/tv_w9.png"
     },
     {
       "id": "tv_france2",
@@ -9292,7 +9327,7 @@
       "media_type": "channel",
       "is_live": true,
       "channel_number": 54,
-      "poster_url": "https://upload.wikimedia.org/wikipedia/commons/thumb/9/9f/France_2_2018.svg/640px-France_2_2018.svg.png",
+      "poster_url": "/images/channels/tv_france2.png",
       "backdrop_url": "https://images.unsplash.com/photo-1522869635100-9f4c5e86aa37?auto=format&fit=crop&w=1920&q=80",
       "video_url": "/api/extract?id=tv_france2&type=channel&server=1",
       "sources": {
@@ -9359,7 +9394,8 @@
       ],
       "is_hero": false,
       "created_at": "2026-09-08T12:53:58.891Z",
-      "cast": []
+      "cast": [],
+      "logo_url": "/images/channels/tv_france2.png"
     },
     {
       "id": "tv_france3",
@@ -9370,7 +9406,7 @@
       "media_type": "channel",
       "is_live": true,
       "channel_number": 55,
-      "poster_url": "https://upload.wikimedia.org/wikipedia/commons/thumb/d/d7/France_3_2018.svg/640px-France_3_2018.svg.png",
+      "poster_url": "/images/channels/tv_france3.png",
       "backdrop_url": "https://images.unsplash.com/photo-1522869635100-9f4c5e86aa37?auto=format&fit=crop&w=1920&q=80",
       "video_url": "/api/extract?id=tv_france3&type=channel&server=1",
       "sources": {
@@ -9437,7 +9473,8 @@
       ],
       "is_hero": false,
       "created_at": "2026-09-08T12:53:58.891Z",
-      "cast": []
+      "cast": [],
+      "logo_url": "/images/channels/tv_france3.png"
     },
     {
       "id": "tv_arte",
@@ -9448,7 +9485,7 @@
       "media_type": "channel",
       "is_live": true,
       "channel_number": 56,
-      "poster_url": "https://upload.wikimedia.org/wikipedia/commons/thumb/b/b5/Arte_logo_2017.svg/640px-Arte_logo_2017.svg.png",
+      "poster_url": "/images/channels/tv_arte.png",
       "backdrop_url": "https://images.unsplash.com/photo-1522869635100-9f4c5e86aa37?auto=format&fit=crop&w=1920&q=80",
       "video_url": "/api/extract?id=tv_arte&type=channel&server=1",
       "sources": {
@@ -9515,7 +9552,8 @@
       ],
       "is_hero": false,
       "created_at": "2026-09-08T12:53:58.891Z",
-      "cast": []
+      "cast": [],
+      "logo_url": "/images/channels/tv_arte.png"
     },
     {
       "id": "tv_bfmtv",
@@ -9526,7 +9564,7 @@
       "media_type": "channel",
       "is_live": true,
       "channel_number": 57,
-      "poster_url": "https://upload.wikimedia.org/wikipedia/commons/thumb/6/6f/BFM_TV_logo_2022.svg/640px-BFM_TV_logo_2022.svg.png",
+      "poster_url": "/images/channels/tv_bfmtv.png",
       "backdrop_url": "https://images.unsplash.com/photo-1522869635100-9f4c5e86aa37?auto=format&fit=crop&w=1920&q=80",
       "video_url": "/api/extract?id=tv_bfmtv&type=channel&server=1",
       "sources": {
@@ -9593,7 +9631,8 @@
       ],
       "is_hero": false,
       "created_at": "2026-09-08T12:53:58.891Z",
-      "cast": []
+      "cast": [],
+      "logo_url": "/images/channels/tv_bfmtv.png"
     },
     {
       "id": "tv_cnews",
@@ -9604,7 +9643,7 @@
       "media_type": "channel",
       "is_live": true,
       "channel_number": 58,
-      "poster_url": "https://upload.wikimedia.org/wikipedia/commons/thumb/7/75/CNews_logo_2017.svg/640px-CNews_logo_2017.svg.png",
+      "poster_url": "/images/channels/tv_cnews.png",
       "backdrop_url": "https://images.unsplash.com/photo-1522869635100-9f4c5e86aa37?auto=format&fit=crop&w=1920&q=80",
       "video_url": "/api/extract?id=tv_cnews&type=channel&server=1",
       "sources": {
@@ -9671,7 +9710,8 @@
       ],
       "is_hero": false,
       "created_at": "2026-09-08T12:53:58.891Z",
-      "cast": []
+      "cast": [],
+      "logo_url": "/images/channels/tv_cnews.png"
     },
     {
       "id": "tv_redbull",
@@ -9681,7 +9721,7 @@
       "media_type": "channel",
       "is_live": true,
       "channel_number": 40,
-      "poster_url": "https://upload.wikimedia.org/wikipedia/en/thumb/f/f5/Red_Bull_TV_logo.svg/640px-Red_Bull_TV_logo.svg.png",
+      "poster_url": "/images/channels/tv_redbull.png",
       "backdrop_url": "https://images.unsplash.com/photo-1508098682722-e99c43a406b2?auto=format&fit=crop&w=1920&q=80",
       "video_url": "/api/extract?id=tv_redbull&type=channel&server=1",
       "categories": [
@@ -9698,7 +9738,8 @@
       ],
       "created_at": "2026-09-08T12:53:58.891Z",
       "cast": [],
-      "is_hero": false
+      "is_hero": false,
+      "logo_url": "/images/channels/tv_redbull.png"
     },
     {
       "id": "tv_fifa",
@@ -9708,7 +9749,7 @@
       "media_type": "channel",
       "is_live": true,
       "channel_number": 41,
-      "poster_url": "https://upload.wikimedia.org/wikipedia/commons/thumb/1/10/FIFA_logo_without_slogan.svg/640px-FIFA_logo_without_slogan.svg.png",
+      "poster_url": "/images/channels/tv_fifa.png",
       "backdrop_url": "https://images.unsplash.com/photo-1508098682722-e99c43a406b2?auto=format&fit=crop&w=1920&q=80",
       "video_url": "/api/extract?id=tv_fifa&type=channel&server=1",
       "categories": [
@@ -9725,7 +9766,8 @@
       ],
       "created_at": "2026-09-08T12:53:58.891Z",
       "cast": [],
-      "is_hero": false
+      "is_hero": false,
+      "logo_url": "/images/channels/tv_fifa.png"
     },
     {
       "id": "tv_freesports",
@@ -9735,7 +9777,7 @@
       "media_type": "channel",
       "is_live": true,
       "channel_number": 42,
-      "poster_url": "https://upload.wikimedia.org/wikipedia/commons/thumb/a/a2/Arena_Sport_logo_2019.svg/320px-Arena_Sport_logo_2019.svg.png",
+      "poster_url": "/images/channels/tv_freesports.png",
       "backdrop_url": "https://images.unsplash.com/photo-1508098682722-e99c43a406b2?auto=format&fit=crop&w=1920&q=80",
       "video_url": "/api/extract?id=tv_freesports&type=channel&server=1",
       "categories": [
@@ -9752,7 +9794,8 @@
       ],
       "created_at": "2026-09-08T12:53:58.891Z",
       "cast": [],
-      "is_hero": false
+      "is_hero": false,
+      "logo_url": "/images/channels/tv_freesports.png"
     }
   ]
 }

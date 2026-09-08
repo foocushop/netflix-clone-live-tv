@@ -256,9 +256,11 @@ class NetflixApp {
 
   createMovieCard(movie) {
     const card = document.createElement('div');
-    card.className = 'movie-card';
     const isSaved = this.myList.includes(movie.id);
     const isChannel = (movie.media_type === 'channel' || movie.is_live);
+    card.className = 'movie-card' + (isChannel ? ' channel-card' : '') + ' focusable';
+    card.setAttribute('tabindex', '0');
+    card.setAttribute('data-id', movie.id);
 
     let topBadges = '';
     if (isChannel) {

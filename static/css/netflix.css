@@ -2024,3 +2024,87 @@ body {
   overflow: hidden;
   text-overflow: ellipsis;
 }
+
+/* ==========================================================================
+   NETFLIX CLONE - ADAPTATION TÉLÉVISION & TÉLÉCOMMANDE (10-FOOT TV UI)
+   ========================================================================== */
+
+/* Surbrillance ultra-visible pour télécommande (Focus Ring Netflix) */
+.tv-focused,
+:focus-visible {
+  outline: 3px solid #ffffff !important;
+  outline-offset: 2px !important;
+  box-shadow: 0 0 25px rgba(229, 9, 20, 0.95), 0 0 45px rgba(255, 255, 255, 0.5) !important;
+  transform: scale(1.12) translateY(-6px) !important;
+  z-index: 99 !important;
+  transition: transform 0.2s cubic-bezier(0.2, 0, 0.2, 1), box-shadow 0.2s ease !important;
+}
+
+/* Carte de Chaîne TV avec Logo PNG Haute Définition */
+.movie-card.channel-card {
+  background: radial-gradient(circle at 50% 45%, #2a2a3e 0%, #151520 70%, #0c0c14 100%) !important;
+  border: 1px solid rgba(255, 255, 255, 0.12) !important;
+  display: flex !important;
+  flex-direction: column !important;
+  justify-content: center !important;
+  align-items: center !important;
+  padding: 16px 12px 14px !important;
+  box-sizing: border-box !important;
+  overflow: hidden !important;
+}
+
+.movie-card.channel-card .card-image {
+  object-fit: contain !important;
+  width: auto !important;
+  max-width: 82% !important;
+  max-height: 58% !important;
+  margin: auto !important;
+  filter: drop-shadow(0 6px 14px rgba(0, 0, 0, 0.85)) !important;
+  transition: transform 0.25s ease, filter 0.25s ease !important;
+}
+
+.movie-card.channel-card:hover .card-image,
+.movie-card.channel-card.tv-focused .card-image {
+  transform: scale(1.14) !important;
+  filter: drop-shadow(0 8px 20px rgba(229, 9, 20, 0.6)) !important;
+}
+
+/* Badges TV et indicateurs directs */
+.channel-card .live-badge-card {
+  background: rgba(229, 9, 20, 0.95);
+  font-size: 0.72rem;
+  letter-spacing: 0.5px;
+  font-weight: 800;
+  box-shadow: 0 2px 8px rgba(229, 9, 20, 0.5);
+}
+
+.channel-card .channel-num-badge {
+  background: rgba(0, 0, 0, 0.85);
+  font-size: 0.75rem;
+  border: 1px solid rgba(255, 255, 255, 0.25);
+}
+
+/* Optimisation pour les écrans de TV 1080p / 4K (TV Safe Zone) */
+@media (min-width: 1200px) {
+  body.tv-experience-active {
+    font-size: 17px;
+  }
+  body.tv-experience-active .netflix-header {
+    padding: 18px 48px;
+  }
+  body.tv-experience-active .hero-banner {
+    min-height: 68vh;
+    padding: 0 48px;
+  }
+  body.tv-experience-active .hero-title {
+    font-size: 3.4rem;
+  }
+  body.tv-experience-active .movie-card {
+    min-width: 220px;
+    height: 330px;
+  }
+  body.tv-experience-active .server-btn {
+    padding: 10px 18px;
+    font-size: 0.95rem;
+  }
+}
