@@ -55,6 +55,7 @@ const XTREAM_CONFIG = {
 };
 
 // Chargement automatique des 128 correspondances de chaînes françaises vérifiées
+// Chargement automatique des correspondances de chaînes françaises vérifiées
 let XTREAM_CHANNELS = {};
 try {
   const mapPath = path.join(__dirname, 'data', 'xtream_channels_map.json');
@@ -64,6 +65,20 @@ try {
 } catch (e) {
   console.warn('[Xtream] Impossible de charger xtream_channels_map.json:', e.message);
 }
+
+// Catalogue complet des 1 268 chaînes françaises multi-qualités
+let XTREAM_FR_CATALOG = [];
+try {
+  const catPath = path.join(__dirname, 'data', 'xtream_fr_catalog.json');
+  if (fs.existsSync(catPath)) {
+    XTREAM_FR_CATALOG = JSON.parse(fs.readFileSync(catPath, 'utf8'));
+    console.log(`[Xtream] ${XTREAM_FR_CATALOG.length} chaînes françaises chargées depuis xtream_fr_catalog.json`);
+  }
+} catch (e) {
+  console.warn('[Xtream] Impossible de charger xtream_fr_catalog.json:', e.message);
+}
+
+
 
 // Fallbacks de sécurité pour les variantes de flux (si un flux FHD est en panne, basculer sur HD ou UHD)
 const XTREAM_STREAM_FALLBACKS = {
@@ -1710,6 +1725,61 @@ const server = http.createServer((req, res) => {
       ],
       mapped_channels_count: Object.keys(XTREAM_CHANNELS).length
     }, null, 2));
+  }
+
+  // ================= ROUTE RECHERCHE & CATALOGUE COMPLET XTREAM (/api/xtream/channels) =================
+  // Retourne les 1 268 chaînes françaises avec recherche instantanée et filtres par catégories/qualités
+  if (pathname === '/api/xtream/channels' && req.method === 'GET') {
+    const q = (parsedUrl.query.q || '').toString().toLowerCase().trim();
+    const category = (parsedUrl.query.category || '').toString().toLowerCase().trim();
+    const quality = (parsedUrl.query.quality || '').toString().toLowerCase().trim();
+    const limit = parseInt(parsedUrl.query.limit, 10) || 1500;
+
+    let filtered = XTREAM_FR_CATALOG;
+
+    if (category && category !== 'all' && category !== 'tous') {
+      filtered = filtered.filter(c => 
+        c.category_id === category ||
+        c.category_name.toLowerCase().includes(category)
+      );
+    }
+
+    if (quality && quality !== 'all' && quality !== 'tous') {
+      filtered = filtered.filter(c => c.quality.toLowerCase() === quality);
+    }
+
+    if (q) {
+      const terms = q.split(/\s+/).filter(t => t.length > 0);
+      filtered = filtered.filter(c => {
+        const target = `${c.name} ${c.raw_name} ${c.category_name} ${c.quality_badge}`.toLowerCase();
+        return terms.every(term => target.includes(term));
+      });
+    }
+
+    // Statistiques des catégories et des qualités disponibles pour les chips de filtrage
+    const categoriesMap = {};
+    const qualitiesMap = {};
+    XTREAM_FR_CATALOG.forEach(c => {
+      categoriesMap[c.category_id] = categoriesMap[c.category_id] || { id: c.category_id, name: c.category_name, count: 0 };
+      categoriesMap[c.category_id].count++;
+      qualitiesMap[c.quality] = (qualitiesMap[c.quality] || 0) + 1;
+    });
+
+    const result = {
+      success: true,
+      count: filtered.length,
+      total: XTREAM_FR_CATALOG.length,
+      categories: Object.values(categoriesMap),
+      qualities: qualitiesMap,
+      data: filtered.slice(0, limit)
+    };
+
+    res.writeHead(200, {
+      'Content-Type': 'application/json; charset=utf-8',
+      'Access-Control-Allow-Origin': '*',
+      'Cache-Control': 'public, max-age=60'
+    });
+    return res.end(JSON.stringify(result));
   }
 
   // ================= ROUTE DIRECT XTREAM VIP PROXY (/api/stream/xtream) =================

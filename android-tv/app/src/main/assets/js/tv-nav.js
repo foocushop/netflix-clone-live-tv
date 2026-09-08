@@ -284,7 +284,7 @@
 
     spatialSearch(dx, dy) {
       const focusables = Array.from(document.querySelectorAll(
-        '.movie-card:not([style*="display: none"]), .btn-netflix, .nav-link, .server-btn, .action-circle-btn, .modal-close-btn'
+        '.movie-card:not([style*="display: none"]), .btn-netflix, .nav-link, .server-btn, .action-circle-btn, .modal-close-btn, .xtream-chip, .xtream-search-input, .xtream-search-clear'
       ));
 
       if (focusables.length === 0) return;

@@ -21,6 +21,7 @@
         <li><a href="#" class="nav-link" data-filter="all">Nouveautés les plus regardées</a></li>
         <li><a href="#" class="nav-link" data-filter="my-list">Ma liste</a></li>
         <li><a href="#" class="nav-link" data-filter="channels"><span class="live-dot-nav">●</span> Chaînes TV</a></li>
+        <li><a href="#" class="nav-link" data-filter="xtream"><span class="xtream-badge-nav">💎</span> Xtream</a></li>
       </ul>
     </div>
     <div class="header-right">
@@ -80,6 +81,37 @@
         <button class="btn-netflix btn-netflix-secondary" id="heroMoreInfoBtn">
           <span>ⓘ</span> Plus d'infos
         </button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= BARRE DE RECHERCHE & FILTRES XTREAM ================= -->
+  <section class="xtream-toolbar" id="xtreamToolbar" style="display: none;">
+    <div class="xtream-toolbar-content">
+      <div class="xtream-search-wrap">
+        <span class="xtream-search-icon">💎 🔍</span>
+        <input type="text" id="xtreamSearchInput" class="xtream-search-input" placeholder="Rechercher une chaîne Xtream (ex: Canal+ Foot, beIN 1, TF1 4K, M6 SD)..." autocomplete="off">
+        <button id="xtreamSearchClear" class="xtream-search-clear" style="display: none;" title="Effacer">✕</button>
+      </div>
+      <div class="xtream-filter-row">
+        <span class="xtream-filter-label">Catégorie :</span>
+        <div class="xtream-chips-scroll" id="xtreamCategoryChips">
+          <!-- Injecté dynamiquement par app.js -->
+        </div>
+      </div>
+      <div class="xtream-filter-row" style="margin-top: 8px;">
+        <span class="xtream-filter-label">Qualité :</span>
+        <div class="xtream-chips-scroll" id="xtreamQualityChips">
+          <button class="xtream-chip quality-chip active" data-quality="all">Toutes (1 268)</button>
+          <button class="xtream-chip quality-chip" data-quality="4k">✨ 4K / UHD (12)</button>
+          <button class="xtream-chip quality-chip" data-quality="fhd">💎 1080p FHD (259)</button>
+          <button class="xtream-chip quality-chip" data-quality="hevc">⚡ HEVC H.265 (173)</button>
+          <button class="xtream-chip quality-chip" data-quality="hd">📡 720p HD (181)</button>
+          <button class="xtream-chip quality-chip" data-quality="sd">📶 SD Bas Débit (152)</button>
+        </div>
+      </div>
+      <div class="xtream-status-bar">
+        <span id="xtreamCountDisplay" class="xtream-count-display">Chargement des chaînes...</span>
       </div>
     </div>
   </section>

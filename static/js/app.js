@@ -33,6 +33,21 @@ class NetflixApp {
     this.catalogRowsContainer = document.getElementById('catalogRows');
     this.searchInput = document.getElementById('searchInput');
 
+    // Éléments Xtream VIP Toolbar
+    this.xtreamToolbar = document.getElementById('xtreamToolbar');
+    this.xtreamSearchInput = document.getElementById('xtreamSearchInput');
+    this.xtreamSearchClear = document.getElementById('xtreamSearchClear');
+    this.xtreamCategoryChips = document.getElementById('xtreamCategoryChips');
+    this.xtreamQualityChips = document.getElementById('xtreamQualityChips');
+    this.xtreamCountDisplay = document.getElementById('xtreamCountDisplay');
+
+    this.xtreamChannels = null;
+    this.xtreamCategories = [];
+    this.selectedXtreamCategory = 'all';
+    this.selectedXtreamQuality = 'all';
+    this.xtreamSearchQuery = '';
+    this.xtreamInitialized = false;
+
     // Modal
     this.modalBackdrop = document.getElementById('detailsModal');
     this.modalCloseBtn = document.getElementById('modalCloseBtn');
@@ -565,6 +580,15 @@ class NetflixApp {
   }
 
   applyFilter(filter) {
+    const xtreamToolbar = document.getElementById('xtreamToolbar');
+    if (filter === 'xtream') {
+      if (xtreamToolbar) xtreamToolbar.style.display = 'block';
+      this.showXtreamView();
+      return;
+    } else {
+      if (xtreamToolbar) xtreamToolbar.style.display = 'none';
+    }
+
     if (!this.catalogData) return;
     if (filter === 'all') {
       if (this.originalHero) this.setupHero(this.originalHero);
@@ -625,6 +649,270 @@ class NetflixApp {
     }).filter(row => row.movies.length > 0);
 
     filteredRows.forEach(r => this.renderRow(r));
+  }
+
+  // ================= MÉTHODES XTREAM VIP CATALOGUE & RECHERCHE =================
+  initXtreamEvents() {
+    if (!this.xtreamSearchInput) return;
+
+    let xtreamSearchDebounce = null;
+    this.xtreamSearchInput.addEventListener('input', (e) => {
+      clearTimeout(xtreamSearchDebounce);
+      const val = e.target.value.trim();
+      this.xtreamSearchQuery = val;
+      if (this.xtreamSearchClear) {
+        this.xtreamSearchClear.style.display = val.length > 0 ? 'flex' : 'none';
+      }
+      xtreamSearchDebounce = setTimeout(() => {
+        this.filterAndRenderXtream();
+      }, 200);
+    });
+
+    if (this.xtreamSearchClear) {
+      this.xtreamSearchClear.addEventListener('click', () => {
+        this.xtreamSearchInput.value = '';
+        this.xtreamSearchQuery = '';
+        this.xtreamSearchClear.style.display = 'none';
+        this.filterAndRenderXtream();
+        this.xtreamSearchInput.focus();
+      });
+    }
+
+    if (this.xtreamQualityChips) {
+      this.xtreamQualityChips.addEventListener('click', (e) => {
+        const chip = e.target.closest('.quality-chip');
+        if (!chip) return;
+        this.xtreamQualityChips.querySelectorAll('.quality-chip').forEach(c => c.classList.remove('active'));
+        chip.classList.add('active');
+        this.selectedXtreamQuality = chip.getAttribute('data-quality') || 'all';
+        this.filterAndRenderXtream();
+      });
+    }
+  }
+
+  renderXtreamCategoryChips(categories) {
+    if (!this.xtreamCategoryChips) return;
+    this.xtreamCategoryChips.innerHTML = '';
+    
+    // Bouton "Toutes"
+    const allBtn = document.createElement('button');
+    allBtn.className = 'xtream-chip category-chip active';
+    allBtn.setAttribute('data-category', 'all');
+    allBtn.textContent = `Toutes (${this.xtreamChannels ? this.xtreamChannels.length : 1268})`;
+    allBtn.addEventListener('click', () => {
+      this.xtreamCategoryChips.querySelectorAll('.category-chip').forEach(c => c.classList.remove('active'));
+      allBtn.classList.add('active');
+      this.selectedXtreamCategory = 'all';
+      this.filterAndRenderXtream();
+    });
+    this.xtreamCategoryChips.appendChild(allBtn);
+
+    categories.forEach(cat => {
+      const btn = document.createElement('button');
+      btn.className = 'xtream-chip category-chip';
+      btn.setAttribute('data-category', cat.id);
+      btn.textContent = `${cat.name} (${cat.count})`;
+      btn.addEventListener('click', () => {
+        this.xtreamCategoryChips.querySelectorAll('.category-chip').forEach(c => c.classList.remove('active'));
+        btn.classList.add('active');
+        this.selectedXtreamCategory = cat.id;
+        this.filterAndRenderXtream();
+      });
+      this.xtreamCategoryChips.appendChild(btn);
+    });
+  }
+
+  createXtreamCard(channel) {
+    const card = document.createElement('div');
+    const qClass = (channel.quality || 'hd').toLowerCase();
+    card.className = 'movie-card channel-card xtream-card focusable';
+    card.setAttribute('tabindex', '0');
+    card.setAttribute('data-id', `xtream_${channel.stream_id}`);
+
+    const movieObj = {
+      id: `xtream_${channel.stream_id}`,
+      title: channel.name,
+      overview: `Chaîne Xtream VIP — Catégorie : ${channel.category_name} • Qualité : ${channel.quality_badge}`,
+      poster_url: channel.icon || 'assets/hero/live-tv-banner.webp',
+      poster_path: channel.icon || 'assets/hero/live-tv-banner.webp',
+      backdrop_url: channel.icon || 'assets/hero/live-tv-banner.webp',
+      backdrop_path: channel.icon || 'assets/hero/live-tv-banner.webp',
+      media_type: 'channel',
+      is_live: true,
+      is_xtream: true,
+      stream_url: `/api/stream/xtream?stream_id=${channel.stream_id}`,
+      player_type: 'direct_hls',
+      age_rating: 'Tous publics',
+      match_score: 99
+    };
+
+    card.innerHTML = `
+      <img src="${movieObj.poster_url}" alt="${channel.name}" class="card-image" loading="lazy" decoding="async" onerror="this.onerror=null; this.src='assets/hero/live-tv-banner.webp'">
+      <span class="xtream-card-quality-badge badge-${qClass}">${channel.quality_badge}</span>
+      <span class="live-badge-card" style="top: 8px; right: 8px; left: auto;"><span class="live-pulse">●</span> DIRECT</span>
+      <div class="card-overlay">
+        <div class="card-title">${channel.name}</div>
+        <div class="card-tags">
+          <span style="color: #00d2ff; font-weight: 800;">💎 XTREAM</span>
+          <span>${channel.category_name}</span>
+        </div>
+        <div class="card-actions">
+          <button class="action-circle-btn play-btn" title="Lecture en direct">▶</button>
+        </div>
+      </div>
+    `;
+
+    card.addEventListener('click', () => {
+      this.player.open(movieObj, 1);
+    });
+
+    return card;
+  }
+
+  async showXtreamView() {
+    this.catalogRowsContainer.innerHTML = `
+      <div style="text-align: center; padding: 60px 20px; color: #888;">
+        <div style="font-size: 2.2rem; margin-bottom: 12px; color: #00d2ff;">💎</div>
+        <div style="font-size: 1.15rem; color: #fff; font-weight: 600;">Chargement des 1 268 chaînes françaises Xtream...</div>
+        <div style="font-size: 0.9rem; color: #888; margin-top: 6px;">Indexation des flux UHD, FHD, HEVC, HD et SD...</div>
+      </div>
+    `;
+
+    if (!this.xtreamChannels) {
+      try {
+        const baseUrl = window.API_BASE || '';
+        const res = await fetch(`${baseUrl}/api/xtream/channels?limit=1500`);
+        const json = await res.json();
+        if (json.success && json.data) {
+          this.xtreamChannels = json.data;
+          this.xtreamCategories = json.categories || [];
+          this.renderXtreamCategoryChips(this.xtreamCategories);
+        }
+      } catch (e) {
+        console.error("Erreur chargement chaînes Xtream", e);
+      }
+    }
+
+    if (!this.xtreamInitialized) {
+      this.initXtreamEvents();
+      this.xtreamInitialized = true;
+    }
+
+    // Configurer le Hero Banner Xtream
+    const featured = this.xtreamChannels ? (
+      this.xtreamChannels.find(c => c.name.includes('CANAL+ FOOT') && c.quality === 'FHD') ||
+      this.xtreamChannels.find(c => c.quality === '4K') ||
+      this.xtreamChannels[0]
+    ) : null;
+
+    if (featured) {
+      this.setupHero({
+        id: `xtream_${featured.stream_id}`,
+        title: `${featured.name} (Xtream VIP)`,
+        overview: `Profitez de plus de 1 268 chaînes françaises en direct : Sports, Généralistes, Cinéma et Événements en 4K UHD, 1080p FHD, HEVC H.265 ou SD.`,
+        backdrop_url: featured.icon || 'assets/hero/live-tv-banner.webp',
+        poster_url: featured.icon || 'assets/hero/live-tv-banner.webp',
+        media_type: 'channel',
+        is_live: true,
+        stream_url: `/api/stream/xtream?stream_id=${featured.stream_id}`,
+        quality_badges: ['💎 Xtream Direct VIP', featured.quality_badge, 'Anti-Saccades Turbo']
+      });
+    }
+
+    this.filterAndRenderXtream();
+  }
+
+  filterAndRenderXtream() {
+    if (!this.xtreamChannels) return;
+    this.catalogRowsContainer.innerHTML = '';
+
+    const q = (this.xtreamSearchQuery || '').toLowerCase().trim();
+    const cat = this.selectedXtreamCategory;
+    const qual = this.selectedXtreamQuality;
+
+    let filtered = this.xtreamChannels;
+
+    if (cat !== 'all') {
+      filtered = filtered.filter(c => c.category_id === cat);
+    }
+
+    if (qual !== 'all') {
+      filtered = filtered.filter(c => c.quality.toLowerCase() === qual);
+    }
+
+    if (q) {
+      const terms = q.split(/\s+/).filter(t => t.length > 0);
+      filtered = filtered.filter(c => {
+        const target = `${c.name} ${c.raw_name} ${c.category_name} ${c.quality_badge}`.toLowerCase();
+        return terms.every(term => target.includes(term));
+      });
+    }
+
+    // Mettre à jour le compteur
+    if (this.xtreamCountDisplay) {
+      this.xtreamCountDisplay.textContent = `${filtered.length} chaîne${filtered.length > 1 ? 's' : ''} française${filtered.length > 1 ? 's' : ''} trouvée${filtered.length > 1 ? 's' : ''} sur ${this.xtreamChannels.length}`;
+    }
+
+    if (filtered.length === 0) {
+      this.catalogRowsContainer.innerHTML = `
+        <div style="text-align: center; padding: 60px 20px; color: #888;">
+          <div style="font-size: 2.5rem; margin-bottom: 12px;">🔍</div>
+          <h3 style="color: #fff; margin-bottom: 8px;">Aucune chaîne trouvée</h3>
+          <p>Essayez avec d'autres mots-clés (ex: "Canal", "TF1", "4K", "beIN", "Foot", "SD").</p>
+        </div>
+      `;
+      return;
+    }
+
+    // Si recherche active ou filtre qualité actif -> Grille fluide et complète
+    if (q || qual !== 'all' || (cat !== 'all' && filtered.length > 60)) {
+      const grid = document.createElement('div');
+      grid.className = 'xtream-grid-container';
+      filtered.forEach(channel => {
+        grid.appendChild(this.createXtreamCard(channel));
+      });
+      this.catalogRowsContainer.appendChild(grid);
+      return;
+    }
+
+    // Sinon -> Rangées thématiques style Netflix
+    const groups = {};
+    filtered.forEach(c => {
+      groups[c.category_name] = groups[c.category_name] || [];
+      groups[c.category_name].push(c);
+    });
+
+    Object.keys(groups).forEach(catName => {
+      const channels = groups[catName];
+      if (channels.length === 0) return;
+      const rowEl = document.createElement('div');
+      rowEl.className = 'movie-row';
+      rowEl.innerHTML = `
+        <h2 class="row-title">${catName} <span style="font-size: 0.85rem; color: #00d2ff; font-weight: 500;">(${channels.length})</span></h2>
+        <div class="row-slider-container">
+          <button class="slider-arrow left" aria-label="Défiler à gauche"><</button>
+          <div class="row-slider"></div>
+          <button class="slider-arrow right" aria-label="Défiler à droite">></button>
+        </div>
+      `;
+      const slider = rowEl.querySelector('.row-slider');
+      const leftArrow = rowEl.querySelector('.slider-arrow.left');
+      const rightArrow = rowEl.querySelector('.slider-arrow.right');
+
+      leftArrow.addEventListener('click', () => {
+        slider.scrollBy({ left: -slider.clientWidth * 0.75, behavior: 'smooth' });
+      });
+      rightArrow.addEventListener('click', () => {
+        slider.scrollBy({ left: slider.clientWidth * 0.75, behavior: 'smooth' });
+      });
+
+      const fragment = document.createDocumentFragment();
+      channels.forEach(ch => {
+        fragment.appendChild(this.createXtreamCard(ch));
+      });
+      slider.appendChild(fragment);
+      this.catalogRowsContainer.appendChild(rowEl);
+    });
   }
 }
 
