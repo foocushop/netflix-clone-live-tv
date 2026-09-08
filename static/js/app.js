@@ -379,13 +379,13 @@ class NetflixApp {
     this.currentModalMovie = movie;
     this.modalBanner.style.backgroundImage = `url(${movie.backdrop_url || movie.poster_url})`;
     this.modalTitle.textContent = movie.title;
-    this.modalMatch.textContent = `Recommandé à ${movie.match_score}%`;
-    this.modalAge.textContent = movie.age_rating;
-    this.modalDuration.textContent = movie.duration;
-    this.modalSynopsis.textContent = movie.overview;
+    this.modalMatch.textContent = movie.match_score ? `Recommandé à ${movie.match_score}%` : 'Recommandé à 98%';
+    this.modalAge.textContent = movie.age_rating || '12+';
+    this.modalDuration.textContent = movie.duration || (movie.seasons ? `${movie.seasons.length} saison(s)` : '1 saison');
+    this.modalSynopsis.textContent = movie.overview || 'Aucune description disponible pour ce programme.';
 
     this.modalBadges.innerHTML = '';
-    (movie.quality_badges || ['4K Ultra HD', '5.1']).forEach(b => {
+    (movie.quality_badges || ['1080p FHD', 'Son 5.1']).forEach(b => {
       const span = document.createElement('span');
       span.className = 'quality-badge';
       span.textContent = b;
@@ -403,8 +403,25 @@ class NetflixApp {
         this.modalEpisodesSection.classList.remove('hidden');
       }
       const seasons = this.getMovieSeasons(movie);
-      this.selectedModalSeason = (seasons && seasons[0]) ? seasons[0].season_number : 1;
-      this.selectedModalEpisode = (seasons && seasons[0] && seasons[0].episodes && seasons[0].episodes[0]) ? seasons[0].episodes[0].episode_number : 1;
+      const showKey = 'netflix_ep_' + (movie.id || movie.tmdb_id || movie.series_id);
+      let defaultS = (seasons && seasons[0]) ? seasons[0].season_number : 1;
+      let defaultE = (seasons && seasons[0] && seasons[0].episodes && seasons[0].episodes[0]) ? seasons[0].episodes[0].episode_number : 1;
+      try {
+        const saved = JSON.parse(localStorage.getItem(showKey));
+        if (saved && saved.season && saved.episode) {
+          const sExists = seasons.some(s => parseInt(s.season_number) === parseInt(saved.season));
+          if (sExists) {
+            defaultS = parseInt(saved.season);
+            const foundS = seasons.find(s => parseInt(s.season_number) === defaultS);
+            if (foundS && foundS.episodes && foundS.episodes.some(e => parseInt(e.episode_number) === parseInt(saved.episode))) {
+              defaultE = parseInt(saved.episode);
+            }
+          }
+        }
+      } catch (e) {}
+
+      this.selectedModalSeason = defaultS;
+      this.selectedModalEpisode = defaultE;
       this.setupModalSeasons(movie);
       this.renderModalEpisodes();
 
@@ -1025,26 +1042,30 @@ class NetflixApp {
           <span>${show.year || '2025'}</span>
         </div>
         <div class="card-actions">
-          <button class="action-circle-btn play-btn" title="Regarder les saisons et épisodes">▶</button>
+          <button class="action-circle-btn play-btn" title="Lecture directe">▶</button>
+          <button class="action-circle-btn info-btn" title="Voir les saisons et épisodes" style="margin-left: auto;">⌄</button>
         </div>
       </div>
     `;
 
     card.addEventListener('click', async (e) => {
       e.stopPropagation();
-      await this.openTeleRealiteSeries(show);
+      const isPlay = !!e.target.closest('.play-btn');
+      await this.openTeleRealiteSeries(show, isPlay);
     });
 
     return card;
   }
 
-  async openTeleRealiteSeries(show) {
-    // Afficher le loader sur le player
-    this.player.showLoader(`⚡ Chargement des saisons de ${show.name} (💎 Xtream VIP)...`);
-    this.player.overlay.classList.add('active');
-    this.player.showControls();
-    this.player.resetSteps();
-    this.player.setStep(1, 'active', `1. Récupération des saisons et épisodes (${show.name})...`);
+  async openTeleRealiteSeries(show, directPlay = false) {
+    // Si lecture directe demandée, afficher le loader du lecteur
+    if (directPlay) {
+      this.player.showLoader(`⚡ Connexion aux épisodes de ${show.name} (💎 Xtream VIP)...`);
+      this.player.overlay.classList.add('active');
+      this.player.showControls();
+      this.player.resetSteps();
+      this.player.setStep(1, 'active', `1. Récupération des saisons et épisodes (${show.name})...`);
+    }
 
     try {
       const baseUrl = window.API_BASE || '';
@@ -1061,14 +1082,20 @@ class NetflixApp {
         existingInCatalog.seasons = seriesObj.seasons;
       }
 
-      this.player.setStep(1, 'done', `1. ${seriesObj.seasons.length} saison(s) chargée(s) avec succès`);
-      this.player.open(seriesObj, 1);
+      if (directPlay) {
+        this.player.setStep(1, 'done', `1. ${seriesObj.seasons.length} saison(s) chargée(s) avec succès`);
+        this.player.open(seriesObj, 1);
+      } else {
+        this.openModal(seriesObj);
+      }
     } catch (err) {
       console.warn('[TV Réalité Open Error]:', err.message);
-      this.player.showStatusBanner(`Erreur lors du chargement des épisodes: ${err.message}`);
-      setTimeout(() => {
-        this.player.close();
-      }, 2500);
+      if (directPlay) {
+        this.player.showStatusBanner(`Erreur lors du chargement des épisodes: ${err.message}`);
+        setTimeout(() => {
+          this.player.close();
+        }, 2500);
+      }
     }
   }
 

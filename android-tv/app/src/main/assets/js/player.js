@@ -229,10 +229,17 @@ class NetflixPlayer {
     this.seasonSelect.addEventListener('change', (e) => {
       this.currentSeason = parseInt(e.target.value) || 1;
       this.savedPlaybackTime = 0;
+      if (this.video) {
+        try { this.video.currentTime = 0; } catch (err) {}
+      }
       this.populateEpisodes();
       const firstOpt = this.episodeSelect.options[0];
       this.currentEpisode = firstOpt ? parseInt(firstOpt.value) : 1;
       this.episodeSelect.value = this.currentEpisode;
+      try {
+        const showKey = 'netflix_ep_' + (this.currentMovie?.id || this.currentMovie?.tmdb_id || this.currentMovie?.series_id);
+        localStorage.setItem(showKey, JSON.stringify({ season: this.currentSeason, episode: this.currentEpisode }));
+      } catch (err) {}
       this.updateMetaDisplay();
       this.loadStream();
     });
@@ -240,6 +247,13 @@ class NetflixPlayer {
     this.episodeSelect.addEventListener('change', (e) => {
       this.currentEpisode = parseInt(e.target.value) || 1;
       this.savedPlaybackTime = 0;
+      if (this.video) {
+        try { this.video.currentTime = 0; } catch (err) {}
+      }
+      try {
+        const showKey = 'netflix_ep_' + (this.currentMovie?.id || this.currentMovie?.tmdb_id || this.currentMovie?.series_id);
+        localStorage.setItem(showKey, JSON.stringify({ season: this.currentSeason, episode: this.currentEpisode }));
+      } catch (err) {}
       this.updateMetaDisplay();
       this.loadStream();
     });
@@ -484,9 +498,16 @@ class NetflixPlayer {
 
     this.video.addEventListener('ended', () => {
       this.updatePlayPauseIcons(false);
-      if (this.currentMovie && this.currentMovie.media_type === 'series') {
+      const dur = this.video.duration || 0;
+      const cur = this.video.currentTime || 0;
+      const isTrulyFinished = dur > 10 && !isNaN(dur) && cur >= (dur - 12);
+      if (isTrulyFinished && this.currentMovie && this.currentMovie.media_type === 'series') {
         this.goToNextEpisode();
       }
+    });
+
+    this.video.addEventListener('waiting', () => {
+      // Tampon en cours de chargement réseau, ne rien interrompre
     });
 
     this.video.addEventListener('volumechange', () => {
@@ -784,24 +805,48 @@ class NetflixPlayer {
   // ================= OUVERTURE & BASCULEMENT DE SERVEUR =================
   open(movie, initialServer = 1, season = 1, episode = 1) {
     this.currentMovie = movie;
+
+    if (this.video) {
+      try {
+        this.video.pause();
+        this.video.currentTime = 0;
+      } catch (e) {}
+    }
+    this.savedPlaybackTime = 0;
+
+    const showKey = 'netflix_ep_' + (movie.id || movie.tmdb_id || movie.series_id);
+    // Si valeurs par défaut (1, 1), vérifier si l'utilisateur a un épisode sauvegardé pour cette série
+    if (parseInt(season) === 1 && parseInt(episode) === 1) {
+      try {
+        const saved = JSON.parse(localStorage.getItem(showKey));
+        if (saved && saved.season && saved.episode) {
+          season = saved.season;
+          episode = saved.episode;
+        }
+      } catch (e) {}
+    }
+
     this.currentSeason = parseInt(season) || 1;
     this.currentEpisode = parseInt(episode) || 1;
-    this.savedPlaybackTime = 0;
 
     // S'assurer que currentSeason et currentEpisode correspondent aux saisons réelles du catalogue
     if (movie.seasons && movie.seasons.length > 0) {
-      const hasSeason = movie.seasons.some(s => s.season_number === this.currentSeason);
+      const hasSeason = movie.seasons.some(s => parseInt(s.season_number) === this.currentSeason);
       if (!hasSeason) {
-        this.currentSeason = movie.seasons[0].season_number;
+        this.currentSeason = parseInt(movie.seasons[0].season_number);
       }
-      const seasonObj = movie.seasons.find(s => s.season_number === this.currentSeason) || movie.seasons[0];
+      const seasonObj = movie.seasons.find(s => parseInt(s.season_number) === this.currentSeason) || movie.seasons[0];
       if (seasonObj && seasonObj.episodes && seasonObj.episodes.length > 0) {
-        const hasEp = seasonObj.episodes.some(e => e.episode_number === this.currentEpisode);
+        const hasEp = seasonObj.episodes.some(e => parseInt(e.episode_number) === this.currentEpisode);
         if (!hasEp) {
-          this.currentEpisode = seasonObj.episodes[0].episode_number;
+          this.currentEpisode = parseInt(seasonObj.episodes[0].episode_number);
         }
       }
     }
+
+    try {
+      localStorage.setItem(showKey, JSON.stringify({ season: this.currentSeason, episode: this.currentEpisode }));
+    } catch (e) {}
 
     this.titleDisplay.textContent = movie.title;
     this.ctrlMediaTitle.textContent = movie.title;
@@ -833,8 +878,14 @@ class NetflixPlayer {
               if (newTotalEps > oldTotalEps) {
                 console.log(`[Player Auto-Sync] ${newTotalEps - oldTotalEps} nouveau(x) épisode(s) détecté(s) pour ${movie.title} !`);
                 movie.seasons = freshData.seasons;
+                const keepS = this.currentSeason;
+                const keepEp = this.currentEpisode;
                 this.populateSeasons();
                 this.populateEpisodes();
+                this.currentSeason = keepS;
+                this.currentEpisode = keepEp;
+                this.seasonSelect.value = this.currentSeason;
+                this.episodeSelect.value = this.currentEpisode;
               }
             }
           })
@@ -850,7 +901,7 @@ class NetflixPlayer {
     }
 
     this.setLanguage(this.currentLang, false);
-    this.switchServer(initialServer);
+    this.switchServer(initialServer, false);
   }
 
   populateSeasons() {
@@ -1126,10 +1177,15 @@ class NetflixPlayer {
     }
   }
 
-  switchServer(serverNum) {
+  switchServer(serverNum, preserveTime = true) {
     const num = parseInt(serverNum) || 1;
-    if (this.video && this.video.currentTime > 0) {
+    if (preserveTime && this.video && this.video.currentTime > 0) {
       this.savedPlaybackTime = this.video.currentTime;
+    } else if (!preserveTime) {
+      this.savedPlaybackTime = 0;
+      if (this.video) {
+        try { this.video.currentTime = 0; } catch (e) {}
+      }
     }
 
     this.currentServer = num;
@@ -1195,9 +1251,16 @@ class NetflixPlayer {
 
     // Accélération Séries Xtream VOD (TV Réalité & La Villa 1080p FHD)
     if (this.currentMovie && this.currentMovie.seasons && (this.currentMovie.is_xtream_series || this.currentMovie.id === '68628' || String(this.currentMovie.id).startsWith('xtream_series_'))) {
-      const sObj = this.currentMovie.seasons.find(s => s.season_number === this.currentSeason) || this.currentMovie.seasons[0];
-      const epObj = sObj?.episodes?.find(e => e.episode_number === this.currentEpisode) || sObj?.episodes?.[0];
+      const sObj = this.currentMovie.seasons.find(s => parseInt(s.season_number) === parseInt(this.currentSeason)) || this.currentMovie.seasons[0];
+      const epObj = sObj?.episodes?.find(e => parseInt(e.episode_number) === parseInt(this.currentEpisode)) || sObj?.episodes?.[0];
       if (epObj && epObj.video_url) {
+        this.currentSeason = parseInt(sObj.season_number);
+        this.currentEpisode = parseInt(epObj.episode_number);
+        try {
+          const showKey = 'netflix_ep_' + (this.currentMovie.id || this.currentMovie.tmdb_id || this.currentMovie.series_id);
+          localStorage.setItem(showKey, JSON.stringify({ season: this.currentSeason, episode: this.currentEpisode }));
+        } catch (e) {}
+
         const baseUrl = window.API_BASE || '';
         let targetStreamUrl = epObj.video_url;
         if (targetStreamUrl && targetStreamUrl.startsWith('/')) {
@@ -1322,6 +1385,7 @@ class NetflixPlayer {
     this.video.addEventListener('loadeddata', onReady, { once: true });
     this.video.addEventListener('playing', onReady, { once: true });
 
+    this.video.preload = 'auto';
     this.video.src = videoUrl;
     this.video.load();
 

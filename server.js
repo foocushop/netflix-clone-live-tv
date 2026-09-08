@@ -159,6 +159,8 @@ const xtreamHttpsAgent = new https.Agent({
 const xtreamEdgeCache = new Map();
 // Cache ultra-rapide des manifests réécrits (TTL 1500ms) pour démarrage immédiat (0ms)
 const xtreamManifestCache = new Map();
+// Cache d'adresses Edge directes pour les épisodes séries Xtream VOD (TTL 2h)
+const xtreamSeriesEdgeCache = new Map();
 
 // Purge automatique périodique pour garantir zéro accumulation RAM dans le temps
 setInterval(() => {
@@ -168,6 +170,9 @@ setInterval(() => {
   }
   for (const [k, v] of xtreamEdgeCache.entries()) {
     if (v.expiresAt <= now) xtreamEdgeCache.delete(k);
+  }
+  for (const [k, v] of xtreamSeriesEdgeCache.entries()) {
+    if (v.expiresAt <= now) xtreamSeriesEdgeCache.delete(k);
   }
 }, 60000);
 
@@ -2516,8 +2521,8 @@ const server = http.createServer((req, res) => {
   }
 
   // ================= ROUTE PROXY STREAMING VOD SÉRIES XTREAM (/api/stream/xtream-series) =================
-  // Support complet des requêtes HTTP Range (206 Partial Content), suivi de redirection 302
-  // et destruction propre des sockets en cas d'interruption par le lecteur Netflix
+  // Support complet des requêtes HTTP Range (206 Partial Content), mise en cache Edge 0ms,
+  // pool Keep-Alive persistant et débit maximal anti-buffering
   if (pathname === '/api/stream/xtream-series' && req.method === 'GET') {
     const episodeId = parsedUrl.query.episode_id;
     const ext = parsedUrl.query.ext || 'mkv';
@@ -2527,7 +2532,11 @@ const server = http.createServer((req, res) => {
       return res.end('Paramètre episode_id manquant');
     }
 
-    const initialUrl = `http://${XTREAM_CONFIG.host}:${XTREAM_CONFIG.port}/series/${XTREAM_CONFIG.username}/${XTREAM_CONFIG.password}/${episodeId}.${ext}`;
+    const cacheKey = `${episodeId}_${ext}`;
+    const cachedEdge = xtreamSeriesEdgeCache.get(cacheKey);
+    const initialUrl = (cachedEdge && cachedEdge.expiresAt > Date.now())
+      ? cachedEdge.url
+      : `http://${XTREAM_CONFIG.host}:${XTREAM_CONFIG.port}/series/${XTREAM_CONFIG.username}/${XTREAM_CONFIG.password}/${episodeId}.${ext}`;
 
     function pipeSeriesStream(targetUrl, hops = 0) {
       if (hops > 4) {
@@ -2554,6 +2563,7 @@ const server = http.createServer((req, res) => {
       }
 
       const client = parsed.protocol === 'https:' ? https : http;
+      const agent = parsed.protocol === 'https:' ? xtreamHttpsAgent : xtreamHttpAgent;
       const headersToForward = {
         'User-Agent': 'IPTVSmartersPro/1.0',
         'Accept': '*/*'
@@ -2568,7 +2578,8 @@ const server = http.createServer((req, res) => {
 
       const clientReq = client.get(targetUrl, {
         headers: headersToForward,
-        timeout: 15000
+        agent: agent,
+        timeout: 20000
       }, (upstreamRes) => {
         activeUpstreamRes = upstreamRes;
 
@@ -2586,13 +2597,14 @@ const server = http.createServer((req, res) => {
           }
         });
 
-        // Suivi propre des redirections 301/302/307/308
+        // Suivi propre des redirections 301/302/307/308 et mise en cache de l'Edge direct (TTL: 2h)
         if (upstreamRes.statusCode === 301 || upstreamRes.statusCode === 302 || upstreamRes.statusCode === 307 || upstreamRes.statusCode === 308) {
           try { upstreamRes.destroy(); } catch (e) {}
           const loc = upstreamRes.headers.location;
           if (loc) {
             cleanupListeners();
             const nextUrl = loc.startsWith('http') ? loc : new URL(loc, targetUrl).href;
+            xtreamSeriesEdgeCache.set(cacheKey, { url: nextUrl, expiresAt: Date.now() + 7200000 });
             return pipeSeriesStream(nextUrl, hops + 1);
           }
         }
@@ -2600,7 +2612,10 @@ const server = http.createServer((req, res) => {
         const outHeaders = {
           'Access-Control-Allow-Origin': '*',
           'Access-Control-Allow-Headers': '*',
-          'Accept-Ranges': 'bytes'
+          'Accept-Ranges': 'bytes',
+          'Cache-Control': 'public, max-age=86400, stale-while-revalidate=86400',
+          'Connection': 'keep-alive',
+          'Keep-Alive': 'timeout=60, max=1000'
         };
 
         if (upstreamRes.headers['content-type']) {
