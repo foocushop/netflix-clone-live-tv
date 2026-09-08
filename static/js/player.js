@@ -1283,25 +1283,28 @@ class NetflixPlayer {
 
     if (window.Hls && Hls.isSupported()) {
       const isChannel = (this.currentMovie?.media_type === 'channel' || this.currentMovie?.is_live);
+      const isXtream = streamUrl.includes('/api/stream/xtream');
       const hls = new Hls({
         enableWorker: true,
-        lowLatencyMode: false, // Désactivé pour stabiliser le buffer et éviter les micro-saccades
-        liveSyncDurationCount: isChannel ? 6 : 4, // 6 segments de marge de sécurité (environ 12s-15s de buffer continu)
-        liveMaxLatencyDurationCount: isChannel ? 12 : 8,
+        lowLatencyMode: false,
+        liveSyncDurationCount: isXtream ? 3 : (isChannel ? 4 : 3), // 3 segments pour démarrage instantané sans attente
+        liveMaxLatencyDurationCount: isXtream ? 6 : (isChannel ? 8 : 6),
         liveDurationInfinity: isChannel,
-        startLevel: -1, // Démarrage adaptatif pour éviter tout gel au lancement
+        startLevel: -1, // Démarrage adaptatif immédiat
         capLevelToPlayerSize: false,
-        backBufferLength: isChannel ? 25 : 60,
-        maxBufferLength: isChannel ? 25 : 45,
-        maxMaxBufferLength: isChannel ? 45 : 75,
+        initialLiveManifestSize: 1, // Démarre dès le premier manifest reçu sans attendre les cycles de rafraîchissement
+        startFragPrefetch: true, // Précharge le fragment suivant pendant la lecture du premier (chargement turbo)
+        backBufferLength: isChannel ? 15 : 60,
+        maxBufferLength: isChannel ? 20 : 45,
+        maxMaxBufferLength: isChannel ? 40 : 75,
         maxBufferSize: 30 * 1000 * 1000, // 30 MB optimal pour Android TV RAM
         highBufferWatchdogPeriod: 2,
-        nudgeOffset: 0.25,
-        nudgeMaxRetry: 10, // Permet de sauter automatiquement au-delà des trous de timestamp
+        nudgeOffset: 0.2,
+        nudgeMaxRetry: 10,
         maxFragLookUpTolerance: 0.25,
-        fragLoadingTimeOut: 20000,
-        manifestLoadingTimeOut: 20000,
-        levelLoadingTimeOut: 20000
+        fragLoadingTimeOut: 15000,
+        manifestLoadingTimeOut: 15000,
+        levelLoadingTimeOut: 15000
       });
       this.hls = hls;
 

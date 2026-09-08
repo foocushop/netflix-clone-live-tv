@@ -83,6 +83,28 @@ const XTREAM_STREAM_FALLBACKS = {
   '479050': ['479049', '479051']         // Ligue 1+ FHD -> HD -> UHD
 };
 
+// Agents HTTP/HTTPS persistants avec réutilisation de sockets (Keep-Alive Pool)
+const xtreamHttpAgent = new http.Agent({
+  keepAlive: true,
+  maxSockets: 100,
+  maxFreeSockets: 30,
+  keepAliveMsecs: 60000,
+  timeout: 15000
+});
+
+const xtreamHttpsAgent = new https.Agent({
+  keepAlive: true,
+  maxSockets: 100,
+  maxFreeSockets: 30,
+  keepAliveMsecs: 60000,
+  timeout: 15000
+});
+
+// Cache d'adresses Edge directes (TTL 60s) pour contourner les redirections 302 à répétition
+const xtreamEdgeCache = new Map();
+// Cache ultra-rapide des manifests réécrits (TTL 1500ms) pour démarrage immédiat (0ms)
+const xtreamManifestCache = new Map();
+
 function fetchXtreamPlaylist(targetUrl, headers = {}, hops = 0) {
   if (hops > 5) return Promise.reject(new Error('Trop de redirections Xtream'));
   return new Promise((resolve, reject) => {
@@ -93,7 +115,9 @@ function fetchXtreamPlaylist(targetUrl, headers = {}, hops = 0) {
       return reject(new Error('URL Xtream invalide: ' + targetUrl));
     }
     const client = parsed.protocol === 'https:' ? https : http;
+    const agent = parsed.protocol === 'https:' ? xtreamHttpsAgent : xtreamHttpAgent;
     const req = client.get(targetUrl, {
+      agent,
       headers: Object.assign({
         'User-Agent': 'IPTVSmartersPro/1.0',
         'Accept': '*/*'
@@ -1689,9 +1713,39 @@ const server = http.createServer((req, res) => {
       return res.end(`Chaîne Xtream non trouvée pour: ${rawChannel}`);
     }
 
+    // Accélération 1 : Cache mémoire RAM instantané (1500ms) pour rafraîchissement à 0 ms
+    if (!parsedUrl.query.target && streamId) {
+      const cachedManifest = xtreamManifestCache.get(streamId);
+      if (cachedManifest && cachedManifest.expiresAt > Date.now()) {
+        res.writeHead(200, {
+          'Content-Type': 'application/vnd.apple.mpegurl',
+          'Access-Control-Allow-Origin': '*',
+          'Access-Control-Allow-Headers': '*',
+          'Cache-Control': 'no-cache, no-store, must-revalidate',
+          'X-Xtream-Cache': 'HIT-RAM',
+          'Pragma': 'no-cache',
+          'Expires': '0'
+        });
+        return res.end(cachedManifest.manifest);
+      }
+    }
+
     async function fetchStreamWithFallback(initialStreamId) {
       if (parsedUrl.query.target) {
         return await fetchXtreamPlaylist(parsedUrl.query.target);
+      }
+
+      // Accélération 2 : Cache direct du nœud Edge (TTL 60s) - Évite l'aller-retour 302 vers foxbleu.org
+      const cachedEdge = xtreamEdgeCache.get(initialStreamId);
+      if (cachedEdge && cachedEdge.expiresAt > Date.now()) {
+        try {
+          const resObj = await fetchXtreamPlaylist(cachedEdge.edgeUrl);
+          if (resObj.statusCode === 200 && resObj.body && resObj.body.includes('#EXTM3U')) {
+            return resObj;
+          }
+        } catch (e) {
+          xtreamEdgeCache.delete(initialStreamId);
+        }
       }
 
       const candidates = [initialStreamId];
@@ -1705,6 +1759,9 @@ const server = http.createServer((req, res) => {
         try {
           const resObj = await fetchXtreamPlaylist(urlToFetch);
           if (resObj.statusCode === 200 && resObj.body && (resObj.body.includes('#EXTM3U') || resObj.buffer.length > 500)) {
+            if (resObj.finalUrl && resObj.finalUrl !== urlToFetch) {
+              xtreamEdgeCache.set(initialStreamId, { edgeUrl: resObj.finalUrl, expiresAt: Date.now() + 60000 });
+            }
             return resObj;
           }
         } catch (e) {
@@ -1768,6 +1825,12 @@ const server = http.createServer((req, res) => {
           });
 
           const rewrittenManifest = rewrittenLines.join('\n');
+
+          // Sauvegarde dans le cache RAM éphémère (1500ms)
+          if (!parsedUrl.query.target && streamId) {
+            xtreamManifestCache.set(streamId, { manifest: rewrittenManifest, expiresAt: Date.now() + 1500 });
+          }
+
           res.writeHead(200, {
             'Content-Type': 'application/vnd.apple.mpegurl',
             'Access-Control-Allow-Origin': '*',
@@ -1802,6 +1865,7 @@ const server = http.createServer((req, res) => {
   // ================= ROUTE XTREAM CHUNK PROXY (/api/stream/xtream-chunk) =================
   // Proxy de streaming pour chaque segment .ts de l'infrastructure Xtream :
   // - Envoi du User-Agent IPTVSmartersPro/1.0
+  // - Connection Pooling persistant (xtreamHttpAgent / xtreamHttpsAgent)
   // - Headers CORS complets & Content-Type video/mp2t
   // - Mise en cache HTTP immuable pour éliminer les saccades et micro-coupures
   if (pathname === '/api/stream/xtream-chunk' && req.method === 'GET') {
@@ -1826,7 +1890,9 @@ const server = http.createServer((req, res) => {
       }
 
       const client = parsed.protocol === 'https:' ? https : http;
+      const agent = parsed.protocol === 'https:' ? xtreamHttpsAgent : xtreamHttpAgent;
       const clientReq = client.get(urlToFetch, {
+        agent,
         headers: {
           'User-Agent': 'IPTVSmartersPro/1.0',
           'Accept': '*/*'
