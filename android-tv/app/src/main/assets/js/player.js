@@ -469,7 +469,17 @@ class NetflixPlayer {
     this.video.addEventListener('progress', () => {
       if (!this.video.duration || !this.video.buffered.length) return;
       try {
-        const bufferedEnd = this.video.buffered.end(this.video.buffered.length - 1);
+        const cur = this.video.currentTime || 0;
+        let bufferedEnd = 0;
+        for (let i = 0; i < this.video.buffered.length; i++) {
+          if (this.video.buffered.start(i) <= cur + 0.5 && cur <= this.video.buffered.end(i) + 0.5) {
+            bufferedEnd = this.video.buffered.end(i);
+            break;
+          }
+        }
+        if (!bufferedEnd && this.video.buffered.length > 0) {
+          bufferedEnd = this.video.buffered.end(this.video.buffered.length - 1);
+        }
         const percent = (bufferedEnd / this.video.duration) * 100;
         this.scrubberBuffered.style.width = `${Math.min(100, percent)}%`;
       } catch (e) {}
@@ -803,7 +813,7 @@ class NetflixPlayer {
   }
 
   // ================= OUVERTURE & BASCULEMENT DE SERVEUR =================
-  open(movie, initialServer = 1, season = 1, episode = 1) {
+  open(movie, initialServer = 1, season = null, episode = null) {
     this.currentMovie = movie;
 
     if (this.video) {
@@ -815,8 +825,8 @@ class NetflixPlayer {
     this.savedPlaybackTime = 0;
 
     const showKey = 'netflix_ep_' + (movie.id || movie.tmdb_id || movie.series_id);
-    // Si valeurs par défaut (1, 1), vérifier si l'utilisateur a un épisode sauvegardé pour cette série
-    if (parseInt(season) === 1 && parseInt(episode) === 1) {
+    // Si aucune saison/épisode spécifié (ex: clic Lecture rapide depuis la fiche), restaurer depuis l'historique
+    if (season == null && episode == null) {
       try {
         const saved = JSON.parse(localStorage.getItem(showKey));
         if (saved && saved.season && saved.episode) {
@@ -865,8 +875,8 @@ class NetflixPlayer {
       this.populateEpisodes();
       this.ctrlNextEpBtn.classList.remove('hidden');
 
-      // Auto-Sync en arrière-plan pour les séries Xtream (détection automatique des nouveaux épisodes ajoutés)
-      if (movie.id === '68628' || movie.tmdb_id === '68628' || String(movie.id).startsWith('xtream_series_')) {
+      // Auto-Sync en arrière-plan pour les séries Xtream uniquement si les saisons ne sont pas encore renseignées
+      if ((!movie.seasons || movie.seasons.length === 0) && (movie.id === '68628' || movie.tmdb_id === '68628' || String(movie.id).startsWith('xtream_series_'))) {
         const sId = (movie.id === '68628' || movie.tmdb_id === '68628') ? '6715' : String(movie.id).replace('xtream_series_', '');
         const baseUrl = window.API_BASE || '';
         fetch(`${baseUrl}/api/xtream/series-info?series_id=${sId}`)

@@ -96,15 +96,34 @@
     }
 
     handleKeyDown(e) {
+      const activeEl = document.activeElement;
+      const isInput = activeEl && (activeEl.tagName === 'INPUT' || activeEl.tagName === 'TEXTAREA');
+
       const code = e.keyCode || e.which;
       const key = e.key;
+
+      // Protection vitale des champs de recherche : laisser la saisie (espaces, lettres, retours) fonctionner normalement
+      if (isInput) {
+        if (key === 'Enter' || code === 13 || key === 'ArrowDown' || code === 40) {
+          activeEl.blur();
+          const firstCard = document.querySelector('.catalog-row .movie-card, .channels-grid .movie-card');
+          if (firstCard) this.setFocus(firstCard);
+          return;
+        }
+        if (key === 'Escape' || code === 27) {
+          activeEl.blur();
+          return;
+        }
+        // Tout le reste (espace, backspace, flèches gauche/droite, saisie texte) s'exécute nativement
+        return;
+      }
 
       // Détection des touches de télécommande TV
       const isUp = key === 'ArrowUp' || code === 38 || code === 19;
       const isDown = key === 'ArrowDown' || code === 40 || code === 20;
       const isLeft = key === 'ArrowLeft' || code === 37 || code === 21;
       const isRight = key === 'ArrowRight' || code === 39 || code === 22;
-      const isEnter = key === 'Enter' || key === ' ' || code === 13 || code === 32 || code === 23 || code === 66;
+      const isEnter = key === 'Enter' || code === 13 || code === 23 || code === 66;
       const isBack = key === 'Escape' || key === 'Backspace' || code === 27 || code === 8 || code === 4 || code === 10009;
 
       // Touches médias

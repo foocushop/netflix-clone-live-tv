@@ -155,11 +155,28 @@ const xtreamHttpsAgent = new https.Agent({
   timeout: 12000
 });
 
+// Agents dédiés au streaming VOD Séries Xtream (Range requests volumineuses, tolérance aux coupures)
+const xtreamSeriesHttpAgent = new http.Agent({
+  keepAlive: true,
+  maxSockets: 40,
+  maxFreeSockets: 8,
+  keepAliveMsecs: 4000,
+  timeout: 25000
+});
+
+const xtreamSeriesHttpsAgent = new https.Agent({
+  keepAlive: true,
+  maxSockets: 40,
+  maxFreeSockets: 8,
+  keepAliveMsecs: 4000,
+  timeout: 25000
+});
+
 // Cache d'adresses Edge directes (TTL 60s) pour contourner les redirections 302 à répétition
 const xtreamEdgeCache = new Map();
 // Cache ultra-rapide des manifests réécrits (TTL 1500ms) pour démarrage immédiat (0ms)
 const xtreamManifestCache = new Map();
-// Cache d'adresses Edge directes pour les épisodes séries Xtream VOD (TTL 2h)
+// Cache d'adresses Edge directes pour les épisodes séries Xtream VOD (TTL court 25s pour renouveler les jetons)
 const xtreamSeriesEdgeCache = new Map();
 
 // Purge automatique périodique pour garantir zéro accumulation RAM dans le temps
@@ -2533,12 +2550,12 @@ const server = http.createServer((req, res) => {
     }
 
     const cacheKey = `${episodeId}_${ext}`;
+    const originUrl = `http://${XTREAM_CONFIG.host}:${XTREAM_CONFIG.port}/series/${XTREAM_CONFIG.username}/${XTREAM_CONFIG.password}/${episodeId}.${ext}`;
     const cachedEdge = xtreamSeriesEdgeCache.get(cacheKey);
-    const initialUrl = (cachedEdge && cachedEdge.expiresAt > Date.now())
-      ? cachedEdge.url
-      : `http://${XTREAM_CONFIG.host}:${XTREAM_CONFIG.port}/series/${XTREAM_CONFIG.username}/${XTREAM_CONFIG.password}/${episodeId}.${ext}`;
+    const hasCachedEdge = !!(cachedEdge && cachedEdge.expiresAt > Date.now());
+    const initialUrl = hasCachedEdge ? cachedEdge.url : originUrl;
 
-    function pipeSeriesStream(targetUrl, hops = 0) {
+    function pipeSeriesStream(targetUrl, hops = 0, isEdgeAttempt = hasCachedEdge) {
       if (hops > 4) {
         if (!res.headersSent) {
           res.writeHead(502, { 'Content-Type': 'text/plain', 'Access-Control-Allow-Origin': '*' });
@@ -2563,7 +2580,7 @@ const server = http.createServer((req, res) => {
       }
 
       const client = parsed.protocol === 'https:' ? https : http;
-      const agent = parsed.protocol === 'https:' ? xtreamHttpsAgent : xtreamHttpAgent;
+      const agent = parsed.protocol === 'https:' ? xtreamSeriesHttpsAgent : xtreamSeriesHttpAgent;
       const headersToForward = {
         'User-Agent': 'IPTVSmartersPro/1.0',
         'Accept': '*/*'
@@ -2579,9 +2596,41 @@ const server = http.createServer((req, res) => {
       const clientReq = client.get(targetUrl, {
         headers: headersToForward,
         agent: agent,
-        timeout: 20000
+        timeout: 25000
       }, (upstreamRes) => {
         activeUpstreamRes = upstreamRes;
+
+        // Suivi propre des redirections 301/302/307/308 et mise en cache éphémère de l'Edge direct (TTL: 25s)
+        if (upstreamRes.statusCode === 301 || upstreamRes.statusCode === 302 || upstreamRes.statusCode === 307 || upstreamRes.statusCode === 308) {
+          try { upstreamRes.destroy(); } catch (e) {}
+          const loc = upstreamRes.headers.location;
+          if (loc) {
+            cleanupListeners();
+            const nextUrl = loc.startsWith('http') ? loc : new URL(loc, targetUrl).href;
+            xtreamSeriesEdgeCache.set(cacheKey, { url: nextUrl, expiresAt: Date.now() + 25000 });
+            return pipeSeriesStream(nextUrl, hops + 1, true);
+          }
+        }
+
+        // Si l'edge CDN renvoie une erreur (HTTP 509 Bandwidth Limit Exceeded, 403 Forbidden, 502, etc.)
+        // et qu'on utilisait une URL Edge en cache :
+        if (upstreamRes.statusCode >= 400 && isEdgeAttempt) {
+          try { upstreamRes.destroy(); } catch (e) {}
+          cleanupListeners();
+          xtreamSeriesEdgeCache.delete(cacheKey);
+          console.log(`[Xtream Series Edge Fallback] Edge CDN a renvoyé HTTP ${upstreamRes.statusCode}. Récupération d'un nouveau jeton depuis foxbleu.org...`);
+          return pipeSeriesStream(originUrl, hops, false);
+        }
+
+        if (upstreamRes.statusCode >= 400) {
+          if (!res.headersSent) {
+            res.writeHead(upstreamRes.statusCode, { 'Access-Control-Allow-Origin': '*' });
+          }
+          return upstreamRes.pipe(res);
+        }
+
+        // Désactiver le timeout de connexion dès que la transmission démarre
+        clientReq.setTimeout(0);
 
         upstreamRes.on('error', (err) => {
           if (isAborted || req.destroyed || res.destroyed || res.writableEnded) return;
@@ -2596,18 +2645,6 @@ const server = http.createServer((req, res) => {
             try { res.end(); } catch (e) {}
           }
         });
-
-        // Suivi propre des redirections 301/302/307/308 et mise en cache de l'Edge direct (TTL: 2h)
-        if (upstreamRes.statusCode === 301 || upstreamRes.statusCode === 302 || upstreamRes.statusCode === 307 || upstreamRes.statusCode === 308) {
-          try { upstreamRes.destroy(); } catch (e) {}
-          const loc = upstreamRes.headers.location;
-          if (loc) {
-            cleanupListeners();
-            const nextUrl = loc.startsWith('http') ? loc : new URL(loc, targetUrl).href;
-            xtreamSeriesEdgeCache.set(cacheKey, { url: nextUrl, expiresAt: Date.now() + 7200000 });
-            return pipeSeriesStream(nextUrl, hops + 1);
-          }
-        }
 
         const outHeaders = {
           'Access-Control-Allow-Origin': '*',
@@ -2637,6 +2674,12 @@ const server = http.createServer((req, res) => {
 
       clientReq.on('error', (err) => {
         if (isAborted || req.destroyed || res.destroyed || res.writableEnded) return;
+        if (isEdgeAttempt && !res.headersSent) {
+          cleanupListeners();
+          xtreamSeriesEdgeCache.delete(cacheKey);
+          console.log(`[Xtream Series Edge Network Error]: ${err.message}. Récupération via serveur maître...`);
+          return pipeSeriesStream(originUrl, hops, false);
+        }
         console.warn('[Xtream Series Request Error]:', err.message);
         if (!res.headersSent) {
           try {
@@ -2649,6 +2692,11 @@ const server = http.createServer((req, res) => {
       clientReq.on('timeout', () => {
         try { clientReq.destroy(); } catch (e) {}
         if (isAborted || req.destroyed || res.destroyed || res.writableEnded) return;
+        if (isEdgeAttempt && !res.headersSent) {
+          cleanupListeners();
+          xtreamSeriesEdgeCache.delete(cacheKey);
+          return pipeSeriesStream(originUrl, hops, false);
+        }
         if (!res.headersSent) {
           try {
             res.writeHead(504, { 'Content-Type': 'text/plain', 'Access-Control-Allow-Origin': '*' });

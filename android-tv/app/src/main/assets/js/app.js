@@ -58,6 +58,7 @@ class NetflixApp {
     this.telerealiteFilter = 'all';
     this.telerealiteSearchQuery = '';
     this.telerealiteInitialized = false;
+    this.telerealiteSeriesCache = new Map();
 
     // Modal
     this.modalBackdrop = document.getElementById('detailsModal');
@@ -989,14 +990,14 @@ class NetflixApp {
     let searchDebounce = null;
     this.telerealiteSearchInput.addEventListener('input', (e) => {
       clearTimeout(searchDebounce);
-      const val = e.target.value.trim();
-      this.telerealiteSearchQuery = val;
+      const rawVal = e.target.value;
+      this.telerealiteSearchQuery = rawVal;
       if (this.telerealiteSearchClear) {
-        this.telerealiteSearchClear.style.display = val.length > 0 ? 'flex' : 'none';
+        this.telerealiteSearchClear.style.display = rawVal.trim().length > 0 ? 'flex' : 'none';
       }
       searchDebounce = setTimeout(() => {
         this.filterAndRenderTeleRealite();
-      }, 180);
+      }, 150);
     });
 
     if (this.telerealiteSearchClear) {
@@ -1019,6 +1020,19 @@ class NetflixApp {
         this.filterAndRenderTeleRealite();
       });
     }
+  }
+
+  prefetchTeleRealiteSeries(seriesId) {
+    if (!seriesId || this.telerealiteSeriesCache.has(seriesId)) return;
+    const baseUrl = window.API_BASE || '';
+    fetch(`${baseUrl}/api/xtream/series-info?series_id=${seriesId}`)
+      .then(res => res.json())
+      .then(seriesObj => {
+        if (seriesObj.success && seriesObj.seasons) {
+          this.telerealiteSeriesCache.set(seriesId, seriesObj);
+        }
+      })
+      .catch(() => {});
   }
 
   createTeleRealiteCard(show) {
@@ -1048,6 +1062,14 @@ class NetflixApp {
       </div>
     `;
 
+    // Préchargement intelligent au survol ou au focus pour ouverture instantanée (0ms)
+    card.addEventListener('mouseenter', () => {
+      this.prefetchTeleRealiteSeries(show.series_id);
+    }, { once: true });
+    card.addEventListener('focus', () => {
+      this.prefetchTeleRealiteSeries(show.series_id);
+    }, { once: true });
+
     card.addEventListener('click', async (e) => {
       e.stopPropagation();
       const isPlay = !!e.target.closest('.play-btn');
@@ -1058,13 +1080,42 @@ class NetflixApp {
   }
 
   async openTeleRealiteSeries(show, directPlay = false) {
-    // Si lecture directe demandée, afficher le loader du lecteur
+    // 1. Accélération immédiate : si la fiche et les saisons sont déjà en mémoire
+    const cached = this.telerealiteSeriesCache.get(show.series_id);
+    if (cached) {
+      if (directPlay) {
+        this.player.open(cached, 1);
+      } else {
+        this.openModal(cached);
+      }
+      return;
+    }
+
+    // 2. Retour visuel instantané pour rassurer l'utilisateur pendant le chargement
     if (directPlay) {
       this.player.showLoader(`⚡ Connexion aux épisodes de ${show.name} (💎 Xtream VIP)...`);
       this.player.overlay.classList.add('active');
       this.player.showControls();
       this.player.resetSteps();
       this.player.setStep(1, 'active', `1. Récupération des saisons et épisodes (${show.name})...`);
+    } else {
+      // Pré-ouvrir la modal avec les informations de base immédiatement
+      this.openModal({
+        id: `xtream_series_${show.series_id}`,
+        title: show.name,
+        poster_url: show.cover,
+        backdrop_url: show.backdrop || show.cover,
+        overview: show.plot || 'Chargement des saisons et épisodes officiels Xtream en cours...',
+        media_type: 'series',
+        is_xtream_series: true,
+        seasons: []
+      });
+      if (this.modalEpisodesSection) {
+        this.modalEpisodesSection.classList.remove('hidden');
+        if (this.modalEpisodesList) {
+          this.modalEpisodesList.innerHTML = `<div style="padding: 30px; text-align: center; color: #bbb;"><span style="display:inline-block; font-size: 1.4rem; margin-bottom: 8px;">⏳</span><br>Chargement des saisons & épisodes en cours...</div>`;
+        }
+      }
     }
 
     try {
@@ -1075,6 +1126,8 @@ class NetflixApp {
       if (!seriesObj.success || !seriesObj.seasons || seriesObj.seasons.length === 0) {
         throw new Error(seriesObj.message || "Aucune saison disponible pour cette émission");
       }
+
+      this.telerealiteSeriesCache.set(show.series_id, seriesObj);
 
       // Synchroniser la fiche du catalogue si présente (ex: La Villa) pour que la page d'accueil ait les nouveaux épisodes
       const existingInCatalog = this.catalogData?.movies?.find(m => m.id === '68628' || m.tmdb_id === '68628');
@@ -1095,6 +1148,8 @@ class NetflixApp {
         setTimeout(() => {
           this.player.close();
         }, 2500);
+      } else if (this.modalEpisodesList) {
+        this.modalEpisodesList.innerHTML = `<div style="padding: 24px; text-align: center; color: #e50914;">Impossible de charger les épisodes (${err.message}). Veuillez réessayer.</div>`;
       }
     }
   }
