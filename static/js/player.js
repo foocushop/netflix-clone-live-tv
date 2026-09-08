@@ -1,0 +1,1248 @@
+// ================= LECTEUR VIDÉO NETFLIX PROFESSIONNEL (5 SERVEURS DIRECTS HLS) =================
+// ⚡ Serveur 1 : Direct HLS (Cluster Alpha)
+// 🎬 Serveur 2 : Direct HD (Cluster Bêta)
+// 🌐 Serveur 3 : Direct Multi-Flux (Cluster Gamma)
+// 📡 Serveur 4 : Direct CDN VIP (Cluster Delta)
+// 🚀 Serveur 5 : Direct Secours (Cluster Epsilon)
+//
+// Fonctionnalités :
+// - Lecteur 100% style Netflix (Timeline Scrubber rouge, tooltip temporel, buffer progressif)
+// - Boutons de saut ±10s avec flèches circulaires aérées
+// - Curseur de volume avec petit rond blanc interactif ("slider thumb") et remplissage dynamique
+// - Ripple animé au centre lors des actions (Play/Pause, ±10s, Volume)
+// - Sélecteur de vitesse de lecture (0.75x à 2x)
+// - Basculement fluide entre les 5 serveurs sans perte de position temporelle
+// - Masquage automatique des contrôles en inactivité (3.5s)
+// - Raccourcis clavier (Espace, Flèches, F, M, 1-5, Échap)
+
+class NetflixPlayer {
+  constructor() {
+    // Éléments principaux
+    this.overlay = document.getElementById('netflixPlayer');
+    this.topBar = document.getElementById('playerTopBar');
+    this.backBtn = document.getElementById('playerBackBtn');
+    this.titleDisplay = document.getElementById('playerTitle');
+    this.metaDisplay = document.getElementById('playerMeta');
+    // Sélecteur de Langue (VO / VF)
+    this.langSwitch = document.getElementById('playerLangSwitch');
+    this.langVoBtn = document.getElementById('playerLangVo');
+    this.langVfBtn = document.getElementById('playerLangVf');
+
+    // Sélecteur de 5 Serveurs
+    this.serverSelector = document.getElementById('playerServerSelector');
+    this.serverPills = document.querySelectorAll('.server-pill');
+
+    // Sélecteur d'Épisodes (Séries)
+    this.episodeBox = document.getElementById('playerEpisodeBox');
+    this.seasonSelect = document.getElementById('playerSeasonSelect');
+    this.episodeSelect = document.getElementById('playerEpisodeSelect');
+
+    // Éléments Média
+    this.mediaContainer = document.getElementById('playerMediaContainer');
+    this.video = document.getElementById('mainVideo');
+    this.iframe = document.getElementById('streamIframe');
+    this.ripple = document.getElementById('centerPlayRipple');
+
+    // Loader & Étapes
+    this.loader = document.getElementById('playerLoader');
+    this.loaderTitle = document.getElementById('loaderTitle');
+    this.step1 = document.getElementById('step1');
+    this.step2 = document.getElementById('step2');
+    this.step3 = document.getElementById('step3');
+    this.step4 = document.getElementById('step4');
+    this.step1Label = document.getElementById('step1Label');
+    this.step2Label = document.getElementById('step2Label');
+    this.step3Label = document.getElementById('step3Label');
+    this.step4Label = document.getElementById('step4Label');
+
+    // Contrôles Netflix Inférieurs
+    this.bottomControls = document.getElementById('netflixBottomControls');
+    this.scrubberContainer = document.getElementById('scrubberContainer');
+    this.scrubberBuffered = document.getElementById('scrubberBuffered');
+    this.scrubberPlayed = document.getElementById('scrubberPlayed');
+    this.scrubberThumb = document.getElementById('scrubberThumb');
+    this.scrubberTooltip = document.getElementById('scrubberTooltip');
+
+    // Boutons de commande
+    this.ctrlPlayBtn = document.getElementById('ctrlPlayBtn');
+    this.iconPlay = document.getElementById('iconPlay');
+    this.iconPause = document.getElementById('iconPause');
+    this.ctrlRewindBtn = document.getElementById('ctrlRewindBtn');
+    this.ctrlForwardBtn = document.getElementById('ctrlForwardBtn');
+    this.ctrlVolumeBtn = document.getElementById('ctrlVolumeBtn');
+    this.iconVolHigh = document.getElementById('iconVolHigh');
+    this.iconVolMuted = document.getElementById('iconVolMuted');
+    this.ctrlVolumeSlider = document.getElementById('ctrlVolumeSlider');
+    this.ctrlCurrentTime = document.getElementById('ctrlCurrentTime');
+    this.ctrlTotalDuration = document.getElementById('ctrlTotalDuration');
+    this.ctrlMediaTitle = document.getElementById('ctrlMediaTitle');
+    this.ctrlNextEpBtn = document.getElementById('ctrlNextEpBtn');
+
+    // Vitesse, Qualité & Plein Écran
+    this.ctrlSpeedBtn = document.getElementById('ctrlSpeedBtn');
+    this.speedMenu = document.getElementById('speedMenu');
+    this.speedItems = document.querySelectorAll('.speed-item');
+    this.ctrlQualityBtn = document.getElementById('ctrlQualityBtn');
+    this.qualityBadge = document.getElementById('qualityBadge');
+    this.qualityCurrentText = document.getElementById('qualityCurrentText');
+    this.qualityMenu = document.getElementById('qualityMenu');
+    this.qualityItems = document.querySelectorAll('.quality-item');
+    this.ctrlFullscreenBtn = document.getElementById('ctrlFullscreenBtn');
+    this.iconEnterFs = document.getElementById('iconEnterFs');
+    this.iconExitFs = document.getElementById('iconExitFs');
+
+    // Bannière de statut
+    this.statusBanner = document.getElementById('playerStatusBanner');
+    this.statusBannerText = document.getElementById('statusBannerText');
+    this.statusSwitchBtn = document.getElementById('statusSwitchBtn');
+    this.statusRetryBtn = document.getElementById('statusRetryBtn');
+
+    // État interne
+    this.currentQuality = -1; // -1 = Auto HD
+    this.currentMovie = null;
+    this.currentServer = 1; // 1, 2, 3, 4, 5
+    this.currentSeason = 1;
+    this.currentEpisode = 1;
+    this.currentLang = localStorage.getItem('netflix_lang') || 'vo';
+    this.savedPlaybackTime = 0;
+    this.isScrubbing = false;
+    this.idleTimer = null;
+    this.lastVolume = 1;
+    this.hls = null;
+    this.activeExtractionAbort = null;
+
+    this.initEvents();
+  }
+
+  initEvents() {
+    // Fermeture du lecteur
+    this.backBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      this.close();
+    });
+
+    // Bascule Langue VO / VF
+    if (this.langVoBtn) {
+      this.langVoBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        this.setLanguage('vo');
+      });
+    }
+    if (this.langVfBtn) {
+      this.langVfBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        this.setLanguage('vf');
+      });
+    }
+
+    // Sélection des 5 serveurs
+    this.serverPills.forEach(pill => {
+      pill.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const serverNum = parseInt(e.currentTarget.dataset.server) || 1;
+        if (serverNum !== this.currentServer) {
+          this.switchServer(serverNum);
+        }
+      });
+    });
+
+    // Sélecteur de Saisons & Épisodes
+    this.seasonSelect.addEventListener('change', (e) => {
+      this.currentSeason = parseInt(e.target.value) || 1;
+      this.savedPlaybackTime = 0;
+      this.populateEpisodes();
+      const firstOpt = this.episodeSelect.options[0];
+      this.currentEpisode = firstOpt ? parseInt(firstOpt.value) : 1;
+      this.episodeSelect.value = this.currentEpisode;
+      this.updateMetaDisplay();
+      this.loadStream();
+    });
+
+    this.episodeSelect.addEventListener('change', (e) => {
+      this.currentEpisode = parseInt(e.target.value) || 1;
+      this.savedPlaybackTime = 0;
+      this.updateMetaDisplay();
+      this.loadStream();
+    });
+
+    // Contrôles Vidéo : Play / Pause
+    this.ctrlPlayBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      this.togglePlayPause();
+    });
+
+    // Clic direct sur la surface vidéo (Play / Pause & Ripple)
+    this.video.addEventListener('click', () => {
+      this.togglePlayPause();
+    });
+
+    // Double clic vidéo pour plein écran
+    this.video.addEventListener('dblclick', () => {
+      this.toggleFullscreen();
+    });
+
+    // Sauts ±10s
+    this.ctrlRewindBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      this.seekRelative(-10);
+    });
+
+    this.ctrlForwardBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      this.seekRelative(10);
+    });
+
+    // Volume & Mute
+    this.ctrlVolumeBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      this.toggleMute();
+    });
+
+    this.ctrlVolumeSlider.addEventListener('input', (e) => {
+      e.stopPropagation();
+      const val = parseFloat(e.target.value);
+      this.setVolume(val);
+    });
+
+    // Vitesse de lecture
+    this.ctrlSpeedBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      this.speedMenu.classList.toggle('hidden');
+    });
+
+    this.speedItems.forEach(item => {
+      item.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const speed = parseFloat(e.currentTarget.dataset.speed) || 1;
+        this.setPlaybackSpeed(speed);
+        this.speedMenu.classList.add('hidden');
+      });
+    });
+
+    // Clic ailleurs ferme le menu de vitesse
+    document.addEventListener('click', (e) => {
+      if (!this.speedMenu.contains(e.target) && e.target !== this.ctrlSpeedBtn) {
+        this.speedMenu.classList.add('hidden');
+      }
+    });
+
+    // Sélecteur de Qualité Vidéo
+    if (this.ctrlQualityBtn) {
+      this.ctrlQualityBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        this.qualityMenu.classList.toggle('hidden');
+        if (this.speedMenu) this.speedMenu.classList.add('hidden');
+      });
+    }
+
+    if (this.qualityItems) {
+      this.qualityItems.forEach(item => {
+        item.addEventListener('click', (e) => {
+          e.stopPropagation();
+          const q = parseInt(e.currentTarget.dataset.quality);
+          this.setVideoQuality(q);
+          this.qualityMenu.classList.add('hidden');
+        });
+      });
+    }
+
+    // Clic ailleurs ferme le menu de qualité
+    document.addEventListener('click', (e) => {
+      if (this.qualityMenu && !this.qualityMenu.contains(e.target) && e.target !== this.ctrlQualityBtn) {
+        this.qualityMenu.classList.add('hidden');
+      }
+    });
+
+    // Plein Écran
+    this.ctrlFullscreenBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      this.toggleFullscreen();
+    });
+
+    document.addEventListener('fullscreenchange', () => {
+      this.updateFullscreenIcons();
+    });
+
+    // Bouton Épisode Suivant
+    this.ctrlNextEpBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      this.goToNextEpisode();
+    });
+
+    // Bannière de résilience
+    this.statusSwitchBtn.addEventListener('click', () => {
+      this.hideStatusBanner();
+      const nextServer = (this.currentServer % 5) + 1;
+      this.switchServer(nextServer);
+    });
+
+    this.statusRetryBtn.addEventListener('click', () => {
+      this.hideStatusBanner();
+      this.loadStream();
+    });
+
+    // Timeline Scrubber Événements (Click & Drag)
+    this.initScrubberEvents();
+
+    // Événements Vidéo HTML5
+    this.initVideoEvents();
+
+    // Inactivité de la souris (Auto-Hide des contrôles)
+    this.initInactivityWatchdog();
+
+    // Raccourcis Clavier Universels
+    this.initKeyboardShortcuts();
+
+    // Synchronisation initiale du volume
+    this.syncVolumeUI();
+  }
+
+  initScrubberEvents() {
+    const onScrub = (e) => {
+      if (!this.video.duration) return;
+      const rect = this.scrubberContainer.getBoundingClientRect();
+      const pos = Math.max(0, Math.min(1, (e.clientX - rect.left) / rect.width));
+      this.video.currentTime = pos * this.video.duration;
+      this.updateScrubberProgress(pos * 100);
+    };
+
+    this.scrubberContainer.addEventListener('mousedown', (e) => {
+      e.stopPropagation();
+      this.isScrubbing = true;
+      this.scrubberContainer.classList.add('dragging');
+      onScrub(e);
+
+      const onMouseMove = (moveEvent) => {
+        if (this.isScrubbing) {
+          onScrub(moveEvent);
+          updateTooltip(moveEvent);
+        }
+      };
+
+      const onMouseUp = () => {
+        this.isScrubbing = false;
+        this.scrubberContainer.classList.remove('dragging');
+        window.removeEventListener('mousemove', onMouseMove);
+        window.removeEventListener('mouseup', onMouseUp);
+      };
+
+      window.addEventListener('mousemove', onMouseMove);
+      window.addEventListener('mouseup', onMouseUp);
+    });
+
+    // Tooltip au survol
+    const updateTooltip = (e) => {
+      if (!this.video.duration) return;
+      const rect = this.scrubberContainer.getBoundingClientRect();
+      const pos = Math.max(0, Math.min(1, (e.clientX - rect.left) / rect.width));
+      const targetTime = pos * this.video.duration;
+
+      this.scrubberTooltip.textContent = this.formatTime(targetTime);
+      this.scrubberTooltip.style.left = `${pos * 100}%`;
+      this.scrubberTooltip.style.display = 'block';
+    };
+
+    this.scrubberContainer.addEventListener('mousemove', updateTooltip);
+    this.scrubberContainer.addEventListener('mouseleave', () => {
+      if (!this.isScrubbing) {
+        this.scrubberTooltip.style.display = 'none';
+      }
+    });
+  }
+
+  initVideoEvents() {
+    this.video.addEventListener('timeupdate', () => {
+      if (this.isScrubbing) return;
+      const isChannel = (this.currentMovie?.media_type === 'channel' || this.currentMovie?.is_live);
+      if (isChannel) {
+        this.ctrlCurrentTime.textContent = 'LIVE';
+        this.ctrlTotalDuration.textContent = 'DIRECT';
+        this.updateScrubberProgress(100);
+        return;
+      }
+      const current = this.video.currentTime || 0;
+      const total = this.video.duration || 0;
+
+      this.ctrlCurrentTime.textContent = this.formatTime(current);
+
+      if (total > 0 && !isNaN(total) && total !== Infinity) {
+        const percent = (current / total) * 100;
+        this.updateScrubberProgress(percent);
+      }
+    });
+
+    this.video.addEventListener('progress', () => {
+      if (!this.video.duration || !this.video.buffered.length) return;
+      try {
+        const bufferedEnd = this.video.buffered.end(this.video.buffered.length - 1);
+        const percent = (bufferedEnd / this.video.duration) * 100;
+        this.scrubberBuffered.style.width = `${Math.min(100, percent)}%`;
+      } catch (e) {}
+    });
+
+    this.video.addEventListener('loadedmetadata', () => {
+      const total = this.video.duration || 0;
+      this.ctrlTotalDuration.textContent = this.formatTime(total);
+
+      // Reprendre à la position sauvegardée si changement de serveur
+      if (this.savedPlaybackTime > 0 && this.savedPlaybackTime < total) {
+        this.video.currentTime = this.savedPlaybackTime;
+        this.savedPlaybackTime = 0;
+      }
+    });
+
+    this.video.addEventListener('play', () => {
+      this.updatePlayPauseIcons(true);
+      this.resetInactivityTimer();
+    });
+
+    this.video.addEventListener('pause', () => {
+      this.updatePlayPauseIcons(false);
+      this.showControls();
+    });
+
+    this.video.addEventListener('ended', () => {
+      this.updatePlayPauseIcons(false);
+      if (this.currentMovie && this.currentMovie.media_type === 'series') {
+        this.goToNextEpisode();
+      }
+    });
+
+    this.video.addEventListener('volumechange', () => {
+      this.syncVolumeUI();
+    });
+  }
+
+  initInactivityWatchdog() {
+    const handleActivity = () => {
+      this.showControls();
+      this.resetInactivityTimer();
+    };
+
+    this.overlay.addEventListener('mousemove', handleActivity);
+    this.overlay.addEventListener('mousedown', handleActivity);
+    this.overlay.addEventListener('touchstart', handleActivity);
+  }
+
+  resetInactivityTimer() {
+    clearTimeout(this.idleTimer);
+    if (!this.video.paused) {
+      this.idleTimer = setTimeout(() => {
+        if (!this.video.paused && !this.isScrubbing) {
+          this.overlay.classList.add('user-idle');
+          this.speedMenu.classList.add('hidden');
+        }
+      }, 3500);
+    }
+  }
+
+  showControls() {
+    clearTimeout(this.idleTimer);
+    this.overlay.classList.remove('user-idle');
+  }
+
+  initKeyboardShortcuts() {
+    document.addEventListener('keydown', (e) => {
+      if (!this.overlay.classList.contains('active')) return;
+
+      // Éviter d'interférer avec les champs de saisie ou select
+      if (['INPUT', 'SELECT', 'TEXTAREA'].includes(document.activeElement.tagName)) return;
+
+      switch (e.code) {
+        case 'Space':
+        case 'KeyK':
+          e.preventDefault();
+          this.togglePlayPause();
+          break;
+        case 'ArrowLeft':
+        case 'KeyJ':
+          e.preventDefault();
+          this.seekRelative(-10);
+          break;
+        case 'ArrowRight':
+        case 'KeyL':
+          e.preventDefault();
+          this.seekRelative(10);
+          break;
+        case 'ArrowUp':
+          e.preventDefault();
+          this.setVolume(Math.min(1, (this.video.volume || 1) + 0.1));
+          break;
+        case 'ArrowDown':
+          e.preventDefault();
+          this.setVolume(Math.max(0, (this.video.volume || 1) - 0.1));
+          break;
+        case 'KeyM':
+          e.preventDefault();
+          this.toggleMute();
+          break;
+        case 'KeyF':
+          e.preventDefault();
+          this.toggleFullscreen();
+          break;
+        case 'Digit1':
+          this.switchServer(1);
+          break;
+        case 'Digit2':
+          this.switchServer(2);
+          break;
+        case 'Digit3':
+          this.switchServer(3);
+          break;
+        case 'Digit4':
+          this.switchServer(4);
+          break;
+        case 'Digit5':
+          this.switchServer(5);
+          break;
+        case 'Escape':
+          e.preventDefault();
+          this.close();
+          break;
+      }
+    });
+  }
+
+  // ================= ACTIONS LECTEUR NETFLIX =================
+  togglePlayPause() {
+    if (this.video.paused) {
+      this.video.play().then(() => {
+        this.triggerCenterRipple('▶');
+      }).catch(err => {
+        console.warn('[Player] Échec lecture :', err.message);
+      });
+    } else {
+      this.video.pause();
+      this.triggerCenterRipple('❚❚');
+    }
+  }
+
+  seekRelative(seconds) {
+    if (!this.video.duration) return;
+    const newTime = Math.max(0, Math.min(this.video.duration, this.video.currentTime + seconds));
+    this.video.currentTime = newTime;
+    this.triggerCenterRipple(seconds > 0 ? `+${seconds}s` : `${seconds}s`);
+  }
+
+  toggleMute() {
+    this.video.muted = !this.video.muted;
+    this.syncVolumeUI();
+    this.triggerCenterRipple(this.video.muted ? '🔇' : '🔊');
+  }
+
+  setVolume(val) {
+    this.video.volume = Math.max(0, Math.min(1, val));
+    if (this.video.volume > 0) {
+      this.video.muted = false;
+      this.lastVolume = this.video.volume;
+    }
+    this.syncVolumeUI();
+  }
+
+  syncVolumeUI() {
+    const vol = this.video.muted ? 0 : this.video.volume;
+    this.ctrlVolumeSlider.value = vol;
+
+    // Mise à jour de la piste avec la couleur rouge pour la portion active
+    const pct = vol * 100;
+    this.ctrlVolumeSlider.style.background = `linear-gradient(to right, var(--netflix-red) ${pct}%, rgba(255, 255, 255, 0.3) ${pct}%)`;
+
+    if (vol === 0) {
+      this.iconVolHigh.classList.add('hidden');
+      this.iconVolMuted.classList.remove('hidden');
+    } else {
+      this.iconVolHigh.classList.remove('hidden');
+      this.iconVolMuted.classList.add('hidden');
+    }
+  }
+
+  setPlaybackSpeed(speed) {
+    this.video.playbackRate = speed;
+    this.ctrlSpeedBtn.textContent = `${speed}x`;
+
+    this.speedItems.forEach(item => {
+      const s = parseFloat(item.dataset.speed);
+      item.classList.toggle('active', s === speed);
+    });
+
+    this.triggerCenterRipple(`${speed}x`);
+  }
+
+  setVideoQuality(quality) {
+    this.currentQuality = parseInt(quality);
+    this.applyQualityLevel();
+
+    if (this.qualityItems) {
+      this.qualityItems.forEach(item => {
+        const q = parseInt(item.dataset.quality);
+        item.classList.toggle('active', q === this.currentQuality);
+      });
+    }
+
+    if (this.currentQuality === -1) {
+      if (this.qualityCurrentText) this.qualityCurrentText.textContent = 'Auto';
+      this.triggerCenterRipple('Auto HD');
+    } else {
+      if (this.qualityCurrentText) this.qualityCurrentText.textContent = `${this.currentQuality}p`;
+      if (this.qualityBadge) this.qualityBadge.textContent = this.currentQuality >= 1080 ? 'FHD' : (this.currentQuality >= 720 ? 'HD' : `${this.currentQuality}p`);
+      this.triggerCenterRipple(`${this.currentQuality}p`);
+    }
+  }
+
+  applyQualityLevel() {
+    if (!this.hls || !this.hls.levels || this.hls.levels.length === 0) return;
+
+    if (this.currentQuality === -1) {
+      this.hls.currentLevel = -1; // Mode ABR Auto
+      return;
+    }
+
+    // Trouver le niveau le plus proche de la résolution demandée
+    let bestIdx = 0;
+    let minDiff = Infinity;
+    this.hls.levels.forEach((lvl, idx) => {
+      const h = lvl.height || (lvl.attrs && parseInt(lvl.attrs.RESOLUTION?.split('x')[1])) || 720;
+      const diff = Math.abs(h - this.currentQuality);
+      if (diff < minDiff) {
+        minDiff = diff;
+        bestIdx = idx;
+      }
+    });
+
+    this.hls.currentLevel = bestIdx;
+    const chosen = this.hls.levels[bestIdx];
+    const h = chosen.height || (chosen.attrs && chosen.attrs.RESOLUTION) || this.currentQuality;
+    console.log(`[Player] Qualité verrouillée à ${h} (${Math.round((chosen.bitrate || 0) / 1000)} kbps)`);
+  }
+
+  updateQualityMenuOptions() {
+    if (!this.hls || !this.hls.levels) return;
+    const has1080 = this.hls.levels.some(l => (l.height >= 1080) || (l.attrs?.RESOLUTION?.includes('1080') || l.attrs?.RESOLUTION?.includes('1920')));
+    const has720 = this.hls.levels.some(l => (l.height >= 720) || (l.attrs?.RESOLUTION?.includes('720') || l.attrs?.RESOLUTION?.includes('1280')));
+
+    const q1080Item = document.querySelector('.quality-item[data-quality="1080"]');
+    const q720Item = document.querySelector('.quality-item[data-quality="720"]');
+    const q480Item = document.querySelector('.quality-item[data-quality="480"]');
+
+    if (q1080Item) q1080Item.style.display = has1080 ? 'flex' : 'none';
+    if (q720Item) q720Item.style.display = (has720 || has1080) ? 'flex' : 'none';
+    if (q480Item) q480Item.style.display = 'flex';
+  }
+
+  toggleFullscreen() {
+    if (!document.fullscreenElement) {
+      if (this.overlay.requestFullscreen) {
+        this.overlay.requestFullscreen();
+      } else if (this.overlay.webkitRequestFullscreen) {
+        this.overlay.webkitRequestFullscreen();
+      }
+    } else {
+      if (document.exitFullscreen) {
+        document.exitFullscreen();
+      } else if (document.webkitExitFullscreen) {
+        document.webkitExitFullscreen();
+      }
+    }
+  }
+
+  updateFullscreenIcons() {
+    const isFs = !!document.fullscreenElement;
+    if (isFs) {
+      this.iconEnterFs.classList.add('hidden');
+      this.iconExitFs.classList.remove('hidden');
+    } else {
+      this.iconEnterFs.classList.remove('hidden');
+      this.iconExitFs.classList.add('hidden');
+    }
+  }
+
+  triggerCenterRipple(symbol) {
+    this.ripple.textContent = symbol;
+    this.ripple.classList.remove('pulse');
+    void this.ripple.offsetWidth; // Déclencher le reflow CSS
+    this.ripple.classList.add('pulse');
+  }
+
+  updatePlayPauseIcons(isPlaying) {
+    if (isPlaying) {
+      this.iconPlay.classList.add('hidden');
+      this.iconPause.classList.remove('hidden');
+      this.ctrlPlayBtn.setAttribute('title', 'Pause (Espace)');
+    } else {
+      this.iconPlay.classList.remove('hidden');
+      this.iconPause.classList.add('hidden');
+      this.ctrlPlayBtn.setAttribute('title', 'Lecture (Espace)');
+    }
+  }
+
+  updateScrubberProgress(percent) {
+    const clamped = Math.max(0, Math.min(100, percent));
+    this.scrubberPlayed.style.width = `${clamped}%`;
+    this.scrubberThumb.style.left = `${clamped}%`;
+  }
+
+  formatTime(seconds) {
+    if (isNaN(seconds) || seconds < 0) return '00:00';
+    const s = Math.floor(seconds % 60);
+    const m = Math.floor((seconds / 60) % 60);
+    const h = Math.floor(seconds / 3600);
+
+    const pad = (n) => String(n).padStart(2, '0');
+    if (h > 0) {
+      return `${h}:${pad(m)}:${pad(s)}`;
+    }
+    return `${pad(m)}:${pad(s)}`;
+  }
+
+  // ================= OUVERTURE & BASCULEMENT DE SERVEUR =================
+  open(movie, initialServer = 1, season = 1, episode = 1) {
+    this.currentMovie = movie;
+    this.currentSeason = parseInt(season) || 1;
+    this.currentEpisode = parseInt(episode) || 1;
+    this.savedPlaybackTime = 0;
+
+    // S'assurer que currentSeason et currentEpisode correspondent aux saisons réelles du catalogue
+    if (movie.seasons && movie.seasons.length > 0) {
+      const hasSeason = movie.seasons.some(s => s.season_number === this.currentSeason);
+      if (!hasSeason) {
+        this.currentSeason = movie.seasons[0].season_number;
+      }
+      const seasonObj = movie.seasons.find(s => s.season_number === this.currentSeason) || movie.seasons[0];
+      if (seasonObj && seasonObj.episodes && seasonObj.episodes.length > 0) {
+        const hasEp = seasonObj.episodes.some(e => e.episode_number === this.currentEpisode);
+        if (!hasEp) {
+          this.currentEpisode = seasonObj.episodes[0].episode_number;
+        }
+      }
+    }
+
+    this.titleDisplay.textContent = movie.title;
+    this.ctrlMediaTitle.textContent = movie.title;
+    this.overlay.classList.add('active');
+    this.showControls();
+
+    // Masquer l'iframe définitivement : le lecteur est 100% natif Netflix
+    this.iframe.classList.add('hidden');
+    this.iframe.src = 'about:blank';
+    this.video.classList.remove('hidden');
+
+    // Gestion Séries vs Films vs Chaînes TV
+    if (movie.media_type === 'series') {
+      this.episodeBox.classList.remove('hidden');
+      this.populateSeasons();
+      this.populateEpisodes();
+      this.ctrlNextEpBtn.classList.remove('hidden');
+    } else {
+      this.episodeBox.classList.add('hidden');
+      this.ctrlNextEpBtn.classList.add('hidden');
+    }
+
+    if (this.langSwitch) {
+      this.langSwitch.style.display = (movie.media_type === 'channel' || movie.is_live) ? 'none' : 'flex';
+    }
+
+    this.setLanguage(this.currentLang, false);
+    this.switchServer(initialServer);
+  }
+
+  populateSeasons() {
+    this.seasonSelect.innerHTML = '';
+    if (this.currentMovie.seasons && this.currentMovie.seasons.length > 0) {
+      this.currentMovie.seasons.forEach(s => {
+        const opt = document.createElement('option');
+        opt.value = s.season_number;
+        opt.textContent = s.name || `Saison ${s.season_number}`;
+        this.seasonSelect.appendChild(opt);
+      });
+    } else {
+      const totalSeasons = Math.min(8, parseInt(this.currentMovie.duration) || 3);
+      for (let s = 1; s <= totalSeasons; s++) {
+        const opt = document.createElement('option');
+        opt.value = s;
+        opt.textContent = `Saison ${s}`;
+        this.seasonSelect.appendChild(opt);
+      }
+    }
+    this.seasonSelect.value = this.currentSeason;
+  }
+
+  populateEpisodes() {
+    this.episodeSelect.innerHTML = '';
+    if (this.currentMovie.seasons && this.currentMovie.seasons.length > 0) {
+      const seasonObj = this.currentMovie.seasons.find(s => s.season_number === this.currentSeason) || this.currentMovie.seasons[0];
+      if (seasonObj && seasonObj.episodes && seasonObj.episodes.length > 0) {
+        seasonObj.episodes.forEach(ep => {
+          const opt = document.createElement('option');
+          opt.value = ep.episode_number;
+          opt.textContent = `Épisode ${ep.episode_number} : ${ep.title}`;
+          this.episodeSelect.appendChild(opt);
+        });
+      } else {
+        const count = seasonObj ? (seasonObj.episode_count || 10) : 10;
+        for (let e = 1; e <= count; e++) {
+          const opt = document.createElement('option');
+          opt.value = e;
+          opt.textContent = `Épisode ${e}`;
+          this.episodeSelect.appendChild(opt);
+        }
+      }
+    } else {
+      const totalEpisodes = 10;
+      for (let e = 1; e <= totalEpisodes; e++) {
+        const opt = document.createElement('option');
+        opt.value = e;
+        opt.textContent = `Épisode ${e}`;
+        this.episodeSelect.appendChild(opt);
+      }
+    }
+    this.episodeSelect.value = this.currentEpisode;
+  }
+
+  goToNextEpisode() {
+    if (!this.currentMovie || !this.currentMovie.seasons || this.currentMovie.seasons.length === 0) return;
+    const sObj = this.currentMovie.seasons.find(s => s.season_number === this.currentSeason);
+    if (!sObj || !sObj.episodes || sObj.episodes.length === 0) return;
+
+    const currentEpIdx = sObj.episodes.findIndex(e => e.episode_number === this.currentEpisode);
+    if (currentEpIdx !== -1 && currentEpIdx < sObj.episodes.length - 1) {
+      // Épisode suivant dans la même saison
+      this.currentEpisode = sObj.episodes[currentEpIdx + 1].episode_number;
+      this.episodeSelect.value = this.currentEpisode;
+      this.savedPlaybackTime = 0;
+      this.updateMetaDisplay();
+      this.loadStream();
+    } else {
+      // Passer à la saison suivante
+      const currentSeasonIdx = this.currentMovie.seasons.findIndex(s => s.season_number === this.currentSeason);
+      if (currentSeasonIdx !== -1 && currentSeasonIdx < this.currentMovie.seasons.length - 1) {
+        const nextSeason = this.currentMovie.seasons[currentSeasonIdx + 1];
+        this.currentSeason = nextSeason.season_number;
+        this.seasonSelect.value = this.currentSeason;
+        this.populateEpisodes();
+        this.currentEpisode = nextSeason.episodes[0]?.episode_number || 1;
+        this.episodeSelect.value = this.currentEpisode;
+        this.savedPlaybackTime = 0;
+        this.updateMetaDisplay();
+        this.loadStream();
+      }
+    }
+  }
+
+  setLanguage(lang, reloadStream = true) {
+    if (lang !== 'vo' && lang !== 'vf') lang = 'vo';
+    this.currentLang = lang;
+    try {
+      localStorage.setItem('netflix_lang', lang);
+    } catch (e) {}
+
+    // Synchroniser toutes les capsules de langue sur l'application
+    document.querySelectorAll('.lang-switch-capsule').forEach(capsule => {
+      capsule.setAttribute('data-active-lang', lang);
+      const voBtn = capsule.querySelector('[data-lang="vo"]');
+      const vfBtn = capsule.querySelector('[data-lang="vf"]');
+      if (voBtn) voBtn.classList.toggle('active', lang === 'vo');
+      if (vfBtn) vfBtn.classList.toggle('active', lang === 'vf');
+    });
+
+    this.updateServerPills();
+    this.updateMetaDisplay();
+
+    if (this.overlay.classList.contains('active') && reloadStream) {
+      if (this.video && this.video.currentTime > 0) {
+        this.savedPlaybackTime = this.video.currentTime;
+      }
+      this.loadStream();
+    }
+  }
+
+  updateServerPills() {
+    const isChannel = (this.currentMovie?.media_type === 'channel' || this.currentMovie?.is_live);
+    const isSpecialShow = (this.currentMovie?.id === '68628' || this.currentMovie?.tmdb_id === '68628' || this.currentMovie?.id === 'telefoot_tf1' || this.currentMovie?.tmdb_id === 'telefoot_tf1');
+    const isVf = (this.currentLang === 'vf');
+    let names;
+    if (isChannel) {
+      names = {
+        1: '⚡ Serveur 1 (Direct HLS • Principal FHD)',
+        2: '🎬 Serveur 2 (Miroir CDN Haute Vitesse)',
+        3: '🌐 Serveur 3 (Flux Direct Secours)',
+        4: '📡 Serveur 4 (Lecteur Événementiel Multi-Flux)',
+        5: '🚀 Serveur 5 (Multi-Débit Adaptatif)'
+      };
+    } else if (isSpecialShow) {
+      names = {
+        1: '⚡ Serveur 1 (Direct HLS • Flux Principal HD)',
+        2: '🎬 Serveur 2 (Direct 1080p FHD)',
+        3: '🌐 Serveur 3 (Direct 720p HD)',
+        4: '📡 Serveur 4 (Miroir CDN Rapide)',
+        5: '🚀 Serveur 5 (Multi-Débit Secours)'
+      };
+    } else if (isVf) {
+      names = {
+        1: '⚡ Serveur 1 (Direct VF • Vidzy HD)',
+        2: '🎬 Serveur 2 (Direct VF • Fsvid VIP)',
+        3: '🌐 Serveur 3 (Direct VF • Uqload)',
+        4: '📡 Serveur 4 (Direct VF • Secours)',
+        5: '🚀 Serveur 5 (Direct VF • Multi-Flux)'
+      };
+    } else {
+      names = {
+        1: '⚡ Serveur 1 (Direct HLS)',
+        2: '🎬 Serveur 2 (Direct HD)',
+        3: '🌐 Serveur 3 (Direct Multi)',
+        4: '📡 Serveur 4 (Direct VIP)',
+        5: '🚀 Serveur 5 (Direct Secours)'
+      };
+    }
+
+    this.serverPills.forEach(p => {
+      const pNum = parseInt(p.dataset.server) || 1;
+      const active = (pNum === this.currentServer);
+      p.classList.toggle('active', active);
+      p.innerHTML = '';
+      if (active) {
+        const dot = document.createElement('span');
+        dot.className = 'pill-dot';
+        dot.textContent = '● ';
+        p.appendChild(dot);
+      }
+      p.appendChild(document.createTextNode(names[pNum] || `Serveur ${pNum}`));
+    });
+  }
+
+  updateMetaDisplay() {
+    if (!this.currentMovie) return;
+    const isChannel = (this.currentMovie?.media_type === 'channel' || this.currentMovie?.is_live);
+    const isSpecialShow = (this.currentMovie?.id === '68628' || this.currentMovie?.tmdb_id === '68628' || this.currentMovie?.id === 'telefoot_tf1' || this.currentMovie?.tmdb_id === 'telefoot_tf1');
+    const isVf = (this.currentLang === 'vf');
+    let serverNames;
+    if (isChannel) {
+      serverNames = {
+        1: 'Serveur 1 (Direct HLS Principal FHD)',
+        2: 'Serveur 2 (Miroir CDN Haute Vitesse)',
+        3: 'Serveur 3 (Flux Direct Secours)',
+        4: 'Serveur 4 (Lecteur Événementiel)',
+        5: 'Serveur 5 (Multi-Débit Adaptatif)'
+      };
+      const sName = serverNames[this.currentServer] || `Serveur ${this.currentServer}`;
+      const chNum = this.currentMovie.channel_number ? `Canal ${this.currentMovie.channel_number} • ` : '';
+      this.metaDisplay.innerHTML = `<span style="color: #e50914; font-weight: 800;"><span class="live-pulse">●</span> EN DIRECT</span> • ${chNum}1080p FHD • ${sName} • Anti-Pubs Actif 🛡️`;
+      this.ctrlMediaTitle.textContent = `${this.currentMovie.title} (🔴 DIRECT)`;
+      if (this.ctrlTotalDuration) {
+        this.ctrlTotalDuration.textContent = 'DIRECT';
+      }
+      return;
+    }
+
+    if (isSpecialShow) {
+      serverNames = {
+        1: 'Serveur 1 (Direct HLS • Flux Principal HD)',
+        2: 'Serveur 2 (Direct 1080p FHD)',
+        3: 'Serveur 3 (Direct 720p HD)',
+        4: 'Serveur 4 (Miroir CDN Rapide)',
+        5: 'Serveur 5 (Multi-Débit Secours)'
+      };
+    } else if (isVf) {
+      serverNames = {
+        1: 'Serveur 1 (Direct VF • Vidzy)',
+        2: 'Serveur 2 (Direct VF • Fsvid)',
+        3: 'Serveur 3 (Direct VF • Uqload)',
+        4: 'Serveur 4 (Direct VF • Secours)',
+        5: 'Serveur 5 (Direct VF • Multi)'
+      };
+    } else {
+      serverNames = {
+        1: 'Serveur 1 (Direct HLS)',
+        2: 'Serveur 2 (Direct HD)',
+        3: 'Serveur 3 (Direct Multi)',
+        4: 'Serveur 4 (Direct VIP)',
+        5: 'Serveur 5 (Direct Secours)'
+      };
+    }
+    const sName = serverNames[this.currentServer] || `Serveur ${this.currentServer}`;
+    const langBadge = isVf ? 'Version Française (VF) 🇫🇷' : 'Version Originale (VO) 🇬🇧';
+
+    if (this.currentMovie.media_type === 'series') {
+      const epText = `S${this.currentSeason}:E${this.currentEpisode}`;
+      this.metaDisplay.textContent = `${epText} • ${langBadge} • ${sName} • Anti-Pubs Actif 🛡️`;
+      this.ctrlMediaTitle.textContent = `${this.currentMovie.title} (${epText})`;
+    } else {
+      const dur = this.currentMovie.duration || '2h 10m';
+      const year = this.currentMovie.release_year || '2025';
+      this.metaDisplay.textContent = `${year} • ${dur} • ${langBadge} • ${sName} • Anti-Pubs Actif 🛡️`;
+      this.ctrlMediaTitle.textContent = this.currentMovie.title;
+    }
+  }
+
+  switchServer(serverNum) {
+    const num = parseInt(serverNum) || 1;
+    if (this.video && this.video.currentTime > 0) {
+      this.savedPlaybackTime = this.video.currentTime;
+    }
+
+    this.currentServer = num;
+    this.hideStatusBanner();
+    this.updateServerPills();
+    this.updateMetaDisplay();
+    this.loadStream();
+  }
+
+  setStep(stepNum, status, labelText = null) {
+    const stepEl = this[`step${stepNum}`];
+    const labelEl = this[`step${stepNum}Label`];
+    if (!stepEl) return;
+
+    stepEl.className = 'step-item ' + status;
+    if (labelText && labelEl) {
+      labelEl.textContent = labelText;
+    }
+  }
+
+  resetSteps() {
+    this.setStep(1, 'pending', '1. Résolution de la source et des métadonnées');
+    this.setStep(2, 'pending', '2. Récupération des flux chiffrés multi-serveurs');
+    this.setStep(3, 'pending', '3. Déchiffrement WebAssembly ChaCha20 & Jeton IP');
+    this.setStep(4, 'pending', '4. Initialisation du flux dans le lecteur Netflix');
+  }
+
+  // ================= CHARGEMENT DU FLUX HLS DIRECT PROXYFIE =================
+  async loadStream() {
+    if (this.activeExtractionAbort) {
+      this.activeExtractionAbort.abort();
+      this.activeExtractionAbort = null;
+    }
+
+    if (this.hls) {
+      this.hls.destroy();
+      this.hls = null;
+    }
+
+    const id = this.currentMovie.tmdb_id || this.currentMovie.id;
+    const isChannel = (this.currentMovie.media_type === 'channel' || this.currentMovie.is_live);
+    const isMovie = (this.currentMovie.media_type === 'movie');
+    const mediaType = isChannel ? 'channel' : (isMovie ? 'movie' : 'series');
+    const s = this.currentSeason;
+    const e = this.currentEpisode;
+
+    const langLabel = isChannel ? 'DIRECT 🔴' : ((this.currentLang === 'vf') ? 'VF 🇫🇷' : 'VO 🇬🇧');
+    this.showLoader(isChannel ? `⚡ Connexion au flux direct ${this.currentMovie.title} (Serveur ${this.currentServer})...` : `⚡ Extraction Serveur ${this.currentServer} (${langLabel})...`);
+    this.resetSteps();
+
+    // Étape 1 : Résolution de la source
+    this.setStep(1, 'active', isChannel ? `1. Résolution de la chaîne TV sportive (${this.currentMovie.title})...` : `1. Résolution de la source (${langLabel} • ${this.currentMovie.title})...`);
+    await new Promise(r => setTimeout(r, 120));
+    this.setStep(1, 'done', isChannel ? `1. Chaîne TV validée (${this.currentMovie.title})` : `1. Source ${langLabel} validée (${this.currentMovie.title})`);
+
+    // Étape 2 : Récupération des flux
+    this.setStep(2, 'active', isChannel ? `2. Requête du flux Serveur ${this.currentServer} (Direct TV)...` : `2. Requête du cluster Serveur ${this.currentServer} (${langLabel})...`);
+
+    const abortController = new AbortController();
+    this.activeExtractionAbort = abortController;
+
+    try {
+      const url = `/api/extract?id=${encodeURIComponent(id)}&type=${mediaType}&season=${s}&episode=${e}&server=${this.currentServer}&lang=${this.currentLang}`;
+      const res = await fetch(url, { signal: abortController.signal });
+      const data = await res.json();
+
+      if (!data.success || !data.stream_url) {
+        throw new Error(data.message || `Serveur ${this.currentServer} temporairement indisponible`);
+      }
+
+      this.setStep(2, 'done', `2. Flux direct obtenu (${data.server_name || 'Cluster'})`);
+
+      // Étape 3 : Déchiffrement & Proxy
+      this.setStep(3, 'active', `3. Déchiffrement direct & Proxy local anti-pub...`);
+      await new Promise(r => setTimeout(r, 100));
+      this.setStep(3, 'done', `3. Déchiffrement validé (${data.hoster || 'Flux Direct'})`);
+
+      // Étape 4 : Initialisation dans le lecteur Netflix
+      this.setStep(4, 'active', `4. Injection dans le lecteur Netflix personnalisé...`);
+
+      if (data.player_type === 'iframe' || data.is_embed) {
+        this.playEmbedIframe(data.embed_url || data.stream_url);
+      } else {
+        this.playDirectHls(data.stream_url);
+      }
+
+    } catch (err) {
+      if (err.name === 'AbortError') return;
+      console.warn(`[Serveur ${this.currentServer}] Erreur extraction :`, err.message);
+      this.showStatusBanner(`Serveur ${this.currentServer} indisponible (${err.message}). Basculement automatique...`);
+
+      // Basculer automatiquement sur le serveur suivant après 1.5s
+      setTimeout(() => {
+        const next = (this.currentServer % 5) + 1;
+        this.switchServer(next);
+      }, 1500);
+    }
+  }
+
+  playEmbedIframe(embedUrl) {
+    if (this.hls) {
+      this.hls.destroy();
+      this.hls = null;
+    }
+    this.video.pause();
+    this.video.src = '';
+    this.video.classList.add('hidden');
+    this.iframe.classList.remove('hidden');
+    this.iframe.src = embedUrl;
+
+    if (this.bottomControls) {
+      this.bottomControls.classList.add('iframe-mode');
+    }
+
+    this.setStep(4, 'done', `4. Lecteur officiel connecté • Lecture active`);
+    setTimeout(() => this.hideLoader(), 400);
+  }
+
+  playDirectHls(streamUrl) {
+    this.iframe.classList.add('hidden');
+    this.iframe.src = 'about:blank';
+    this.video.classList.remove('hidden');
+    if (this.bottomControls) {
+      this.bottomControls.classList.remove('iframe-mode');
+    }
+
+    const onReady = () => {
+      this.setStep(4, 'done', `4. Flux connecté • Lecture active`);
+      setTimeout(() => this.hideLoader(), 300);
+    };
+
+    this.video.addEventListener('loadeddata', onReady, { once: true });
+    this.video.addEventListener('playing', onReady, { once: true });
+
+    if (window.Hls && Hls.isSupported()) {
+      const isChannel = (this.currentMovie?.media_type === 'channel' || this.currentMovie?.is_live);
+      const hls = new Hls({
+        enableWorker: true,
+        lowLatencyMode: true,
+        liveSyncDurationCount: isChannel ? 3 : 5,
+        liveMaxLatencyDurationCount: isChannel ? 6 : 10,
+        startLevel: -1,
+        capLevelToPlayerSize: false,
+        backBufferLength: 90,
+        maxBufferLength: 60,
+        maxMaxBufferLength: 120
+      });
+      this.hls = hls;
+
+      hls.loadSource(streamUrl);
+      hls.attachMedia(this.video);
+
+      hls.on(Hls.Events.MANIFEST_PARSED, () => {
+        if (hls.levels && hls.levels.length > 0) {
+          this.updateQualityMenuOptions();
+          if (this.currentQuality === -1) {
+            // Forcer le niveau de résolution maximal par défaut (HD / 1080p)
+            hls.currentLevel = hls.levels.length - 1;
+          } else {
+            this.applyQualityLevel();
+          }
+        }
+
+        this.video.play().catch(err => {
+          console.warn('[Player] Autoplay avec son restreint par le navigateur, démarrage en muet :', err.message);
+          this.video.muted = true;
+          this.syncVolumeUI();
+          this.video.play().catch(() => {});
+        });
+      });
+
+      hls.on(Hls.Events.LEVEL_SWITCHED, (event, data) => {
+        if (hls.levels && hls.levels[data.level]) {
+          const lvl = hls.levels[data.level];
+          const h = lvl.height || 720;
+          if (this.qualityBadge) {
+            this.qualityBadge.textContent = (h >= 1080) ? 'FHD' : ((h >= 720) ? 'HD' : `${h}p`);
+          }
+          if (this.currentQuality === -1 && this.qualityCurrentText) {
+            this.qualityCurrentText.textContent = `${h}p`;
+          }
+        }
+      });
+
+      hls.on(Hls.Events.ERROR, (event, data) => {
+        if (data.fatal) {
+          console.warn('[HLS Fatal Error]', data.type, data.details);
+          switch (data.type) {
+            case Hls.ErrorTypes.NETWORK_ERROR:
+              hls.startLoad();
+              break;
+            case Hls.ErrorTypes.MEDIA_ERROR:
+              hls.recoverMediaError();
+              break;
+            default:
+              hls.destroy();
+              this.hls = null;
+              this.showStatusBanner(`Erreur de segment sur Serveur ${this.currentServer}. Basculement...`);
+              setTimeout(() => {
+                const next = (this.currentServer % 5) + 1;
+                this.switchServer(next);
+              }, 1200);
+              break;
+          }
+        }
+      });
+    } else if (this.video.canPlayType('application/vnd.apple.mpegurl')) {
+      this.video.src = streamUrl;
+      this.video.onloadedmetadata = () => {
+        this.video.play().catch(() => {
+          this.video.muted = true;
+          this.syncVolumeUI();
+          this.video.play().catch(() => {});
+        });
+      };
+    } else {
+      this.showStatusBanner("Votre navigateur ne supporte pas la lecture HLS directe.");
+    }
+  }
+
+  showLoader(title = "Extraction du flux en cours...") {
+    if (this.loaderTitle) this.loaderTitle.textContent = title;
+    this.loader.classList.remove('hidden');
+  }
+
+  hideLoader() {
+    this.loader.classList.add('hidden');
+  }
+
+  showStatusBanner(message, actionLabel = "Basculer de serveur") {
+    if (this.statusBannerText) this.statusBannerText.textContent = message;
+    if (this.statusSwitchBtn) this.statusSwitchBtn.textContent = actionLabel;
+    this.statusBanner.classList.remove('hidden');
+  }
+
+  hideStatusBanner() {
+    this.statusBanner.classList.add('hidden');
+  }
+
+  close() {
+    clearTimeout(this.idleTimer);
+    if (this.activeExtractionAbort) {
+      this.activeExtractionAbort.abort();
+      this.activeExtractionAbort = null;
+    }
+    if (this.hls) {
+      this.hls.destroy();
+      this.hls = null;
+    }
+    this.video.pause();
+    this.video.src = '';
+    this.iframe.src = 'about:blank';
+    this.iframe.classList.add('hidden');
+    this.video.classList.remove('hidden');
+    if (this.bottomControls) {
+      this.bottomControls.classList.remove('iframe-mode');
+    }
+    this.hideLoader();
+    this.hideStatusBanner();
+    this.overlay.classList.remove('active', 'user-idle');
+
+    if (document.fullscreenElement) {
+      if (document.exitFullscreen) document.exitFullscreen().catch(() => {});
+      else if (document.webkitExitFullscreen) document.webkitExitFullscreen().catch(() => {});
+    }
+  }
+}
+
+window.NetflixPlayer = NetflixPlayer;
