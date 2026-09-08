@@ -1243,14 +1243,23 @@ class NetflixPlayer {
       const isChannel = (this.currentMovie?.media_type === 'channel' || this.currentMovie?.is_live);
       const hls = new Hls({
         enableWorker: true,
-        lowLatencyMode: true,
-        liveSyncDurationCount: isChannel ? 3 : 5,
-        liveMaxLatencyDurationCount: isChannel ? 6 : 10,
-        startLevel: -1,
+        lowLatencyMode: false, // Désactivé pour stabiliser le buffer et éviter les micro-saccades
+        liveSyncDurationCount: isChannel ? 5 : 4, // 5 segments de marge de sécurité (environ 12s-15s de buffer continu)
+        liveMaxLatencyDurationCount: isChannel ? 10 : 8,
+        liveDurationInfinity: isChannel,
+        startLevel: -1, // Démarrage adaptatif pour éviter tout gel au lancement
         capLevelToPlayerSize: false,
-        backBufferLength: 90,
-        maxBufferLength: 60,
-        maxMaxBufferLength: 120
+        backBufferLength: isChannel ? 30 : 90,
+        maxBufferLength: isChannel ? 30 : 60,
+        maxMaxBufferLength: isChannel ? 60 : 120,
+        maxBufferSize: 60 * 1000 * 1000,
+        highBufferWatchdogPeriod: 2,
+        nudgeOffset: 0.1,
+        nudgeMaxRetry: 5,
+        maxFragLookUpTolerance: 0.25,
+        fragLoadingTimeOut: 20000,
+        manifestLoadingTimeOut: 20000,
+        levelLoadingTimeOut: 20000
       });
       this.hls = hls;
 

@@ -358,7 +358,15 @@ async function getWideIptvM3u8(daddyId) {
   return null;
 }
 
-async function getLiveM3u8Url(daddyId, mirror = 'premium_vip') {
+const backupChannelIds = {
+  '121': [3050], // Canal+ France (secours Ligue1+ 121)
+  '464': [3057], // Canal+ Sport 360 (secours CH-3057)
+  '116': [3051], // beIN Sports 1 FR (secours FR 3051)
+  '120': [3055], // RMC Sport 2 (secours CH-3055)
+  '960': [3053, 3054, 3056, 3052] // DAZN Ligue 1 (secours Multi-Canaux 3052-3056)
+};
+
+async function getLiveM3u8Url(daddyId, mirror = 'premium_vip', isRecursive = false) {
   const cacheKey = `${daddyId}_${mirror}`;
   const now = Date.now();
   if (liveStreamCache.has(cacheKey)) {
@@ -377,19 +385,19 @@ async function getLiveM3u8Url(daddyId, mirror = 'premium_vip') {
       return wideUrl;
     }
     // 2. Priorité 2: DLHD Daddy1 Alpha (xameleon.phantemlis.top/one/...)
-    const d1 = await getLiveM3u8Url(daddyId, 'daddy1');
+    const d1 = await getLiveM3u8Url(daddyId, 'daddy1', isRecursive);
     if (d1) {
       liveStreamCache.set(cacheKey, { streamUrl: d1, expiresAt: now + (180 * 1000) });
       return d1;
     }
     // 3. Priorité 3: DLHD Cluster 2 (xameleon.phantemlis.top/two/...)
-    const d2 = await getLiveM3u8Url(daddyId, 'daddy2');
+    const d2 = await getLiveM3u8Url(daddyId, 'daddy2', isRecursive);
     if (d2) {
       liveStreamCache.set(cacheKey, { streamUrl: d2, expiresAt: now + (180 * 1000) });
       return d2;
     }
     // 4. Fallback: Cricsfree
-    const cf = await getLiveM3u8Url(daddyId, 'cricsfree');
+    const cf = await getLiveM3u8Url(daddyId, 'cricsfree', isRecursive);
     if (cf) {
       liveStreamCache.set(cacheKey, { streamUrl: cf, expiresAt: now + (180 * 1000) });
       return cf;
@@ -443,6 +451,19 @@ async function getLiveM3u8Url(daddyId, mirror = 'premium_vip') {
       }
     } catch (e) {}
   }
+
+  // Cascade intelligente vers les canaux de secours français alternatifs
+  const backups = backupChannelIds[String(daddyId)];
+  if (backups && backups.length > 0 && !isRecursive) {
+    for (const bId of backups) {
+      const bUrl = await getLiveM3u8Url(bId, mirror, true);
+      if (bUrl) {
+        liveStreamCache.set(cacheKey, { streamUrl: bUrl, expiresAt: now + (180 * 1000) });
+        return bUrl;
+      }
+    }
+  }
+
   return null;
 }
 
