@@ -1039,13 +1039,6 @@ class NetflixApp {
   }
 
   async openTeleRealiteSeries(show) {
-    // Si la série est La Villa (6715 / 68628), elle existe déjà dans catalog.movies avec les vrais épisodes
-    const existingInCatalog = this.catalogData?.movies?.find(m => m.id === '68628' || m.tmdb_id === '68628');
-    if (show.series_id === 6715 && existingInCatalog && existingInCatalog.seasons && existingInCatalog.seasons.length > 0) {
-      this.player.open(existingInCatalog, 1);
-      return;
-    }
-
     // Afficher le loader sur le player
     this.player.showLoader(`⚡ Chargement des saisons de ${show.name} (💎 Xtream VIP)...`);
     this.player.overlay.classList.add('active');
@@ -1060,6 +1053,12 @@ class NetflixApp {
 
       if (!seriesObj.success || !seriesObj.seasons || seriesObj.seasons.length === 0) {
         throw new Error(seriesObj.message || "Aucune saison disponible pour cette émission");
+      }
+
+      // Synchroniser la fiche du catalogue si présente (ex: La Villa) pour que la page d'accueil ait les nouveaux épisodes
+      const existingInCatalog = this.catalogData?.movies?.find(m => m.id === '68628' || m.tmdb_id === '68628');
+      if (show.series_id === 6715 && existingInCatalog) {
+        existingInCatalog.seasons = seriesObj.seasons;
       }
 
       this.player.setStep(1, 'done', `1. ${seriesObj.seasons.length} saison(s) chargée(s) avec succès`);

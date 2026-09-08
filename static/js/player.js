@@ -819,6 +819,27 @@ class NetflixPlayer {
       this.populateSeasons();
       this.populateEpisodes();
       this.ctrlNextEpBtn.classList.remove('hidden');
+
+      // Auto-Sync en arrière-plan pour les séries Xtream (détection automatique des nouveaux épisodes ajoutés)
+      if (movie.id === '68628' || movie.tmdb_id === '68628' || String(movie.id).startsWith('xtream_series_')) {
+        const sId = (movie.id === '68628' || movie.tmdb_id === '68628') ? '6715' : String(movie.id).replace('xtream_series_', '');
+        const baseUrl = window.API_BASE || '';
+        fetch(`${baseUrl}/api/xtream/series-info?series_id=${sId}`)
+          .then(r => r.json())
+          .then(freshData => {
+            if (freshData && freshData.seasons && freshData.seasons.length > 0) {
+              const oldTotalEps = (movie.seasons || []).reduce((acc, s) => acc + (s.episodes?.length || 0), 0);
+              const newTotalEps = freshData.seasons.reduce((acc, s) => acc + (s.episodes?.length || 0), 0);
+              if (newTotalEps > oldTotalEps) {
+                console.log(`[Player Auto-Sync] ${newTotalEps - oldTotalEps} nouveau(x) épisode(s) détecté(s) pour ${movie.title} !`);
+                movie.seasons = freshData.seasons;
+                this.populateSeasons();
+                this.populateEpisodes();
+              }
+            }
+          })
+          .catch(() => {});
+      }
     } else {
       this.episodeBox.classList.add('hidden');
       this.ctrlNextEpBtn.classList.add('hidden');

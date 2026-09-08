@@ -1945,11 +1945,76 @@ const server = http.createServer((req, res) => {
     return res.end(JSON.stringify(result));
   }
 
+  // ================= SYNCHRONISATION AUTOMATIQUE DU CATALOGUE TÉLÉ-RÉALITÉ XTREAM =================
+  let lastTeleRealiteSync = Date.now();
+
+  function syncTeleRealiteCatalogFromXtream(onDone) {
+    const apiUrl = `http://${XTREAM_CONFIG.host}:${XTREAM_CONFIG.port}/player_api.php?username=${XTREAM_CONFIG.username}&password=${XTREAM_CONFIG.password}&action=get_series&category_id=947`;
+    http.get(apiUrl, { timeout: 15000 }, (apiRes) => {
+      let data = '';
+      apiRes.on('data', chunk => data += chunk);
+      apiRes.on('end', () => {
+        try {
+          const rawList = JSON.parse(data);
+          if (Array.isArray(rawList) && rawList.length > 0) {
+            XTREAM_TELEREALITE_CATALOG = rawList.map(item => {
+              const rawName = item.name || '';
+              const yearMatch = rawName.match(/\((\d{4})\)/) || rawName.match(/\b(20\d{2})\b/);
+              const year = yearMatch ? parseInt(yearMatch[1], 10) : (parseInt(item.releaseDate, 10) || 2025);
+              let cleanName = rawName.replace(/\(\d{4}\)/g, '').replace(/\[.*?\]/g, '').replace(/\s+/g, ' ').trim();
+              const cover = item.cover && (item.cover.startsWith('http') || item.cover.startsWith('https')) ? item.cover : 'assets/hero/live-tv-banner.webp';
+              const backdrop = (Array.isArray(item.backdrop_path) && item.backdrop_path[0]) ? item.backdrop_path[0] : cover;
+
+              return {
+                series_id: item.series_id,
+                name: cleanName,
+                raw_name: rawName,
+                year: year,
+                rating: item.rating || "7.5",
+                cover: cover,
+                backdrop: backdrop,
+                plot: item.plot || "Émission de télé-réalité en streaming haute qualité.",
+                genre: item.genre || "Télé-Réalité",
+                cast: item.cast || "",
+                category_id: "947",
+                category_name: "Télé-Réalité",
+                episode_run_time: item.episode_run_time || "0"
+              };
+            });
+
+            XTREAM_TELEREALITE_CATALOG.sort((a, b) => (b.year - a.year) || a.name.localeCompare(b.name, 'fr'));
+
+            const trPath = path.join(__dirname, 'data', 'xtream_telerealite_catalog.json');
+            fs.writeFileSync(trPath, JSON.stringify(XTREAM_TELEREALITE_CATALOG, null, 2), 'utf8');
+            lastTeleRealiteSync = Date.now();
+            console.log(`[Xtream Auto-Sync] Catalogue Télé-Réalité actualisé avec succès : ${XTREAM_TELEREALITE_CATALOG.length} émissions synchronisées.`);
+            if (onDone) onDone(null, XTREAM_TELEREALITE_CATALOG);
+          }
+        } catch (e) {
+          if (onDone) onDone(e);
+        }
+      });
+    }).on('error', (err) => {
+      if (onDone) onDone(err);
+    });
+  }
+
+  // Tâche de fond automatique : synchronise les nouvelles séries toutes les 6 heures
+  setInterval(() => {
+    syncTeleRealiteCatalogFromXtream();
+  }, 6 * 3600 * 1000);
+
   // ================= ROUTE CATALOGUE TÉLÉ-RÉALITÉ XTREAM (/api/xtream/telerealite) =================
-  // Retourne les 221 séries de télé-réalité authentiques de la catégorie 947
+  // Retourne les séries de télé-réalité authentiques avec auto-actualisation
   if (pathname === '/api/xtream/telerealite' && req.method === 'GET') {
     const q = (parsedUrl.query.q || '').toString().toLowerCase().trim();
     const limit = parseInt(parsedUrl.query.limit, 10) || 300;
+    const forceRefresh = (parsedUrl.query.refresh === '1' || parsedUrl.query.refresh === 'true');
+
+    // Auto-actualisation si le catalogue a plus de 6h ou si refresh forcé
+    if (forceRefresh || (Date.now() - lastTeleRealiteSync > 6 * 3600 * 1000)) {
+      syncTeleRealiteCatalogFromXtream();
+    }
 
     let filtered = XTREAM_TELEREALITE_CATALOG;
     if (q) {
@@ -1964,6 +2029,7 @@ const server = http.createServer((req, res) => {
       success: true,
       count: filtered.length,
       total: XTREAM_TELEREALITE_CATALOG.length,
+      last_sync: new Date(lastTeleRealiteSync).toISOString(),
       data: filtered.slice(0, limit)
     };
 
@@ -1976,9 +2042,11 @@ const server = http.createServer((req, res) => {
   }
 
   // ================= ROUTE DÉTAILS SÉRIE XTREAM (/api/xtream/series-info) =================
-  // Renvoie les vraies saisons et les vrais épisodes depuis Xtream avec mise en cache disque
+  // Renvoie les vraies saisons et les vrais épisodes avec auto-actualisation Stale-While-Revalidate (TTL: 2h)
   if (pathname === '/api/xtream/series-info' && req.method === 'GET') {
     const seriesId = parsedUrl.query.series_id || parsedUrl.query.id;
+    const forceRefresh = (parsedUrl.query.refresh === '1' || parsedUrl.query.refresh === 'true');
+
     if (!seriesId) {
       res.writeHead(400, { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' });
       return res.end(JSON.stringify({ success: false, message: 'Paramètre series_id requis' }));
@@ -1991,7 +2059,6 @@ const server = http.createServer((req, res) => {
     const cacheFile = path.join(cacheDir, `series_${seriesId}.json`);
 
     const serveSeriesData = (rawData) => {
-      // Formater pour le lecteur Netflix : saisons réelles + épisodes réels
       const episodesMap = rawData.episodes || {};
       const seasonsList = [];
 
@@ -2050,37 +2117,71 @@ const server = http.createServer((req, res) => {
       res.writeHead(200, {
         'Content-Type': 'application/json; charset=utf-8',
         'Access-Control-Allow-Origin': '*',
-        'Cache-Control': 'public, max-age=300'
+        'Cache-Control': 'public, max-age=180'
       });
       return res.end(JSON.stringify(seriesObj));
     };
 
-    // 1. Vérifier le cache disque
-    if (fs.existsSync(cacheFile)) {
-      try {
-        const cached = JSON.parse(fs.readFileSync(cacheFile, 'utf8'));
-        return serveSeriesData(cached);
-      } catch (e) {}
+    function fetchFreshSeriesFromXtream(onDone) {
+      const apiUrl = `http://${XTREAM_CONFIG.host}:${XTREAM_CONFIG.port}/player_api.php?username=${XTREAM_CONFIG.username}&password=${XTREAM_CONFIG.password}&action=get_series_info&series_id=${seriesId}`;
+      http.get(apiUrl, { timeout: 12000 }, (apiRes) => {
+        let data = '';
+        apiRes.on('data', chunk => data += chunk);
+        apiRes.on('end', () => {
+          try {
+            const parsed = JSON.parse(data);
+            if (parsed && (parsed.info || parsed.episodes)) {
+              fs.writeFileSync(cacheFile, JSON.stringify(parsed, null, 2), 'utf8');
+              console.log(`[Xtream Auto-Sync] Série ${seriesId} mise à jour avec les derniers épisodes.`);
+              if (onDone) onDone(null, parsed);
+            } else if (onDone) {
+              onDone(new Error('Données Xtream incomplètes'));
+            }
+          } catch (e) {
+            if (onDone) onDone(e);
+          }
+        });
+      }).on('error', (err) => {
+        if (onDone) onDone(err);
+      });
     }
 
-    // 2. Récupérer depuis l'API Xtream Codes
-    const apiUrl = `http://${XTREAM_CONFIG.host}:${XTREAM_CONFIG.port}/player_api.php?username=${XTREAM_CONFIG.username}&password=${XTREAM_CONFIG.password}&action=get_series_info&series_id=${seriesId}`;
-    http.get(apiUrl, { timeout: 12000 }, (apiRes) => {
-      let data = '';
-      apiRes.on('data', chunk => data += chunk);
-      apiRes.on('end', () => {
-        try {
-          const parsed = JSON.parse(data);
-          fs.writeFileSync(cacheFile, JSON.stringify(parsed, null, 2), 'utf8');
-          return serveSeriesData(parsed);
-        } catch (e) {
-          res.writeHead(502, { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' });
-          return res.end(JSON.stringify({ success: false, message: 'Erreur parsing Xtream series info: ' + e.message }));
+    // 1. Vérification du cache disque avec politique Stale-While-Revalidate (TTL 2h)
+    let cached = null;
+    let isStale = false;
+    if (fs.existsSync(cacheFile)) {
+      try {
+        const stats = fs.statSync(cacheFile);
+        cached = JSON.parse(fs.readFileSync(cacheFile, 'utf8'));
+        const age = Date.now() - stats.mtimeMs;
+        // Si le cache a plus de 2 heures ou si refresh explicite demandé
+        if (age > 2 * 3600 * 1000 || forceRefresh) {
+          isStale = true;
         }
-      });
-    }).on('error', (err) => {
-      res.writeHead(502, { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' });
-      return res.end(JSON.stringify({ success: false, message: 'Erreur connexion Xtream series info: ' + err.message }));
+      } catch (e) {
+        cached = null;
+      }
+    }
+
+    if (cached) {
+      if (isStale) {
+        // Rafraîchissement automatique en arrière-plan sans faire attendre l'utilisateur
+        fetchFreshSeriesFromXtream((err, fresh) => {
+          if (!err && fresh) {
+            console.log(`[Xtream Auto-Sync] Nouveaux épisodes récupérés pour série ${seriesId}`);
+          }
+        });
+      }
+      return serveSeriesData(cached);
+    }
+
+    // 2. Si aucun cache disque n'existe, récupération immédiate depuis Xtream
+    fetchFreshSeriesFromXtream((err, fresh) => {
+      if (err || !fresh) {
+        res.writeHead(502, { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' });
+        return res.end(JSON.stringify({ success: false, message: 'Erreur connexion Xtream series info: ' + (err?.message || 'Inconnu') }));
+      }
+      return serveSeriesData(fresh);
     });
     return;
   }
