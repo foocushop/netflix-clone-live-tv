@@ -316,6 +316,48 @@ async function extractShowMultiProvider(showType, season, episode, serverIndex) 
 
 const liveStreamCache = new Map();
 
+async function getWideIptvM3u8(daddyId) {
+  const cacheKey = `wideiptv_${daddyId}`;
+  const now = Date.now();
+  if (liveStreamCache.has(cacheKey)) {
+    const item = liveStreamCache.get(cacheKey);
+    if (now < item.expiresAt) {
+      return item.streamUrl;
+    }
+  }
+
+  try {
+    const pageHtml = await httpsGet(`https://dlive.sx/player/stream-${daddyId}.php`, {
+      'Referer': 'https://dlive.sx/'
+    });
+    if (!pageHtml || !pageHtml.text) return null;
+
+    const slugMatch = pageHtml.text.match(/wideiptv\.top\/(?:daddy\.php\?stream=|player\/)([^"&'\s]+)/i);
+    if (!slugMatch) return null;
+
+    const slug = slugMatch[1];
+    const playerHtml = await httpsGet(`https://wideiptv.top/player/${slug}`, {
+      'Referer': `https://wideiptv.top/daddy.php?stream=${slug}`
+    });
+    if (!playerHtml || !playerHtml.text) return null;
+
+    const m3u8Match = playerHtml.text.match(/streamUrl:\s*["']([^"']+\.m3u8[^"']*)["']/i);
+    if (m3u8Match) {
+      const streamUrl = m3u8Match[1].replace(/\\\//g, '/');
+      try {
+        const testRes = await httpsGet(streamUrl, { 'Referer': 'https://wideiptv.top/' });
+        if (testRes.status === 200 && testRes.text && testRes.text.includes('#EXTM3U')) {
+          liveStreamCache.set(cacheKey, { streamUrl, expiresAt: now + (180 * 1000) });
+          return streamUrl;
+        }
+      } catch (e) {}
+    }
+  } catch (e) {
+    console.warn(`[WideIPTV Extraction Error ${daddyId}]:`, e.message);
+  }
+  return null;
+}
+
 async function getLiveM3u8Url(daddyId, mirror = 'cricsfree') {
   const cacheKey = `${daddyId}_${mirror}`;
   const now = Date.now();
@@ -326,9 +368,22 @@ async function getLiveM3u8Url(daddyId, mirror = 'cricsfree') {
     }
   }
 
+  if (mirror === 'wideiptv') {
+    const wideUrl = await getWideIptvM3u8(daddyId);
+    if (wideUrl) {
+      return wideUrl;
+    }
+    mirror = 'cricsfree';
+  }
+
   const sources = [];
-  if (mirror === 'daddy2') {
+  if (mirror === 'daddy1') {
+    sources.push({ url: `https://hamis.romponalis.st/premiumtv/daddy.php?id=${daddyId}`, ref: 'https://dlhd.st/' });
     sources.push({ url: `https://hamis.romponalis.st/premiumtv/daddy2.php?id=${daddyId}`, ref: 'https://dlhd.st/' });
+    sources.push({ url: `https://hamis.romponalis.st/premiumtv/cricsfree2.php?id=${daddyId}`, ref: 'https://cricsfree.cfd/' });
+  } else if (mirror === 'daddy2') {
+    sources.push({ url: `https://hamis.romponalis.st/premiumtv/daddy2.php?id=${daddyId}`, ref: 'https://dlhd.st/' });
+    sources.push({ url: `https://hamis.romponalis.st/premiumtv/daddy.php?id=${daddyId}`, ref: 'https://dlhd.st/' });
     sources.push({ url: `https://hamis.romponalis.st/premiumtv/cricsfree2.php?id=${daddyId}`, ref: 'https://cricsfree.cfd/' });
     sources.push({ url: `https://hamis.romponalis.st/premiumtv/apexstreams2.php?id=${daddyId}`, ref: 'https://apexstreams.cfd/' });
   } else if (mirror === 'apex') {
@@ -339,6 +394,7 @@ async function getLiveM3u8Url(daddyId, mirror = 'cricsfree') {
     sources.push({ url: `https://hamis.romponalis.st/premiumtv/cricsfree2.php?id=${daddyId}`, ref: 'https://cricsfree.cfd/' });
     sources.push({ url: `https://hamis.romponalis.st/premiumtv/apexstreams2.php?id=${daddyId}`, ref: 'https://apexstreams.cfd/' });
     sources.push({ url: `https://hamis.romponalis.st/premiumtv/daddy2.php?id=${daddyId}`, ref: 'https://dlhd.st/' });
+    sources.push({ url: `https://hamis.romponalis.st/premiumtv/daddy.php?id=${daddyId}`, ref: 'https://dlhd.st/' });
   }
 
   for (const s of sources) {
@@ -371,26 +427,21 @@ async function extractChannelMultiProvider(channelId, serverNum) {
     if (/^\d+$/.test(raw)) daddyId = parseInt(raw, 10);
   }
 
-  const srvNum = Math.max(1, Math.min(17, parseInt(serverNum) || 1));
+  const srvNum = Math.max(1, Math.min(12, parseInt(serverNum) || 1));
 
   const serverNames = {
     1: 'Serveur 1 (⚡ Direct HLS Principal 1080p)',
     2: 'Serveur 2 (🎬 Direct HLS Apex 1080p)',
     3: 'Serveur 3 (📡 Direct HLS DLHD 1080p)',
-    4: 'Serveur 4 (📺 DLive Cast • Srv 1 interne)',
-    5: 'Serveur 5 (📺 DLive Watch • Srv 2 interne)',
-    6: 'Serveur 6 (📺 DLive Plus • Srv 3 interne)',
-    7: 'Serveur 7 (📺 DLive Casting • Srv 4 interne)',
-    8: 'Serveur 8 (📺 DLive Player • Srv 5 interne)',
-    9: 'Serveur 9 (📺 DLive Embed • Srv 6 interne)',
-    10: 'Serveur 10 (🌐 Lecteur Cricsfree Web)',
-    11: 'Serveur 11 (🌐 Lecteur Apex Web)',
-    12: 'Serveur 12 (🌐 Lecteur DLHD Watch)',
-    13: 'Serveur 13 (🚀 Lecteur HD1 Alba SBS)',
-    14: 'Serveur 14 (🛡️ Lecteur CX / Merit)',
-    15: 'Serveur 15 (🎯 Lecteur EngStreams)',
-    16: 'Serveur 16 (⚡ Hub Nontongo)',
-    17: 'Serveur 17 (⚡ Hub DaddyLive Li)'
+    4: 'Serveur 4 (🌐 Direct HLS DLHD Alpha 1080p)',
+    5: 'Serveur 5 (🚀 Direct HLS WideIPTV 1080p)',
+    6: 'Serveur 6 (📺 Direct HLS DLive Watch 1080p)',
+    7: 'Serveur 7 (📺 Direct HLS DLive Embed 1080p)',
+    8: 'Serveur 8 (📺 Direct HLS DLive Player 1080p)',
+    9: 'Serveur 9 (🌐 Direct HLS Cricsfree Alt 1080p)',
+    10: 'Serveur 10 (🌐 Direct HLS Apex Alt 1080p)',
+    11: 'Serveur 11 (🚀 Direct HLS Alba Cloud 1080p)',
+    12: 'Serveur 12 (🛡️ Direct HLS Bluetier VIP 1080p)'
   };
 
   // Chaînes FAST Sport ouvertes
@@ -413,7 +464,7 @@ async function extractChannelMultiProvider(channelId, serverNum) {
       player_type: 'direct_hls',
       is_embed: false,
       is_live: true,
-      sources_count: 17,
+      sources_count: 12,
       lang: 'vf'
     };
   }
@@ -430,7 +481,7 @@ async function extractChannelMultiProvider(channelId, serverNum) {
       player_type: 'direct_hls',
       is_embed: false,
       is_live: true,
-      sources_count: 17,
+      sources_count: 12,
       lang: 'vf'
     };
   }
@@ -447,372 +498,73 @@ async function extractChannelMultiProvider(channelId, serverNum) {
       player_type: 'direct_hls',
       is_embed: false,
       is_live: true,
-      sources_count: 17,
+      sources_count: 12,
       lang: 'vf'
     };
   }
 
   // Traitement pour les chaînes DaddyLive
   if (daddyId) {
-    if (srvNum === 1) {
-      const liveM3u8 = await getLiveM3u8Url(daddyId, 'cricsfree');
-      if (liveM3u8) {
-        return {
-          success: true,
-          server: 1,
-          server_name: serverNames[1],
-          hoster: `Direct HLS Cricsfree • ${title}`,
-          quality: '1080p FHD Direct',
-          title: `${title} • 🔴 EN DIRECT`,
-          stream_url: `/api/stream/live?channel=${encodeURIComponent(daddyId)}&mirror=cricsfree`,
-          player_type: 'direct_hls',
-          is_embed: false,
-          is_live: true,
-          sources_count: 17,
-          lang: 'vf'
-        };
-      }
+    const mirrorMap = {
+      1: { mirror: 'cricsfree', hoster: 'Direct HLS Principal (Cricsfree 1080p)' },
+      2: { mirror: 'apex', hoster: 'Direct HLS Apex (1080p)' },
+      3: { mirror: 'daddy2', hoster: 'Direct HLS DLHD (1080p)' },
+      4: { mirror: 'daddy1', hoster: 'Direct HLS DLHD Alpha (1080p)' },
+      5: { mirror: 'wideiptv', hoster: 'Direct HLS WideIPTV (Bluetier 1080p)' },
+      6: { mirror: 'daddy2', hoster: 'Direct HLS DLive Watch (1080p)' },
+      7: { mirror: 'daddy2', hoster: 'Direct HLS DLive Embed (1080p)' },
+      8: { mirror: 'wideiptv', hoster: 'Direct HLS DLive Player (WideIPTV 1080p)' },
+      9: { mirror: 'cricsfree', hoster: 'Direct HLS Cricsfree Alt (1080p)' },
+      10: { mirror: 'apex', hoster: 'Direct HLS Apex Alt (1080p)' },
+      11: { mirror: 'daddy1', hoster: 'Direct HLS Alba Cloud (1080p)' },
+      12: { mirror: 'wideiptv', hoster: 'Direct HLS Bluetier VIP (1080p)' }
+    };
+
+    const cfg = mirrorMap[srvNum] || mirrorMap[1];
+    let streamUrl = await getLiveM3u8Url(daddyId, cfg.mirror);
+
+    // Cascade automatique vers les miroirs alternatifs si le principal est hors-ligne
+    if (!streamUrl && cfg.mirror !== 'cricsfree') streamUrl = await getLiveM3u8Url(daddyId, 'cricsfree');
+    if (!streamUrl && cfg.mirror !== 'apex') streamUrl = await getLiveM3u8Url(daddyId, 'apex');
+    if (!streamUrl && cfg.mirror !== 'daddy2') streamUrl = await getLiveM3u8Url(daddyId, 'daddy2');
+    if (!streamUrl && cfg.mirror !== 'wideiptv') streamUrl = await getLiveM3u8Url(daddyId, 'wideiptv');
+
+    if (streamUrl) {
       return {
         success: true,
-        server: 1,
-        server_name: serverNames[1],
-        hoster: `Lecteur Cricsfree • ${title}`,
-        quality: '1080p HD',
+        server: srvNum,
+        server_name: serverNames[srvNum],
+        hoster: `${cfg.hoster} • ${title}`,
+        quality: '1080p FHD Direct',
         title: `${title} • 🔴 EN DIRECT`,
-        stream_url: `https://cricsfree.cfd/live/stream-${daddyId}.php`,
-        embed_url: `https://cricsfree.cfd/live/stream-${daddyId}.php`,
-        player_type: 'iframe',
-        is_embed: true,
+        stream_url: `/api/stream/live?channel=${encodeURIComponent(daddyId)}&mirror=${encodeURIComponent(cfg.mirror)}`,
+        player_type: 'direct_hls',
+        is_embed: false,
         is_live: true,
-        sources_count: 17,
+        sources_count: 12,
         lang: 'vf'
       };
     }
 
-    if (srvNum === 2) {
-      const liveApex = await getLiveM3u8Url(daddyId, 'apex');
-      if (liveApex) {
-        return {
-          success: true,
-          server: 2,
-          server_name: serverNames[2],
-          hoster: `Direct HLS Apex • ${title}`,
-          quality: '1080p FHD Direct',
-          title: `${title} • 🔴 EN DIRECT`,
-          stream_url: `/api/stream/live?channel=${encodeURIComponent(daddyId)}&mirror=apex`,
-          player_type: 'direct_hls',
-          is_embed: false,
-          is_live: true,
-          sources_count: 17,
-          lang: 'vf'
-        };
-      }
-      return {
-        success: true,
-        server: 2,
-        server_name: serverNames[2],
-        hoster: `Lecteur Apex • ${title}`,
-        quality: '1080p HD',
-        title: `${title} • 🔴 EN DIRECT`,
-        stream_url: `https://apexstreams.cfd/live/stream-${daddyId}.php`,
-        embed_url: `https://apexstreams.cfd/live/stream-${daddyId}.php`,
-        player_type: 'iframe',
-        is_embed: true,
-        is_live: true,
-        sources_count: 17,
-        lang: 'vf'
-      };
-    }
-
-    if (srvNum === 3) {
-      const liveDaddy = await getLiveM3u8Url(daddyId, 'daddy2');
-      if (liveDaddy) {
-        return {
-          success: true,
-          server: 3,
-          server_name: serverNames[3],
-          hoster: `Direct HLS DLHD • ${title}`,
-          quality: '1080p FHD Direct',
-          title: `${title} • 🔴 EN DIRECT`,
-          stream_url: `/api/stream/live?channel=${encodeURIComponent(daddyId)}&mirror=daddy2`,
-          player_type: 'direct_hls',
-          is_embed: false,
-          is_live: true,
-          sources_count: 17,
-          lang: 'vf'
-        };
-      }
-      return {
-        success: true,
-        server: 3,
-        server_name: serverNames[3],
-        hoster: `Lecteur DLHD Watch • ${title}`,
-        quality: '1080p HD',
-        title: `${title} • 🔴 EN DIRECT`,
-        stream_url: `https://dlhd.st/watch/stream-${daddyId}.php`,
-        embed_url: `https://dlhd.st/watch/stream-${daddyId}.php`,
-        player_type: 'iframe',
-        is_embed: true,
-        is_live: true,
-        sources_count: 17,
-        lang: 'vf'
-      };
-    }
-
-    if (srvNum === 4) {
-      return {
-        success: true,
-        server: 4,
-        server_name: serverNames[4],
-        hoster: `DLive Cast (Serveur 1 interne) • ${title}`,
-        quality: '1080p HD',
-        title: `${title} • 🔴 EN DIRECT`,
-        stream_url: `https://dlive.sx/cast/stream-${daddyId}.php`,
-        embed_url: `https://dlive.sx/cast/stream-${daddyId}.php`,
-        player_type: 'iframe',
-        is_embed: true,
-        is_live: true,
-        sources_count: 17,
-        lang: 'vf'
-      };
-    }
-
-    if (srvNum === 5) {
-      return {
-        success: true,
-        server: 5,
-        server_name: serverNames[5],
-        hoster: `DLive Watch (Serveur 2 interne) • ${title}`,
-        quality: '1080p HD',
-        title: `${title} • 🔴 EN DIRECT`,
-        stream_url: `https://dlive.sx/watch/stream-${daddyId}.php`,
-        embed_url: `https://dlive.sx/watch/stream-${daddyId}.php`,
-        player_type: 'iframe',
-        is_embed: true,
-        is_live: true,
-        sources_count: 17,
-        lang: 'vf'
-      };
-    }
-
-    if (srvNum === 6) {
-      return {
-        success: true,
-        server: 6,
-        server_name: serverNames[6],
-        hoster: `DLive Plus (Serveur 3 interne) • ${title}`,
-        quality: '1080p HD',
-        title: `${title} • 🔴 EN DIRECT`,
-        stream_url: `https://dlive.sx/plus/stream-${daddyId}.php`,
-        embed_url: `https://dlive.sx/plus/stream-${daddyId}.php`,
-        player_type: 'iframe',
-        is_embed: true,
-        is_live: true,
-        sources_count: 17,
-        lang: 'vf'
-      };
-    }
-
-    if (srvNum === 7) {
-      return {
-        success: true,
-        server: 7,
-        server_name: serverNames[7],
-        hoster: `DLive Casting (Serveur 4 interne) • ${title}`,
-        quality: '1080p HD',
-        title: `${title} • 🔴 EN DIRECT`,
-        stream_url: `https://dlive.sx/casting/stream-${daddyId}.php`,
-        embed_url: `https://dlive.sx/casting/stream-${daddyId}.php`,
-        player_type: 'iframe',
-        is_embed: true,
-        is_live: true,
-        sources_count: 17,
-        lang: 'vf'
-      };
-    }
-
-    if (srvNum === 8) {
-      return {
-        success: true,
-        server: 8,
-        server_name: serverNames[8],
-        hoster: `DLive Player (Serveur 5 interne) • ${title}`,
-        quality: '1080p HD',
-        title: `${title} • 🔴 EN DIRECT`,
-        stream_url: `https://dlive.sx/player/stream-${daddyId}.php`,
-        embed_url: `https://dlive.sx/player/stream-${daddyId}.php`,
-        player_type: 'iframe',
-        is_embed: true,
-        is_live: true,
-        sources_count: 17,
-        lang: 'vf'
-      };
-    }
-
-    if (srvNum === 9) {
-      return {
-        success: true,
-        server: 9,
-        server_name: serverNames[9],
-        hoster: `DLive Embed (Serveur 6 interne) • ${title}`,
-        quality: '1080p HD',
-        title: `${title} • 🔴 EN DIRECT`,
-        stream_url: `https://dlive.sx/embed/stream-${daddyId}.php`,
-        embed_url: `https://dlive.sx/embed/stream-${daddyId}.php`,
-        player_type: 'iframe',
-        is_embed: true,
-        is_live: true,
-        sources_count: 17,
-        lang: 'vf'
-      };
-    }
-
-    if (srvNum === 10) {
-      return {
-        success: true,
-        server: 10,
-        server_name: serverNames[10],
-        hoster: `Lecteur Cricsfree Web • ${title}`,
-        quality: '1080p HD',
-        title: `${title} • 🔴 EN DIRECT`,
-        stream_url: `https://cricsfree.cfd/live/stream-${daddyId}.php`,
-        embed_url: `https://cricsfree.cfd/live/stream-${daddyId}.php`,
-        player_type: 'iframe',
-        is_embed: true,
-        is_live: true,
-        sources_count: 17,
-        lang: 'vf'
-      };
-    }
-
-    if (srvNum === 11) {
-      return {
-        success: true,
-        server: 11,
-        server_name: serverNames[11],
-        hoster: `Lecteur Apex Web • ${title}`,
-        quality: '1080p HD',
-        title: `${title} • 🔴 EN DIRECT`,
-        stream_url: `https://apexstreams.cfd/live/stream-${daddyId}.php`,
-        embed_url: `https://apexstreams.cfd/live/stream-${daddyId}.php`,
-        player_type: 'iframe',
-        is_embed: true,
-        is_live: true,
-        sources_count: 17,
-        lang: 'vf'
-      };
-    }
-
-    if (srvNum === 12) {
-      return {
-        success: true,
-        server: 12,
-        server_name: serverNames[12],
-        hoster: `Lecteur DLHD Watch • ${title}`,
-        quality: '1080p HD',
-        title: `${title} • 🔴 EN DIRECT`,
-        stream_url: `https://dlhd.st/watch/stream-${daddyId}.php`,
-        embed_url: `https://dlhd.st/watch/stream-${daddyId}.php`,
-        player_type: 'iframe',
-        is_embed: true,
-        is_live: true,
-        sources_count: 17,
-        lang: 'vf'
-      };
-    }
-
-    if (srvNum === 13) {
-      return {
-        success: true,
-        server: 13,
-        server_name: serverNames[13],
-        hoster: `Lecteur HD1 Alba SBS • ${title}`,
-        quality: '1080p HD',
-        title: `${title} • 🔴 EN DIRECT`,
-        stream_url: `https://daddylivehd1.sbs/embed/stream-${daddyId}.php`,
-        embed_url: `https://daddylivehd1.sbs/embed/stream-${daddyId}.php`,
-        player_type: 'iframe',
-        is_embed: true,
-        is_live: true,
-        sources_count: 17,
-        lang: 'vf'
-      };
-    }
-
-    if (srvNum === 14) {
-      return {
-        success: true,
-        server: 14,
-        server_name: serverNames[14],
-        hoster: `Lecteur DaddyLive1 CX / Merit • ${title}`,
-        quality: '1080p HD',
-        title: `${title} • 🔴 EN DIRECT`,
-        stream_url: `https://daddylive1.cx/new/stream-${daddyId}.php`,
-        embed_url: `https://daddylive1.cx/new/stream-${daddyId}.php`,
-        player_type: 'iframe',
-        is_embed: true,
-        is_live: true,
-        sources_count: 17,
-        lang: 'vf'
-      };
-    }
-
-    if (srvNum === 15) {
-      return {
-        success: true,
-        server: 15,
-        server_name: serverNames[15],
-        hoster: `Lecteur EngStreams • ${title}`,
-        quality: '1080p HD',
-        title: `${title} • 🔴 EN DIRECT`,
-        stream_url: `https://engstreams.shop/stream/index.php?id=${daddyId}`,
-        embed_url: `https://engstreams.shop/stream/index.php?id=${daddyId}`,
-        player_type: 'iframe',
-        is_embed: true,
-        is_live: true,
-        sources_count: 17,
-        lang: 'vf'
-      };
-    }
-
-    if (srvNum === 16) {
-      return {
-        success: true,
-        server: 16,
-        server_name: serverNames[16],
-        hoster: `Hub Nontongo Multi-Serveurs • ${title}`,
-        quality: '1080p HD',
-        title: `${title} • 🔴 EN DIRECT`,
-        stream_url: `https://nontongo.win/livetv/play-movie.php?id=${daddyId}`,
-        embed_url: `https://nontongo.win/livetv/play-movie.php?id=${daddyId}`,
-        player_type: 'iframe',
-        is_embed: true,
-        is_live: true,
-        sources_count: 17,
-        lang: 'vf'
-      };
-    }
-
-    if (srvNum === 17) {
-      return {
-        success: true,
-        server: 17,
-        server_name: serverNames[17],
-        hoster: `Hub Miroir Global DaddyLive Li • ${title}`,
-        quality: '1080p HD',
-        title: `${title} • 🔴 EN DIRECT`,
-        stream_url: `https://daddylive.li/player/embed.php?id=${daddyId}`,
-        embed_url: `https://daddylive.li/player/embed.php?id=${daddyId}`,
-        player_type: 'iframe',
-        is_embed: true,
-        is_live: true,
-        sources_count: 17,
-        lang: 'vf'
-      };
-    }
+    // Ultime fallback si tous les miroirs HLS sont indisponibles
+    return {
+      success: true,
+      server: srvNum,
+      server_name: serverNames[srvNum],
+      hoster: `Lecteur Web Secours • ${title}`,
+      quality: '1080p HD',
+      title: `${title} • 🔴 EN DIRECT`,
+      stream_url: `https://dlhd.st/watch/stream-${daddyId}.php`,
+      embed_url: `https://dlhd.st/watch/stream-${daddyId}.php`,
+      player_type: 'iframe',
+      is_embed: true,
+      is_live: true,
+      sources_count: 12,
+      lang: 'vf'
+    };
   }
 
-  // Fallback
+  // Fallback universel
   return {
     success: true,
     server: srvNum,
@@ -824,7 +576,7 @@ async function extractChannelMultiProvider(channelId, serverNum) {
     player_type: 'direct_hls',
     is_embed: false,
     is_live: true,
-    sources_count: 5,
+    sources_count: 12,
     lang: 'vf'
   };
 }
@@ -1592,7 +1344,11 @@ const server = http.createServer((req, res) => {
           targetUrl = resolveProxyUrl(masterUrl, track);
         }
 
-        const hlsRes = await httpsGet(targetUrl, {
+        const isWideIptv = (mirror === 'wideiptv');
+        const hlsRes = await httpsGet(targetUrl, isWideIptv ? {
+          'Referer': 'https://wideiptv.top/',
+          'Origin': 'https://wideiptv.top'
+        } : {
           'Referer': 'https://hamis.romponalis.st/',
           'Origin': 'https://hamis.romponalis.st'
         });
@@ -1613,6 +1369,14 @@ const server = http.createServer((req, res) => {
             const trimmed = line.trim();
             if (!trimmed || trimmed.startsWith('#')) return line;
             return `/api/stream/live?channel=${encodeURIComponent(channelId)}&mirror=${encodeURIComponent(mirror)}&track=${encodeURIComponent(trimmed)}`;
+          }).join('\n');
+        } else if (isWideIptv) {
+          // Pour WideIPTV, résoudre les segments relatifs .ts en URLs directes Bluetier compatibles CORS
+          const lines = outputBody.split(/\r?\n/);
+          outputBody = lines.map(line => {
+            const trimmed = line.trim();
+            if (!trimmed || trimmed.startsWith('#')) return line;
+            return resolveProxyUrl(targetUrl, trimmed);
           }).join('\n');
         }
 

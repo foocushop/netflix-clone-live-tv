@@ -960,27 +960,18 @@ class NetflixPlayer {
     let serverList = [];
     if (isChannel) {
       serverList = [
-        // Flux HLS Directs (Natif Netflix 1080p, 0 pub, lecteur HTML5)
         { num: 1, label: '⚡ S1: Direct 1080p (Principal)', title: 'Serveur 1 : Direct HLS FHD 1080p (Cricsfree - Lecteur Netflix Natif)', badge: '1080p Natif' },
         { num: 2, label: '🎬 S2: Direct 1080p (Apex)', title: 'Serveur 2 : Direct HLS Apex FHD 1080p (Lecteur Netflix Natif)', badge: '1080p Natif' },
         { num: 3, label: '📡 S3: Direct 1080p (DLHD)', title: 'Serveur 3 : Direct HLS DLHD FHD 1080p (Daddy2 - Lecteur Netflix Natif)', badge: '1080p Natif' },
-        // Sous-serveurs DLive internes extraits
-        { num: 4, label: '📺 S4: DLive Cast (Srv 1)', title: 'Serveur 4 : DLive Cast (Serveur 1 interne extrait)', badge: 'DLive 1' },
-        { num: 5, label: '📺 S5: DLive Watch (Srv 2)', title: 'Serveur 5 : DLive Watch (Serveur 2 interne extrait)', badge: 'DLive 2' },
-        { num: 6, label: '📺 S6: DLive Plus (Srv 3)', title: 'Serveur 6 : DLive Plus (Serveur 3 interne extrait)', badge: 'DLive 3' },
-        { num: 7, label: '📺 S7: DLive Casting (Srv 4)', title: 'Serveur 7 : DLive Casting (Serveur 4 interne extrait)', badge: 'DLive 4' },
-        { num: 8, label: '📺 S8: DLive Player (Srv 5)', title: 'Serveur 8 : DLive Player (Serveur 5 interne extrait)', badge: 'DLive 5' },
-        { num: 9, label: '📺 S9: DLive Embed (Srv 6)', title: 'Serveur 9 : DLive Embed (Serveur 6 interne extrait)', badge: 'DLive 6' },
-        // Miroirs Web Distribués
-        { num: 10, label: '🌐 S10: Cricsfree Web', title: 'Serveur 10 : Lecteur Web Cricsfree Direct', badge: 'Miroir' },
-        { num: 11, label: '🌐 S11: Apex Web', title: 'Serveur 11 : Lecteur Web Apex Direct', badge: 'Miroir' },
-        { num: 12, label: '🌐 S12: DLHD Watch', title: 'Serveur 12 : Lecteur Web DLHD Watch Direct', badge: 'Miroir' },
-        { num: 13, label: '🚀 S13: HD1 SBS', title: 'Serveur 13 : Lecteur HD1 Alba SBS Direct', badge: 'Miroir' },
-        { num: 14, label: '🛡️ S14: CX Merit', title: 'Serveur 14 : Lecteur DaddyLive1 CX / Merit Direct', badge: 'Miroir' },
-        { num: 15, label: '🎯 S15: EngStreams', title: 'Serveur 15 : Lecteur EngStreams Direct', badge: 'Miroir' },
-        // Hubs Miroirs
-        { num: 16, label: '⚡ S16: Hub Nontongo', title: 'Serveur 16 : Hub Nontongo Multi-Serveurs', badge: 'Hub' },
-        { num: 17, label: '⚡ S17: Hub DaddyLive Li', title: 'Serveur 17 : Hub Miroir Global DaddyLive Li', badge: 'Hub' }
+        { num: 4, label: '🌐 S4: Direct 1080p (Alpha)', title: 'Serveur 4 : Direct HLS DLHD Alpha FHD 1080p (Daddy1 - Lecteur Netflix Natif)', badge: '1080p Natif' },
+        { num: 5, label: '🚀 S5: Direct 1080p (WideIPTV)', title: 'Serveur 5 : Direct HLS WideIPTV FHD 1080p (Bluetier CDN - Lecteur Netflix Natif)', badge: '1080p Natif' },
+        { num: 6, label: '📺 S6: Direct DLive Watch', title: 'Serveur 6 : Direct HLS DLive Watch FHD 1080p (Lecteur Netflix Natif)', badge: '1080p Natif' },
+        { num: 7, label: '📺 S7: Direct DLive Embed', title: 'Serveur 7 : Direct HLS DLive Embed FHD 1080p (Lecteur Netflix Natif)', badge: '1080p Natif' },
+        { num: 8, label: '📺 S8: Direct DLive Player', title: 'Serveur 8 : Direct HLS DLive Player FHD 1080p (WideIPTV Srv 5 - Lecteur Netflix Natif)', badge: '1080p Natif' },
+        { num: 9, label: '🌐 S9: Cricsfree Alt', title: 'Serveur 9 : Direct HLS Cricsfree Alt 1080p (Lecteur Netflix Natif)', badge: '1080p Natif' },
+        { num: 10, label: '🌐 S10: Apex Alt', title: 'Serveur 10 : Direct HLS Apex Alt 1080p (Lecteur Netflix Natif)', badge: '1080p Natif' },
+        { num: 11, label: '🚀 S11: DLHD Cloud Alt', title: 'Serveur 11 : Direct HLS DLHD Cloud Alt 1080p (Lecteur Netflix Natif)', badge: '1080p Natif' },
+        { num: 12, label: '🛡️ S12: Bluetier VIP Alt', title: 'Serveur 12 : Direct HLS Bluetier VIP Alt 1080p (Lecteur Netflix Natif)', badge: '1080p Natif' }
       ];
     } else if (isSpecialShow) {
       serverList = [
@@ -1052,20 +1043,15 @@ class NetflixPlayer {
         1: 'Serveur 1 (⚡ Direct HLS Principal 1080p)',
         2: 'Serveur 2 (🎬 Direct HLS Apex 1080p)',
         3: 'Serveur 3 (📡 Direct HLS DLHD 1080p)',
-        4: 'Serveur 4 (📺 DLive Cast • Srv 1 interne)',
-        5: 'Serveur 5 (📺 DLive Watch • Srv 2 interne)',
-        6: 'Serveur 6 (📺 DLive Plus • Srv 3 interne)',
-        7: 'Serveur 7 (📺 DLive Casting • Srv 4 interne)',
-        8: 'Serveur 8 (📺 DLive Player • Srv 5 interne)',
-        9: 'Serveur 9 (📺 DLive Embed • Srv 6 interne)',
-        10: 'Serveur 10 (🌐 Lecteur Cricsfree Web)',
-        11: 'Serveur 11 (🌐 Lecteur Apex Web)',
-        12: 'Serveur 12 (🌐 Lecteur DLHD Watch)',
-        13: 'Serveur 13 (🚀 Lecteur HD1 Alba SBS)',
-        14: 'Serveur 14 (🛡️ Lecteur CX / Merit)',
-        15: 'Serveur 15 (🎯 Lecteur EngStreams)',
-        16: 'Serveur 16 (⚡ Hub Nontongo)',
-        17: 'Serveur 17 (⚡ Hub DaddyLive Li)'
+        4: 'Serveur 4 (🌐 Direct HLS DLHD Alpha 1080p)',
+        5: 'Serveur 5 (🚀 Direct HLS WideIPTV 1080p)',
+        6: 'Serveur 6 (📺 Direct HLS DLive Watch 1080p)',
+        7: 'Serveur 7 (📺 Direct HLS DLive Embed 1080p)',
+        8: 'Serveur 8 (📺 Direct HLS DLive Player 1080p)',
+        9: 'Serveur 9 (🌐 Direct HLS Cricsfree Alt 1080p)',
+        10: 'Serveur 10 (🌐 Direct HLS Apex Alt 1080p)',
+        11: 'Serveur 11 (🚀 Direct HLS Alba Cloud 1080p)',
+        12: 'Serveur 12 (🛡️ Direct HLS Bluetier VIP 1080p)'
       };
       const sName = serverNames[this.currentServer] || `Serveur ${this.currentServer}`;
       const chNum = this.currentMovie.channel_number ? `Canal ${this.currentMovie.channel_number} • ` : '';
@@ -1215,7 +1201,7 @@ class NetflixPlayer {
       // Basculer automatiquement sur le serveur suivant après 1.5s
       setTimeout(() => {
         const isChannel = (this.currentMovie?.media_type === 'channel' || this.currentMovie?.is_live);
-        const maxSrv = isChannel ? 9 : 5;
+        const maxSrv = isChannel ? 12 : 5;
         const next = (this.currentServer % maxSrv) + 1;
         this.switchServer(next);
       }, 1500);
