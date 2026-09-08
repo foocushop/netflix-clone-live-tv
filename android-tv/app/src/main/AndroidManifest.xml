@@ -5,7 +5,7 @@
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.WAKE_LOCK" />
 
-    <!-- Android TV Requirements -->
+    <!-- Android TV Requirements (must be required="false" so TV does not filter out app) -->
     <uses-feature
         android:name="android.hardware.touchscreen"
         android:required="false" />
@@ -15,12 +15,18 @@
     <uses-feature
         android:name="android.software.leanback"
         android:required="false" />
+    <uses-feature
+        android:name="android.hardware.screen.landscape"
+        android:required="false" />
+    <uses-feature
+        android:name="android.hardware.wifi"
+        android:required="false" />
 
     <application
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
-        android:banner="@mipmap/ic_launcher"
+        android:banner="@drawable/banner"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:hardwareAccelerated="true"
@@ -29,13 +35,21 @@
         <activity
             android:name=".MainActivity"
             android:exported="true"
+            android:launchMode="singleTask"
+            android:banner="@drawable/banner"
+            android:icon="@mipmap/ic_launcher"
             android:configChanges="orientation|screenSize|screenLayout|keyboardHidden|keyboard"
             android:screenOrientation="landscape"
             android:windowSoftInputMode="adjustResize">
+            <!-- TV Leanback Launcher Intent -->
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LEANBACK_LAUNCHER" />
+            </intent-filter>
+            <!-- Mobile / Tablet Launcher Intent -->
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
-                <category android:name="android.intent.category.LEANBACK_LAUNCHER" />
             </intent-filter>
         </activity>
     </application>

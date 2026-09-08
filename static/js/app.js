@@ -56,14 +56,21 @@ class NetflixApp {
   }
 
   initEvents() {
-    // Défilement du header
+    // Défilement optimisé du header
+    let scrollTicking = false;
     window.addEventListener('scroll', () => {
-      if (window.scrollY > 50) {
-        this.header.classList.add('scrolled');
-      } else {
-        this.header.classList.remove('scrolled');
+      if (!scrollTicking) {
+        window.requestAnimationFrame(() => {
+          if (window.scrollY > 50) {
+            this.header.classList.add('scrolled');
+          } else {
+            this.header.classList.remove('scrolled');
+          }
+          scrollTicking = false;
+        });
+        scrollTicking = true;
       }
-    });
+    }, { passive: true });
 
     // Hero buttons
     this.heroPlayBtn.addEventListener('click', () => {
@@ -204,25 +211,28 @@ class NetflixApp {
 
   renderCatalog(data) {
     this.catalogRowsContainer.innerHTML = '';
+    const fragment = document.createDocumentFragment();
 
     // Ligne "Ma Liste" si elle contient des titres
     const myListMovies = this.getMyListMovies();
     if (myListMovies.length > 0) {
-      this.renderRow({
+      fragment.appendChild(this.buildRowElement({
         category: { name: "Ma Liste", slug: "my-list" },
         movies: myListMovies
-      });
+      }));
     }
 
     // Carrousels de catégories
     if (data.rows && data.rows.length > 0) {
       data.rows.forEach(row => {
-        this.renderRow(row);
+        fragment.appendChild(this.buildRowElement(row));
       });
     }
+
+    this.catalogRowsContainer.appendChild(fragment);
   }
 
-  renderRow(row) {
+  buildRowElement(row) {
     const rowEl = document.createElement('div');
     rowEl.className = 'movie-row';
     rowEl.innerHTML = `
@@ -246,12 +256,14 @@ class NetflixApp {
       slider.scrollBy({ left: 600, behavior: 'smooth' });
     });
 
+    const cardFragment = document.createDocumentFragment();
     row.movies.forEach(movie => {
       const card = this.createMovieCard(movie);
-      slider.appendChild(card);
+      cardFragment.appendChild(card);
     });
+    slider.appendChild(cardFragment);
 
-    this.catalogRowsContainer.appendChild(rowEl);
+    return rowEl;
   }
 
   createMovieCard(movie) {
@@ -286,7 +298,7 @@ class NetflixApp {
     }
 
     card.innerHTML = `
-      <img src="${movie.poster_url}" alt="${movie.title}" class="card-image" loading="lazy" onerror="this.onerror=null; this.src='data:image/svg+xml;charset=UTF-8,<svg xmlns=\\'http://www.w3.org/2000/svg\\' width=\\'300\\' height=\\'450\\' viewBox=\\'0 0 300 450\\'><rect fill=\\'%231f1f1f\\' width=\\'300\\' height=\\'450\\'/><text fill=\\'%23E50914\\' font-family=\\'sans-serif\\' font-size=\\'36\\' font-weight=\\'800\\' x=\\'50%25\\' y=\\'45%25\\' text-anchor=\\'middle\\'>NETFLIX</text><text fill=\\'%23888\\' font-family=\\'sans-serif\\' font-size=\\'13\\' x=\\'50%25\\' y=\\'55%25\\' text-anchor=\\'middle\\'>${isChannel ? 'Chaîne TV' : 'Titre Netflix'}</text></svg>'">
+      <img src="${movie.poster_url}" alt="${movie.title}" class="card-image" loading="lazy" decoding="async" onerror="this.onerror=null; this.src='data:image/svg+xml;charset=UTF-8,<svg xmlns=\\'http://www.w3.org/2000/svg\\' width=\\'300\\' height=\\'450\\' viewBox=\\'0 0 300 450\\'><rect fill=\\'%231f1f1f\\' width=\\'300\\' height=\\'450\\'/><text fill=\\'%23E50914\\' font-family=\\'sans-serif\\' font-size=\\'36\\' font-weight=\\'800\\' x=\\'50%25\\' y=\\'45%25\\' text-anchor=\\'middle\\'>NETFLIX</text><text fill=\\'%23888\\' font-family=\\'sans-serif\\' font-size=\\'13\\' x=\\'50%25\\' y=\\'55%25\\' text-anchor=\\'middle\\'>${isChannel ? 'Chaîne TV' : 'Titre Netflix'}</text></svg>'">
       ${topBadges}
       <div class="card-overlay">
         <div class="card-title">${movie.title}</div>

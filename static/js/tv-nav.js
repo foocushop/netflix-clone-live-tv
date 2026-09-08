@@ -27,31 +27,15 @@
       // Écoute des touches télécommande / clavier
       window.addEventListener('keydown', (e) => this.handleKeyDown(e), { capture: true });
 
-      // Écoute des clics souris pour synchroniser le focus TV
-      document.addEventListener('mouseover', (e) => {
-        const focusable = e.target.closest('.movie-card, .btn-netflix, .nav-link, .server-btn, .action-circle-btn, .modal-close-btn, .player-control-btn');
-        if (focusable && focusable !== this.currentFocus) {
-          this.setFocus(focusable, false);
-        }
-      });
-
       // Focus initial après chargement du catalogue
       window.addEventListener('load', () => {
-        setTimeout(() => this.setInitialFocus(), 800);
+        setTimeout(() => this.setInitialFocus(), 600);
       });
-
-      // Observer les changements du DOM pour réindexer les éléments navigables
-      const observer = new MutationObserver(() => {
-        if (!this.currentFocus || !document.contains(this.currentFocus)) {
-          this.setInitialFocus();
-        }
-      });
-      observer.observe(document.body, { childList: true, subtree: true });
     }
 
     setInitialFocus() {
       // Priorité 1: Si le lecteur vidéo est ouvert
-      const playerModal = document.getElementById('netflixPlayerModal');
+      const playerModal = document.getElementById('netflixPlayerModal') || document.getElementById('netflixPlayer');
       if (playerModal && playerModal.classList.contains('active')) {
         const firstServerBtn = playerModal.querySelector('.server-btn.active') || playerModal.querySelector('.server-btn');
         if (firstServerBtn) return this.setFocus(firstServerBtn);
@@ -61,9 +45,9 @@
       const firstCard = document.querySelector('.movie-card');
       const heroPlay = document.getElementById('heroPlayBtn');
       if (firstCard) {
-        this.setFocus(firstCard);
+        this.setFocus(firstCard, false);
       } else if (heroPlay) {
-        this.setFocus(heroPlay);
+        this.setFocus(heroPlay, false);
       }
     }
 
@@ -71,12 +55,17 @@
       if (!el) return;
       if (this.currentFocus && this.currentFocus !== el) {
         this.currentFocus.classList.remove('tv-focused');
-        this.currentFocus.blur();
       }
 
       this.currentFocus = el;
       this.currentFocus.classList.add('tv-focused');
-      this.currentFocus.focus();
+      
+      // Empêcher le scroll brutal natif de focus()
+      try {
+        this.currentFocus.focus({ preventScroll: true });
+      } catch (e) {
+        this.currentFocus.focus();
+      }
 
       if (this.currentFocus.classList.contains('movie-card')) {
         this.lastFocusedCard = this.currentFocus;
@@ -88,18 +77,22 @@
     }
 
     ensureVisible(el) {
+      if (!el) return;
       // Défilement horizontal dans la rangée (carrousel)
-      const rowContainer = el.closest('.row-cards, .category-row-cards, .row-cards-container');
+      const rowContainer = el.closest('.row-slider, .row-cards, .category-row-cards, .row-cards-container');
       if (rowContainer) {
         const rect = el.getBoundingClientRect();
         const containerRect = rowContainer.getBoundingClientRect();
-        if (rect.left < containerRect.left + 50 || rect.right > containerRect.right - 50) {
+        if (rect.left < containerRect.left + 80 || rect.right > containerRect.right - 80) {
           el.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
         }
       }
 
-      // Défilement vertical de la page TV
-      el.scrollIntoView({ behavior: 'smooth', block: 'center', inline: 'nearest' });
+      // Défilement vertical de la page TV seulement si hors viewport
+      const elRect = el.getBoundingClientRect();
+      if (elRect.top < 100 || elRect.bottom > (window.innerHeight - 80)) {
+        el.scrollIntoView({ behavior: 'smooth', block: 'center', inline: 'nearest' });
+      }
     }
 
     handleKeyDown(e) {

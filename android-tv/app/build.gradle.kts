@@ -7,10 +7,10 @@ android {
     compileSdk = 36
     defaultConfig {
         applicationId = "com.example.netflixlivetv"
-        minSdk = 24
-        targetSdk = 36
-        versionCode = 1
-        versionName = "1.0"
+        minSdk = 21
+        targetSdk = 34
+        versionCode = 2
+        versionName = "1.1"
     }
 
     buildTypes {
@@ -20,8 +20,8 @@ android {
         }
     }
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_17
-        targetCompatibility = JavaVersion.VERSION_17
+        sourceCompatibility = JavaVersion.VERSION_1_8
+        targetCompatibility = JavaVersion.VERSION_1_8
     }
 
     packaging {
