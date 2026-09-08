@@ -8,7 +8,7 @@ const url = require('url');
 const querystring = require('querystring');
 
 
-const PORT = 8080;
+const PORT = process.env.PORT || 8080;
 const DATA_FILE = path.join(__dirname, 'data', 'catalog.json');
 
 // Assurer l'existence du dossier data

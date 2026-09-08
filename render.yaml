@@ -1,0 +1,7 @@
+services:
+  - type: web
+    name: netflix-clone-live-tv
+    env: node
+    plan: free
+    buildCommand: echo Build completed
+    startCommand: node server.js

@@ -1,1 +1,13 @@
-{\" name\:\netflix-clone\,\version\:\1.0.0\,\main\:\server.js\,\scripts\:{\start\:\node "server.js\},\engines\:{\node\:\ 
+{
+  "name": "netflix-clone-live-tv",
+  "version": "1.0.0",
+  "description": "Netflix Clone avec streaming VF/VO et chaines TV sport & PPV",
+  "main": "server.js",
+  "scripts": {
+    "build": "echo Build completed",
+    "start": "node server.js"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}
