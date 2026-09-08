@@ -670,15 +670,53 @@ async function extractChannelMultiProvider(channelId, serverNum) {
   const srvNum = Math.max(1, Math.min(8, parseInt(serverNum) || 1));
 
   const serverNames = {
-    1: 'Serveur 1 (⭐ Dark VIP Ultra HD 1080p/60fps)',
-    2: 'Serveur 2 (⚡ Direct HLS DLHD Cluster 2 1080p)',
-    3: 'Serveur 3 (🎬 Direct HLS Apex Streams 1080p)',
-    4: 'Serveur 4 (📡 Direct HLS DLHD Alpha Cluster 1 1080p)',
-    5: 'Serveur 5 (🌐 Direct HLS Cricsfree 1080p)',
-    6: 'Serveur 6 (📺 Lecteur Web Intégré DLive HD)',
-    7: 'Serveur 7 (🛡️ Lecteur Secours DLHD HD)',
-    8: 'Serveur 8 (💎 Direct Xtream VIP 1080p)'
+    1: 'Serveur 1 (💎 Direct Xtream VIP 1080p)',
+    2: 'Serveur 2 (⭐ Dark VIP Ultra HD 1080p/60fps)',
+    3: 'Serveur 3 (⚡ Direct HLS DLHD Cluster 2 1080p)',
+    4: 'Serveur 4 (🎬 Direct HLS Apex Streams 1080p)',
+    5: 'Serveur 5 (📡 Direct HLS DLHD Alpha Cluster 1 1080p)',
+    6: 'Serveur 6 (🌐 Direct HLS Cricsfree 1080p)',
+    7: 'Serveur 7 (🚀 Direct HLS WideIPTV Secours 1080p)',
+    8: 'Serveur 8 (🛡️ Direct HLS Secours Multi-Cluster 1080p)'
   };
+
+  const mirrorMap = {
+    1: { mirror: 'xtream', hoster: '💎 Direct Xtream VIP FHD (Flux Résilient Haute Stabilité • Recommandé)' },
+    2: { mirror: 'premium_vip', hoster: '⭐ Dark VIP Ultra HD 1080p/60fps (Bluetier CDN)' },
+    3: { mirror: 'daddy2', hoster: '⚡ Direct HLS DLHD Cluster 2 (1080p)' },
+    4: { mirror: 'apex', hoster: '🎬 Direct HLS Apex Streams (1080p Alternate)' },
+    5: { mirror: 'daddy1', hoster: '📡 Direct HLS DLHD Alpha Cluster 1 (1080p)' },
+    6: { mirror: 'cricsfree', hoster: '🌐 Direct HLS Cricsfree (1080p)' },
+    7: { mirror: 'wideiptv', hoster: '🚀 Direct HLS WideIPTV Secours (1080p)' },
+    8: { mirror: 'secours', hoster: '🛡️ Direct HLS Secours Multi-Cluster (1080p)' }
+  };
+
+  const liveChannelParam = encodeURIComponent(channelId || daddyId);
+
+  // ── PRIORITÉ ABSOLUE N°1 : SERVEUR 1 = DIRECT XTREAM VIP ──
+  if (srvNum === 1) {
+    const rawChan = (channelId || '').toString().toLowerCase().trim();
+    const hasXtream = XTREAM_CHANNELS[rawChan] 
+      || XTREAM_CHANNELS[rawChan.replace(/^tv_/, '')] 
+      || XTREAM_CHANNELS[rawChan.replace(/_/g, ' ')];
+
+    if (hasXtream) {
+      return {
+        success: true,
+        server: 1,
+        server_name: serverNames[1],
+        hoster: `${mirrorMap[1].hoster} • ${title}`,
+        quality: '1080p FHD Direct VIP',
+        title: `${title} • 🔴 EN DIRECT`,
+        stream_url: `/api/stream/xtream?channel=${liveChannelParam}`,
+        player_type: 'direct_hls',
+        is_embed: false,
+        is_live: true,
+        sources_count: 8,
+        lang: 'vf'
+      };
+    }
+  }
 
   // Chaînes FAST & TNT Officielles Directes HD
   if (channelId === 'tv_arte' || channelId === '958') {
@@ -693,7 +731,7 @@ async function extractChannelMultiProvider(channelId, serverNum) {
       player_type: 'direct_hls',
       is_embed: false,
       is_live: true,
-      sources_count: 7,
+      sources_count: 8,
       lang: 'vf'
     };
   }
@@ -710,7 +748,7 @@ async function extractChannelMultiProvider(channelId, serverNum) {
       player_type: 'direct_hls',
       is_embed: false,
       is_live: true,
-      sources_count: 7,
+      sources_count: 8,
       lang: 'vf'
     };
   }
@@ -736,7 +774,7 @@ async function extractChannelMultiProvider(channelId, serverNum) {
       player_type: 'direct_hls',
       is_embed: false,
       is_live: true,
-      sources_count: 7,
+      sources_count: 8,
       lang: 'vf'
     };
   }
@@ -753,7 +791,7 @@ async function extractChannelMultiProvider(channelId, serverNum) {
       player_type: 'direct_hls',
       is_embed: false,
       is_live: true,
-      sources_count: 7,
+      sources_count: 8,
       lang: 'vf'
     };
   }
@@ -770,43 +808,14 @@ async function extractChannelMultiProvider(channelId, serverNum) {
       player_type: 'direct_hls',
       is_embed: false,
       is_live: true,
-      sources_count: 7,
+      sources_count: 8,
       lang: 'vf'
     };
   }
 
-  // Traitement pour les chaînes TV Direct HLS (100% injecté dans le player Netflix)
+  // Traitement pour les serveurs 2 à 8 (Miroirs Alternatifs)
   if (daddyId || channelId) {
-    const mirrorMap = {
-      1: { mirror: 'premium_vip', hoster: '⭐ Dark VIP Ultra HD 1080p/60fps (Bluetier CDN)' },
-      2: { mirror: 'daddy2', hoster: '⚡ Direct HLS DLHD Cluster 2 (1080p)' },
-      3: { mirror: 'apex', hoster: '🎬 Direct HLS Apex Streams (1080p Alternate)' },
-      4: { mirror: 'daddy1', hoster: '📡 Direct HLS DLHD Alpha Cluster 1 (1080p)' },
-      5: { mirror: 'cricsfree', hoster: '🌐 Direct HLS Cricsfree (1080p)' },
-      6: { mirror: 'wideiptv', hoster: '🚀 Direct HLS WideIPTV Secours (1080p)' },
-      7: { mirror: 'secours', hoster: '🛡️ Direct HLS Secours Multi-Cluster (1080p)' },
-      8: { mirror: 'xtream', hoster: '💎 Direct Xtream VIP FHD (Flux Résilient Haute Stabilité)' }
-    };
-
-    const liveChannelParam = encodeURIComponent(channelId || daddyId);
-    if (srvNum === 8) {
-      return {
-        success: true,
-        server: 8,
-        server_name: serverNames[8],
-        hoster: `${mirrorMap[8].hoster} • ${title}`,
-        quality: '1080p FHD Direct VIP',
-        title: `${title} • 🔴 EN DIRECT`,
-        stream_url: `/api/stream/xtream?channel=${liveChannelParam}`,
-        player_type: 'direct_hls',
-        is_embed: false,
-        is_live: true,
-        sources_count: 8,
-        lang: 'vf'
-      };
-    }
-
-    const cfg = mirrorMap[srvNum] || mirrorMap[1];
+    const cfg = mirrorMap[srvNum] || mirrorMap[2];
     let streamUrl = await getLiveM3u8Url(daddyId, cfg.mirror, channelId);
 
     // Cascade automatique intelligente vers les miroirs alternatifs si la source sélectionnée est hors-ligne
@@ -822,7 +831,7 @@ async function extractChannelMultiProvider(channelId, serverNum) {
       server: srvNum,
       server_name: serverNames[srvNum],
       hoster: `${cfg.hoster} • ${title}`,
-      quality: srvNum === 1 ? '⭐ Ultra HD 1080p/60fps Direct' : '1080p FHD Direct',
+      quality: srvNum === 2 ? '⭐ Ultra HD 1080p/60fps Direct' : '1080p FHD Direct',
       title: `${title} • 🔴 EN DIRECT`,
       stream_url: `/api/stream/live?channel=${liveChannelParam}&mirror=${encodeURIComponent(cfg.mirror)}`,
       player_type: 'direct_hls',

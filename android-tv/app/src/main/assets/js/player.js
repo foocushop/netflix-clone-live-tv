@@ -970,14 +970,14 @@ class NetflixPlayer {
     let serverList = [];
     if (isChannel) {
       serverList = [
-        { num: 1, label: '⭐ S1: Dark VIP 1080p', title: 'Serveur 1 : Flux Premium VIP Ultra HD 1080p/60fps (Brut non-compressé • Lecteur Netflix)', badge: '⭐ Dark VIP', isVip: true },
-        { num: 2, label: '⚡ S2: Direct 1080p (Cricsfree)', title: 'Serveur 2 : Direct HLS Cricsfree FHD 1080p (Lecteur Netflix Natif)', badge: '1080p Natif' },
-        { num: 3, label: '🎬 S3: Direct 1080p (Apex)', title: 'Serveur 3 : Direct HLS Apex Streams FHD 1080p (Lecteur Netflix Natif)', badge: '1080p Natif' },
-        { num: 4, label: '📡 S4: Direct 1080p (DLHD)', title: 'Serveur 4 : Direct HLS DLHD Cluster 2 FHD 1080p (Lecteur Netflix Natif)', badge: '1080p Natif' },
-        { num: 5, label: '🌐 S5: Direct 1080p (Alpha)', title: 'Serveur 5 : Direct HLS DLHD Alpha Cluster 1 FHD 1080p (Lecteur Netflix Natif)', badge: '1080p Natif' },
-        { num: 6, label: '🚀 S6: Direct 1080p (WideIPTV)', title: 'Serveur 6 : Direct HLS WideIPTV Bluetier CDN FHD 1080p (Lecteur Netflix Natif)', badge: '1080p Natif' },
-        { num: 7, label: '🛡️ S7: Direct 1080p (Secours)', title: 'Serveur 7 : Direct HLS Miroir de Secours FHD 1080p (Lecteur Netflix Natif)', badge: 'Secours' },
-        { num: 8, label: '💎 S8: Xtream VIP (1080p)', title: 'Serveur 8 : Direct Xtream VIP 1080p (Flux Résilient Haute Stabilité)', badge: '💎 Xtream VIP', isVip: true }
+        { num: 1, label: '💎 S1: Xtream VIP (1080p)', title: 'Serveur 1 : Direct Xtream VIP 1080p (Flux Résilient Haute Stabilité • Recommandé & Prioritaire)', badge: '💎 Xtream VIP', isVip: true },
+        { num: 2, label: '⭐ S2: Dark VIP 1080p', title: 'Serveur 2 : Flux Premium VIP Ultra HD 1080p/60fps (Brut non-compressé • Lecteur Netflix)', badge: '⭐ Dark VIP', isVip: true },
+        { num: 3, label: '⚡ S3: Direct 1080p (DLHD)', title: 'Serveur 3 : Direct HLS DLHD Cluster 2 FHD 1080p (Lecteur Netflix Natif)', badge: '1080p Natif' },
+        { num: 4, label: '🎬 S4: Direct 1080p (Apex)', title: 'Serveur 4 : Direct HLS Apex Streams FHD 1080p (Lecteur Netflix Natif)', badge: '1080p Natif' },
+        { num: 5, label: '📡 S5: Direct 1080p (Alpha)', title: 'Serveur 5 : Direct HLS DLHD Alpha Cluster 1 FHD 1080p (Lecteur Netflix Natif)', badge: '1080p Natif' },
+        { num: 6, label: '🌐 S6: Direct 1080p (Cricsfree)', title: 'Serveur 6 : Direct HLS Cricsfree FHD 1080p (Lecteur Netflix Natif)', badge: '1080p Natif' },
+        { num: 7, label: '🚀 S7: Direct 1080p (WideIPTV)', title: 'Serveur 7 : Direct HLS WideIPTV Bluetier CDN FHD 1080p (Lecteur Netflix Natif)', badge: '1080p Natif' },
+        { num: 8, label: '🛡️ S8: Direct 1080p (Secours)', title: 'Serveur 8 : Direct HLS Miroir de Secours FHD 1080p (Lecteur Netflix Natif)', badge: 'Secours' }
       ];
     } else if (isSpecialShow) {
       serverList = [
@@ -1046,14 +1046,14 @@ class NetflixPlayer {
     let serverNames;
     if (isChannel) {
       serverNames = {
-        1: 'Serveur 1 (⭐ Dark VIP Ultra HD 1080p/60fps)',
-        2: 'Serveur 2 (⚡ Direct HLS Principal 1080p)',
-        3: 'Serveur 3 (🎬 Direct HLS Apex Streams 1080p)',
-        4: 'Serveur 4 (📡 Direct HLS DLHD Cluster 2 1080p)',
-        5: 'Serveur 5 (🌐 Direct HLS DLHD Alpha Cluster 1 1080p)',
-        6: 'Serveur 6 (🚀 Direct HLS WideIPTV Bluetier 1080p)',
-        7: 'Serveur 7 (🛡️ Direct HLS Secours 1080p)',
-        8: 'Serveur 8 (💎 Direct Xtream VIP 1080p)'
+        1: 'Serveur 1 (💎 Direct Xtream VIP 1080p)',
+        2: 'Serveur 2 (⭐ Dark VIP Ultra HD 1080p/60fps)',
+        3: 'Serveur 3 (⚡ Direct HLS DLHD Cluster 2 1080p)',
+        4: 'Serveur 4 (🎬 Direct HLS Apex Streams 1080p)',
+        5: 'Serveur 5 (📡 Direct HLS DLHD Alpha Cluster 1 1080p)',
+        6: 'Serveur 6 (🌐 Direct HLS Cricsfree 1080p)',
+        7: 'Serveur 7 (🚀 Direct HLS WideIPTV Bluetier 1080p)',
+        8: 'Serveur 8 (🛡️ Direct HLS Secours 1080p)'
       };
       const sName = serverNames[this.currentServer] || `Serveur ${this.currentServer}`;
       const chNum = this.currentMovie.channel_number ? `Canal ${this.currentMovie.channel_number} • ` : '';
