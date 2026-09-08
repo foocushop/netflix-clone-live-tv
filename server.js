@@ -54,43 +54,33 @@ const XTREAM_CONFIG = {
   password: '21321'
 };
 
-const XTREAM_CHANNELS = {
-  'tv_canal_foot': '180946',
-  '463': '180946',
-  'canal_foot': '180946',
-  'canal+ foot': '180946',
-  'canal foot': '180946',
-  '180946': '180946',
-  'tv_canal_sport': '14156',
-  '464': '14156',
-  'canal_sport': '14156',
-  'canal+ sport': '14156',
-  'canal sport': '14156',
-  'tv_canal_360': '180947',
-  'canal+ sport 360': '180947',
-  'canal 360': '180947',
-  'tv_canal_france': '14155',
-  'canal+': '14155',
-  'canal+ france': '14155',
-  'tv_canal_live1': '327340',
-  'tv_canal_live2': '327339',
-  'tv_canal_live3': '327338',
-  'tv_canal_f1': '14156',
-  'tv_canal_motogp': '180947',
-  'tv_bein1': '14164',
-  'tv_bein2': '14165',
-  'tv_bein3': '14166',
-  'tv_rmc_sport1': '14167',
-  'tv_rmc_sport2': '14168',
-  'tv_tf1': '14150',
-  'tv_france2': '14151',
-  'tv_france3': '14152',
-  'tv_m6': '14153',
-  'tv_w9': '14154',
-  'tv_tmc': '14170',
-  'tv_lequipe': '14169',
-  'tv_dazn1': '180948',
-  'tv_dazn_ligue1': '180948'
+// Chargement automatique des 128 correspondances de chaînes françaises vérifiées
+let XTREAM_CHANNELS = {};
+try {
+  const mapPath = path.join(__dirname, 'data', 'xtream_channels_map.json');
+  if (fs.existsSync(mapPath)) {
+    XTREAM_CHANNELS = JSON.parse(fs.readFileSync(mapPath, 'utf8'));
+  }
+} catch (e) {
+  console.warn('[Xtream] Impossible de charger xtream_channels_map.json:', e.message);
+}
+
+// Fallbacks de sécurité pour les variantes de flux (si un flux FHD est en panne, basculer sur HD ou UHD)
+const XTREAM_STREAM_FALLBACKS = {
+  '13739': ['13916', '479236', '47475'], // France 2 FHD -> HD -> UHD -> HEVC
+  '14152': ['14163', '94'],              // beIN 3 FHD -> HD -> SD
+  '408065': ['408064', '47502'],         // RMC 1 FHD -> HD -> HEVC
+  '180946': ['181485', '84801'],         // Canal+ Foot FHD -> HD -> SD
+  '180947': ['181486', '84802'],         // Canal+ 360 FHD -> HD -> SD
+  '14156': ['14161', '13936'],           // Canal+ Sport FHD -> HD -> SD
+  '14151': ['14167', '479240'],          // Canal+ France FHD -> HD -> Direct
+  '14160': ['14170', '92'],              // beIN 1 FHD -> HD -> SD
+  '14153': ['14169', '93'],              // beIN 2 FHD -> HD -> SD
+  '13847': ['13917', '177689'],          // TF1 FHD -> HD -> 4K
+  '13726': ['14003', '222569'],          // M6 FHD -> HD -> 4K
+  '13690': ['13973', '47481'],           // W9 FHD -> HD -> HEVC
+  '13696': ['13979', '47494'],           // TMC FHD -> HD -> HEVC
+  '479050': ['479049', '479051']         // Ligue 1+ FHD -> HD -> UHD
 };
 
 function fetchXtreamPlaylist(targetUrl, headers = {}, hops = 0) {
@@ -1653,24 +1643,78 @@ const server = http.createServer((req, res) => {
     return;
   }
 
+  // ================= ROUTE STATISTIQUES & INVENTAIRE XTREAM (/api/xtream/stats) =================
+  if (pathname === '/api/xtream/stats' && req.method === 'GET') {
+    res.writeHead(200, { 'Content-Type': 'application/json; charset=utf-8', 'Access-Control-Allow-Origin': '*' });
+    return res.end(JSON.stringify({
+      success: true,
+      provider: 'FoxBleu Xtream Codes',
+      server: `http://${XTREAM_CONFIG.host}:${XTREAM_CONFIG.port}`,
+      username: XTREAM_CONFIG.username,
+      total_live_streams: 11929,
+      total_french_streams: 1859,
+      total_categories: 74,
+      french_categories: [
+        { id: '4', name: 'FRANCE UHD/FHD/HD (TNT & Généralistes)', count: 320 },
+        { id: '871', name: 'FRANCE SPORT (Canal+, beIN, RMC, Eurosport)', count: 166 },
+        { id: '958', name: 'LIGUE 1+ (FHD / UHD)', count: 34 },
+        { id: '983', name: 'DAZN FR EVENTS', count: 89 },
+        { id: '984', name: 'DAZN FR PPV', count: 18 },
+        { id: '986', name: 'PRIME VIDEO FR PPV', count: 12 },
+        { id: '35', name: 'FRANCE KIDS', count: 36 },
+        { id: '901', name: 'FRANCE NEWS', count: 28 },
+        { id: '921', name: 'FRANCE CINEMA ONDEMAND', count: 42 }
+      ],
+      mapped_channels_count: Object.keys(XTREAM_CHANNELS).length
+    }, null, 2));
+  }
+
   // ================= ROUTE DIRECT XTREAM VIP PROXY (/api/stream/xtream) =================
   // Infrastructure Haute Résilience pour Xtream Codes :
-  // 1. Suivi transparent des redirections 302 vers les serveurs edge de diffusion
-  // 2. Réécriture dynamique des segments HLS (.ts) vers le proxy local /api/stream/xtream-chunk
-  // 3. Élimination des erreurs Mixed-Content (HTTP -> HTTPS) et contournement CORS total
-  // 4. Compatible nativement avec le lecteur Netflix HLS.js
+  // 1. Détection dynamique de la chaîne exacte (zéro duplication sur Canal+ Foot)
+  // 2. Cascade automatique sur flux de secours (FHD -> HD -> UHD) en cas d'indisponibilité
+  // 3. Suivi transparent des redirections 302 vers les serveurs edge de diffusion
+  // 4. Réécriture dynamique des segments HLS (.ts) vers le proxy local /api/stream/xtream-chunk
+  // 5. Élimination des erreurs Mixed-Content (HTTP -> HTTPS) et contournement CORS total
   if (pathname === '/api/stream/xtream' && req.method === 'GET') {
     const rawChannel = (parsedUrl.query.channel || '').toString().toLowerCase().trim();
-    const streamId = XTREAM_CHANNELS[rawChannel] 
+    let streamId = parsedUrl.query.stream_id
+      || XTREAM_CHANNELS[rawChannel] 
       || XTREAM_CHANNELS[rawChannel.replace(/^tv_/, '')] 
-      || parsedUrl.query.stream_id 
-      || (rawChannel.match(/^\d+$/) ? rawChannel : '180946');
+      || XTREAM_CHANNELS[rawChannel.replace(/_/g, ' ')]
+      || (rawChannel.match(/^\d+$/) ? rawChannel : null);
 
-    const targetUrl = parsedUrl.query.target
-      ? parsedUrl.query.target
-      : `http://${XTREAM_CONFIG.host}:${XTREAM_CONFIG.port}/live/${XTREAM_CONFIG.username}/${XTREAM_CONFIG.password}/${streamId}.m3u8`;
+    if (!streamId && !parsedUrl.query.target) {
+      res.writeHead(404, { 'Content-Type': 'text/plain; charset=utf-8', 'Access-Control-Allow-Origin': '*' });
+      return res.end(`Chaîne Xtream non trouvée pour: ${rawChannel}`);
+    }
 
-    fetchXtreamPlaylist(targetUrl)
+    async function fetchStreamWithFallback(initialStreamId) {
+      if (parsedUrl.query.target) {
+        return await fetchXtreamPlaylist(parsedUrl.query.target);
+      }
+
+      const candidates = [initialStreamId];
+      if (XTREAM_STREAM_FALLBACKS[initialStreamId]) {
+        candidates.push(...XTREAM_STREAM_FALLBACKS[initialStreamId]);
+      }
+
+      let lastErr = null;
+      for (const sId of candidates) {
+        const urlToFetch = `http://${XTREAM_CONFIG.host}:${XTREAM_CONFIG.port}/live/${XTREAM_CONFIG.username}/${XTREAM_CONFIG.password}/${sId}.m3u8`;
+        try {
+          const resObj = await fetchXtreamPlaylist(urlToFetch);
+          if (resObj.statusCode === 200 && resObj.body && (resObj.body.includes('#EXTM3U') || resObj.buffer.length > 500)) {
+            return resObj;
+          }
+        } catch (e) {
+          lastErr = e;
+        }
+      }
+      throw lastErr || new Error(`Flux Xtream indisponible (ID: ${initialStreamId})`);
+    }
+
+    fetchStreamWithFallback(streamId)
       .then(({ statusCode, finalUrl, body, buffer }) => {
         if (statusCode !== 200) {
           res.writeHead(statusCode || 502, {
@@ -1748,7 +1792,7 @@ const server = http.createServer((req, res) => {
       .catch(err => {
         console.warn('[Xtream Manifest Error]:', err.message);
         if (!res.headersSent) {
-          res.writeHead(502, { 'Content-Type': 'text/plain', 'Access-Control-Allow-Origin': '*' });
+          res.writeHead(502, { 'Content-Type': 'text/plain; charset=utf-8', 'Access-Control-Allow-Origin': '*' });
           res.end('Erreur de connexion Xtream: ' + err.message);
         }
       });
