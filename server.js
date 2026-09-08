@@ -327,12 +327,18 @@ async function getLiveM3u8Url(daddyId, mirror = 'cricsfree') {
   }
 
   const sources = [];
-  if (mirror === 'apex') {
+  if (mirror === 'daddy2') {
+    sources.push({ url: `https://hamis.romponalis.st/premiumtv/daddy2.php?id=${daddyId}`, ref: 'https://dlhd.st/' });
+    sources.push({ url: `https://hamis.romponalis.st/premiumtv/cricsfree2.php?id=${daddyId}`, ref: 'https://cricsfree.cfd/' });
+    sources.push({ url: `https://hamis.romponalis.st/premiumtv/apexstreams2.php?id=${daddyId}`, ref: 'https://apexstreams.cfd/' });
+  } else if (mirror === 'apex') {
     sources.push({ url: `https://hamis.romponalis.st/premiumtv/apexstreams2.php?id=${daddyId}`, ref: 'https://apexstreams.cfd/' });
     sources.push({ url: `https://hamis.romponalis.st/premiumtv/cricsfree2.php?id=${daddyId}`, ref: 'https://cricsfree.cfd/' });
+    sources.push({ url: `https://hamis.romponalis.st/premiumtv/daddy2.php?id=${daddyId}`, ref: 'https://dlhd.st/' });
   } else {
     sources.push({ url: `https://hamis.romponalis.st/premiumtv/cricsfree2.php?id=${daddyId}`, ref: 'https://cricsfree.cfd/' });
     sources.push({ url: `https://hamis.romponalis.st/premiumtv/apexstreams2.php?id=${daddyId}`, ref: 'https://apexstreams.cfd/' });
+    sources.push({ url: `https://hamis.romponalis.st/premiumtv/daddy2.php?id=${daddyId}`, ref: 'https://dlhd.st/' });
   }
 
   for (const s of sources) {
@@ -356,7 +362,7 @@ async function getLiveM3u8Url(daddyId, mirror = 'cricsfree') {
   return null;
 }
 
-async function extractChannelMultiProvider(channelId, serverIndex) {
+async function extractChannelMultiProvider(channelId, serverNum) {
   const channel = catalog.movies.find(m => m.id === channelId || m.tmdb_id === channelId || String(m.daddy_id) === String(channelId));
   const title = channel ? channel.title : 'Chaîne Sport Direct';
   let daddyId = channel?.daddy_id || channel?.sources?.daddylive_id;
@@ -365,15 +371,18 @@ async function extractChannelMultiProvider(channelId, serverIndex) {
     if (/^\d+$/.test(raw)) daddyId = parseInt(raw, 10);
   }
 
-  const srvIdx = (parseInt(serverIndex) || 0) % 5;
-  const srvNum = srvIdx + 1;
+  const srvNum = Math.max(1, Math.min(9, parseInt(serverNum) || 1));
 
   const serverNames = {
     1: 'Serveur 1 (⚡ Direct HLS Principal FHD)',
-    2: 'Serveur 2 (🎬 Miroir Direct HLS / Apex)',
-    3: 'Serveur 3 (🌐 Nontongo Multi-Flux HD)',
-    4: 'Serveur 4 (📡 Lecteur HD1 Secours)',
-    5: 'Serveur 5 (🚀 Miroir DLHD Watch)'
+    2: 'Serveur 2 (🎬 Direct HLS Apex FHD)',
+    3: 'Serveur 3 (📡 Direct HLS DLHD FHD)',
+    4: 'Serveur 4 (🌐 Lecteur Nontongo HD)',
+    5: 'Serveur 5 (🚀 Lecteur HD1 / Alba)',
+    6: 'Serveur 6 (📺 Lecteur DLive Cast)',
+    7: 'Serveur 7 (🛡️ Lecteur CX / Merit)',
+    8: 'Serveur 8 (🎯 Lecteur EngStreams)',
+    9: 'Serveur 9 (⚡ Hub Miroir Li)'
   };
 
   // Chaînes FAST Sport ouvertes
@@ -392,11 +401,11 @@ async function extractChannelMultiProvider(channelId, serverIndex) {
       hoster: 'Red Bull TV Direct',
       quality: '1080p FHD Direct',
       title: `${title} • 🔴 EN DIRECT`,
-      stream_url: urls[srvIdx % urls.length],
+      stream_url: urls[(srvNum - 1) % urls.length],
       player_type: 'direct_hls',
       is_embed: false,
       is_live: true,
-      sources_count: 5,
+      sources_count: 9,
       lang: 'vf'
     };
   }
@@ -413,7 +422,7 @@ async function extractChannelMultiProvider(channelId, serverIndex) {
       player_type: 'direct_hls',
       is_embed: false,
       is_live: true,
-      sources_count: 5,
+      sources_count: 9,
       lang: 'vf'
     };
   }
@@ -430,7 +439,7 @@ async function extractChannelMultiProvider(channelId, serverIndex) {
       player_type: 'direct_hls',
       is_embed: false,
       is_live: true,
-      sources_count: 5,
+      sources_count: 9,
       lang: 'vf'
     };
   }
@@ -447,28 +456,27 @@ async function extractChannelMultiProvider(channelId, serverIndex) {
           hoster: `Direct HLS • ${title}`,
           quality: '1080p FHD Direct',
           title: `${title} • 🔴 EN DIRECT`,
-          stream_url: `/api/stream/live?channel=${encodeURIComponent(daddyId)}`,
+          stream_url: `/api/stream/live?channel=${encodeURIComponent(daddyId)}&mirror=cricsfree`,
           player_type: 'direct_hls',
           is_embed: false,
           is_live: true,
-          sources_count: 5,
+          sources_count: 9,
           lang: 'vf'
         };
       }
-      // Secours propre si pas de flux HLS actif à cet instant (avant match)
       return {
         success: true,
         server: 1,
         server_name: serverNames[1],
-        hoster: `Lecteur Nontongo • ${title}`,
+        hoster: `Lecteur Cricsfree • ${title}`,
         quality: '1080p HD',
         title: `${title} • 🔴 EN DIRECT`,
-        stream_url: `https://nontongo.win/livetv/${daddyId}`,
-        embed_url: `https://nontongo.win/livetv/${daddyId}`,
+        stream_url: `https://cricsfree.cfd/live/stream-${daddyId}.php`,
+        embed_url: `https://cricsfree.cfd/live/stream-${daddyId}.php`,
         player_type: 'iframe',
         is_embed: true,
         is_live: true,
-        sources_count: 5,
+        sources_count: 9,
         lang: 'vf'
       };
     }
@@ -487,7 +495,7 @@ async function extractChannelMultiProvider(channelId, serverIndex) {
           player_type: 'direct_hls',
           is_embed: false,
           is_live: true,
-          sources_count: 5,
+          sources_count: 9,
           lang: 'vf'
         };
       }
@@ -495,33 +503,50 @@ async function extractChannelMultiProvider(channelId, serverIndex) {
         success: true,
         server: 2,
         server_name: serverNames[2],
-        hoster: `Lecteur Cricsfree • ${title}`,
+        hoster: `Lecteur Apex • ${title}`,
         quality: '1080p HD',
         title: `${title} • 🔴 EN DIRECT`,
-        stream_url: `https://cricsfree.cfd/live/stream-${daddyId}.php`,
-        embed_url: `https://cricsfree.cfd/live/stream-${daddyId}.php`,
+        stream_url: `https://apexstreams.cfd/live/stream-${daddyId}.php`,
+        embed_url: `https://apexstreams.cfd/live/stream-${daddyId}.php`,
         player_type: 'iframe',
         is_embed: true,
         is_live: true,
-        sources_count: 5,
+        sources_count: 9,
         lang: 'vf'
       };
     }
 
     if (srvNum === 3) {
+      const liveDaddy = await getLiveM3u8Url(daddyId, 'daddy2');
+      if (liveDaddy) {
+        return {
+          success: true,
+          server: 3,
+          server_name: serverNames[3],
+          hoster: `Direct DLHD • ${title}`,
+          quality: '1080p FHD Direct',
+          title: `${title} • 🔴 EN DIRECT`,
+          stream_url: `/api/stream/live?channel=${encodeURIComponent(daddyId)}&mirror=daddy2`,
+          player_type: 'direct_hls',
+          is_embed: false,
+          is_live: true,
+          sources_count: 9,
+          lang: 'vf'
+        };
+      }
       return {
         success: true,
         server: 3,
         server_name: serverNames[3],
-        hoster: `Lecteur Nontongo HD • ${title}`,
+        hoster: `Lecteur DLHD Watch • ${title}`,
         quality: '1080p HD',
         title: `${title} • 🔴 EN DIRECT`,
-        stream_url: `https://nontongo.win/livetv/${daddyId}`,
-        embed_url: `https://nontongo.win/livetv/${daddyId}`,
+        stream_url: `https://dlhd.st/watch/stream-${daddyId}.php`,
+        embed_url: `https://dlhd.st/watch/stream-${daddyId}.php`,
         player_type: 'iframe',
         is_embed: true,
         is_live: true,
-        sources_count: 5,
+        sources_count: 9,
         lang: 'vf'
       };
     }
@@ -531,15 +556,15 @@ async function extractChannelMultiProvider(channelId, serverIndex) {
         success: true,
         server: 4,
         server_name: serverNames[4],
-        hoster: `Lecteur HD1 Secours • ${title}`,
+        hoster: `Lecteur Nontongo HD • ${title}`,
         quality: '1080p HD',
         title: `${title} • 🔴 EN DIRECT`,
-        stream_url: `https://daddylivehd1.sbs/embed/stream-${daddyId}.php`,
-        embed_url: `https://daddylivehd1.sbs/embed/stream-${daddyId}.php`,
+        stream_url: `https://nontongo.win/livetv/${daddyId}`,
+        embed_url: `https://nontongo.win/livetv/${daddyId}`,
         player_type: 'iframe',
         is_embed: true,
         is_live: true,
-        sources_count: 5,
+        sources_count: 9,
         lang: 'vf'
       };
     }
@@ -549,15 +574,87 @@ async function extractChannelMultiProvider(channelId, serverIndex) {
         success: true,
         server: 5,
         server_name: serverNames[5],
-        hoster: `Lecteur DLHD Watch • ${title}`,
+        hoster: `Lecteur HD1 / Alba • ${title}`,
         quality: '1080p HD',
         title: `${title} • 🔴 EN DIRECT`,
-        stream_url: `https://dlhd.st/watch/stream-${daddyId}.php`,
-        embed_url: `https://dlhd.st/watch/stream-${daddyId}.php`,
+        stream_url: `https://daddylivehd1.sbs/embed/stream-${daddyId}.php`,
+        embed_url: `https://daddylivehd1.sbs/embed/stream-${daddyId}.php`,
         player_type: 'iframe',
         is_embed: true,
         is_live: true,
-        sources_count: 5,
+        sources_count: 9,
+        lang: 'vf'
+      };
+    }
+
+    if (srvNum === 6) {
+      return {
+        success: true,
+        server: 6,
+        server_name: serverNames[6],
+        hoster: `Lecteur DLive Cast • ${title}`,
+        quality: '1080p HD',
+        title: `${title} • 🔴 EN DIRECT`,
+        stream_url: `https://dlive.sx/cast/stream-${daddyId}.php`,
+        embed_url: `https://dlive.sx/cast/stream-${daddyId}.php`,
+        player_type: 'iframe',
+        is_embed: true,
+        is_live: true,
+        sources_count: 9,
+        lang: 'vf'
+      };
+    }
+
+    if (srvNum === 7) {
+      return {
+        success: true,
+        server: 7,
+        server_name: serverNames[7],
+        hoster: `Lecteur DaddyLive1 CX • ${title}`,
+        quality: '1080p HD',
+        title: `${title} • 🔴 EN DIRECT`,
+        stream_url: `https://daddylive1.cx/new/stream-${daddyId}.php`,
+        embed_url: `https://daddylive1.cx/new/stream-${daddyId}.php`,
+        player_type: 'iframe',
+        is_embed: true,
+        is_live: true,
+        sources_count: 9,
+        lang: 'vf'
+      };
+    }
+
+    if (srvNum === 8) {
+      return {
+        success: true,
+        server: 8,
+        server_name: serverNames[8],
+        hoster: `Lecteur EngStreams • ${title}`,
+        quality: '1080p HD',
+        title: `${title} • 🔴 EN DIRECT`,
+        stream_url: `https://engstreams.shop/stream/index.php?id=${daddyId}`,
+        embed_url: `https://engstreams.shop/stream/index.php?id=${daddyId}`,
+        player_type: 'iframe',
+        is_embed: true,
+        is_live: true,
+        sources_count: 9,
+        lang: 'vf'
+      };
+    }
+
+    if (srvNum === 9) {
+      return {
+        success: true,
+        server: 9,
+        server_name: serverNames[9],
+        hoster: `Hub Miroir DaddyLive Li • ${title}`,
+        quality: '1080p HD',
+        title: `${title} • 🔴 EN DIRECT`,
+        stream_url: `https://daddylive.li/player/embed.php?id=${daddyId}`,
+        embed_url: `https://daddylive.li/player/embed.php?id=${daddyId}`,
+        player_type: 'iframe',
+        is_embed: true,
+        is_live: true,
+        sources_count: 9,
         lang: 'vf'
       };
     }
@@ -1218,7 +1315,7 @@ const server = http.createServer((req, res) => {
     const runExtraction = async () => {
       // ── Cas spécial : Chaînes TV Sport & PPV Multi-Fournisseurs ──
       if (type === 'channel' || (id && id.startsWith('tv_')) || (tmdbId && tmdbId.startsWith('tv_'))) {
-        return await extractChannelMultiProvider(id || tmdbId, serverIndex);
+        return await extractChannelMultiProvider(id || tmdbId, serverNum);
       }
 
       // ── Cas spécial : La Villa des Cœurs Brisés & Téléfoot via Multi-Fournisseurs Authentiques ──

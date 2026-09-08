@@ -135,16 +135,18 @@ class NetflixPlayer {
       });
     }
 
-    // Sélection des 5 serveurs
-    this.serverPills.forEach(pill => {
-      pill.addEventListener('click', (e) => {
+    // Sélection dynamique des serveurs (Cinéma 5 serveurs ou TV 9 serveurs)
+    if (this.serverSelector) {
+      this.serverSelector.addEventListener('click', (e) => {
+        const pill = e.target.closest('.server-pill');
+        if (!pill) return;
         e.stopPropagation();
-        const serverNum = parseInt(e.currentTarget.dataset.server) || 1;
+        const serverNum = parseInt(pill.dataset.server) || 1;
         if (serverNum !== this.currentServer) {
           this.switchServer(serverNum);
         }
       });
-    });
+    }
 
     // Sélecteur de Saisons & Épisodes
     this.seasonSelect.addEventListener('change', (e) => {
@@ -272,7 +274,9 @@ class NetflixPlayer {
     // Bannière de résilience
     this.statusSwitchBtn.addEventListener('click', () => {
       this.hideStatusBanner();
-      const nextServer = (this.currentServer % 5) + 1;
+      const isChannel = (this.currentMovie?.media_type === 'channel' || this.currentMovie?.is_live);
+      const maxSrv = isChannel ? 9 : 5;
+      const nextServer = (this.currentServer % maxSrv) + 1;
       this.switchServer(nextServer);
     });
 
@@ -856,56 +860,65 @@ class NetflixPlayer {
   }
 
   updateServerPills() {
+    if (!this.serverSelector) return;
     const isChannel = (this.currentMovie?.media_type === 'channel' || this.currentMovie?.is_live);
     const isSpecialShow = (this.currentMovie?.id === '68628' || this.currentMovie?.tmdb_id === '68628' || this.currentMovie?.id === 'telefoot_tf1' || this.currentMovie?.tmdb_id === 'telefoot_tf1');
     const isVf = (this.currentLang === 'vf');
-    let names;
+
+    let serverList = [];
     if (isChannel) {
-      names = {
-        1: '⚡ Serveur 1 (Direct HLS • Principal FHD)',
-        2: '🎬 Serveur 2 (Miroir CDN Haute Vitesse)',
-        3: '🌐 Serveur 3 (Flux Direct Secours)',
-        4: '📡 Serveur 4 (Lecteur Événementiel Multi-Flux)',
-        5: '🚀 Serveur 5 (Multi-Débit Adaptatif)'
-      };
+      serverList = [
+        { num: 1, label: '⚡ S1: Direct HLS (Principal)', title: 'Serveur 1 : Direct HLS Principal FHD (Cricsfree)' },
+        { num: 2, label: '🎬 S2: Direct HLS (Apex)', title: 'Serveur 2 : Direct HLS Apex FHD' },
+        { num: 3, label: '📡 S3: Direct HLS (DLHD)', title: 'Serveur 3 : Direct HLS DLHD FHD (Daddy2)' },
+        { num: 4, label: '🌐 S4: Nontongo HD', title: 'Serveur 4 : Lecteur Nontongo HD' },
+        { num: 5, label: '🚀 S5: HD1 / Alba', title: 'Serveur 5 : Lecteur HD1 / Alba' },
+        { num: 6, label: '📺 S6: DLive Cast', title: 'Serveur 6 : Lecteur DLive Cast' },
+        { num: 7, label: '🛡️ S7: Merit / CX', title: 'Serveur 7 : Lecteur DaddyLive1 CX / Merit' },
+        { num: 8, label: '🎯 S8: EngStreams', title: 'Serveur 8 : Lecteur EngStreams' },
+        { num: 9, label: '⚡ S9: Miroir Li Hub', title: 'Serveur 9 : Miroir Global DaddyLive Li' }
+      ];
     } else if (isSpecialShow) {
-      names = {
-        1: '⚡ Serveur 1 (Direct HLS • Flux Principal HD)',
-        2: '🎬 Serveur 2 (Direct 1080p FHD)',
-        3: '🌐 Serveur 3 (Direct 720p HD)',
-        4: '📡 Serveur 4 (Miroir CDN Rapide)',
-        5: '🚀 Serveur 5 (Multi-Débit Secours)'
-      };
+      serverList = [
+        { num: 1, label: '⚡ S1: Direct HLS (Principal)', title: 'Serveur 1 : Direct HLS • Flux Principal HD' },
+        { num: 2, label: '🎬 S2: Direct 1080p FHD', title: 'Serveur 2 : Direct 1080p FHD' },
+        { num: 3, label: '🌐 S3: Direct 720p HD', title: 'Serveur 3 : Direct 720p HD' },
+        { num: 4, label: '📡 S4: Miroir CDN Rapide', title: 'Serveur 4 : Miroir CDN Rapide' },
+        { num: 5, label: '🚀 S5: Multi-Débit Secours', title: 'Serveur 5 : Multi-Débit Secours' }
+      ];
     } else if (isVf) {
-      names = {
-        1: '⚡ Serveur 1 (Direct VF • Vidzy HD)',
-        2: '🎬 Serveur 2 (Direct VF • Fsvid VIP)',
-        3: '🌐 Serveur 3 (Direct VF • Uqload)',
-        4: '📡 Serveur 4 (Direct VF • Secours)',
-        5: '🚀 Serveur 5 (Direct VF • Multi-Flux)'
-      };
+      serverList = [
+        { num: 1, label: '⚡ S1: Vidzy HD (VF)', title: 'Serveur 1 : Direct VF • Vidzy HD' },
+        { num: 2, label: '🎬 S2: Fsvid VIP (VF)', title: 'Serveur 2 : Direct VF • Fsvid VIP' },
+        { num: 3, label: '🌐 S3: Uqload (VF)', title: 'Serveur 3 : Direct VF • Uqload' },
+        { num: 4, label: '📡 S4: Secours (VF)', title: 'Serveur 4 : Direct VF • Secours' },
+        { num: 5, label: '🚀 S5: Multi-Flux (VF)', title: 'Serveur 5 : Direct VF • Multi-Flux' }
+      ];
     } else {
-      names = {
-        1: '⚡ Serveur 1 (Direct HLS)',
-        2: '🎬 Serveur 2 (Direct HD)',
-        3: '🌐 Serveur 3 (Direct Multi)',
-        4: '📡 Serveur 4 (Direct VIP)',
-        5: '🚀 Serveur 5 (Direct Secours)'
-      };
+      serverList = [
+        { num: 1, label: '⚡ S1: Direct HLS', title: 'Serveur 1 : Direct HLS (Cluster Alpha)' },
+        { num: 2, label: '🎬 S2: Direct HD', title: 'Serveur 2 : Direct HD (Cluster Bêta)' },
+        { num: 3, label: '🌐 S3: Direct Multi', title: 'Serveur 3 : Direct Multi (Cluster Gamma)' },
+        { num: 4, label: '📡 S4: Direct VIP', title: 'Serveur 4 : Direct VIP (Cluster Delta)' },
+        { num: 5, label: '🚀 S5: Secours', title: 'Serveur 5 : Direct Secours (Cluster Epsilon)' }
+      ];
     }
 
-    this.serverPills.forEach(p => {
-      const pNum = parseInt(p.dataset.server) || 1;
-      const active = (pNum === this.currentServer);
-      p.classList.toggle('active', active);
-      p.innerHTML = '';
+    this.serverSelector.innerHTML = '';
+    serverList.forEach(s => {
+      const btn = document.createElement('button');
+      const active = (s.num === this.currentServer);
+      btn.className = 'server-pill' + (active ? ' active' : '');
+      btn.dataset.server = String(s.num);
+      btn.title = s.title;
       if (active) {
         const dot = document.createElement('span');
         dot.className = 'pill-dot';
         dot.textContent = '● ';
-        p.appendChild(dot);
+        btn.appendChild(dot);
       }
-      p.appendChild(document.createTextNode(names[pNum] || `Serveur ${pNum}`));
+      btn.appendChild(document.createTextNode(s.label));
+      this.serverSelector.appendChild(btn);
     });
   }
 
@@ -917,11 +930,15 @@ class NetflixPlayer {
     let serverNames;
     if (isChannel) {
       serverNames = {
-        1: 'Serveur 1 (Direct HLS Principal FHD)',
-        2: 'Serveur 2 (Miroir CDN Haute Vitesse)',
-        3: 'Serveur 3 (Flux Direct Secours)',
-        4: 'Serveur 4 (Lecteur Événementiel)',
-        5: 'Serveur 5 (Multi-Débit Adaptatif)'
+        1: 'Serveur 1 (⚡ Direct HLS Principal FHD)',
+        2: 'Serveur 2 (🎬 Direct HLS Apex FHD)',
+        3: 'Serveur 3 (📡 Direct HLS DLHD FHD)',
+        4: 'Serveur 4 (🌐 Lecteur Nontongo HD)',
+        5: 'Serveur 5 (🚀 Lecteur HD1 / Alba)',
+        6: 'Serveur 6 (📺 Lecteur DLive Cast)',
+        7: 'Serveur 7 (🛡️ Lecteur CX / Merit)',
+        8: 'Serveur 8 (🎯 Lecteur EngStreams)',
+        9: 'Serveur 9 (⚡ Hub Miroir Li)'
       };
       const sName = serverNames[this.currentServer] || `Serveur ${this.currentServer}`;
       const chNum = this.currentMovie.channel_number ? `Canal ${this.currentMovie.channel_number} • ` : '';
@@ -1070,7 +1087,9 @@ class NetflixPlayer {
 
       // Basculer automatiquement sur le serveur suivant après 1.5s
       setTimeout(() => {
-        const next = (this.currentServer % 5) + 1;
+        const isChannel = (this.currentMovie?.media_type === 'channel' || this.currentMovie?.is_live);
+        const maxSrv = isChannel ? 9 : 5;
+        const next = (this.currentServer % maxSrv) + 1;
         this.switchServer(next);
       }, 1500);
     }
@@ -1176,7 +1195,9 @@ class NetflixPlayer {
               this.hls = null;
               this.showStatusBanner(`Erreur de segment sur Serveur ${this.currentServer}. Basculement...`);
               setTimeout(() => {
-                const next = (this.currentServer % 5) + 1;
+                const isChannel = (this.currentMovie?.media_type === 'channel' || this.currentMovie?.is_live);
+                const maxSrv = isChannel ? 9 : 5;
+                const next = (this.currentServer % maxSrv) + 1;
                 this.switchServer(next);
               }, 1200);
               break;

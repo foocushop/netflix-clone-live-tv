@@ -987,14 +987,22 @@ body {
 .player-server-selector {
   display: flex;
   align-items: center;
-  gap: 8px;
-  background: rgba(18, 18, 18, 0.9);
+  gap: 6px;
+  background: rgba(18, 18, 18, 0.92);
   padding: 5px 8px;
   border-radius: 24px;
   backdrop-filter: blur(12px);
   border: 1px solid rgba(255, 255, 255, 0.18);
   margin-left: auto;
   box-shadow: 0 4px 18px rgba(0, 0, 0, 0.7);
+  max-width: calc(100vw - 360px);
+  overflow-x: auto;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.player-server-selector::-webkit-scrollbar {
+  display: none;
 }
 
 .server-pill {
