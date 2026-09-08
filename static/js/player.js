@@ -1144,9 +1144,16 @@ class NetflixPlayer {
     }
 
     if (this.hls) {
-      this.hls.destroy();
+      try {
+        this.hls.stopLoad();
+        this.hls.detachMedia();
+        this.hls.destroy();
+      } catch (e) {}
       this.hls = null;
     }
+    try {
+      this.video.pause();
+    } catch (e) {}
 
     // Accélération 0ms : Si l'objet possède déjà une URL directe Xtream VIP (Cas de l'onglet Xtream)
     if (this.currentMovie && this.currentMovie.stream_url && (this.currentMovie.is_xtream || this.currentMovie.stream_url.includes('/api/stream/xtream'))) {
@@ -1261,6 +1268,21 @@ class NetflixPlayer {
       streamUrl = baseUrl + streamUrl;
     }
 
+    // 1. Purge et libération instantanée du flux précédent et de la mémoire RAM décodeur
+    if (this.hls) {
+      try {
+        this.hls.stopLoad();
+        this.hls.detachMedia();
+        this.hls.destroy();
+      } catch (e) {}
+      this.hls = null;
+    }
+    try {
+      this.video.pause();
+      this.video.removeAttribute('src');
+      this.video.load();
+    } catch (e) {}
+
     this.iframe.classList.add('hidden');
     this.iframe.src = 'about:blank';
     this.video.classList.remove('hidden');
@@ -1311,17 +1333,17 @@ class NetflixPlayer {
         capLevelToPlayerSize: false,
         initialLiveManifestSize: 1, // Démarre dès le premier manifest reçu sans attendre les cycles de rafraîchissement
         startFragPrefetch: true, // Précharge le fragment suivant pendant la lecture du premier (chargement turbo)
-        backBufferLength: isChannel ? 15 : 60,
-        maxBufferLength: isChannel ? 20 : 45,
-        maxMaxBufferLength: isChannel ? 40 : 75,
-        maxBufferSize: 30 * 1000 * 1000, // 30 MB optimal pour Android TV RAM
+        backBufferLength: isChannel ? 5 : 20, // 5s arrière max pour zéro accumulation mémoire lors du zapping
+        maxBufferLength: isChannel ? 10 : 25, // 10s avant max pour fluidité et libération rapide
+        maxMaxBufferLength: isChannel ? 18 : 45,
+        maxBufferSize: 15 * 1000 * 1000, // 15 MB optimal pour Android TV RAM
         highBufferWatchdogPeriod: 2,
         nudgeOffset: 0.2,
         nudgeMaxRetry: 10,
         maxFragLookUpTolerance: 0.25,
-        fragLoadingTimeOut: 15000,
-        manifestLoadingTimeOut: 15000,
-        levelLoadingTimeOut: 15000
+        fragLoadingTimeOut: 12000,
+        manifestLoadingTimeOut: 12000,
+        levelLoadingTimeOut: 12000
       });
       this.hls = hls;
 
@@ -1379,7 +1401,11 @@ class NetflixPlayer {
               hls.recoverMediaError();
               break;
             default:
-              hls.destroy();
+              try {
+                hls.stopLoad();
+                hls.detachMedia();
+                hls.destroy();
+              } catch(e) {}
               this.hls = null;
               this.showStatusBanner(`Erreur de segment sur Serveur ${this.currentServer}. Basculement...`);
               setTimeout(() => {
@@ -1437,11 +1463,18 @@ class NetflixPlayer {
       this.activeExtractionAbort = null;
     }
     if (this.hls) {
-      this.hls.destroy();
+      try {
+        this.hls.stopLoad();
+        this.hls.detachMedia();
+        this.hls.destroy();
+      } catch (e) {}
       this.hls = null;
     }
-    this.video.pause();
-    this.video.src = '';
+    try {
+      this.video.pause();
+      this.video.removeAttribute('src');
+      this.video.load();
+    } catch (e) {}
     this.iframe.src = 'about:blank';
     this.iframe.classList.add('hidden');
     this.video.classList.remove('hidden');

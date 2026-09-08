@@ -7,6 +7,27 @@ const path = require('path');
 const url = require('url');
 const querystring = require('querystring');
 
+// ================= ROBUSTESSE & GESTION DES DÉCONNEXIONS RÉSEAU =================
+// Protection vitale anti-crash Render / Node.js :
+// Empêche tout crash sur 'socket hang up', 'ECONNRESET', 'EPIPE', 'ETIMEDOUT'
+// causé par des fermetures inattendues de flux IPTV distants ou d'aborts clients lors du zapping.
+process.on('uncaughtException', (err) => {
+  const msg = err?.message || String(err);
+  const code = err?.code || '';
+  if (code === 'ECONNRESET' || code === 'EPIPE' || code === 'ETIMEDOUT' || code === 'ECONNREFUSED' || msg.includes('socket hang up') || msg.includes('aborted') || msg.includes('Premature close')) {
+    return;
+  }
+  console.error('[UNCAUGHT EXCEPTION]:', err);
+});
+
+process.on('unhandledRejection', (reason) => {
+  const msg = reason?.message || String(reason);
+  const code = reason?.code || '';
+  if (code === 'ECONNRESET' || code === 'EPIPE' || code === 'ETIMEDOUT' || msg.includes('socket hang up') || msg.includes('aborted') || msg.includes('Premature close')) {
+    return;
+  }
+  console.error('[UNHANDLED REJECTION]:', reason);
+});
 
 const PORT = process.env.PORT || 8080;
 const DATA_FILE = path.join(__dirname, 'data', 'catalog.json');
@@ -24,17 +45,23 @@ function httpsGet(urlStr, headers = {}) {
       'Referer': 'https://cloudorchestranova.com/'
     };
     const finalHeaders = Object.assign({}, defaultHeaders, headers);
-    https.get(urlStr, {
+    const req = https.get(urlStr, {
       headers: finalHeaders,
       timeout: 8000
     }, res => {
+      res.on('error', reject);
       let chunks = [];
       res.on('data', c => chunks.push(c));
       res.on('end', () => {
         const buffer = Buffer.concat(chunks);
         resolve({ status: res.statusCode, buffer, text: buffer.toString('utf8'), headers: res.headers });
       });
-    }).on('error', reject).on('timeout', () => reject(new Error('Timeout réseau')));
+    });
+    req.on('error', reject);
+    req.on('timeout', () => {
+      req.destroy();
+      reject(new Error('Timeout réseau'));
+    });
   });
 }
 
@@ -99,27 +126,38 @@ const XTREAM_STREAM_FALLBACKS = {
 };
 
 // Agents HTTP/HTTPS persistants avec réutilisation de sockets (Keep-Alive Pool)
-// keepAliveMsecs réglé à 10s pour concorder avec les timeouts des reverse-proxies Nginx IPTV
+// keepAliveMsecs réglé à 4s pour concorder avec les timeouts des reverse-proxies Nginx IPTV
 const xtreamHttpAgent = new http.Agent({
   keepAlive: true,
-  maxSockets: 100,
-  maxFreeSockets: 20,
-  keepAliveMsecs: 10000,
-  timeout: 15000
+  maxSockets: 30,
+  maxFreeSockets: 5,
+  keepAliveMsecs: 4000,
+  timeout: 12000
 });
 
 const xtreamHttpsAgent = new https.Agent({
   keepAlive: true,
-  maxSockets: 100,
-  maxFreeSockets: 20,
-  keepAliveMsecs: 10000,
-  timeout: 15000
+  maxSockets: 30,
+  maxFreeSockets: 5,
+  keepAliveMsecs: 4000,
+  timeout: 12000
 });
 
 // Cache d'adresses Edge directes (TTL 60s) pour contourner les redirections 302 à répétition
 const xtreamEdgeCache = new Map();
 // Cache ultra-rapide des manifests réécrits (TTL 1500ms) pour démarrage immédiat (0ms)
 const xtreamManifestCache = new Map();
+
+// Purge automatique périodique pour garantir zéro accumulation RAM dans le temps
+setInterval(() => {
+  const now = Date.now();
+  for (const [k, v] of xtreamManifestCache.entries()) {
+    if (v.expiresAt <= now) xtreamManifestCache.delete(k);
+  }
+  for (const [k, v] of xtreamEdgeCache.entries()) {
+    if (v.expiresAt <= now) xtreamEdgeCache.delete(k);
+  }
+}, 60000);
 
 function fetchXtreamPlaylist(targetUrl, headers = {}, hops = 0, retry = 0) {
   if (hops > 5) return Promise.reject(new Error('Trop de redirections Xtream'));
@@ -132,6 +170,8 @@ function fetchXtreamPlaylist(targetUrl, headers = {}, hops = 0, retry = 0) {
     }
     const client = parsed.protocol === 'https:' ? https : http;
     const agent = parsed.protocol === 'https:' ? xtreamHttpsAgent : xtreamHttpAgent;
+    let settled = false;
+
     const req = client.get(targetUrl, {
       agent,
       headers: Object.assign({
@@ -140,15 +180,36 @@ function fetchXtreamPlaylist(targetUrl, headers = {}, hops = 0, retry = 0) {
       }, headers),
       timeout: 10000
     }, (res) => {
+      res.on('error', (err) => {
+        if (settled) return;
+        settled = true;
+        try { req.destroy(); } catch (e) {}
+        if (retry < 2 && (err.code === 'ECONNRESET' || err.message?.includes('socket hang up') || err.code === 'ETIMEDOUT')) {
+          return resolve(fetchXtreamPlaylist(targetUrl, headers, hops, retry + 1));
+        }
+        reject(err);
+      });
+
       if (res.statusCode === 301 || res.statusCode === 302 || res.statusCode === 307 || res.statusCode === 308) {
+        try { res.destroy(); } catch (e) {}
         const loc = res.headers.location;
-        if (!loc) return reject(new Error('Redirection sans en-tête location'));
+        if (!loc) {
+          if (!settled) { settled = true; reject(new Error('Redirection sans en-tête location')); }
+          return;
+        }
         const nextUrl = loc.startsWith('http') ? loc : new URL(loc, targetUrl).href;
-        return resolve(fetchXtreamPlaylist(nextUrl, headers, hops + 1, retry));
+        if (!settled) {
+          settled = true;
+          return resolve(fetchXtreamPlaylist(nextUrl, headers, hops + 1, retry));
+        }
+        return;
       }
+
       let chunks = [];
       res.on('data', c => chunks.push(c));
       res.on('end', () => {
+        if (settled) return;
+        settled = true;
         const buf = Buffer.concat(chunks);
         resolve({
           statusCode: res.statusCode,
@@ -159,15 +220,20 @@ function fetchXtreamPlaylist(targetUrl, headers = {}, hops = 0, retry = 0) {
         });
       });
     });
+
     req.on('error', (err) => {
-      // Auto-retry transparent sur socket hang up / ECONNRESET
+      if (settled) return;
+      settled = true;
       if (retry < 2 && (err.message.includes('socket hang up') || err.code === 'ECONNRESET' || err.code === 'ETIMEDOUT')) {
         return resolve(fetchXtreamPlaylist(targetUrl, headers, hops, retry + 1));
       }
       reject(err);
     });
+
     req.on('timeout', () => {
-      req.destroy();
+      try { req.destroy(); } catch (e) {}
+      if (settled) return;
+      settled = true;
       if (retry < 2) {
         return resolve(fetchXtreamPlaylist(targetUrl, headers, hops, retry + 1));
       }
@@ -323,6 +389,7 @@ async function fetchDailymotionStream(videoId) {
       headers: { 'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36' },
       timeout: 8000
     }, metaRes => {
+      metaRes.on('error', reject);
       let body = '';
       const setCookies = metaRes.headers['set-cookie'] || [];
       metaRes.on('data', c => body += c);
@@ -344,6 +411,7 @@ async function fetchDailymotionStream(videoId) {
             },
             timeout: 8000
           }, mRes => {
+            mRes.on('error', reject);
             let mBody = '';
             mRes.on('data', c => mBody += c);
             mRes.on('end', () => {
@@ -1860,6 +1928,8 @@ const server = http.createServer((req, res) => {
           const resObj = await fetchXtreamPlaylist(cachedEdge.edgeUrl);
           if (resObj.statusCode === 200 && resObj.body && resObj.body.includes('#EXTM3U')) {
             return resObj;
+          } else {
+            xtreamEdgeCache.delete(initialStreamId);
           }
         } catch (e) {
           xtreamEdgeCache.delete(initialStreamId);
@@ -1983,9 +2053,9 @@ const server = http.createServer((req, res) => {
   // ================= ROUTE XTREAM CHUNK PROXY (/api/stream/xtream-chunk) =================
   // Proxy de streaming pour chaque segment .ts de l'infrastructure Xtream :
   // - Envoi du User-Agent IPTVSmartersPro/1.0
-  // - Connection Pooling persistant (xtreamHttpAgent / xtreamHttpsAgent)
+  // - Connection Pooling persistant résistant aux micro-coupures
   // - Headers CORS complets & Content-Type video/mp2t
-  // - Mise en cache HTTP immuable pour éliminer les saccades et micro-coupures
+  // - Destruction instantanée des flux amont lors du zapping client pour zéro fuite RAM
   if (pathname === '/api/stream/xtream-chunk' && req.method === 'GET') {
     const chunkUrl = parsedUrl.query.url;
     if (!chunkUrl) {
@@ -2002,7 +2072,7 @@ const server = http.createServer((req, res) => {
         return;
       }
 
-      if (req.destroyed || res.writableEnded) {
+      if (req.destroyed || res.writableEnded || res.destroyed) {
         return;
       }
 
@@ -2019,7 +2089,8 @@ const server = http.createServer((req, res) => {
 
       const client = parsed.protocol === 'https:' ? https : http;
       const agent = parsed.protocol === 'https:' ? xtreamHttpsAgent : xtreamHttpAgent;
-      let isClientAborted = false;
+      let isAborted = false;
+      let activeChunkRes = null;
 
       const clientReq = client.get(urlToFetch, {
         agent,
@@ -2027,16 +2098,36 @@ const server = http.createServer((req, res) => {
           'User-Agent': 'IPTVSmartersPro/1.0',
           'Accept': '*/*'
         },
-        timeout: 15000
+        timeout: 12000
       }, (chunkRes) => {
-        if (isClientAborted || req.destroyed || res.writableEnded) {
+        activeChunkRes = chunkRes;
+
+        // Attacher immédiatement un écouteur d'erreur sur chunkRes pour éviter tout crash processus
+        chunkRes.on('error', (err) => {
+          if (isAborted || req.destroyed || res.destroyed || res.writableEnded) return;
+          console.warn('[Xtream Chunk Stream Error]:', err.message);
+          try { chunkRes.destroy(); } catch (e) {}
+          if (!res.headersSent) {
+            try {
+              res.writeHead(502, { 'Content-Type': 'text/plain', 'Access-Control-Allow-Origin': '*' });
+              res.end('Erreur de chargement flux: ' + err.message);
+            } catch (e) {}
+          } else {
+            try { res.end(); } catch (e) {}
+          }
+        });
+
+        if (isAborted || req.destroyed || res.destroyed || res.writableEnded) {
           try { chunkRes.destroy(); } catch (e) {}
           return;
         }
 
-        if (chunkRes.statusCode === 301 || chunkRes.statusCode === 302 || chunkRes.statusCode === 307) {
+        // Suivi propre des redirections 3xx avec libération immédiate de la socket
+        if (chunkRes.statusCode === 301 || chunkRes.statusCode === 302 || chunkRes.statusCode === 307 || chunkRes.statusCode === 308) {
+          try { chunkRes.destroy(); } catch (e) {}
           const loc = chunkRes.headers.location;
           if (loc) {
+            cleanupListeners();
             const nextUrl = loc.startsWith('http') ? loc : new URL(loc, urlToFetch).href;
             return pipeChunk(nextUrl, hops + 1, retry);
           }
@@ -2062,28 +2153,55 @@ const server = http.createServer((req, res) => {
       });
 
       clientReq.on('error', (err) => {
-        // 1. Si la connexion client a déjà été coupée (zapping, seek, fermeture d'onglet)
-        if (isClientAborted || req.destroyed || res.writableEnded) {
+        if (isAborted || req.destroyed || res.destroyed || res.writableEnded) {
           return;
         }
 
-        // 2. Si le serveur distant a fermé une socket inactive (socket hang up / ECONNRESET / ETIMEDOUT),
-        // on relance automatiquement une tentative sur une socket neuve
+        // Auto-retry si socket fermée prématurément par le serveur distant
         if (retry < 2 && !res.headersSent && (err.message.includes('socket hang up') || err.code === 'ECONNRESET' || err.code === 'ETIMEDOUT')) {
+          cleanupListeners();
           return pipeChunk(urlToFetch, hops, retry + 1);
         }
 
-        console.warn('[Xtream Chunk Error]:', err.message);
+        console.warn('[Xtream Chunk Request Error]:', err.message);
         if (!res.headersSent) {
-          res.writeHead(502, { 'Content-Type': 'text/plain', 'Access-Control-Allow-Origin': '*' });
-          res.end('Erreur de chargement chunk: ' + err.message);
+          try {
+            res.writeHead(502, { 'Content-Type': 'text/plain', 'Access-Control-Allow-Origin': '*' });
+            res.end('Erreur de chargement chunk: ' + err.message);
+          } catch (e) {}
         }
       });
 
-      req.on('close', () => {
-        isClientAborted = true;
+      clientReq.on('timeout', () => {
         try { clientReq.destroy(); } catch (e) {}
+        if (isAborted || req.destroyed || res.destroyed || res.writableEnded) return;
+        if (retry < 2 && !res.headersSent) {
+          cleanupListeners();
+          return pipeChunk(urlToFetch, hops, retry + 1);
+        }
+        if (!res.headersSent) {
+          try {
+            res.writeHead(504, { 'Content-Type': 'text/plain', 'Access-Control-Allow-Origin': '*' });
+            res.end('Timeout chunk Xtream');
+          } catch (e) {}
+        }
       });
+
+      const onClientClose = () => {
+        isAborted = true;
+        try { clientReq.destroy(); } catch (e) {}
+        if (activeChunkRes) {
+          try { activeChunkRes.destroy(); } catch (e) {}
+        }
+      };
+
+      req.once('close', onClientClose);
+      res.once('close', onClientClose);
+
+      function cleanupListeners() {
+        req.removeListener('close', onClientClose);
+        res.removeListener('close', onClientClose);
+      }
     }
 
     pipeChunk(chunkUrl);
@@ -2183,11 +2301,27 @@ const server = http.createServer((req, res) => {
       options.headers['Range'] = req.headers.range;
     }
 
+    let isAborted = false;
+    let activeProxyRes = null;
+
     const proxyReq = client.get(targetUrl, options, proxyRes => {
+      activeProxyRes = proxyRes;
       const statusCode = proxyRes.statusCode || 200;
+
+      proxyRes.on('error', (err) => {
+        if (isAborted || req.destroyed || res.destroyed || res.writableEnded) return;
+        console.warn('[Proxy Res Error]:', err.message);
+        try { proxyRes.destroy(); } catch (e) {}
+        if (!res.headersSent) {
+          try { res.writeHead(502); res.end(); } catch (e) {}
+        } else {
+          try { res.end(); } catch (e) {}
+        }
+      });
 
       // Suivre les redirections 3xx
       if (statusCode >= 300 && statusCode < 400 && proxyRes.headers.location) {
+        try { proxyRes.destroy(); } catch (e) {}
         const redirected = resolveProxyUrl(targetUrl, proxyRes.headers.location);
         const sessionSuffix = sessionKey ? '&dm_session=' + encodeURIComponent(sessionKey) : '';
         res.writeHead(302, { 'Location': '/api/stream/proxy?url=' + encodeURIComponent(redirected) + sessionSuffix });
@@ -2234,20 +2368,36 @@ const server = http.createServer((req, res) => {
     });
 
     proxyReq.on('error', err => {
+      if (isAborted || req.destroyed || res.destroyed || res.writableEnded) return;
       console.warn('[Proxy Error] Échec sur', targetUrl.substring(0, 60), ':', err.message);
       if (!res.headersSent) {
-        res.writeHead(502, { 'Content-Type': 'text/plain', 'Access-Control-Allow-Origin': '*' });
-        res.end('Erreur proxy streaming: ' + err.message);
+        try {
+          res.writeHead(502, { 'Content-Type': 'text/plain', 'Access-Control-Allow-Origin': '*' });
+          res.end('Erreur proxy streaming: ' + err.message);
+        } catch (e) {}
       }
     });
 
     proxyReq.on('timeout', () => {
-      proxyReq.destroy();
+      try { proxyReq.destroy(); } catch (e) {}
+      if (isAborted || req.destroyed || res.destroyed || res.writableEnded) return;
       if (!res.headersSent) {
-        res.writeHead(504, { 'Content-Type': 'text/plain', 'Access-Control-Allow-Origin': '*' });
-        res.end('Timeout proxy streaming');
+        try {
+          res.writeHead(504, { 'Content-Type': 'text/plain', 'Access-Control-Allow-Origin': '*' });
+          res.end('Timeout proxy streaming');
+        } catch (e) {}
       }
     });
+
+    const onClientClose = () => {
+      isAborted = true;
+      try { proxyReq.destroy(); } catch (e) {}
+      if (activeProxyRes) {
+        try { activeProxyRes.destroy(); } catch (e) {}
+      }
+    };
+    req.once('close', onClientClose);
+    res.once('close', onClientClose);
 
     return;
   }

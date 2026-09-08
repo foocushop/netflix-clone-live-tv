@@ -910,9 +910,36 @@ class NetflixApp {
       });
 
       const fragment = document.createDocumentFragment();
-      channels.forEach(ch => {
+      const visibleChannels = channels.slice(0, 50);
+      visibleChannels.forEach(ch => {
         fragment.appendChild(this.createXtreamCard(ch));
       });
+      if (channels.length > 50) {
+        const moreCard = document.createElement('div');
+        moreCard.className = 'movie-card channel-card xtream-card focusable';
+        moreCard.style.display = 'flex';
+        moreCard.style.flexDirection = 'column';
+        moreCard.style.alignItems = 'center';
+        moreCard.style.justifyContent = 'center';
+        moreCard.style.background = 'linear-gradient(135deg, rgba(0, 210, 255, 0.15), rgba(0, 0, 0, 0.8))';
+        moreCard.style.border = '1px dashed #00d2ff';
+        moreCard.style.cursor = 'pointer';
+        moreCard.innerHTML = `
+          <div style="font-size: 2rem; margin-bottom: 8px; color: #00d2ff;">➕</div>
+          <div style="font-weight: 700; color: #fff; text-align: center; padding: 0 10px;">Voir toutes les ${channels.length} chaînes</div>
+          <div style="font-size: 0.8rem; color: #00d2ff; margin-top: 4px;">${catName}</div>
+        `;
+        moreCard.addEventListener('click', () => {
+          this.selectedXtreamCategory = channels[0].category_id;
+          const chips = this.xtreamCategoryChips.querySelectorAll('.xtream-chip');
+          chips.forEach(c => {
+            if (c.getAttribute('data-cat') === this.selectedXtreamCategory) c.classList.add('active');
+            else c.classList.remove('active');
+          });
+          this.filterAndRenderXtream();
+        });
+        fragment.appendChild(moreCard);
+      }
       slider.appendChild(fragment);
       this.catalogRowsContainer.appendChild(rowEl);
     });
