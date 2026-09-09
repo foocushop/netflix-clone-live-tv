@@ -1165,14 +1165,24 @@ class NetflixApp {
 
     if (!this.telerealiteShows) {
       try {
-        const baseUrl = window.API_BASE || '';
-        const res = await fetch(`${baseUrl}/api/xtream/telerealite?limit=300`);
-        const json = await res.json();
-        if (json.success && json.data) {
-          this.telerealiteShows = json.data;
+        const stored = sessionStorage.getItem('telerealite_shows_cache');
+        if (stored) {
+          this.telerealiteShows = JSON.parse(stored);
         }
-      } catch (e) {
-        console.error("Erreur chargement télé-réalité", e);
+      } catch (e) {}
+
+      if (!this.telerealiteShows) {
+        try {
+          const baseUrl = window.API_BASE || '';
+          const res = await fetch(`${baseUrl}/api/xtream/telerealite?limit=300`);
+          const json = await res.json();
+          if (json.success && json.data) {
+            this.telerealiteShows = json.data;
+            try { sessionStorage.setItem('telerealite_shows_cache', JSON.stringify(json.data)); } catch (e) {}
+          }
+        } catch (e) {
+          console.error("Erreur chargement télé-réalité", e);
+        }
       }
     }
 

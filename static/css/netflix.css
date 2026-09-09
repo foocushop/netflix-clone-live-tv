@@ -1253,19 +1253,32 @@ body {
 }
 
 .player-select {
-  background: rgba(30, 30, 30, 0.95);
+  appearance: none;
+  -webkit-appearance: none;
+  background: rgba(20, 20, 24, 0.92);
   color: #fff;
-  border: 1px solid rgba(255, 255, 255, 0.25);
-  padding: 6px 12px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  padding: 7px 32px 7px 12px;
   border-radius: 6px;
   font-size: 0.85rem;
+  font-weight: 600;
   cursor: pointer;
   outline: none;
-  transition: border-color 0.2s;
+  transition: all 0.2s ease;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 10px center;
+  backdrop-filter: blur(8px);
 }
 
-.player-select:hover, .player-select:focus {
+.player-select:hover {
+  background-color: rgba(35, 35, 42, 0.95);
+  border-color: rgba(255, 255, 255, 0.4);
+}
+
+.player-select:focus {
   border-color: var(--netflix-red);
+  box-shadow: 0 0 0 2px rgba(229, 9, 20, 0.4);
 }
 
 /* ================= CONTENEUR MÉDIA (PLEIN ÉCRAN RÉEL & ANTI-PUBS) ================= */
@@ -2277,6 +2290,51 @@ body {
   outline: 2px solid #fff;
   transform: scale(1.08);
   box-shadow: 0 0 14px #00d2ff;
+}
+
+/* ================= PERSONNALISATION TÉLÉ-RÉALITÉ (STYLE NETFLIX RED GLASS) ================= */
+.telerealite-toolbar {
+  background: rgba(14, 14, 18, 0.88);
+  border: 1px solid rgba(229, 9, 20, 0.35);
+  box-shadow: 0 14px 40px rgba(0, 0, 0, 0.8), 0 0 25px rgba(229, 9, 20, 0.12);
+  backdrop-filter: blur(18px);
+}
+
+.telerealite-search-input {
+  background: rgba(22, 22, 26, 0.95);
+  border: 1.5px solid rgba(255, 255, 255, 0.15);
+  color: #fff;
+}
+
+.telerealite-search-input:focus,
+.telerealite-search-input.tv-focused {
+  border-color: #e50914;
+  background: rgba(28, 28, 34, 0.98);
+  box-shadow: 0 0 0 3px rgba(229, 9, 20, 0.35), 0 4px 18px rgba(229, 9, 20, 0.25);
+}
+
+.telerealite-chip {
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.telerealite-chip:hover {
+  border-color: rgba(229, 9, 20, 0.6);
+  color: #fff;
+  background: rgba(229, 9, 20, 0.15);
+}
+
+.telerealite-chip.active {
+  background: linear-gradient(135deg, #e50914, #b20710) !important;
+  color: #fff !important;
+  border-color: #e50914 !important;
+  font-weight: 700 !important;
+  box-shadow: 0 4px 16px rgba(229, 9, 20, 0.55) !important;
+}
+
+.telerealite-chip.tv-focused {
+  outline: 2px solid #fff;
+  transform: scale(1.08);
+  box-shadow: 0 0 16px rgba(229, 9, 20, 0.85);
 }
 
 .xtream-status-bar {
