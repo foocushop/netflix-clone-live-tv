@@ -3534,8 +3534,18 @@ const server = http.createServer((req, res) => {
           }
         });
 
-        // Remuxage fMP4 temps réel optionnel si explicitement demandé (?remux=1)
-        if (parsedUrl.query.remux === '1' && ffmpegPath) {
+        // ── Détection automatique MKV/Matroska → Remuxage fMP4 temps réel ──
+        // Le serveur Xtream envoie les épisodes en MKV (H.264 + AAC), mais Chrome
+        // ne peut PAS décoder du MKV brut. On remuxe à la volée en fMP4 sans recoder
+        // (-c copy = 0% CPU, débit identique). Fallback proxy direct si ffmpeg absent.
+        const upstreamCt = (upstreamRes.headers['content-type'] || '').toLowerCase();
+        const isMkvContent = upstreamCt.includes('matroska') || upstreamCt.includes('octet-stream') || ext === 'mkv';
+        const needsRemux = isMkvContent && !isRaw;
+
+        if (needsRemux && ffmpegPath) {
+          console.log(`[Xtream Series fMP4] Remuxage automatique MKV→fMP4 pour épisode ${episodeId} (${upstreamCt || ext})`);
+
+          // Ne pas transférer le Range à ffmpeg — ffmpeg lit depuis le début et transcrit
           const ffmpegArgs = [
             '-loglevel', 'error',
             '-i', 'pipe:0',
@@ -3552,14 +3562,16 @@ const server = http.createServer((req, res) => {
             stdio: ['pipe', 'pipe', 'pipe']
           });
 
-          res.writeHead(200, {
-            'Content-Type': 'video/mp4',
-            'Accept-Ranges': 'none',
-            'Access-Control-Allow-Origin': '*',
-            'Access-Control-Allow-Headers': '*',
-            'Cache-Control': 'no-cache, no-store, must-revalidate',
-            'Connection': 'keep-alive'
-          });
+          if (!res.headersSent) {
+            res.writeHead(200, {
+              'Content-Type': 'video/mp4',
+              'Accept-Ranges': 'none',
+              'Access-Control-Allow-Origin': '*',
+              'Access-Control-Allow-Headers': '*',
+              'Cache-Control': 'no-cache, no-store, must-revalidate',
+              'Connection': 'keep-alive'
+            });
+          }
 
           upstreamRes.pipe(ffmpeg.stdin);
           ffmpeg.stdout.pipe(res);
@@ -3567,7 +3579,7 @@ const server = http.createServer((req, res) => {
           ffmpeg.stderr.on('data', (d) => {
             const msg = d.toString();
             if (msg.includes('Error') || msg.includes('Invalid')) {
-              console.warn('[FFmpeg Series Remux]:', msg.trim());
+              console.warn('[FFmpeg Series Remux Error]:', msg.trim());
             }
           });
 
@@ -3591,7 +3603,7 @@ const server = http.createServer((req, res) => {
           return;
         }
 
-        // Proxy direct HTTP Range avec support complet 206 Partial Content (comme avant)
+        // Proxy direct HTTP Range avec support complet 206 Partial Content (fallback si ffmpeg absent ou ext=mp4)
         const outHeaders = {
           'Access-Control-Allow-Origin': '*',
           'Access-Control-Allow-Headers': '*',

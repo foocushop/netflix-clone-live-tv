@@ -1676,18 +1676,34 @@ class NetflixPlayer {
 
     const onError = () => {
       if (hasReadied) return;
-      console.warn('[Direct Video Error]:', this.video.error);
+      const errCode = this.video.error ? this.video.error.code : '?';
+      const errMsg = this.video.error ? this.video.error.message : 'inconnu';
+      console.warn(`[Direct Video Error] code=${errCode}:`, errMsg);
+      // Erreur de format → tentative de recharge après 800ms (fMP4 ffmpeg pas encore prêt)
+      if (!hasReadied && this.video.error && (this.video.error.code === 3 || this.video.error.code === 4)) {
+        console.log('[Direct Video] Recharge après erreur de format...');
+        setTimeout(() => {
+          if (!hasReadied) {
+            this.video.src = videoUrl + (videoUrl.includes('?') ? '&' : '?') + '_retry=' + Date.now();
+            this.video.load();
+            this.video.play().catch(() => {});
+          }
+        }, 800);
+        return;
+      }
       this.showStatusBanner('Erreur de lecture du flux direct.');
       this.hideLoader();
     };
     this.video.addEventListener('error', onError, { once: true });
 
-    // Fallback de sécurité : masquer le loader après 3.5s si la vidéo a commencé à charger
+    // Fallback de sécurité : masquer le loader après 8s si la vidéo a commencé à charger
+    // (le remuxage ffmpeg prend ~1-2s avant de produire les premiers octets fMP4)
     setTimeout(() => {
-      if (!hasReadied && !this.video.error && this.video.readyState >= 2) {
+      if (!hasReadied && !this.video.error && this.video.readyState >= 1) {
+        console.log('[Direct Video] Safety timeout: forçage hideLoader (readyState:', this.video.readyState, ')');
         onReady();
       }
-    }, 3500);
+    }, 8000);
 
     this.video.preload = 'auto';
     this.video.src = videoUrl;
