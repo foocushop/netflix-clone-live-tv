@@ -2890,10 +2890,11 @@ const server = http.createServer((req, res) => {
           'Keep-Alive': 'timeout=60, max=1000'
         };
 
-        if (upstreamRes.headers['content-type']) {
+        const ct = (upstreamRes.headers['content-type'] || '').toLowerCase();
+        if (ct && !ct.includes('matroska') && !ct.includes('octet-stream')) {
           outHeaders['Content-Type'] = upstreamRes.headers['content-type'];
         } else {
-          outHeaders['Content-Type'] = ext === 'mp4' ? 'video/mp4' : 'video/x-matroska';
+          outHeaders['Content-Type'] = 'video/mp4';
         }
 
         if (upstreamRes.headers['content-length']) {

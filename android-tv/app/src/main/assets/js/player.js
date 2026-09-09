@@ -1413,11 +1413,6 @@ class NetflixPlayer {
     this.video.src = videoUrl;
     this.video.load();
 
-    if (this.savedPlaybackTime > 0) {
-      this.video.currentTime = this.savedPlaybackTime;
-      this.savedPlaybackTime = 0;
-    }
-
     const playPromise = this.video.play();
     if (playPromise !== undefined) {
       playPromise.catch(err => {
@@ -1481,52 +1476,30 @@ class NetflixPlayer {
     this.video.addEventListener('loadeddata', onReady, { once: true });
     this.video.addEventListener('playing', onReady, { once: true });
 
-    // Protection Anti-Boucle / Anti-Saccade Xtream :
-    // Empêche le lecteur de revenir en arrière de 5-10 secondes lors des resets PTS/PCR
-    this.lastLiveMaxTime = 0;
-    if (this._antiLoopHandler) {
-      this.video.removeEventListener('timeupdate', this._antiLoopHandler);
-    }
-    this._antiLoopHandler = () => {
-      const isChannel = (this.currentMovie?.media_type === 'channel' || this.currentMovie?.is_live);
-      if (isChannel && !this.video.paused && !this.video.seeking) {
-        const cur = this.video.currentTime;
-        if (this.lastLiveMaxTime > 6 && cur < (this.lastLiveMaxTime - 2.0)) {
-          console.warn(`[Anti-Loop Xtream] Décalage arrière détecté (${cur.toFixed(1)}s < ${this.lastLiveMaxTime.toFixed(1)}s). Repositionnement direct actif.`);
-          this.video.currentTime = this.lastLiveMaxTime + 0.2;
-          return;
-        }
-        if (cur > this.lastLiveMaxTime) {
-          this.lastLiveMaxTime = cur;
-        }
-      }
-    };
-    this.video.addEventListener('timeupdate', this._antiLoopHandler);
-
     if (window.Hls && Hls.isSupported()) {
       const isChannel = (this.currentMovie?.media_type === 'channel' || this.currentMovie?.is_live);
       const isXtream = streamUrl.includes('/api/stream/xtream');
       const hls = new Hls({
         enableWorker: true,
         lowLatencyMode: false,
-        liveSyncDurationCount: isXtream ? 3 : (isChannel ? 4 : 3), // 3 segments pour démarrage instantané sans attente
-        liveMaxLatencyDurationCount: isXtream ? 6 : (isChannel ? 8 : 6),
+        liveSyncDurationCount: isXtream ? 4 : (isChannel ? 4 : 3), // Marge sécurisée de 4 segments anti-coupure
+        liveMaxLatencyDurationCount: isXtream ? 10 : (isChannel ? 12 : 10),
         liveDurationInfinity: isChannel,
         startLevel: -1, // Démarrage adaptatif immédiat
         capLevelToPlayerSize: false,
-        initialLiveManifestSize: 1, // Démarre dès le premier manifest reçu sans attendre les cycles de rafraîchissement
-        startFragPrefetch: true, // Précharge le fragment suivant pendant la lecture du premier (chargement turbo)
-        backBufferLength: isChannel ? 5 : 20, // 5s arrière max pour zéro accumulation mémoire lors du zapping
-        maxBufferLength: isChannel ? 10 : 25, // 10s avant max pour fluidité et libération rapide
-        maxMaxBufferLength: isChannel ? 18 : 45,
-        maxBufferSize: 15 * 1000 * 1000, // 15 MB optimal pour Android TV RAM
-        highBufferWatchdogPeriod: 2,
-        nudgeOffset: 0.2,
-        nudgeMaxRetry: 10,
+        initialLiveManifestSize: 1, // Démarre dès le premier manifest
+        startFragPrefetch: true, // Précharge les fragments suivants en tâche de fond (chargement turbo)
+        backBufferLength: 30, // 30s en arrière conservées
+        maxBufferLength: isChannel ? 30 : 60, // 30s à 60s d'avance pour un tampon large et stable (style YouTube)
+        maxMaxBufferLength: isChannel ? 60 : 120, // Jusqu'à 120s de préchargement max
+        maxBufferSize: 60 * 1024 * 1024, // 60 Mo alloués au tampon vidéo
+        highBufferWatchdogPeriod: 3,
+        nudgeOffset: 0.1,
+        nudgeMaxRetry: 5,
         maxFragLookUpTolerance: 0.25,
-        fragLoadingTimeOut: 12000,
-        manifestLoadingTimeOut: 12000,
-        levelLoadingTimeOut: 12000
+        fragLoadingTimeOut: 20000,
+        manifestLoadingTimeOut: 20000,
+        levelLoadingTimeOut: 20000
       });
       this.hls = hls;
 
@@ -1566,21 +1539,16 @@ class NetflixPlayer {
       });
 
       hls.on(Hls.Events.ERROR, (event, data) => {
-        // Détection et saut automatique par-dessus les micro-trous de diffusion (anti-saccade & anti-coupure)
-        if (data.details === Hls.ErrorDetails.BUFFER_STALLED_ERROR || data.details === Hls.ErrorDetails.BUFFER_SEEK_OVER_HOLE || data.details === Hls.ErrorDetails.BUFFER_NUDGE_ON_STALL) {
-          console.warn('[HLS Watchdog] Micro-trou détecté, saut préventif anti-saccade');
-          this.video.currentTime += 0.3;
-          this.video.play().catch(() => {});
-          return;
-        }
-
+        // En cas d'erreur fatale non-récupérable automatiquement par le moteur de buffering interne
         if (data.fatal) {
           console.warn('[HLS Fatal Error]', data.type, data.details);
           switch (data.type) {
             case Hls.ErrorTypes.NETWORK_ERROR:
+              console.log('[HLS] Récupération réseau automatique...');
               hls.startLoad();
               break;
             case Hls.ErrorTypes.MEDIA_ERROR:
+              console.log('[HLS] Récupération média automatique...');
               hls.recoverMediaError();
               break;
             default:
