@@ -1667,26 +1667,53 @@ class NetflixPlayer {
     };
 
     this.video.addEventListener('loadeddata', onReady, { once: true });
-    this.video.addEventListener('canplay', onReady, { once: true });
+    this.video.addEventListener('canplay', () => {
+      onReady();
+      // Lancer la lecture uniquement quand le navigateur est PRÊT (après TTFB Render)
+      const playPromise = this.video.play();
+      if (playPromise !== undefined) {
+        playPromise.catch(err => {
+          console.warn('[Direct Video Autoplay Warn]:', err.message);
+          // Fallback muet si autoplay bloqué
+          this.video.muted = true;
+          this.syncVolumeUI();
+          this.video.play().catch(() => {});
+        });
+      }
+    }, { once: true });
     this.video.addEventListener('playing', onReady, { once: true });
 
-    // Fallback de sécurité : masquer le loader après 2s si le flux démarre
+    // Détection d'erreur de format (MKV non supporté par le navigateur)
+    this.video.addEventListener('error', () => {
+      if (hasReadied) return;
+      const err = this.video.error;
+      console.warn('[Direct Video Error]:', err?.message || 'unknown', 'code:', err?.code);
+      // Si le navigateur refuse le format, afficher un message utile
+      if (err && (err.code === MediaError.MEDIA_ERR_SRC_NOT_SUPPORTED || err.code === MediaError.MEDIA_ERR_DECODE)) {
+        this.showStatusBanner('Format vidéo non supporté. Tentative de reconnexion...');
+        // Relancer le stream via le player
+        setTimeout(() => this.loadStream(), 1500);
+      }
+    }, { once: true });
+
+    // Fallback de sécurité : timeout généreux pour Render free tier (TTFB ~2-3s + buffering)
     setTimeout(() => {
       if (!hasReadied && this.video.readyState >= 1) {
         onReady();
       }
-    }, 2000);
+    }, 8000);
+
+    // Fallback ultime : si après 12s rien ne s'est passé, cacher le loader quand même
+    setTimeout(() => {
+      if (!hasReadied) {
+        console.warn('[Direct Video] Timeout 12s atteint, masquage du loader');
+        onReady();
+      }
+    }, 12000);
 
     this.video.preload = 'auto';
     this.video.src = videoUrl;
     this.video.load();
-
-    const playPromise = this.video.play();
-    if (playPromise !== undefined) {
-      playPromise.catch(err => {
-        console.warn('[Direct Video Autoplay Warn]:', err.message);
-      });
-    }
   }
 
   playEmbedIframe(embedUrl) {
@@ -1752,12 +1779,13 @@ class NetflixPlayer {
       if (!hasReadied && this.video.currentTime > 0) onReady();
     });
 
-    // Fallback de sécurité : masquer le loader après 2.5s maximum si le flux est en cours
+    // Fallback de sécurité : timeout généreux pour Render free tier (TTFB m3u8 ~2s + premier segment ~3s)
     setTimeout(() => {
       if (!hasReadied) {
+        console.warn('[HLS] Fallback timeout 10s atteint, masquage du loader');
         onReady();
       }
-    }, 2500);
+    }, 10000);
 
     // Protection Anti-Boucle / Anti-Rollback Xtream :
     // Empêche le lecteur de revenir en arrière de 5-10 secondes lors des resets PTS/PCR
@@ -1802,10 +1830,10 @@ class NetflixPlayer {
         nudgeOffset: 0.1,
         nudgeMaxRetry: 5,
         maxFragLookUpTolerance: 0.25,
-        fragLoadingTimeOut: 20000,
-        manifestLoadingTimeOut: 15000,
-        levelLoadingTimeOut: 15000,
-        fragLoadingMaxRetry: 4,
+        fragLoadingTimeOut: 30000,
+        manifestLoadingTimeOut: 25000,
+        levelLoadingTimeOut: 25000,
+        fragLoadingMaxRetry: 6,
         fragLoadingRetryDelay: 500
       });
       this.hls = hls;
