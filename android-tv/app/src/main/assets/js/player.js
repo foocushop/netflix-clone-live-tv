@@ -84,6 +84,7 @@ class NetflixPlayer {
     this.ctrlTotalDuration = document.getElementById('ctrlTotalDuration');
     this.ctrlMediaTitle = document.getElementById('ctrlMediaTitle');
     this.ctrlNextEpBtn = document.getElementById('ctrlNextEpBtn');
+    this.ctrlNextEpBtnRight = document.getElementById('ctrlNextEpBtnRight');
 
     // Vitesse, Qualité & Plein Écran
     this.ctrlSpeedBtn = document.getElementById('ctrlSpeedBtn');
@@ -359,10 +360,14 @@ class NetflixPlayer {
       this.updateFullscreenIcons();
     });
 
-    // Bouton Épisode Suivant
-    this.ctrlNextEpBtn.addEventListener('click', (e) => {
-      e.stopPropagation();
-      this.goToNextEpisode();
+    // Boutons Épisode Suivant (Desktop Centre & Mobile/Desktop à côté de la qualité)
+    [this.ctrlNextEpBtn, this.ctrlNextEpBtnRight].forEach(btn => {
+      if (btn) {
+        btn.addEventListener('click', (e) => {
+          e.stopPropagation();
+          this.goToNextEpisode();
+        });
+      }
     });
 
     // Bannière de résilience
@@ -877,6 +882,8 @@ class NetflixPlayer {
       this.populateSeasons();
       this.populateEpisodes();
       this.ctrlNextEpBtn.classList.remove('hidden');
+      if (this.ctrlNextEpBtnRight) this.ctrlNextEpBtnRight.classList.remove('hidden');
+      this.updateNextEpBtnState();
 
       // Auto-Sync en arrière-plan pour les séries Xtream uniquement si les saisons ne sont pas encore renseignées
       if ((!movie.seasons || movie.seasons.length === 0) && (movie.id === '68628' || movie.tmdb_id === '68628' || String(movie.id).startsWith('xtream_series_'))) {
@@ -899,6 +906,7 @@ class NetflixPlayer {
                 this.currentEpisode = keepEp;
                 this.seasonSelect.value = this.currentSeason;
                 this.episodeSelect.value = this.currentEpisode;
+                this.updateNextEpBtnState();
               }
             }
           })
@@ -907,6 +915,7 @@ class NetflixPlayer {
     } else {
       this.episodeBox.classList.add('hidden');
       this.ctrlNextEpBtn.classList.add('hidden');
+      if (this.ctrlNextEpBtnRight) this.ctrlNextEpBtnRight.classList.add('hidden');
     }
 
     if (this.langSwitch) {
@@ -1009,6 +1018,43 @@ class NetflixPlayer {
         this.loadStream();
       }
     }
+  }
+
+  hasNextEpisode() {
+    if (!this.currentMovie || this.currentMovie.media_type !== 'series') return false;
+    if (!this.currentMovie.seasons || this.currentMovie.seasons.length === 0) {
+      return true;
+    }
+    const sObj = this.currentMovie.seasons.find(s => s.season_number === this.currentSeason);
+    if (!sObj || !sObj.episodes || sObj.episodes.length === 0) return true;
+
+    const currentEpIdx = sObj.episodes.findIndex(e => e.episode_number === this.currentEpisode);
+    if (currentEpIdx !== -1 && currentEpIdx < sObj.episodes.length - 1) return true;
+
+    const currentSeasonIdx = this.currentMovie.seasons.findIndex(s => s.season_number === this.currentSeason);
+    if (currentSeasonIdx !== -1 && currentSeasonIdx < this.currentMovie.seasons.length - 1) return true;
+
+    return false;
+  }
+
+  updateNextEpBtnState() {
+    const hasNext = this.hasNextEpisode();
+    [this.ctrlNextEpBtn, this.ctrlNextEpBtnRight].forEach(btn => {
+      if (!btn) return;
+      if (hasNext) {
+        btn.removeAttribute('disabled');
+        btn.style.opacity = '1';
+        btn.style.cursor = 'pointer';
+        btn.style.pointerEvents = 'auto';
+        btn.title = "Passer à l'épisode suivant";
+      } else {
+        btn.setAttribute('disabled', 'true');
+        btn.style.opacity = '0.35';
+        btn.style.cursor = 'not-allowed';
+        btn.style.pointerEvents = 'none';
+        btn.title = "Dernier épisode disponible";
+      }
+    });
   }
 
   setLanguage(lang, reloadStream = true) {
@@ -1199,6 +1245,7 @@ class NetflixPlayer {
       this.metaDisplay.textContent = `${year} • ${dur} • ${langBadge} • ${sName} • Anti-Pubs Actif 🛡️`;
       this.ctrlMediaTitle.textContent = this.currentMovie.title;
     }
+    this.updateNextEpBtnState();
   }
 
   switchServer(serverNum, preserveTime = true) {

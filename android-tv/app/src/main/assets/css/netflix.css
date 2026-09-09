@@ -1930,7 +1930,41 @@ body {
 }
 
 .quality-item.active .quality-sub {
-  color: rgba(229, 9, 20, 0.75);
+/* Bouton Épisode Suivant dans les contrôles de droite (Mobile & Desktop) */
+.ctrl-next-ep-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.82rem;
+  font-weight: 700;
+  padding: 5px 10px;
+  border-radius: 4px;
+  border: 1px solid rgba(255, 255, 255, 0.28);
+  background: rgba(255, 255, 255, 0.08);
+  color: #fff;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  user-select: none;
+}
+
+.ctrl-next-ep-btn:hover {
+  background: rgba(255, 255, 255, 0.22);
+  border-color: rgba(255, 255, 255, 0.55);
+  transform: scale(1.05);
+}
+
+.ctrl-next-ep-btn:active {
+  transform: scale(0.95);
+  background: rgba(229, 9, 20, 0.35);
+}
+
+.ctrl-next-ep-btn.hidden {
+  display: none !important;
+}
+
+.ctrl-next-ep-btn svg {
+  display: block;
+  flex-shrink: 0;
 }
 
 /* ================= FOOTER ================= */
@@ -2672,6 +2706,27 @@ body {
   .quality-btn {
     padding: 5px 8px;
     font-size: 0.72rem;
+  }
+  .ctrl-next-ep-btn {
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    padding: 5px 8px !important;
+    font-size: 0.72rem !important;
+    border-radius: 4px !important;
+    background: rgba(255, 255, 255, 0.12) !important;
+    border: 1px solid rgba(255, 255, 255, 0.3) !important;
+    touch-action: manipulation !important;
+  }
+  .ctrl-next-ep-btn.hidden {
+    display: none !important;
+  }
+  .ctrl-next-ep-btn .next-ep-text {
+    display: none;
+  }
+  .ctrl-next-ep-btn svg {
+    width: 18px !important;
+    height: 18px !important;
   }
   #ctrlFullscreenBtn {
     display: inline-flex !important;
