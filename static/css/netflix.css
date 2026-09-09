@@ -1512,6 +1512,7 @@ body {
 .netflix-player-overlay.user-idle .player-top-bar,
 .netflix-player-overlay.user-idle .netflix-bottom-controls {
   opacity: 0;
+  visibility: hidden;
   pointer-events: none;
   transform: translateY(8px);
 }

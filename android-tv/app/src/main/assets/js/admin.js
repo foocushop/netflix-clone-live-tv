@@ -264,7 +264,7 @@ class NetflixAdmin {
 
   async loadCatalog() {
     try {
-      const res = await fetch(`${this.apiBase()}/api/admin/movies`, {
+      const res = await fetch(`${this.apiBase()}/api/admin/movies?_t=${Date.now()}`, {
         headers: this.authHeaders()
       });
       if (res.status === 401) {
@@ -368,9 +368,12 @@ class NetflixAdmin {
         ? m.categories.slice(0, 2).map(c => `<span class="category-chip-mini">${c}</span>`).join(' ')
         : '';
 
+      const rawId = String(m.id || m.tmdb_id || '').trim();
+      const safeId = encodeURIComponent(rawId);
+
       tr.innerHTML = `
         <td>
-          <img src="${m.poster_url || ''}" alt="${m.title}" class="table-poster" loading="lazy" onerror="this.onerror=null; this.src='data:image/svg+xml;charset=UTF-8,<svg xmlns=\\'http://www.w3.org/2000/svg\\' width=\\'100\\' height=\\'150\\' viewBox=\\'0 0 100 150\\'><rect fill=\\'%23222\\' width=\\'100\\' height=\\'150\\'/><text fill=\\'%23E50914\\' font-family=\\'sans-serif\\' font-size=\\'16\\' font-weight=\\'bold\\' x=\\'50%25\\' y=\\'50%25\\' text-anchor=\\'middle\\'>NETFLIX</text></svg>'">
+          <img src="${m.poster_url || ''}" alt="${this.escapeHtml(m.title)}" class="table-poster" loading="lazy" onerror="this.onerror=null; this.src='data:image/svg+xml;charset=UTF-8,<svg xmlns=\\'http://www.w3.org/2000/svg\\' width=\\'100\\' height=\\'150\\' viewBox=\\'0 0 100 150\\'><rect fill=\\'%23222\\' width=\\'100\\' height=\\'150\\'/><text fill=\\'%23E50914\\' font-family=\\'sans-serif\\' font-size=\\'16\\' font-weight=\\'bold\\' x=\\'50%25\\' y=\\'50%25\\' text-anchor=\\'middle\\'>NETFLIX</text></svg>'">
         </td>
         <td>
           <div class="table-title-wrap">
@@ -387,11 +390,11 @@ class NetflixAdmin {
         </td>
         <td>
           <div class="table-actions">
-            <button class="btn-action-sm btn-play-test" onclick="window.netflixAdmin.testPlayback('${m.id}')" title="Tester le flux dans le lecteur Netflix">▶ Tester</button>
-            ${!isHero ? `<button class="btn-action-sm btn-star" onclick="window.netflixAdmin.setHero('${m.id}')" title="Mettre en tête d'affiche (Hero Billboard)">⭐ Vedette</button>` : ''}
-            <button class="btn-action-sm" onclick="window.netflixAdmin.openEditModal('${m.id}')" title="Modifier les métadonnées">✏️ Modifier</button>
-            <button class="btn-action-sm btn-clone" onclick="window.netflixAdmin.cloneMovie('${m.id}')" title="Dupliquer pour créer une variante">📋 Cloner</button>
-            <button class="btn-action-sm btn-danger" onclick="window.netflixAdmin.deleteMovie('${m.id}')" title="Supprimer du catalogue">🗑️</button>
+            <button class="btn-action-sm btn-play-test" onclick="window.netflixAdmin.testPlayback(decodeURIComponent('${safeId}'))" title="Tester le flux dans le lecteur Netflix">▶ Tester</button>
+            ${!isHero ? `<button class="btn-action-sm btn-star" onclick="window.netflixAdmin.setHero(decodeURIComponent('${safeId}'))" title="Mettre en tête d'affiche (Hero Billboard)">⭐ Vedette</button>` : ''}
+            <button class="btn-action-sm" onclick="window.netflixAdmin.openEditModal(decodeURIComponent('${safeId}'))" title="Modifier les métadonnées">✏️ Modifier</button>
+            <button class="btn-action-sm btn-clone" onclick="window.netflixAdmin.cloneMovie(decodeURIComponent('${safeId}'))" title="Dupliquer pour créer une variante">📋 Cloner</button>
+            <button class="btn-action-sm btn-danger" onclick="window.netflixAdmin.deleteMovie(decodeURIComponent('${safeId}'))" title="Supprimer du catalogue">🗑️</button>
           </div>
         </td>
       `;
@@ -409,7 +412,7 @@ class NetflixAdmin {
   }
 
   testPlayback(id) {
-    const movie = this.allMovies.find(m => m.id === id);
+    const movie = this.allMovies.find(m => String(m.id) === String(id) || String(m.tmdb_id) === String(id));
     if (!movie) {
       this.showToast("Média introuvable pour le test", true);
       return;
@@ -435,7 +438,7 @@ class NetflixAdmin {
   }
 
   cloneMovie(id) {
-    const m = this.allMovies.find(item => item.id === id);
+    const m = this.allMovies.find(item => String(item.id) === String(id) || String(item.tmdb_id) === String(id));
     if (!m) return;
     this.openAddModal();
     this.modalTitle.textContent = `Dupliquer : ${m.title}`;
@@ -460,7 +463,7 @@ class NetflixAdmin {
   async openEditModal(id) {
     this.editingId = id;
     this.modalTitle.textContent = "Modifier le titre";
-    const m = this.allMovies.find(item => item.id === id);
+    const m = this.allMovies.find(item => String(item.id) === String(id) || String(item.tmdb_id) === String(id));
     if (m) {
       this.populateEditForm(m);
       this.modal.classList.add('active');

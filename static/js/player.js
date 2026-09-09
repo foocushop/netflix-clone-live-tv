@@ -537,7 +537,8 @@ class NetflixPlayer {
       this.resetInactivityTimer();
       const pausedFor = this.pauseTimestamp ? (Date.now() - this.pauseTimestamp) : 0;
       this.pauseTimestamp = null;
-      if (pausedFor > 15000) {
+      const isChannel = (this.currentMovie?.media_type === 'channel' || this.currentMovie?.is_live);
+      if ((isChannel && pausedFor > 2000) || (!isChannel && pausedFor > 6000)) {
         this.handlePostPauseRecovery(pausedFor);
       }
     });
@@ -667,15 +668,17 @@ class NetflixPlayer {
       const pausedFor = this.pauseTimestamp ? (Date.now() - this.pauseTimestamp) : 0;
       const isChannel = (this.currentMovie?.media_type === 'channel' || this.currentMovie?.is_live);
 
-      // Si pause longue (> 20s), réactiver immédiatement le flux pour éviter les saccades dues aux sockets fermées
-      if (pausedFor > 20000) {
-        if (this.hls && isChannel) {
+      // Reprise intelligente du flux pour éviter les saccades dues aux sockets fermées ou au décalage live
+      if (this.hls && isChannel) {
+        try {
+          this.hls.startLoad();
           const livePos = this.hls.liveSyncPosition;
-          if (livePos && isFinite(livePos) && (this.video.currentTime < livePos - 8 || isNaN(this.video.currentTime))) {
+          if (livePos && isFinite(livePos) && (this.video.currentTime < livePos - 3 || isNaN(this.video.currentTime))) {
             this.video.currentTime = livePos;
           }
-          this.hls.startLoad();
-        } else if (!this.hls && this.video && this.video.src && !this.video.classList.contains('hidden')) {
+        } catch (e) {}
+      } else if (!this.hls && this.video && this.video.src && !this.video.classList.contains('hidden')) {
+        if (pausedFor > 8000) {
           this.recoverDirectStream(this.video.currentTime);
           this.triggerCenterRipple('▶');
           return;
@@ -707,7 +710,7 @@ class NetflixPlayer {
         this.hls.startLoad();
         const livePos = this.hls.liveSyncPosition;
         const curTime = this.video.currentTime;
-        if (livePos && isFinite(livePos) && (curTime < livePos - 8 || isNaN(curTime))) {
+        if (livePos && isFinite(livePos) && (curTime < livePos - 2 || isNaN(curTime))) {
           console.log(`[Player Live Sync] Recalage sur le direct après pause de ${Math.round(pausedFor / 1000)}s (${livePos.toFixed(1)}s)`);
           this.video.currentTime = livePos;
         }
@@ -1482,7 +1485,6 @@ class NetflixPlayer {
 
     // Étape 1 : Résolution de la source
     this.setStep(1, 'active', isChannel ? `1. Résolution de la chaîne TV sportive (${this.currentMovie.title})...` : `1. Résolution de la source (${langLabel} • ${this.currentMovie.title})...`);
-    await new Promise(r => setTimeout(r, 120));
     this.setStep(1, 'done', isChannel ? `1. Chaîne TV validée (${this.currentMovie.title})` : `1. Source ${langLabel} validée (${this.currentMovie.title})`);
 
     // Étape 2 : Récupération des flux
@@ -1497,6 +1499,27 @@ class NetflixPlayer {
       const res = await fetch(url, { signal: abortController.signal });
       const data = await res.json();
 
+      // ── Cas spécial : série Xtream sans cache → charger les infos série puis relancer ──
+      if (!data.success && data.needsSeriesInfo && data.series_id) {
+        console.log(`[player] needsSeriesInfo pour série ${data.series_id}, chargement live...`);
+        this.setStep(2, 'active', `2. Chargement de la bibliothèque épisodes (Xtream)...`);
+        try {
+          const siRes = await fetch(`${baseUrl}/api/xtream/series-info?series_id=${data.series_id}`, { signal: abortController.signal });
+          const siData = await siRes.json();
+          if (siData && siData.seasons && siData.seasons.length > 0) {
+            // Peupler les saisons du film courant et relancer
+            this.currentMovie.seasons = siData.seasons;
+            this.currentMovie.series_id = siData.series_id || data.series_id;
+            console.log(`[player] Saisons chargées (${siData.seasons.length}), relance loadStream...`);
+            this.loadStream(); // relance avec les saisons disponibles
+            return;
+          }
+        } catch (siErr) {
+          console.error('[player] Échec chargement series-info:', siErr.message);
+        }
+        throw new Error('Impossible de charger les épisodes de cette série. Réessayez.');
+      }
+
       if (!data.success || !data.stream_url) {
         throw new Error(data.message || `Serveur ${this.currentServer} temporairement indisponible`);
       }
@@ -1505,7 +1528,6 @@ class NetflixPlayer {
 
       // Étape 3 : Déchiffrement & Proxy
       this.setStep(3, 'active', `3. Déchiffrement direct & Proxy local anti-pub...`);
-      await new Promise(r => setTimeout(r, 100));
       this.setStep(3, 'done', `3. Déchiffrement validé (${data.hoster || 'Flux Direct'})`);
 
       // Étape 4 : Initialisation dans le lecteur Netflix
@@ -1638,10 +1660,11 @@ class NetflixPlayer {
 
     const onReady = () => {
       this.setStep(4, 'done', `4. Flux connecté • Lecture active`);
-      setTimeout(() => this.hideLoader(), 300);
+      setTimeout(() => this.hideLoader(), 150);
     };
 
     this.video.addEventListener('loadeddata', onReady, { once: true });
+    this.video.addEventListener('canplay', onReady, { once: true });
     this.video.addEventListener('playing', onReady, { once: true });
 
     if (window.Hls && Hls.isSupported()) {
@@ -1650,24 +1673,26 @@ class NetflixPlayer {
       const hls = new Hls({
         enableWorker: true,
         lowLatencyMode: false,
-        liveSyncDurationCount: isXtream ? 4 : (isChannel ? 4 : 3), // Marge sécurisée de 4 segments anti-coupure
-        liveMaxLatencyDurationCount: isXtream ? 10 : (isChannel ? 12 : 10),
+        liveSyncDurationCount: isChannel ? 2 : 2, // Démarrage immédiat en 1-2s dès le premier fragment disponible (style VLC)
+        liveMaxLatencyDurationCount: 5, // Recalage rapide si dérive
         liveDurationInfinity: isChannel,
-        startLevel: -1, // Démarrage adaptatif immédiat
-        capLevelToPlayerSize: false,
+        startLevel: -1, // Démarrage adaptatif automatique
+        capLevelToPlayerSize: true, // Optimisation Smart TV : adapter la résolution à l'écran
         initialLiveManifestSize: 1, // Démarre dès le premier manifest
-        startFragPrefetch: true, // Précharge les fragments suivants en tâche de fond (chargement turbo)
-        backBufferLength: 30, // 30s en arrière conservées
-        maxBufferLength: isChannel ? 30 : 60, // 30s à 60s d'avance pour un tampon large et stable (style YouTube)
-        maxMaxBufferLength: isChannel ? 60 : 120, // Jusqu'à 120s de préchargement max
-        maxBufferSize: 60 * 1024 * 1024, // 60 Mo alloués au tampon vidéo
-        highBufferWatchdogPeriod: 3,
+        startFragPrefetch: true, // Précharge le fragment suivant en arrière-plan
+        backBufferLength: 5, // Ne conserve que 5s en arrière pour préserver la RAM TV
+        maxBufferLength: isChannel ? 12 : 25, // Tampon stable sans surcharger la mémoire
+        maxMaxBufferLength: isChannel ? 18 : 35,
+        maxBufferSize: 15 * 1024 * 1024, // 15 Mo alloués au tampon vidéo (idéal pour Android TV & Smart TV)
+        highBufferWatchdogPeriod: 2,
         nudgeOffset: 0.1,
         nudgeMaxRetry: 5,
         maxFragLookUpTolerance: 0.25,
-        fragLoadingTimeOut: 20000,
-        manifestLoadingTimeOut: 20000,
-        levelLoadingTimeOut: 20000
+        fragLoadingTimeOut: 12000,
+        manifestLoadingTimeOut: 10000,
+        levelLoadingTimeOut: 10000,
+        fragLoadingMaxRetry: 3,
+        fragLoadingRetryDelay: 500
       });
       this.hls = hls;
 

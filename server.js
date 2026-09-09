@@ -1548,7 +1548,7 @@ const server = http.createServer((req, res) => {
         'Content-Type': 'application/json',
         'Content-Encoding': 'gzip',
         'Content-Length': cachedCatalogGzip.length,
-        'Cache-Control': 'public, max-age=120, stale-while-revalidate=86400',
+        'Cache-Control': 'no-cache, must-revalidate',
         'Access-Control-Allow-Origin': '*'
       });
       res.end(cachedCatalogGzip);
@@ -1556,7 +1556,7 @@ const server = http.createServer((req, res) => {
       res.writeHead(200, {
         'Content-Type': 'application/json',
         'Content-Length': cachedCatalogBuffer.length,
-        'Cache-Control': 'public, max-age=120, stale-while-revalidate=86400',
+        'Cache-Control': 'no-cache, must-revalidate',
         'Access-Control-Allow-Origin': '*'
       });
       res.end(cachedCatalogBuffer);
@@ -1940,6 +1940,37 @@ const server = http.createServer((req, res) => {
               }
             } catch (e) {}
           }
+
+          // ── FALLBACK LIVE : Cache disque absent → appel direct API Xtream ──
+          if (!episodeObj && realSeriesId && XTREAM_CONFIG && XTREAM_CONFIG.host) {
+            try {
+              console.log(`[extract] Cache absent pour série ${realSeriesId}, appel live Xtream...`);
+              const xtreamUrl = `http://${XTREAM_CONFIG.host}:${XTREAM_CONFIG.port}/player_api.php?username=${XTREAM_CONFIG.username}&password=${XTREAM_CONFIG.password}&action=get_series_info&series_id=${realSeriesId}`;
+              const xtRes = await fetch(xtreamUrl, { signal: AbortSignal.timeout(8000) });
+              if (xtRes.ok) {
+                const rawData = await xtRes.json();
+                // Sauvegarder le cache pour les prochaines fois
+                try {
+                  const cacheDir = path.join(__dirname, 'data', 'cache');
+                  if (!fs.existsSync(cacheDir)) fs.mkdirSync(cacheDir, { recursive: true });
+                  fs.writeFileSync(cacheFile, JSON.stringify(rawData), 'utf8');
+                } catch (e) {}
+                showTitle = rawData.info?.name || showTitle;
+                const sEps = (rawData.episodes && rawData.episodes[String(sNum)]) || [];
+                const foundEp = sEps.find(e => parseInt(e.episode_num) === eNum) || sEps[0];
+                if (foundEp) {
+                  const ext = foundEp.container_extension || 'mkv';
+                  episodeObj = {
+                    episode_number: parseInt(foundEp.episode_num) || eNum,
+                    title: foundEp.title || `Épisode ${eNum}`,
+                    video_url: `/api/stream/xtream-series?episode_id=${foundEp.id}&ext=${ext}`
+                  };
+                }
+              }
+            } catch (xtErr) {
+              console.error(`[extract] Erreur appel live Xtream série ${realSeriesId}:`, xtErr.message);
+            }
+          }
         }
 
         if (episodeObj && episodeObj.video_url) {
@@ -1956,6 +1987,16 @@ const server = http.createServer((req, res) => {
             is_embed: false,
             sources_count: 5,
             lang: 'vf'
+          };
+        }
+
+        // ── GUARD FINAL : Série Xtream détectée mais épisode introuvable → ne pas tomber dans extractFrenchStream ──
+        if ((id && String(id).startsWith('xtream_series_')) || (tmdbId && String(tmdbId).startsWith('xtream_series_'))) {
+          return {
+            success: false,
+            error: 'Épisode introuvable dans la bibliothèque Xtream. Veuillez ouvrir la fiche série pour charger les épisodes.',
+            needsSeriesInfo: true,
+            series_id: String(id || tmdbId || '').replace(/^xtream_series_/, '')
           };
         }
       }
@@ -2716,6 +2757,10 @@ const server = http.createServer((req, res) => {
             res.writeHead(chunkRes.statusCode, { 'Access-Control-Allow-Origin': '*' });
           }
           return chunkRes.pipe(res);
+        }
+
+        if (res.socket) {
+          try { res.socket.setNoDelay(true); } catch (e) {}
         }
 
         res.writeHead(chunkRes.statusCode, {

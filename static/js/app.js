@@ -197,7 +197,7 @@ class NetflixApp {
   async loadCatalog() {
     try {
       const baseUrl = window.API_BASE || '';
-      const res = await fetch(`${baseUrl}/api/catalog`);
+      const res = await fetch(`${baseUrl}/api/catalog?_t=${Date.now()}`);
       const json = await res.json();
       if (json.success && json.data) {
         this.catalogData = json.data;
