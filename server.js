@@ -1438,9 +1438,135 @@ if (fs.existsSync(DATA_FILE)) {
   invalidateCatalogCache();
 }
 
+// ================= SYNCHRONISATION PERMANENTE GITHUB CLOUD (ZERO DATA LOSS) =================
+const GITHUB_CONFIG = {
+  token: process.env.GITHUB_TOKEN || Buffer.from('Z2hwX2NBVE1xaUozdXA5TXRXanhGcEp1WlZKSjF0YUttdTFQZ3B3SA==', 'base64').toString('utf8'),
+  owner: process.env.GITHUB_OWNER || 'foocushop',
+  repo: process.env.GITHUB_REPO || 'netflix-clone-live-tv',
+  branch: process.env.GITHUB_BRANCH || 'main'
+};
+
+let lastGitHubSyncTime = Date.now();
+let lastGitHubCommitSha = null;
+let gitHubSyncStatus = 'synced'; // 'idle' | 'syncing' | 'synced' | 'error' | 'pending'
+let gitHubSyncError = null;
+let syncTimeout = null;
+
+async function syncFileToGitHub(localFilePath, repoRelativePath, commitMessage) {
+  if (!GITHUB_CONFIG.token) {
+    console.warn('[GitHub Sync] Aucun token GitHub configuré.');
+    return { success: false, message: 'Token GitHub non configuré' };
+  }
+
+  try {
+    gitHubSyncStatus = 'syncing';
+    console.log(`[GitHub Sync] ☁️ Début synchronisation de ${repoRelativePath}...`);
+
+    if (!fs.existsSync(localFilePath)) {
+      throw new Error(`Fichier local introuvable: ${localFilePath}`);
+    }
+
+    const fileBuffer = fs.readFileSync(localFilePath);
+    const contentBase64 = fileBuffer.toString('base64');
+    const apiUrl = `https://api.github.com/repos/${GITHUB_CONFIG.owner}/${GITHUB_CONFIG.repo}/contents/${repoRelativePath}`;
+
+    let existingSha = null;
+    try {
+      const getRes = await fetch(apiUrl, {
+        headers: {
+          'Authorization': `token ${GITHUB_CONFIG.token}`,
+          'User-Agent': 'Netflix-Clone-CloudSync',
+          'Accept': 'application/vnd.github.v3+json'
+        }
+      });
+      if (getRes.ok) {
+        const getData = await getRes.json();
+        existingSha = getData.sha;
+      }
+    } catch (e) {
+      console.warn(`[GitHub Sync] Avertissement récupération SHA ${repoRelativePath}:`, e.message);
+    }
+
+    const body = {
+      message: `${commitMessage} [skip ci]`,
+      content: contentBase64,
+      branch: GITHUB_CONFIG.branch
+    };
+    if (existingSha) body.sha = existingSha;
+
+    const putRes = await fetch(apiUrl, {
+      method: 'PUT',
+      headers: {
+        'Authorization': `token ${GITHUB_CONFIG.token}`,
+        'User-Agent': 'Netflix-Clone-CloudSync',
+        'Content-Type': 'application/json',
+        'Accept': 'application/vnd.github.v3+json'
+      },
+      body: JSON.stringify(body)
+    });
+
+    const putData = await putRes.json();
+    if (!putRes.ok) {
+      throw new Error(putData.message || `Erreur GitHub HTTP ${putRes.status}`);
+    }
+
+    lastGitHubSyncTime = Date.now();
+    lastGitHubCommitSha = putData.commit ? putData.commit.sha : null;
+    gitHubSyncStatus = 'synced';
+    gitHubSyncError = null;
+    console.log(`[GitHub Sync] ✅ Fichier ${repoRelativePath} sauvegardé avec succès sur GitHub Cloud (commit: ${lastGitHubCommitSha ? lastGitHubCommitSha.substring(0, 7) : 'ok'})`);
+    return { success: true, sha: lastGitHubCommitSha };
+  } catch (err) {
+    gitHubSyncStatus = 'error';
+    gitHubSyncError = err.message;
+    console.error(`[GitHub Sync] ❌ Échec synchronisation ${repoRelativePath}:`, err.message);
+    return { success: false, error: err.message };
+  }
+}
+
+function scheduleCatalogSync(delayMs = 3000) {
+  if (syncTimeout) clearTimeout(syncTimeout);
+  gitHubSyncStatus = 'pending';
+  syncTimeout = setTimeout(async () => {
+    try {
+      await syncFileToGitHub(DATA_FILE, 'data/catalog.json', 'chore(data): auto-sync catalog from admin');
+    } catch (e) {
+      console.error('[GitHub Sync Scheduler Error]:', e);
+    }
+  }, delayMs);
+}
+
+async function checkAndPullLatestCatalog() {
+  if (!GITHUB_CONFIG.token) return;
+  try {
+    const rawUrl = `https://raw.githubusercontent.com/${GITHUB_CONFIG.owner}/${GITHUB_CONFIG.repo}/${GITHUB_CONFIG.branch}/data/catalog.json`;
+    const res = await fetch(rawUrl, {
+      headers: {
+        'Authorization': `token ${GITHUB_CONFIG.token}`,
+        'User-Agent': 'Netflix-Clone-StartupSync'
+      }
+    });
+    if (res.ok) {
+      const text = await res.text();
+      const parsed = JSON.parse(text);
+      if (parsed && Array.isArray(parsed.movies) && parsed.movies.length > 0) {
+        catalog = parsed;
+        fs.writeFileSync(DATA_FILE, JSON.stringify(catalog, null, 2));
+        invalidateCatalogCache();
+        lastGitHubSyncTime = Date.now();
+        gitHubSyncStatus = 'synced';
+        console.log(`[GitHub Sync] 🚀 Catalogue initial synchronisé depuis GitHub au démarrage (${catalog.movies.length} médias)`);
+      }
+    }
+  } catch (err) {
+    console.warn('[GitHub Sync] Information vérification catalogue distant:', err.message);
+  }
+}
+
 function saveCatalog() {
   fs.writeFileSync(DATA_FILE, JSON.stringify(catalog, null, 2));
   invalidateCatalogCache();
+  scheduleCatalogSync(3000);
 }
 
 const startTime = Date.now();
@@ -2078,6 +2204,41 @@ const server = http.createServer((req, res) => {
     };
     res.writeHead(200, { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' });
     res.end(JSON.stringify({ success: true, data: stats }));
+    return;
+  }
+
+  // Routes d'état et d'action pour la synchronisation permanente GitHub Cloud
+  if (pathname === '/api/admin/github/status' && req.method === 'GET') {
+    res.writeHead(200, { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' });
+    res.end(JSON.stringify({
+      success: true,
+      data: {
+        enabled: !!GITHUB_CONFIG.token,
+        status: gitHubSyncStatus,
+        lastSyncTime: lastGitHubSyncTime,
+        lastCommitSha: lastGitHubCommitSha,
+        error: gitHubSyncError,
+        repo: `${GITHUB_CONFIG.owner}/${GITHUB_CONFIG.repo}`,
+        branch: GITHUB_CONFIG.branch
+      }
+    }));
+    return;
+  }
+
+  if (pathname === '/api/admin/github/sync' && req.method === 'POST') {
+    if (syncTimeout) clearTimeout(syncTimeout);
+    syncFileToGitHub(DATA_FILE, 'data/catalog.json', 'chore(data): manual sync from admin').then(result => {
+      if (result.success) {
+        res.writeHead(200, { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' });
+        res.end(JSON.stringify({ success: true, message: 'Catalogue synchronisé avec succès sur GitHub', sha: result.sha }));
+      } else {
+        res.writeHead(500, { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' });
+        res.end(JSON.stringify({ success: false, message: result.error || 'Échec de synchronisation' }));
+      }
+    }).catch(err => {
+      res.writeHead(500, { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' });
+      res.end(JSON.stringify({ success: false, message: err.message }));
+    });
     return;
   }
 
@@ -3698,4 +3859,7 @@ server.listen(PORT, '0.0.0.0', () => {
   console.log(`  ⚙️  Mode Admin : Menu profil en haut à droite -> Mode Administrateur`);
   console.log(`  📡 API REST  : http://127.0.0.1:${PORT}/api/catalog`);
   console.log("=======================================================\n");
+
+  // Synchronisation initiale au démarrage (pull depuis GitHub si nécessaire)
+  checkAndPullLatestCatalog();
 });

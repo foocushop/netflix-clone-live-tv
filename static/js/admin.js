@@ -156,7 +156,13 @@ class NetflixAdmin {
         this.showToast("Rafraîchissement du catalogue...");
         this.loadStats();
         this.loadCatalog();
+        this.loadGitHubStatus();
       });
+    }
+
+    const manualSyncBtn = document.getElementById('manualGithubSyncBtn');
+    if (manualSyncBtn) {
+      manualSyncBtn.addEventListener('click', () => this.triggerGitHubSync());
     }
   }
 
@@ -169,6 +175,7 @@ class NetflixAdmin {
     this.overlay.classList.add('active');
     this.loadStats();
     this.loadCatalog();
+    this.loadGitHubStatus();
   }
 
   openAuthModal() {
@@ -289,6 +296,76 @@ class NetflixAdmin {
       }
     } catch (e) {
       console.error('Erreur chargement stats admin', e);
+    }
+  }
+
+  async loadGitHubStatus() {
+    try {
+      const res = await fetch(`${this.apiBase()}/api/admin/github/status`, {
+        headers: this.authHeaders()
+      });
+      if (res.ok) {
+        const json = await res.json();
+        if (json.success && json.data) {
+          const badge = document.getElementById('githubSyncBadge');
+          const display = document.getElementById('githubLastSyncDisplay');
+          if (badge) {
+            if (json.data.status === 'synced') {
+              badge.textContent = 'SYNCHRONISÉ';
+              badge.style.background = '#238636';
+            } else if (json.data.status === 'syncing' || json.data.status === 'pending') {
+              badge.textContent = 'SYNCHRONISATION...';
+              badge.style.background = '#d29922';
+            } else if (json.data.status === 'error') {
+              badge.textContent = 'ERREUR SYNCHRO';
+              badge.style.background = '#da3633';
+            }
+          }
+          if (display && json.data.lastSyncTime) {
+            const diffMin = Math.round((Date.now() - json.data.lastSyncTime) / 60000);
+            if (diffMin <= 0) {
+              display.textContent = 'À l\'instant';
+            } else {
+              display.textContent = `Il y a ${diffMin} min`;
+            }
+          }
+        }
+      }
+    } catch (e) {
+      console.warn('Erreur chargement statut GitHub', e);
+    }
+  }
+
+  async triggerGitHubSync() {
+    const syncBtn = document.getElementById('manualGithubSyncBtn');
+    const badge = document.getElementById('githubSyncBadge');
+    if (syncBtn) {
+      syncBtn.disabled = true;
+      syncBtn.textContent = '⏳ Sauvegarde en cours...';
+    }
+    if (badge) {
+      badge.textContent = 'EN COURS...';
+      badge.style.background = '#d29922';
+    }
+    try {
+      const res = await fetch(`${this.apiBase()}/api/admin/github/sync`, {
+        method: 'POST',
+        headers: this.authHeaders()
+      });
+      const data = await res.json();
+      if (res.ok && data.success) {
+        this.showToast('✅ Catalogue sauvegardé et sécurisé sur GitHub Cloud !');
+        this.loadGitHubStatus();
+      } else {
+        this.showToast('❌ Erreur lors de la synchronisation : ' + (data.message || 'Échec'));
+      }
+    } catch (e) {
+      this.showToast('❌ Erreur réseau lors de la sauvegarde');
+    } finally {
+      if (syncBtn) {
+        syncBtn.disabled = false;
+        syncBtn.textContent = '☁️ Synchroniser maintenant';
+      }
     }
   }
 
@@ -586,6 +663,8 @@ class NetflixAdmin {
         this.closeModal();
         await this.loadCatalog();
         await this.loadStats();
+        this.loadGitHubStatus();
+        setTimeout(() => this.loadGitHubStatus(), 4000);
         if (window.netflixApp && typeof window.netflixApp.loadCatalog === 'function') {
           window.netflixApp.loadCatalog();
         }
@@ -612,6 +691,8 @@ class NetflixAdmin {
         this.showToast("⭐ Titre promu en tête d'affiche (Hero Billboard) !");
         await this.loadCatalog();
         await this.loadStats();
+        this.loadGitHubStatus();
+        setTimeout(() => this.loadGitHubStatus(), 4000);
         if (window.netflixApp && typeof window.netflixApp.loadCatalog === 'function') {
           window.netflixApp.loadCatalog();
         }
@@ -640,6 +721,8 @@ class NetflixAdmin {
         this.showToast(`"${title}" supprimé du catalogue avec succès`);
         await this.loadCatalog();
         await this.loadStats();
+        this.loadGitHubStatus();
+        setTimeout(() => this.loadGitHubStatus(), 4000);
         if (window.netflixApp && typeof window.netflixApp.loadCatalog === 'function') {
           window.netflixApp.loadCatalog();
         }
