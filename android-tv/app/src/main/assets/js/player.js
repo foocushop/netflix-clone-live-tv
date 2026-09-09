@@ -1718,37 +1718,37 @@ class NetflixPlayer {
           }
           return;
         }
-          console.warn('[HLS Fatal Error]', data.type, data.details);
-          switch (data.type) {
-            case Hls.ErrorTypes.NETWORK_ERROR:
-              console.log('[HLS] Récupération réseau automatique...');
-              hls.startLoad();
-              break;
-            case Hls.ErrorTypes.MEDIA_ERROR:
-              console.log('[HLS] Récupération média automatique...');
-              hls.recoverMediaError();
-              break;
-            default:
-              try {
-                hls.stopLoad();
-                hls.detachMedia();
-                hls.destroy();
-              } catch(e) {}
-              this.hls = null;
-              this.showStatusBanner(`Erreur de segment sur Serveur ${this.currentServer}. Basculement...`);
-              setTimeout(() => {
-                const isXtream = (this.currentMovie?.is_xtream || this.currentMovie?.stream_url?.includes('/api/stream/xtream'));
-                if (isXtream) {
-                  this.loadStream();
-                  return;
-                }
-                const isChannel = (this.currentMovie?.media_type === 'channel' || this.currentMovie?.is_live);
-                const maxSrv = isChannel ? 8 : 5;
-                const next = (this.currentServer % maxSrv) + 1;
-                this.switchServer(next);
-              }, 1200);
-              break;
-          }
+
+        console.warn('[HLS Fatal Error]', data.type, data.details);
+        switch (data.type) {
+          case Hls.ErrorTypes.NETWORK_ERROR:
+            console.log('[HLS] Récupération réseau automatique...');
+            hls.startLoad();
+            break;
+          case Hls.ErrorTypes.MEDIA_ERROR:
+            console.log('[HLS] Récupération média automatique...');
+            hls.recoverMediaError();
+            break;
+          default:
+            try {
+              hls.stopLoad();
+              hls.detachMedia();
+              hls.destroy();
+            } catch(e) {}
+            this.hls = null;
+            this.showStatusBanner(`Erreur de segment sur Serveur ${this.currentServer}. Basculement...`);
+            setTimeout(() => {
+              const isXtream = (this.currentMovie?.is_xtream || this.currentMovie?.stream_url?.includes('/api/stream/xtream'));
+              if (isXtream) {
+                this.loadStream();
+                return;
+              }
+              const isChannel = (this.currentMovie?.media_type === 'channel' || this.currentMovie?.is_live);
+              const maxSrv = isChannel ? 8 : 5;
+              const next = (this.currentServer % maxSrv) + 1;
+              this.switchServer(next);
+            }, 1200);
+            break;
         }
       });
     } else if (this.video.canPlayType('application/vnd.apple.mpegurl')) {

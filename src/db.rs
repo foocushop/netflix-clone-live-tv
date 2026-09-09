@@ -225,7 +225,7 @@ impl Database {
     pub async fn delete_movie(&self, id: &str) -> Result<(), String> {
         let mut state = self.state.write().await;
         let before_len = state.movies.len();
-        state.movies.retain(|m| m.id != id);
+        state.movies.retain(|m| m.id != id && m.tmdb_id.as_deref() != Some(id));
 
         if state.movies.len() == before_len {
             return Err("Média introuvable".to_string());

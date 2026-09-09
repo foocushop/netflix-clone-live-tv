@@ -1440,6 +1440,7 @@ if (fs.existsSync(DATA_FILE)) {
 
 function saveCatalog() {
   fs.writeFileSync(DATA_FILE, JSON.stringify(catalog, null, 2));
+  invalidateCatalogCache();
 }
 
 const startTime = Date.now();
@@ -1771,13 +1772,18 @@ const server = http.createServer((req, res) => {
   }
 
   if (pathname.startsWith('/api/admin/movies/') && !pathname.endsWith('/hero') && req.method === 'PUT') {
-    const id = pathname.replace('/api/admin/movies/', '');
+    const rawId = pathname.replace('/api/admin/movies/', '');
+    const id = decodeURIComponent(rawId).trim();
     let body = '';
     req.on('data', chunk => body += chunk);
     req.on('end', () => {
       try {
         const payload = JSON.parse(body);
-        const movie = catalog.movies.find(m => m.id === id);
+        const movie = catalog.movies.find(m => {
+          const mId = m.id != null ? String(m.id).trim() : '';
+          const tmdbId = m.tmdb_id != null ? String(m.tmdb_id).trim() : '';
+          return mId === id || tmdbId === id;
+        });
         if (!movie) {
           res.writeHead(404, { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' });
           return res.end(JSON.stringify({ success: false, message: 'Média non trouvé' }));
@@ -1818,10 +1824,13 @@ const server = http.createServer((req, res) => {
   }
 
   if (pathname.startsWith('/api/admin/movies/') && pathname.endsWith('/hero') && req.method === 'POST') {
-    const id = pathname.split('/')[4];
+    const rawId = pathname.replace('/api/admin/movies/', '').replace('/hero', '');
+    const id = decodeURIComponent(rawId).trim();
     let found = false;
     catalog.movies.forEach(m => {
-      if (m.id === id) {
+      const mId = m.id != null ? String(m.id).trim() : '';
+      const tmdbId = m.tmdb_id != null ? String(m.tmdb_id).trim() : '';
+      if (mId === id || tmdbId === id) {
         m.is_hero = true;
         found = true;
       } else {
@@ -1840,16 +1849,21 @@ const server = http.createServer((req, res) => {
   }
 
   if (pathname.startsWith('/api/admin/movies/') && req.method === 'DELETE') {
-    const id = pathname.replace('/api/admin/movies/', '');
+    const rawId = pathname.replace('/api/admin/movies/', '');
+    const targetId = decodeURIComponent(rawId).trim();
     const before = catalog.movies.length;
-    catalog.movies = catalog.movies.filter(m => m.id !== id);
+    catalog.movies = catalog.movies.filter(m => {
+      const mId = m.id != null ? String(m.id).trim() : '';
+      const tmdbId = m.tmdb_id != null ? String(m.tmdb_id).trim() : '';
+      return mId !== targetId && tmdbId !== targetId;
+    });
     if (catalog.movies.length < before) {
       if (!catalog.movies.some(m => m.is_hero) && catalog.movies.length > 0) {
         catalog.movies[0].is_hero = true;
       }
       saveCatalog();
       res.writeHead(200, { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' });
-      res.end(JSON.stringify({ success: true }));
+      res.end(JSON.stringify({ success: true, count: catalog.movies.length }));
     } else {
       res.writeHead(404, { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' });
       res.end(JSON.stringify({ success: false, message: 'Média non trouvé' }));

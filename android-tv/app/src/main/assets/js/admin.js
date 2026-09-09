@@ -227,6 +227,10 @@ class NetflixAdmin {
   }
 
   // Helper pour injecter l'en-tête de sécurité admin
+  apiBase() {
+    return window.API_BASE || '';
+  }
+
   authHeaders(extra = {}) {
     return Object.assign({
       'x-admin-password': this.getAuthPassword() || '1965'
@@ -235,7 +239,7 @@ class NetflixAdmin {
 
   async loadStats() {
     try {
-      const res = await fetch('/api/admin/stats', {
+      const res = await fetch(`${this.apiBase()}/api/admin/stats`, {
         headers: this.authHeaders()
       });
       if (res.status === 401) {
@@ -260,7 +264,7 @@ class NetflixAdmin {
 
   async loadCatalog() {
     try {
-      const res = await fetch('/api/admin/movies', {
+      const res = await fetch(`${this.apiBase()}/api/admin/movies`, {
         headers: this.authHeaders()
       });
       if (res.status === 401) {
@@ -524,11 +528,11 @@ class NetflixAdmin {
     };
 
     try {
-      let url = '/api/admin/movies';
+      let url = `${this.apiBase()}/api/admin/movies`;
       let method = 'POST';
 
       if (this.editingId) {
-        url = `/api/admin/movies/${this.editingId}`;
+        url = `${this.apiBase()}/api/admin/movies/${encodeURIComponent(this.editingId)}`;
         method = 'PUT';
       }
 
@@ -547,8 +551,11 @@ class NetflixAdmin {
       if (json.success) {
         this.showToast(this.editingId ? "Titre modifié avec succès !" : "Nouveau titre ajouté avec succès !");
         this.closeModal();
-        this.loadCatalog();
-        this.loadStats();
+        await this.loadCatalog();
+        await this.loadStats();
+        if (window.netflixApp && typeof window.netflixApp.loadCatalog === 'function') {
+          window.netflixApp.loadCatalog();
+        }
       } else {
         this.showToast(json.message || "Erreur lors de l'enregistrement", true);
       }
@@ -559,7 +566,7 @@ class NetflixAdmin {
 
   async setHero(id) {
     try {
-      const res = await fetch(`/api/admin/movies/${id}/hero`, {
+      const res = await fetch(`${this.apiBase()}/api/admin/movies/${encodeURIComponent(id)}/hero`, {
         method: 'POST',
         headers: this.authHeaders()
       });
@@ -570,8 +577,11 @@ class NetflixAdmin {
       const json = await res.json();
       if (json.success) {
         this.showToast("⭐ Titre promu en tête d'affiche (Hero Billboard) !");
-        this.loadCatalog();
-        this.loadStats();
+        await this.loadCatalog();
+        await this.loadStats();
+        if (window.netflixApp && typeof window.netflixApp.loadCatalog === 'function') {
+          window.netflixApp.loadCatalog();
+        }
       }
     } catch (e) {
       this.showToast("Erreur lors de la mise en vedette", true);
@@ -579,12 +589,12 @@ class NetflixAdmin {
   }
 
   async deleteMovie(id) {
-    const m = this.allMovies.find(item => item.id === id);
+    const m = this.allMovies.find(item => item.id === id || item.tmdb_id === id);
     const title = m ? m.title : 'ce titre';
     if (!confirm(`Voulez-vous vraiment supprimer "${title}" du catalogue ?`)) return;
 
     try {
-      const res = await fetch(`/api/admin/movies/${id}`, {
+      const res = await fetch(`${this.apiBase()}/api/admin/movies/${encodeURIComponent(id)}`, {
         method: 'DELETE',
         headers: this.authHeaders()
       });
@@ -594,14 +604,17 @@ class NetflixAdmin {
       }
       const json = await res.json();
       if (json.success) {
-        this.showToast("Média supprimé du catalogue avec succès");
-        this.loadCatalog();
-        this.loadStats();
+        this.showToast(`"${title}" supprimé du catalogue avec succès`);
+        await this.loadCatalog();
+        await this.loadStats();
+        if (window.netflixApp && typeof window.netflixApp.loadCatalog === 'function') {
+          window.netflixApp.loadCatalog();
+        }
       } else {
         this.showToast(json.message || "Erreur lors de la suppression", true);
       }
     } catch (e) {
-      this.showToast("Erreur de suppression", true);
+      this.showToast("Erreur de communication avec le serveur", true);
     }
   }
 
