@@ -35,7 +35,7 @@ public class MainActivity extends Activity {
 
     private static final String TAG = "NetflixLiveTV";
     private static final String LOCAL_URL = "file:///android_asset/index.html";
-    private static final String APP_URL = "https://netflix-clone-live-tv-1.onrender.com/";
+    private static final String APP_URL = "https://netflix-clone-live-tv-j9ta.onrender.com/";
 
     private WebView webView;
     private ProgressBar progressBar;

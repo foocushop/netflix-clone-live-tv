@@ -16,7 +16,7 @@
 // - Raccourcis clavier (Espace, Flèches, F, M, 1-5, Échap)
 // Détection de l'hôte API pour compatibilité Web & Android TV locale (file://)
 window.API_BASE = window.API_BASE || ((window.location.protocol === 'file:' || !window.location.origin || window.location.origin === 'null' || window.location.origin.startsWith('file:'))
-  ? 'https://netflix-clone-live-tv-1.onrender.com'
+  ? 'https://netflix-clone-live-tv-j9ta.onrender.com'
   : '');
 
 class NetflixPlayer {
