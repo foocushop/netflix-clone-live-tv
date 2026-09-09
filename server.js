@@ -1507,9 +1507,273 @@ const mimeTypes = {
   '.json': 'application/json'
 };
 
+// ================= MODULE SERVEUR XTREAM CODES API =================
+// Rend le serveur 100% compatible avec IPTV Smarters Pro, TiviMate, XCIPTV, VLC, etc.
+let XTREAM_USERS = [];
+function loadXtreamUsers() {
+  try {
+    const p = path.join(__dirname, 'data', 'xtream_users.json');
+    if (fs.existsSync(p)) {
+      XTREAM_USERS = JSON.parse(fs.readFileSync(p, 'utf8'));
+    }
+  } catch (e) {}
+  if (!XTREAM_USERS || XTREAM_USERS.length === 0) {
+    XTREAM_USERS = [
+      { username: 'jose', password: '1965', status: 'Active', exp_date: 1893456000, max_connections: 5 },
+      { username: 'admin', password: '1965', status: 'Active', exp_date: 1893456000, max_connections: 10 }
+    ];
+  }
+}
+loadXtreamUsers();
+
+function authenticateXtreamClient(username, password) {
+  loadXtreamUsers();
+  const u = String(username || '').trim();
+  const p = String(password || '').trim();
+  return XTREAM_USERS.find(user => user.username === u && user.password === p && user.status === 'Active');
+}
+
+async function handlePlayerApi(req, res, q) {
+  const username = q.username;
+  const password = q.password;
+  const action = q.action;
+
+  const user = authenticateXtreamClient(username, password);
+  if (!user) {
+    res.writeHead(200, { 'Content-Type': 'application/json; charset=utf-8', 'Access-Control-Allow-Origin': '*' });
+    return res.end(JSON.stringify({
+      user_info: {
+        auth: 0,
+        status: "Disabled",
+        message: "Nom d'utilisateur ou mot de passe incorrect"
+      }
+    }));
+  }
+
+  const host = req.headers.host || '127.0.0.1:8080';
+  const proto = req.headers['x-forwarded-proto'] || (req.connection?.encrypted ? 'https' : 'http');
+  const port = host.includes(':') ? host.split(':')[1] : (proto === 'https' ? '443' : '80');
+
+  // CAS 1 : Authentification initiale & Ping de l'application IPTV
+  if (!action) {
+    res.writeHead(200, { 'Content-Type': 'application/json; charset=utf-8', 'Access-Control-Allow-Origin': '*' });
+    return res.end(JSON.stringify({
+      user_info: {
+        username: user.username,
+        password: user.password,
+        message: "Serveur IPTV Xtream Codes Actif",
+        auth: 1,
+        status: "Active",
+        exp_date: String(user.exp_date || "1893456000"),
+        is_trial: "0",
+        active_cons: "1",
+        created_at: String(user.created_at || "1725000000"),
+        max_connections: String(user.max_connections || "5"),
+        allowed_output_formats: ["m3u8", "ts", "mp4", "mkv"]
+      },
+      server_info: {
+        url: host.split(':')[0],
+        port: String(port),
+        https_port: "443",
+        server_protocol: proto,
+        rtmp_port: "8880",
+        timezone: "Europe/Paris",
+        time_now: new Date().toISOString().replace('T', ' ').substring(0, 19),
+        process: true
+      }
+    }));
+  }
+
+  // CAS 2 : Catégories Live
+  if (action === 'get_live_categories') {
+    const catMap = new Map();
+    XTREAM_FR_CATALOG.forEach(ch => {
+      const cId = String(ch.category_id || '1');
+      const cName = ch.category_name || 'Général';
+      if (!catMap.has(cId)) {
+        catMap.set(cId, { category_id: cId, category_name: cName, parent_id: 0 });
+      }
+    });
+    res.writeHead(200, { 'Content-Type': 'application/json; charset=utf-8', 'Access-Control-Allow-Origin': '*' });
+    return res.end(JSON.stringify(Array.from(catMap.values())));
+  }
+
+  // CAS 3 : Chaînes Live
+  if (action === 'get_live_streams') {
+    let streams = XTREAM_FR_CATALOG;
+    if (q.category_id) {
+      streams = streams.filter(ch => String(ch.category_id) === String(q.category_id));
+    }
+    const result = streams.map((ch, idx) => ({
+      num: idx + 1,
+      name: ch.name || ch.raw_name,
+      stream_type: "live",
+      stream_id: parseInt(ch.stream_id, 10),
+      stream_icon: ch.icon || "",
+      epg_channel_id: ch.epg_channel_id || "",
+      added: "1725000000",
+      category_id: String(ch.category_id || "1"),
+      custom_sid: "",
+      tv_archive: 0,
+      direct_source: "",
+      tv_archive_duration: 0
+    }));
+    res.writeHead(200, { 'Content-Type': 'application/json; charset=utf-8', 'Access-Control-Allow-Origin': '*' });
+    return res.end(JSON.stringify(result));
+  }
+
+  // CAS 4 : Catégories VOD (Films)
+  if (action === 'get_vod_categories') {
+    const vodCats = (catalog.categories || []).filter(c => !['sports_fr', 'ppv_combat', 'sports_extreme', 'tnt_fr', 'telerealite'].includes(c.slug)).map((c, i) => ({
+      category_id: String(i + 10),
+      category_name: c.name,
+      parent_id: 0
+    }));
+    res.writeHead(200, { 'Content-Type': 'application/json; charset=utf-8', 'Access-Control-Allow-Origin': '*' });
+    return res.end(JSON.stringify(vodCats));
+  }
+
+  // CAS 5 : Films VOD
+  if (action === 'get_vod_streams') {
+    const movies = (catalog.movies || []).filter(m => m.media_type !== 'channel' && m.media_type !== 'series' && !m.is_live && !m.is_xtream_series);
+    const result = movies.map((m, idx) => ({
+      num: idx + 1,
+      name: m.title,
+      stream_type: "movie",
+      stream_id: m.id || m.tmdb_id,
+      stream_icon: m.poster_url || "",
+      rating: m.match_score ? (m.match_score / 10).toFixed(1) : "8.5",
+      rating_5based: m.match_score ? (m.match_score / 20).toFixed(1) : "4.3",
+      added: "1725000000",
+      category_id: "10",
+      container_extension: "mp4"
+    }));
+    res.writeHead(200, { 'Content-Type': 'application/json; charset=utf-8', 'Access-Control-Allow-Origin': '*' });
+    return res.end(JSON.stringify(result));
+  }
+
+  // CAS 6 : Catégories Séries
+  if (action === 'get_series_categories') {
+    const seriesCats = [
+      { category_id: "947", category_name: "Télé-Réalité & Divertissement", parent_id: 0 },
+      { category_id: "948", category_name: "Séries Tendances", parent_id: 0 }
+    ];
+    res.writeHead(200, { 'Content-Type': 'application/json; charset=utf-8', 'Access-Control-Allow-Origin': '*' });
+    return res.end(JSON.stringify(seriesCats));
+  }
+
+  // CAS 7 : Liste des Séries
+  if (action === 'get_series') {
+    const result = XTREAM_TELEREALITE_CATALOG.map((s, idx) => ({
+      num: idx + 1,
+      name: s.name,
+      series_id: s.series_id,
+      cover: s.cover || "",
+      plot: s.plot || "",
+      cast: s.cast || "",
+      director: "",
+      genre: s.genre || "Télé-Réalité",
+      releaseDate: String(s.year || "2025"),
+      last_modified: "1725000000",
+      rating: s.rating || "8.5",
+      rating_5based: "4.3",
+      backdrop_path: [s.backdrop || ""],
+      youtube_trailer: "",
+      episode_run_time: s.episode_run_time || "45",
+      category_id: String(s.category_id || "947")
+    }));
+    res.writeHead(200, { 'Content-Type': 'application/json; charset=utf-8', 'Access-Control-Allow-Origin': '*' });
+    return res.end(JSON.stringify(result));
+  }
+
+  // CAS 8 : Détails d'une Série (Saisons et Épisodes)
+  if (action === 'get_series_info') {
+    const seriesId = String(q.series_id || '');
+    if (!seriesId) {
+      res.writeHead(400, { 'Content-Type': 'application/json; charset=utf-8' });
+      return res.end(JSON.stringify({ message: "series_id requis" }));
+    }
+
+    // 1. Vérifier si c'est La Villa (6715 / 68628) dans catalog.json
+    const catVilla = (catalog.movies || []).find(m => m.id === '68628' || m.series_id === 6715);
+    if ((seriesId === '6715' || seriesId === '68628') && catVilla && catVilla.seasons) {
+      const episodesMap = {};
+      catVilla.seasons.forEach(s => {
+        const sNumStr = String(s.season_number);
+        episodesMap[sNumStr] = (s.episodes || []).map((e, idx) => ({
+          id: parseInt(e.id, 10) || (385600 + idx),
+          episode_num: e.episode_number,
+          title: e.title || `Épisode ${e.episode_number}`,
+          container_extension: "mkv",
+          info: {
+            duration_secs: 2700,
+            duration: e.duration || "45:00",
+            video: {},
+            audio: {},
+            bitrate: 0
+          }
+        }));
+      });
+
+      res.writeHead(200, { 'Content-Type': 'application/json; charset=utf-8', 'Access-Control-Allow-Origin': '*' });
+      return res.end(JSON.stringify({
+        seasons: catVilla.seasons.map(s => ({
+          season_number: s.season_number,
+          name: s.title || `Saison ${s.season_number}`,
+          episode_count: s.episode_count || (s.episodes?.length || 0),
+          air_date: "2025-08-11"
+        })),
+        info: {
+          name: catVilla.title,
+          cover: catVilla.poster_url,
+          plot: catVilla.overview,
+          cast: (catVilla.cast || []).join(', '),
+          director: catVilla.director || "",
+          genre: (catVilla.genres || []).join(' / '),
+          releaseDate: "2025",
+          rating: "8.5"
+        },
+        episodes: episodesMap
+      }));
+    }
+
+    // 2. Vérifier dans le cache disque
+    const cacheFile = path.join(__dirname, 'data', 'cache', `series_${seriesId}.json`);
+    if (fs.existsSync(cacheFile)) {
+      try {
+        const cachedJson = fs.readFileSync(cacheFile, 'utf8');
+        res.writeHead(200, { 'Content-Type': 'application/json; charset=utf-8', 'Access-Control-Allow-Origin': '*' });
+        return res.end(cachedJson);
+      } catch (e) {}
+    }
+
+    // 3. Appel live Xtream si pas en cache
+    try {
+      const upstreamUrl = `http://${XTREAM_CONFIG.host}:${XTREAM_CONFIG.port}/player_api.php?username=${XTREAM_CONFIG.username}&password=${XTREAM_CONFIG.password}&action=get_series_info&series_id=${seriesId}`;
+      const fRes = await fetch(upstreamUrl, { signal: AbortSignal.timeout(8000) });
+      if (fRes.ok) {
+        const text = await fRes.text();
+        try {
+          const cacheDir = path.join(__dirname, 'data', 'cache');
+          if (!fs.existsSync(cacheDir)) fs.mkdirSync(cacheDir, { recursive: true });
+          fs.writeFileSync(cacheFile, text, 'utf8');
+        } catch (e) {}
+        res.writeHead(200, { 'Content-Type': 'application/json; charset=utf-8', 'Access-Control-Allow-Origin': '*' });
+        return res.end(text);
+      }
+    } catch (err) {}
+
+    res.writeHead(404, { 'Content-Type': 'application/json; charset=utf-8', 'Access-Control-Allow-Origin': '*' });
+    return res.end(JSON.stringify({ message: "Série introuvable" }));
+  }
+
+  res.writeHead(200, { 'Content-Type': 'application/json; charset=utf-8', 'Access-Control-Allow-Origin': '*' });
+  return res.end(JSON.stringify({ message: "Action non supportée" }));
+}
+
 const server = http.createServer((req, res) => {
   const parsedUrl = url.parse(req.url, true);
-  const pathname = parsedUrl.pathname;
+  let pathname = parsedUrl.pathname;
 
   // CORS headers
   res.setHeader('Access-Control-Allow-Origin', '*');
@@ -1520,6 +1784,99 @@ const server = http.createServer((req, res) => {
     res.writeHead(200);
     res.end();
     return;
+  }
+
+  // ── ROUTEUR STREAMING XTREAM CODES (/live/, /series/, /movie/) ──
+  if (pathname.startsWith('/live/') || pathname.startsWith('/series/') || pathname.startsWith('/movie/')) {
+    const parts = pathname.split('/').filter(Boolean);
+    if (parts.length >= 4) {
+      const type = parts[0];
+      const user = parts[1];
+      const pass = parts[2];
+      const fileWithExt = parts[3];
+
+      if (!authenticateXtreamClient(user, pass)) {
+        res.writeHead(403, { 'Content-Type': 'text/plain; charset=utf-8', 'Access-Control-Allow-Origin': '*' });
+        return res.end('Accès refusé : Identifiants Xtream incorrects');
+      }
+
+      if (type === 'live') {
+        const streamId = fileWithExt.replace(/\.(m3u8|ts)$/i, '');
+        parsedUrl.query.stream_id = streamId;
+        pathname = '/api/stream/xtream';
+      } else if (type === 'series') {
+        const extMatch = fileWithExt.match(/\.([a-zA-Z0-9]+)$/);
+        const ext = extMatch ? extMatch[1] : 'mkv';
+        const episodeId = fileWithExt.replace(/\.[a-zA-Z0-9]+$/, '');
+        parsedUrl.query.episode_id = episodeId;
+        parsedUrl.query.ext = ext;
+        pathname = '/api/stream/xtream-series';
+      } else if (type === 'movie') {
+        const movieId = fileWithExt.replace(/\.[a-zA-Z0-9]+$/, '');
+        const catMovie = (catalog.movies || []).find(m => m.id === movieId || m.tmdb_id === movieId);
+        if (catMovie && catMovie.video_url) {
+          res.writeHead(302, { 'Location': catMovie.video_url, 'Access-Control-Allow-Origin': '*' });
+          return res.end();
+        }
+      }
+    }
+  }
+
+  // ── ROUTE STANDARD XTREAM CODES API (/player_api.php) ──
+  if (pathname === '/player_api.php') {
+    if (req.method === 'POST') {
+      let body = '';
+      req.on('data', chunk => body += chunk);
+      req.on('end', () => {
+        let postParams = {};
+        if (body) {
+          try {
+            if (body.startsWith('{')) {
+              postParams = JSON.parse(body);
+            } else {
+              postParams = querystring.parse(body);
+            }
+          } catch (e) {}
+        }
+        const q = Object.assign({}, parsedUrl.query, postParams);
+        handlePlayerApi(req, res, q);
+      });
+      return;
+    } else {
+      handlePlayerApi(req, res, parsedUrl.query || {});
+      return;
+    }
+  }
+
+  // ── ROUTE TÉLÉCHARGEMENT PLAYLIST M3U UNIVERSELLE (/get.php) ──
+  if (pathname === '/get.php' && req.method === 'GET') {
+    const q = parsedUrl.query || {};
+    const username = q.username;
+    const password = q.password;
+    if (!username || !password || !authenticateXtreamClient(username, password)) {
+      res.writeHead(403, { 'Content-Type': 'text/plain; charset=utf-8', 'Access-Control-Allow-Origin': '*' });
+      return res.end('Accès refusé : Identifiants M3U incorrects');
+    }
+
+    const host = req.headers.host || '127.0.0.1:8080';
+    const proto = req.headers['x-forwarded-proto'] || (req.connection?.encrypted ? 'https' : 'http');
+    const baseUrl = `${proto}://${host}`;
+
+    let m3u = '#EXTM3U\n';
+    XTREAM_FR_CATALOG.forEach(ch => {
+      const epg = ch.epg_channel_id || '';
+      const icon = ch.icon || '';
+      const cat = ch.category_name || 'Général';
+      m3u += `#EXTINF:-1 tvg-id="${epg}" tvg-name="${ch.name}" tvg-logo="${icon}" group-title="${cat}",${ch.name}\n`;
+      m3u += `${baseUrl}/live/${encodeURIComponent(username)}/${encodeURIComponent(password)}/${ch.stream_id}.ts\n`;
+    });
+
+    res.writeHead(200, {
+      'Content-Type': 'application/vnd.apple.mpegurl; charset=utf-8',
+      'Content-Disposition': 'attachment; filename="iptv_playlist.m3u"',
+      'Access-Control-Allow-Origin': '*'
+    });
+    return res.end(m3u);
   }
 
   // ================= API REST =================
@@ -1973,7 +2330,9 @@ const server = http.createServer((req, res) => {
           }
         }
 
-        if (episodeObj && episodeObj.video_url) {
+        const streamUrlToUse = episodeObj ? (episodeObj.video_url || episodeObj.stream_url || episodeObj.sources?.vf) : null;
+
+        if (episodeObj && streamUrlToUse) {
           return {
             success: true,
             server: serverNum,
@@ -1981,8 +2340,8 @@ const server = http.createServer((req, res) => {
             hoster: 'Xtream Codes VIP Full HD',
             quality: '1080p FHD',
             title: `${showTitle} - S${sNum}:E${episodeObj.episode_number || eNum}`,
-            stream_url: episodeObj.video_url,
-            raw_stream_url: episodeObj.video_url,
+            stream_url: streamUrlToUse,
+            raw_stream_url: streamUrlToUse,
             player_type: 'direct_video',
             is_embed: false,
             sources_count: 5,
@@ -1991,12 +2350,13 @@ const server = http.createServer((req, res) => {
         }
 
         // ── GUARD FINAL : Série Xtream détectée mais épisode introuvable → ne pas tomber dans extractFrenchStream ──
-        if ((id && String(id).startsWith('xtream_series_')) || (tmdbId && String(tmdbId).startsWith('xtream_series_'))) {
+        if (id === '68628' || tmdbId === '68628' || (id && String(id).startsWith('xtream_series_')) || (tmdbId && String(tmdbId).startsWith('xtream_series_'))) {
+          const sId = (id === '68628' || tmdbId === '68628') ? '6715' : String(id || tmdbId || '').replace(/^xtream_series_/, '');
           return {
             success: false,
             error: 'Épisode introuvable dans la bibliothèque Xtream. Veuillez ouvrir la fiche série pour charger les épisodes.',
             needsSeriesInfo: true,
-            series_id: String(id || tmdbId || '').replace(/^xtream_series_/, '')
+            series_id: sId
           };
         }
       }

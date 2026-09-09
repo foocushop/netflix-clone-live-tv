@@ -58,6 +58,36 @@ class NetflixAdmin {
       logoutBtn.addEventListener('click', () => this.logout());
     }
 
+    // Gestion de la boîte d'accès Xtream Codes
+    const xtHostEl = document.getElementById('xtreamHostDisplay');
+    if (xtHostEl) {
+      const serverOrigin = this.apiBase() || window.location.origin;
+      xtHostEl.textContent = serverOrigin;
+    }
+
+    const copyXtBtn = document.getElementById('copyXtreamUrlBtn');
+    if (copyXtBtn) {
+      copyXtBtn.addEventListener('click', () => {
+        const serverOrigin = this.apiBase() || window.location.origin;
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+          navigator.clipboard.writeText(serverOrigin);
+        }
+        this.showToast('📋 URL Serveur Xtream copiée : ' + serverOrigin);
+      });
+    }
+
+    const copyM3uBtn = document.getElementById('copyM3uUrlBtn');
+    if (copyM3uBtn) {
+      copyM3uBtn.addEventListener('click', () => {
+        const serverOrigin = this.apiBase() || window.location.origin;
+        const m3uUrl = `${serverOrigin}/get.php?username=jose&password=1965`;
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+          navigator.clipboard.writeText(m3uUrl);
+        }
+        this.showToast('🔗 Lien M3U copié ! Prêt pour VLC ou TiviMate.');
+      });
+    }
+
     // 2. Navigation Studio Admin
     const closeAdminBtn = document.getElementById('closeAdminBtn');
     if (closeAdminBtn) {

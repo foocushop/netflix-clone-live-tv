@@ -1448,7 +1448,8 @@ class NetflixPlayer {
     if (this.currentMovie && this.currentMovie.seasons && (this.currentMovie.is_xtream_series || this.currentMovie.id === '68628' || String(this.currentMovie.id).startsWith('xtream_series_'))) {
       const sObj = this.currentMovie.seasons.find(s => parseInt(s.season_number) === parseInt(this.currentSeason)) || this.currentMovie.seasons[0];
       const epObj = sObj?.episodes?.find(e => parseInt(e.episode_number) === parseInt(this.currentEpisode)) || sObj?.episodes?.[0];
-      if (epObj && epObj.video_url) {
+      const epStreamUrl = epObj ? (epObj.video_url || epObj.stream_url || epObj.sources?.vf) : null;
+      if (epObj && epStreamUrl) {
         this.currentSeason = parseInt(sObj.season_number);
         this.currentEpisode = parseInt(epObj.episode_number);
         try {
@@ -1457,7 +1458,7 @@ class NetflixPlayer {
         } catch (e) {}
 
         const baseUrl = window.API_BASE || '';
-        let targetStreamUrl = epObj.video_url;
+        let targetStreamUrl = epStreamUrl;
         if (targetStreamUrl && targetStreamUrl.startsWith('/')) {
           targetStreamUrl = baseUrl + targetStreamUrl;
         }
