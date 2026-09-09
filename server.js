@@ -1671,6 +1671,41 @@ const server = http.createServer((req, res) => {
     return sendResponse(req, res, 200, 'application/json', JSON.stringify({ success: true, count: results.length, data: results }), {}, 180);
   }
 
+  // ================= SÉCURITÉ ADMIN STUDIO (CODE PIN 1965) & ENDPOINTS =================
+  if (pathname.startsWith('/api/admin/')) {
+    // Route de vérification explicite du mot de passe
+    if (pathname === '/api/admin/auth' && req.method === 'POST') {
+      let body = '';
+      req.on('data', chunk => body += chunk);
+      req.on('end', () => {
+        try {
+          const payload = JSON.parse(body || '{}');
+          if (String(payload.password || '').trim() === '1965') {
+            res.writeHead(200, { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' });
+            return res.end(JSON.stringify({ success: true, message: 'Authentification administrateur réussie', token: '1965' }));
+          } else {
+            res.writeHead(401, { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' });
+            return res.end(JSON.stringify({ success: false, message: 'Mot de passe ou code PIN incorrect' }));
+          }
+        } catch (e) {
+          res.writeHead(400, { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' });
+          return res.end(JSON.stringify({ success: false, message: 'Corps JSON invalide' }));
+        }
+      });
+      return;
+    }
+
+    // Vérification de sécurité obligatoire pour toutes les opérations admin
+    const clientPass = req.headers['x-admin-password'] || (req.headers['authorization'] || '').replace(/^Bearer\s+/i, '');
+    if (clientPass !== '1965') {
+      res.writeHead(401, { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' });
+      return res.end(JSON.stringify({
+        success: false,
+        message: 'Accès refusé : Authentification administrateur requise (Code PIN 1965)'
+      }));
+    }
+  }
+
   if (pathname === '/api/admin/stats' && req.method === 'GET') {
     const hero = catalog.movies.find(m => m.is_hero);
     const stats = {
@@ -1683,13 +1718,13 @@ const server = http.createServer((req, res) => {
       rust_engine: "Axum v0.7 + Tokio + Tower-HTTP (Mode Rust Natif)",
       system_status: "Opérationnel (100% Rust Ready)"
     };
-    res.writeHead(200, { 'Content-Type': 'application/json' });
+    res.writeHead(200, { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' });
     res.end(JSON.stringify({ success: true, data: stats }));
     return;
   }
 
   if (pathname === '/api/admin/movies' && req.method === 'GET') {
-    res.writeHead(200, { 'Content-Type': 'application/json' });
+    res.writeHead(200, { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' });
     res.end(JSON.stringify({ success: true, data: catalog.movies }));
     return;
   }
@@ -1725,10 +1760,57 @@ const server = http.createServer((req, res) => {
         };
         catalog.movies.push(newMovie);
         saveCatalog();
-        res.writeHead(201, { 'Content-Type': 'application/json' });
+        res.writeHead(201, { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' });
         res.end(JSON.stringify({ success: true, data: newMovie }));
       } catch (e) {
-        res.writeHead(400, { 'Content-Type': 'application/json' });
+        res.writeHead(400, { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' });
+        res.end(JSON.stringify({ success: false, message: 'JSON invalide' }));
+      }
+    });
+    return;
+  }
+
+  if (pathname.startsWith('/api/admin/movies/') && !pathname.endsWith('/hero') && req.method === 'PUT') {
+    const id = pathname.replace('/api/admin/movies/', '');
+    let body = '';
+    req.on('data', chunk => body += chunk);
+    req.on('end', () => {
+      try {
+        const payload = JSON.parse(body);
+        const movie = catalog.movies.find(m => m.id === id);
+        if (!movie) {
+          res.writeHead(404, { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' });
+          return res.end(JSON.stringify({ success: false, message: 'Média non trouvé' }));
+        }
+
+        if (payload.title) movie.title = payload.title;
+        if (payload.original_title !== undefined) movie.original_title = payload.original_title;
+        if (payload.overview !== undefined) movie.overview = payload.overview;
+        if (payload.media_type) movie.media_type = payload.media_type;
+        if (payload.poster_url) movie.poster_url = payload.poster_url;
+        if (payload.backdrop_url) movie.backdrop_url = payload.backdrop_url;
+        if (payload.video_url) movie.video_url = payload.video_url;
+        if (payload.categories) movie.categories = payload.categories;
+        if (payload.release_year) movie.release_year = payload.release_year;
+        if (payload.match_score) movie.match_score = payload.match_score;
+        if (payload.age_rating) movie.age_rating = payload.age_rating;
+        if (payload.duration) movie.duration = payload.duration;
+        if (payload.cast) movie.cast = payload.cast;
+        if (payload.director !== undefined) movie.director = payload.director;
+        if (payload.is_hero !== undefined) {
+          if (payload.is_hero) {
+            catalog.movies.forEach(m => m.is_hero = false);
+            movie.is_hero = true;
+          } else {
+            movie.is_hero = false;
+          }
+        }
+
+        saveCatalog();
+        res.writeHead(200, { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' });
+        res.end(JSON.stringify({ success: true, data: movie }));
+      } catch (e) {
+        res.writeHead(400, { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' });
         res.end(JSON.stringify({ success: false, message: 'JSON invalide' }));
       }
     });
@@ -1748,10 +1830,10 @@ const server = http.createServer((req, res) => {
     });
     if (found) {
       saveCatalog();
-      res.writeHead(200, { 'Content-Type': 'application/json' });
+      res.writeHead(200, { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' });
       res.end(JSON.stringify({ success: true }));
     } else {
-      res.writeHead(404, { 'Content-Type': 'application/json' });
+      res.writeHead(404, { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' });
       res.end(JSON.stringify({ success: false, message: 'Média non trouvé' }));
     }
     return;
@@ -1766,10 +1848,10 @@ const server = http.createServer((req, res) => {
         catalog.movies[0].is_hero = true;
       }
       saveCatalog();
-      res.writeHead(200, { 'Content-Type': 'application/json' });
+      res.writeHead(200, { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' });
       res.end(JSON.stringify({ success: true }));
     } else {
-      res.writeHead(404, { 'Content-Type': 'application/json' });
+      res.writeHead(404, { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' });
       res.end(JSON.stringify({ success: false, message: 'Média non trouvé' }));
     }
     return;

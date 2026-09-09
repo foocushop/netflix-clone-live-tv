@@ -442,6 +442,32 @@
     </div>
   </div>
 
+  <!-- ================= MODAL SÉCURITÉ ADMIN (CODE PIN 1965) ================= -->
+  <div class="admin-auth-backdrop" id="adminAuthModal">
+    <div class="admin-auth-card">
+      <div class="admin-auth-icon">
+        <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#e50914" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+          <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+        </svg>
+      </div>
+      <h2 class="admin-auth-title">Accès Administrateur</h2>
+      <p class="admin-auth-desc">Veuillez saisir le code PIN de sécurité pour déverrouiller le Studio Netflix.</p>
+      
+      <form id="adminAuthForm">
+        <div class="admin-auth-input-wrap">
+          <input type="password" id="adminPinInput" class="admin-auth-input" placeholder="Code PIN (ex: 1965)" maxlength="20" autocomplete="current-password" required>
+          <button type="button" class="admin-auth-eye-btn" id="togglePinVisibilityBtn" title="Afficher/Masquer le code">👁️</button>
+        </div>
+        <div class="admin-auth-error" id="adminAuthError" style="display: none;"></div>
+        <div class="admin-auth-actions">
+          <button type="button" class="btn-admin btn-admin-outline" id="cancelAdminAuthBtn">Annuler</button>
+          <button type="submit" class="btn-admin" id="submitAdminAuthBtn">Déverrouiller 🔓</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
   <!-- ================= STUDIO ADMINISTRATEUR NETFLIX ================= -->
   <div class="admin-overlay" id="adminOverlay">
     <nav class="admin-navbar">
@@ -449,15 +475,18 @@
         <img src="assets/logos/netflix-logo.svg" alt="Netflix" height="28">
         <span class="admin-badge">ADMIN STUDIO</span>
         <div class="admin-rust-tag">
-          <span>🦀</span> Propulsé par Rust (Axum Engine)
+          <span>🦀</span> Rust Engine (Secured 1965)
         </div>
       </div>
       <div class="admin-actions">
         <button class="btn-admin" id="openAddMovieModal">
           <span>+</span> Ajouter un média
         </button>
+        <button class="btn-admin btn-admin-secondary" id="adminLogoutBtn" title="Verrouiller et se déconnecter">
+          <span>🔒</span> Déconnexion
+        </button>
         <button class="btn-admin btn-admin-outline" id="closeAdminBtn">
-          <span>✕</span> Quitter le mode Admin
+          <span>✕</span> Quitter
         </button>
       </div>
     </nav>
@@ -491,9 +520,29 @@
         </div>
       </div>
 
-      <!-- Tableau du Catalogue -->
+      <!-- Barre d'outils pratique : Recherche instantanée & Filtres de type -->
+      <div class="admin-toolbar">
+        <div class="admin-search-wrapper">
+          <span class="admin-search-icon">🔍</span>
+          <input type="text" id="adminSearchInput" class="admin-search-input" placeholder="Rechercher par titre, genre, acteur, réalisateur, année...">
+          <button type="button" id="adminSearchClear" class="admin-search-clear" style="display: none;">✕</button>
+        </div>
+        <div class="admin-toolbar-right">
+          <div class="admin-filter-tabs" id="adminFilterTabs">
+            <button class="admin-tab-btn active" data-filter="all">Tous (<span id="countAll">0</span>)</button>
+            <button class="admin-tab-btn" data-filter="movie">Films (<span id="countMovies">0</span>)</button>
+            <button class="admin-tab-btn" data-filter="series">Séries (<span id="countSeries">0</span>)</button>
+            <button class="admin-tab-btn" data-filter="channel">Chaînes TV (<span id="countChannels">0</span>)</button>
+            <button class="admin-tab-btn" data-filter="hero">⭐ En Vedette (<span id="countHero">0</span>)</button>
+          </div>
+          <button class="btn-action-sm btn-refresh" id="adminRefreshBtn" title="Actualiser le catalogue">🔄 Actualiser</button>
+        </div>
+      </div>
+
+      <!-- En-tête de section avec indicateur de résultats -->
       <div class="admin-section-header">
         <h2 class="admin-section-title">Catalogue des Médias</h2>
+        <div class="admin-results-info" id="adminResultsInfo">Chargement du catalogue...</div>
       </div>
 
       <div class="catalog-table-container">
@@ -501,12 +550,12 @@
           <thead>
             <tr>
               <th>Affiche</th>
-              <th>Titre & Original</th>
+              <th>Titre & Infos</th>
               <th>Type</th>
               <th>Année</th>
               <th>Score</th>
               <th>En Vedette</th>
-              <th>Actions</th>
+              <th>Actions Rapides</th>
             </tr>
           </thead>
           <tbody id="adminCatalogBody">

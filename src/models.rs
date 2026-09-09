@@ -82,6 +82,11 @@ pub struct UpdateMovieInput {
     pub seasons: Option<serde_json::Value>,
 }
 
+#[derive(Debug, Clone, Deserialize)]
+pub struct AuthInput {
+    pub password: String,
+}
+
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Category {
     pub id: String,

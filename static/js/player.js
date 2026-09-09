@@ -347,10 +347,13 @@ class NetflixPlayer {
     });
 
     // Plein Écran
-    this.ctrlFullscreenBtn.addEventListener('click', (e) => {
+    const handleFs = (e) => {
+      e.preventDefault();
       e.stopPropagation();
       this.toggleFullscreen();
-    });
+    };
+    this.ctrlFullscreenBtn.addEventListener('click', handleFs);
+    this.ctrlFullscreenBtn.addEventListener('touchend', handleFs);
 
     document.addEventListener('fullscreenchange', () => {
       this.updateFullscreenIcons();
@@ -908,6 +911,17 @@ class NetflixPlayer {
 
     if (this.langSwitch) {
       this.langSwitch.style.display = (movie.media_type === 'channel' || movie.is_live) ? 'none' : 'flex';
+    }
+
+    // Gestion propre du sélecteur de serveurs :
+    // Masqué pour les séries Xtream, les émissions de télé-réalité et les films qui ont leur flux unique dédié.
+    // Uniquement affiché pour les chaînes Live TV multi-miroirs.
+    const isLive = (movie.media_type === 'channel' || movie.is_live);
+    const isXtreamOnly = movie.is_xtream || movie.is_xtream_series || movie.series_id || (movie.id && String(movie.id).startsWith('xtream_series_'));
+    const hasMultipleServers = isLive && !isXtreamOnly;
+
+    if (this.serverWrapper) {
+      this.serverWrapper.style.display = hasMultipleServers ? 'flex' : 'none';
     }
 
     this.setLanguage(this.currentLang, false);

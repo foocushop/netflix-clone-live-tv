@@ -49,6 +49,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         .route("/stream/:id", get(stream::stream_movie))
         .route("/stream/file/:filename", get(stream::stream_raw_file))
         // Routes du Studio Administrateur
+        .route("/admin/auth", post(admin::auth_admin))
         .route("/admin/stats", get(admin::get_admin_stats))
         .route("/admin/movies", get(admin::list_admin_movies).post(admin::create_movie))
         .route(
