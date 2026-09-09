@@ -373,9 +373,6 @@
 
           <div class="controls-center">
             <span class="ctrl-media-title" id="ctrlMediaTitle">Lecture en cours</span>
-            <button class="btn-netflix-subtle hidden" id="ctrlNextEpBtn" title="Passer à l'épisode suivant">
-              <span>⏭</span> Épisode suivant
-            </button>
           </div>
 
           <div class="controls-right">
@@ -390,6 +387,14 @@
                 <div class="speed-item" data-speed="2">2x</div>
               </div>
             </div>
+
+            <!-- Bouton Épisode suivant (juste à côté du choix de la qualité) -->
+            <button class="ctrl-btn next-ep-btn hidden" id="ctrlNextEpBtn" title="Épisode suivant (N)">
+              <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor">
+                <path d="M6 18l8.5-6L6 6v12zM16 6v12h2V6h-2z"/>
+              </svg>
+              <span class="next-ep-label">Ép. suivant</span>
+            </button>
 
             <!-- Sélecteur de Qualité Vidéo (Auto, 1080p, 720p, 480p) -->
             <div class="quality-control-wrapper" id="qualityControlWrapper">
@@ -417,14 +422,6 @@
                 </div>
               </div>
             </div>
-
-            <!-- Bouton Épisode Suivant (Directement à côté de la qualité, optimisé Mobile & Desktop) -->
-            <button class="ctrl-btn ctrl-next-ep-btn hidden" id="ctrlNextEpBtnRight" title="Passer à l'épisode suivant" aria-label="Épisode suivant">
-              <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor">
-                <path d="M6 18l8.5-6L6 6v12zM16 6v12h2V6h-2z"/>
-              </svg>
-              <span class="next-ep-text">Ép. suiv.</span>
-            </button>
 
             <!-- Plein écran -->
             <button class="ctrl-btn" id="ctrlFullscreenBtn" title="Plein écran (F)">

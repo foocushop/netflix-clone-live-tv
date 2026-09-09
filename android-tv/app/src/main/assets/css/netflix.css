@@ -1765,6 +1765,45 @@ body {
   letter-spacing: 0.3px;
 }
 
+/* Bouton Épisode Suivant à côté de la qualité */
+.next-ep-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 0.8rem;
+  font-weight: 700;
+  padding: 4px 10px;
+  border-radius: 4px;
+  border: 1px solid rgba(255, 255, 255, 0.28);
+  background: rgba(255, 255, 255, 0.12);
+  color: #fff;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+}
+
+.next-ep-btn:hover {
+  background: rgba(229, 9, 20, 0.85);
+  border-color: #e50914;
+  color: #fff;
+  transform: translateY(-1px);
+  box-shadow: 0 2px 8px rgba(229, 9, 20, 0.4);
+}
+
+.next-ep-btn:active {
+  transform: scale(0.96);
+}
+
+.next-ep-btn svg {
+  display: block;
+  flex-shrink: 0;
+  fill: currentColor;
+}
+
+.next-ep-btn.hidden {
+  display: none !important;
+}
+
 .btn-netflix-subtle {
   background: rgba(255, 255, 255, 0.12);
   border: 1px solid rgba(255, 255, 255, 0.28);
@@ -1930,41 +1969,7 @@ body {
 }
 
 .quality-item.active .quality-sub {
-/* Bouton Épisode Suivant dans les contrôles de droite (Mobile & Desktop) */
-.ctrl-next-ep-btn {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  font-size: 0.82rem;
-  font-weight: 700;
-  padding: 5px 10px;
-  border-radius: 4px;
-  border: 1px solid rgba(255, 255, 255, 0.28);
-  background: rgba(255, 255, 255, 0.08);
-  color: #fff;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  user-select: none;
-}
-
-.ctrl-next-ep-btn:hover {
-  background: rgba(255, 255, 255, 0.22);
-  border-color: rgba(255, 255, 255, 0.55);
-  transform: scale(1.05);
-}
-
-.ctrl-next-ep-btn:active {
-  transform: scale(0.95);
-  background: rgba(229, 9, 20, 0.35);
-}
-
-.ctrl-next-ep-btn.hidden {
-  display: none !important;
-}
-
-.ctrl-next-ep-btn svg {
-  display: block;
-  flex-shrink: 0;
+  color: rgba(229, 9, 20, 0.75);
 }
 
 /* ================= FOOTER ================= */
@@ -2703,30 +2708,36 @@ body {
   .speed-control-wrapper {
     display: none !important;
   }
-  .quality-btn {
-    padding: 5px 8px;
-    font-size: 0.72rem;
-  }
-  .ctrl-next-ep-btn {
+  .next-ep-btn {
     display: inline-flex !important;
     align-items: center !important;
     justify-content: center !important;
+    gap: 4px !important;
     padding: 5px 8px !important;
+    height: 34px !important;
     font-size: 0.72rem !important;
+    font-weight: 700 !important;
+    background: rgba(255, 255, 255, 0.18) !important;
+    border: 1px solid rgba(255, 255, 255, 0.35) !important;
     border-radius: 4px !important;
-    background: rgba(255, 255, 255, 0.12) !important;
-    border: 1px solid rgba(255, 255, 255, 0.3) !important;
+    color: #ffffff !important;
     touch-action: manipulation !important;
+    -webkit-tap-highlight-color: transparent !important;
   }
-  .ctrl-next-ep-btn.hidden {
+  .next-ep-btn.hidden {
     display: none !important;
   }
-  .ctrl-next-ep-btn .next-ep-text {
-    display: none;
+  .next-ep-btn:active {
+    background: #e50914 !important;
+    border-color: #e50914 !important;
   }
-  .ctrl-next-ep-btn svg {
-    width: 18px !important;
-    height: 18px !important;
+  .next-ep-btn svg {
+    width: 16px !important;
+    height: 16px !important;
+  }
+  .quality-btn {
+    padding: 5px 8px;
+    font-size: 0.72rem;
   }
   #ctrlFullscreenBtn {
     display: inline-flex !important;
@@ -2749,6 +2760,16 @@ body {
     width: 22px !important;
     height: 22px !important;
     fill: #ffffff !important;
+  }
+}
+
+@media (max-width: 480px) {
+  .next-ep-btn .next-ep-label {
+    display: none !important;
+  }
+  .next-ep-btn {
+    width: 34px !important;
+    padding: 0 !important;
   }
 }
 
