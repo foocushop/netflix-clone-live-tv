@@ -46,7 +46,7 @@ pub async fn get_admin_stats(
     if !is_authorized(&headers) {
         return (
             StatusCode::UNAUTHORIZED,
-            Json(ApiResponse::error("Accès refusé : code PIN 1965 requis")),
+            Json(ApiResponse::error("Accès refusé : authentification requise")),
         );
     }
     let stats = db.get_stats().await;
@@ -60,7 +60,7 @@ pub async fn list_admin_movies(
     if !is_authorized(&headers) {
         return (
             StatusCode::UNAUTHORIZED,
-            Json(ApiResponse::error("Accès refusé : code PIN 1965 requis")),
+            Json(ApiResponse::error("Accès refusé : authentification requise")),
         );
     }
     let movies = db.get_all_movies().await;
@@ -75,7 +75,7 @@ pub async fn create_movie(
     if !is_authorized(&headers) {
         return (
             StatusCode::UNAUTHORIZED,
-            Json(ApiResponse::error("Accès refusé : code PIN 1965 requis")),
+            Json(ApiResponse::error("Accès refusé : authentification requise")),
         );
     }
     if payload.title.trim().is_empty() {
@@ -103,7 +103,7 @@ pub async fn update_movie(
     if !is_authorized(&headers) {
         return (
             StatusCode::UNAUTHORIZED,
-            Json(ApiResponse::error("Accès refusé : code PIN 1965 requis")),
+            Json(ApiResponse::error("Accès refusé : authentification requise")),
         );
     }
     match db.update_movie(&id, payload).await {
@@ -123,7 +123,7 @@ pub async fn delete_movie(
     if !is_authorized(&headers) {
         return (
             StatusCode::UNAUTHORIZED,
-            Json(ApiResponse::error("Accès refusé : code PIN 1965 requis")),
+            Json(ApiResponse::error("Accès refusé : authentification requise")),
         );
     }
     match db.delete_movie(&id).await {
@@ -146,7 +146,7 @@ pub async fn set_hero(
     if !is_authorized(&headers) {
         return (
             StatusCode::UNAUTHORIZED,
-            Json(ApiResponse::error("Accès refusé : code PIN 1965 requis")),
+            Json(ApiResponse::error("Accès refusé : authentification requise")),
         );
     }
     match db.set_hero_movie(&id).await {

@@ -1701,7 +1701,7 @@ const server = http.createServer((req, res) => {
       res.writeHead(401, { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' });
       return res.end(JSON.stringify({
         success: false,
-        message: 'Accès refusé : Authentification administrateur requise (Code PIN 1965)'
+        message: 'Accès refusé : Authentification administrateur requise'
       }));
     }
   }

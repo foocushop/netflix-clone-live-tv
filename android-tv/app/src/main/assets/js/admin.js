@@ -182,7 +182,7 @@ class NetflixAdmin {
         this.loadStats();
         this.loadCatalog();
       } else {
-        this.showAuthError(data.message || "Code PIN incorrect (Code requis : 1965)");
+        this.showAuthError(data.message || "Code PIN ou mot de passe incorrect");
       }
     } catch (err) {
       // Fallback local direct
@@ -283,7 +283,7 @@ class NetflixAdmin {
     sessionStorage.removeItem('netflix_admin_authenticated');
     this.close();
     this.openAuthModal();
-    this.showToast("Session expirée. Veuillez saisir le code PIN (1965).", true);
+    this.showToast("Session expirée. Veuillez vous reconnecter.", true);
   }
 
   updateCounts() {
