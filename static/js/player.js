@@ -1592,13 +1592,36 @@ class NetflixPlayer {
       this.bottomControls.classList.remove('iframe-mode');
     }
 
+    let hasReadied = false;
     const onReady = () => {
+      if (hasReadied) return;
+      hasReadied = true;
       this.setStep(4, 'done', `4. Épisode connecté • Lecture active 1080p FHD`);
-      setTimeout(() => this.hideLoader(), 300);
+      setTimeout(() => this.hideLoader(), 200);
     };
 
     this.video.addEventListener('loadeddata', onReady, { once: true });
+    this.video.addEventListener('loadedmetadata', onReady, { once: true });
+    this.video.addEventListener('canplay', onReady, { once: true });
     this.video.addEventListener('playing', onReady, { once: true });
+    this.video.addEventListener('timeupdate', () => {
+      if (!hasReadied && this.video.currentTime > 0) onReady();
+    });
+
+    const onError = () => {
+      if (hasReadied) return;
+      console.warn('[Direct Video Error]:', this.video.error);
+      this.showStatusBanner('Erreur de lecture du flux direct.');
+      this.hideLoader();
+    };
+    this.video.addEventListener('error', onError, { once: true });
+
+    // Fallback de sécurité : masquer le loader après 3.5s si la vidéo a commencé à charger
+    setTimeout(() => {
+      if (!hasReadied && !this.video.error && this.video.readyState >= 2) {
+        onReady();
+      }
+    }, 3500);
 
     this.video.preload = 'auto';
     this.video.src = videoUrl;
