@@ -164,6 +164,25 @@ class NetflixAdmin {
     if (manualSyncBtn) {
       manualSyncBtn.addEventListener('click', () => this.triggerGitHubSync());
     }
+
+    const toggleTokenBtn = document.getElementById('toggleGithubTokenBtn');
+    if (toggleTokenBtn) {
+      toggleTokenBtn.addEventListener('click', () => {
+        const section = document.getElementById('githubTokenSection');
+        if (section) {
+          section.style.display = section.style.display === 'none' ? 'block' : 'none';
+          if (section.style.display === 'block') {
+            const input = document.getElementById('githubTokenInput');
+            if (input) input.focus();
+          }
+        }
+      });
+    }
+
+    const saveTokenBtn = document.getElementById('saveGithubTokenBtn');
+    if (saveTokenBtn) {
+      saveTokenBtn.addEventListener('click', () => this.saveGitHubToken());
+    }
   }
 
   // ================= FLUX DE SÉCURITÉ & CONNEXION =================
@@ -309,8 +328,13 @@ class NetflixAdmin {
         if (json.success && json.data) {
           const badge = document.getElementById('githubSyncBadge');
           const display = document.getElementById('githubLastSyncDisplay');
+          const section = document.getElementById('githubTokenSection');
           if (badge) {
-            if (json.data.status === 'synced') {
+            if (!json.data.hasToken) {
+              badge.textContent = '🔑 CLÉ REQUISE';
+              badge.style.background = '#d29922';
+              if (section) section.style.display = 'block';
+            } else if (json.data.status === 'synced') {
               badge.textContent = 'SYNCHRONISÉ';
               badge.style.background = '#238636';
             } else if (json.data.status === 'syncing' || json.data.status === 'pending') {
@@ -321,12 +345,18 @@ class NetflixAdmin {
               badge.style.background = '#da3633';
             }
           }
-          if (display && json.data.lastSyncTime) {
-            const diffMin = Math.round((Date.now() - json.data.lastSyncTime) / 60000);
-            if (diffMin <= 0) {
-              display.textContent = 'À l\'instant';
-            } else {
-              display.textContent = `Il y a ${diffMin} min`;
+          if (display) {
+            if (!json.data.hasToken) {
+              display.textContent = 'Veuillez saisir votre clé GitHub';
+              display.style.color = '#ff5252';
+            } else if (json.data.lastSyncTime) {
+              display.style.color = '#46d369';
+              const diffMin = Math.round((Date.now() - json.data.lastSyncTime) / 60000);
+              if (diffMin <= 0) {
+                display.textContent = 'À l\'instant';
+              } else {
+                display.textContent = `Il y a ${diffMin} min`;
+              }
             }
           }
         }
@@ -357,14 +387,77 @@ class NetflixAdmin {
         this.showToast('✅ Catalogue sauvegardé et sécurisé sur GitHub Cloud !');
         this.loadGitHubStatus();
       } else {
-        this.showToast('❌ Erreur lors de la synchronisation : ' + (data.message || 'Échec'));
+        this.showToast('❌ Erreur : ' + (data.message || 'Clé GitHub requise ou invalide'), true);
+        const section = document.getElementById('githubTokenSection');
+        if (section) section.style.display = 'block';
+        this.loadGitHubStatus();
       }
     } catch (e) {
-      this.showToast('❌ Erreur réseau lors de la sauvegarde');
+      this.showToast('❌ Erreur réseau lors de la sauvegarde', true);
     } finally {
       if (syncBtn) {
         syncBtn.disabled = false;
         syncBtn.textContent = '☁️ Synchroniser maintenant';
+      }
+    }
+  }
+
+  async saveGitHubToken() {
+    const input = document.getElementById('githubTokenInput');
+    const feedback = document.getElementById('githubTokenFeedback');
+    const saveBtn = document.getElementById('saveGithubTokenBtn');
+    const tokenVal = input ? input.value.trim() : '';
+    if (!tokenVal) {
+      if (feedback) {
+        feedback.style.display = 'block';
+        feedback.style.color = '#ff5252';
+        feedback.textContent = 'Veuillez saisir votre clé GitHub (ghp_...).';
+      }
+      return;
+    }
+
+    if (saveBtn) {
+      saveBtn.disabled = true;
+      saveBtn.textContent = '⏳ Vérification auprès de GitHub...';
+    }
+
+    try {
+      const res = await fetch(`${this.apiBase()}/api/admin/github/token`, {
+        method: 'POST',
+        headers: this.authHeaders({ 'Content-Type': 'application/json' }),
+        body: JSON.stringify({ token: tokenVal })
+      });
+      const data = await res.json();
+      if (res.ok && data.success) {
+        if (feedback) {
+          feedback.style.display = 'block';
+          feedback.style.color = '#46d369';
+          feedback.textContent = `✅ Clé validée et enregistrée pour ${data.user || 'votre compte'} ! Sauvegarde permanente active.`;
+        }
+        this.showToast('✅ Clé GitHub enregistrée avec succès !');
+        if (input) input.value = '';
+        setTimeout(() => {
+          const section = document.getElementById('githubTokenSection');
+          if (section) section.style.display = 'none';
+        }, 3000);
+        this.loadGitHubStatus();
+      } else {
+        if (feedback) {
+          feedback.style.display = 'block';
+          feedback.style.color = '#ff5252';
+          feedback.textContent = `❌ ${data.message || 'Clé GitHub invalide ou refusée'}`;
+        }
+      }
+    } catch (e) {
+      if (feedback) {
+        feedback.style.display = 'block';
+        feedback.style.color = '#ff5252';
+        feedback.textContent = 'Erreur réseau lors de la validation.';
+      }
+    } finally {
+      if (saveBtn) {
+        saveBtn.disabled = false;
+        saveBtn.textContent = '💾 Enregistrer la clé';
       }
     }
   }

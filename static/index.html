@@ -551,25 +551,41 @@
       </div>
 
       <!-- Sauvegarde Permanente GitHub Cloud (Zéro Perte de Données au Redéploiement) -->
-      <div class="admin-github-box" style="margin-bottom: 24px; padding: 18px 24px; background: linear-gradient(135deg, rgba(35, 134, 54, 0.15) 0%, rgba(20, 20, 20, 0.9) 100%); border: 1px solid rgba(35, 134, 54, 0.4); border-radius: 12px; display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 16px;">
-        <div style="flex: 1; min-width: 280px;">
-          <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 6px;">
-            <span style="font-size: 1.3rem;">☁️</span>
-            <span style="font-weight: 800; font-size: 1.05rem; color: #fff; letter-spacing: 0.5px;">SAUVEGARDE PERMANENTE GITHUB CLOUD</span>
-            <span id="githubSyncBadge" style="background: #238636; color: #fff; font-size: 0.72rem; font-weight: 800; padding: 2px 8px; border-radius: 4px; transition: background 0.3s ease;">SYNCHRONISÉ</span>
+      <div class="admin-github-box" style="margin-bottom: 24px; padding: 18px 24px; background: linear-gradient(135deg, rgba(35, 134, 54, 0.15) 0%, rgba(20, 20, 20, 0.9) 100%); border: 1px solid rgba(35, 134, 54, 0.4); border-radius: 12px; display: flex; flex-direction: column; gap: 14px;">
+        <div style="display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 16px;">
+          <div style="flex: 1; min-width: 280px;">
+            <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 6px;">
+              <span style="font-size: 1.3rem;">☁️</span>
+              <span style="font-weight: 800; font-size: 1.05rem; color: #fff; letter-spacing: 0.5px;">SAUVEGARDE PERMANENTE GITHUB CLOUD</span>
+              <span id="githubSyncBadge" style="background: #238636; color: #fff; font-size: 0.72rem; font-weight: 800; padding: 2px 8px; border-radius: 4px; transition: background 0.3s ease;">SYNCHRONISÉ</span>
+            </div>
+            <div style="font-size: 0.88rem; color: #ccc; line-height: 1.5;">
+              Toutes vos modifications (ajouts, modifications, suppressions de chaînes ou séries) sont automatiquement sauvegardées sur votre compte GitHub. Même en cas de redéploiement ou redémarrage de Render, aucune donnée n'est perdue.
+            </div>
+            <div style="display: flex; flex-wrap: wrap; gap: 18px; margin-top: 10px; font-size: 0.85rem; font-family: monospace;">
+              <span style="color: #bbb;">Dépôt : <strong style="color: #58a6ff;">foocushop/netflix-clone-live-tv (main)</strong></span>
+              <span style="color: #bbb;">Dernière synchro : <strong id="githubLastSyncDisplay" style="color: #46d369;">Il y a quelques instants</strong></span>
+            </div>
           </div>
-          <div style="font-size: 0.88rem; color: #ccc; line-height: 1.5;">
-            Toutes vos modifications (ajouts, modifications, suppressions de chaînes ou séries) sont automatiquement sauvegardées sur votre compte GitHub. Même en cas de redéploiement ou redémarrage de Render, aucune donnée n'est perdue.
-          </div>
-          <div style="display: flex; flex-wrap: wrap; gap: 18px; margin-top: 10px; font-size: 0.85rem; font-family: monospace;">
-            <span style="color: #bbb;">Dépôt : <strong style="color: #58a6ff;">foocushop/netflix-clone-live-tv (main)</strong></span>
-            <span style="color: #bbb;">Dernière synchro : <strong id="githubLastSyncDisplay" style="color: #46d369;">Il y a quelques instants</strong></span>
+          <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
+            <button type="button" class="btn-admin btn-admin-secondary" id="toggleGithubTokenBtn" style="padding: 8px 14px; font-size: 0.82rem; white-space: nowrap;">
+              🔑 Clé GitHub
+            </button>
+            <button type="button" class="btn-admin" id="manualGithubSyncBtn" style="padding: 8px 16px; font-size: 0.85rem; background: #238636; white-space: nowrap; cursor: pointer;">
+              ☁️ Synchroniser maintenant
+            </button>
           </div>
         </div>
-        <div style="display: flex; gap: 10px; align-items: center;">
-          <button type="button" class="btn-admin" id="manualGithubSyncBtn" style="padding: 8px 16px; font-size: 0.85rem; background: #238636; white-space: nowrap; cursor: pointer;">
-            ☁️ Synchroniser maintenant
-          </button>
+
+        <!-- Section de configuration de la clé GitHub -->
+        <div id="githubTokenSection" style="display: none; padding-top: 12px; border-top: 1px solid rgba(255,255,255,0.1);">
+          <div style="display: flex; flex-wrap: wrap; gap: 10px; align-items: center;">
+            <input type="password" id="githubTokenInput" placeholder="Coller votre nouvelle clé GitHub (ghp_...)" style="flex: 1; min-width: 260px; padding: 8px 14px; background: rgba(0,0,0,0.6); border: 1px solid #444; color: #fff; border-radius: 6px; font-size: 0.85rem;">
+            <button type="button" class="btn-admin" id="saveGithubTokenBtn" style="padding: 8px 16px; font-size: 0.85rem; background: #1f6feb; white-space: nowrap;">
+              💾 Enregistrer la clé
+            </button>
+          </div>
+          <div id="githubTokenFeedback" style="font-size: 0.82rem; margin-top: 8px; display: none;"></div>
         </div>
       </div>
 

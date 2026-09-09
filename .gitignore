@@ -2,3 +2,5 @@ target/
 *.exe  
 node_modules/ 
 xtream_streams_all.json
+.env
+data/.github_token

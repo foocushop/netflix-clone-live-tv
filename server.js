@@ -1439,8 +1439,22 @@ if (fs.existsSync(DATA_FILE)) {
 }
 
 // ================= SYNCHRONISATION PERMANENTE GITHUB CLOUD (ZERO DATA LOSS) =================
+function getGitHubToken() {
+  if (process.env.GITHUB_TOKEN && process.env.GITHUB_TOKEN.trim()) {
+    return process.env.GITHUB_TOKEN.trim();
+  }
+  const tokenPath = path.join(__dirname, 'data', '.github_token');
+  if (fs.existsSync(tokenPath)) {
+    try {
+      const t = fs.readFileSync(tokenPath, 'utf8').trim();
+      if (t) return t;
+    } catch (e) {}
+  }
+  return '';
+}
+
 const GITHUB_CONFIG = {
-  token: process.env.GITHUB_TOKEN || Buffer.from('Z2hwX2NBVE1xaUozdXA5TXRXanhGcEp1WlZKSjF0YUttdTFQZ3B3SA==', 'base64').toString('utf8'),
+  get token() { return getGitHubToken(); },
   owner: process.env.GITHUB_OWNER || 'foocushop',
   repo: process.env.GITHUB_REPO || 'netflix-clone-live-tv',
   branch: process.env.GITHUB_BRANCH || 'main'
@@ -2209,11 +2223,14 @@ const server = http.createServer((req, res) => {
 
   // Routes d'état et d'action pour la synchronisation permanente GitHub Cloud
   if (pathname === '/api/admin/github/status' && req.method === 'GET') {
+    const currentToken = getGitHubToken();
     res.writeHead(200, { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' });
     res.end(JSON.stringify({
       success: true,
       data: {
-        enabled: !!GITHUB_CONFIG.token,
+        enabled: !!currentToken,
+        hasToken: !!currentToken,
+        tokenPrefix: currentToken ? (currentToken.substring(0, 7) + '...') : null,
         status: gitHubSyncStatus,
         lastSyncTime: lastGitHubSyncTime,
         lastCommitSha: lastGitHubCommitSha,
@@ -2222,6 +2239,53 @@ const server = http.createServer((req, res) => {
         branch: GITHUB_CONFIG.branch
       }
     }));
+    return;
+  }
+
+  if (pathname === '/api/admin/github/token' && req.method === 'POST') {
+    let body = '';
+    req.on('data', chunk => body += chunk);
+    req.on('end', async () => {
+      try {
+        const payload = JSON.parse(body || '{}');
+        const newToken = (payload.token || '').trim();
+        if (!newToken) {
+          res.writeHead(400, { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' });
+          return res.end(JSON.stringify({ success: false, message: 'Clé GitHub vide' }));
+        }
+
+        // Test de validation de la clé auprès de GitHub
+        const checkRes = await fetch('https://api.github.com/user', {
+          headers: {
+            'Authorization': `token ${newToken}`,
+            'User-Agent': 'Netflix-Clone-TokenCheck'
+          }
+        });
+
+        if (!checkRes.ok) {
+          res.writeHead(400, { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' });
+          return res.end(JSON.stringify({ success: false, message: 'Clé GitHub invalide ou refusée par GitHub' }));
+        }
+
+        const userData = await checkRes.json();
+        // Sauvegarder la clé dans data/.github_token (fichier exclu de git)
+        const tokenPath = path.join(__dirname, 'data', '.github_token');
+        fs.writeFileSync(tokenPath, newToken, 'utf8');
+
+        // Lancer une première sauvegarde immédiate
+        syncFileToGitHub(DATA_FILE, 'data/catalog.json', 'chore(data): initial sync with new github token');
+
+        res.writeHead(200, { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' });
+        return res.end(JSON.stringify({
+          success: true,
+          message: `Clé GitHub validée avec succès pour le compte ${userData.login} ! Sauvegarde active.`,
+          user: userData.login
+        }));
+      } catch (err) {
+        res.writeHead(500, { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' });
+        return res.end(JSON.stringify({ success: false, message: err.message }));
+      }
+    });
     return;
   }
 
