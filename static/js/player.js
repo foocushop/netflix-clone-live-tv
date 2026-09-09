@@ -1667,43 +1667,15 @@ class NetflixPlayer {
     };
 
     this.video.addEventListener('loadeddata', onReady, { once: true });
-    this.video.addEventListener('loadedmetadata', onReady, { once: true });
     this.video.addEventListener('canplay', onReady, { once: true });
     this.video.addEventListener('playing', onReady, { once: true });
-    this.video.addEventListener('timeupdate', () => {
-      if (!hasReadied && this.video.currentTime > 0) onReady();
-    });
 
-    const onError = () => {
-      if (hasReadied) return;
-      const errCode = this.video.error ? this.video.error.code : '?';
-      const errMsg = this.video.error ? this.video.error.message : 'inconnu';
-      console.warn(`[Direct Video Error] code=${errCode}:`, errMsg);
-      // Erreur de format → tentative de recharge après 800ms (fMP4 ffmpeg pas encore prêt)
-      if (!hasReadied && this.video.error && (this.video.error.code === 3 || this.video.error.code === 4)) {
-        console.log('[Direct Video] Recharge après erreur de format...');
-        setTimeout(() => {
-          if (!hasReadied) {
-            this.video.src = videoUrl + (videoUrl.includes('?') ? '&' : '?') + '_retry=' + Date.now();
-            this.video.load();
-            this.video.play().catch(() => {});
-          }
-        }, 800);
-        return;
-      }
-      this.showStatusBanner('Erreur de lecture du flux direct.');
-      this.hideLoader();
-    };
-    this.video.addEventListener('error', onError, { once: true });
-
-    // Fallback de sécurité : masquer le loader après 8s si la vidéo a commencé à charger
-    // (le remuxage ffmpeg prend ~1-2s avant de produire les premiers octets fMP4)
+    // Fallback de sécurité : masquer le loader après 2s si le flux démarre
     setTimeout(() => {
-      if (!hasReadied && !this.video.error && this.video.readyState >= 1) {
-        console.log('[Direct Video] Safety timeout: forçage hideLoader (readyState:', this.video.readyState, ')');
+      if (!hasReadied && this.video.readyState >= 1) {
         onReady();
       }
-    }, 8000);
+    }, 2000);
 
     this.video.preload = 'auto';
     this.video.src = videoUrl;
@@ -1787,24 +1759,46 @@ class NetflixPlayer {
       }
     }, 2500);
 
+    // Protection Anti-Boucle / Anti-Rollback Xtream :
+    // Empêche le lecteur de revenir en arrière de 5-10 secondes lors des resets PTS/PCR
+    this.lastLiveMaxTime = 0;
+    if (this._antiLoopHandler) {
+      this.video.removeEventListener('timeupdate', this._antiLoopHandler);
+    }
+    this._antiLoopHandler = () => {
+      const isChannel = (this.currentMovie?.media_type === 'channel' || this.currentMovie?.is_live);
+      if (isChannel && !this.video.paused && !this.video.seeking) {
+        const cur = this.video.currentTime;
+        if (this.lastLiveMaxTime > 6 && cur < (this.lastLiveMaxTime - 2.0)) {
+          console.warn(`[Anti-Loop Xtream] Décalage arrière détecté (${cur.toFixed(1)}s < ${this.lastLiveMaxTime.toFixed(1)}s). Repositionnement direct actif.`);
+          this.video.currentTime = this.lastLiveMaxTime + 0.2;
+          return;
+        }
+        if (cur > this.lastLiveMaxTime) {
+          this.lastLiveMaxTime = cur;
+        }
+      }
+    };
+    this.video.addEventListener('timeupdate', this._antiLoopHandler);
+
     if (window.Hls && Hls.isSupported()) {
       const isChannel = (this.currentMovie?.media_type === 'channel' || this.currentMovie?.is_live);
       const isXtream = streamUrl.includes('/api/stream/xtream');
       const hls = new Hls({
         enableWorker: true,
         lowLatencyMode: false,
-        liveSyncDurationCount: isXtream ? 3 : (isChannel ? 3 : 3),
-        liveMaxLatencyDurationCount: 10,
+        liveSyncDurationCount: isXtream ? 4 : (isChannel ? 4 : 3), // Marge sécurisée de 4 segments anti-coupure et anti-rollback
+        liveMaxLatencyDurationCount: isXtream ? 10 : (isChannel ? 12 : 10), // Tolérance large pour éliminer les boucles de recalage arrière
         liveDurationInfinity: isChannel,
-        startLevel: -1,
-        capLevelToPlayerSize: false,
-        initialLiveManifestSize: 1,
-        startFragPrefetch: true,
-        backBufferLength: 15,
-        maxBufferLength: 30,
-        maxMaxBufferLength: 60,
-        maxBufferSize: 60 * 1024 * 1024,
-        highBufferWatchdogPeriod: 2,
+        startLevel: -1, // Démarrage adaptatif automatique
+        capLevelToPlayerSize: false, // Pleine qualité écran (pas de restriction TV)
+        initialLiveManifestSize: 1, // Démarre dès le premier manifest
+        startFragPrefetch: true, // Précharge les fragments suivants en tâche de fond (chargement turbo)
+        backBufferLength: 30, // 30s en arrière conservées
+        maxBufferLength: isChannel ? 30 : 60, // 30s à 60s d'avance pour un tampon large et stable (style YouTube)
+        maxMaxBufferLength: isChannel ? 60 : 120, // Jusqu'à 120s de préchargement max
+        maxBufferSize: 60 * 1024 * 1024, // 60 Mo alloués au tampon vidéo (fini la limite 15 Mo de l'APK !)
+        highBufferWatchdogPeriod: 3,
         nudgeOffset: 0.1,
         nudgeMaxRetry: 5,
         maxFragLookUpTolerance: 0.25,
@@ -1859,17 +1853,15 @@ class NetflixPlayer {
       });
 
       hls.on(Hls.Events.ERROR, (event, data) => {
-        if (!data.fatal) {
-          if (data.details === 'bufferStalledError' && isChannel) {
-            const livePos = hls.liveSyncPosition;
-            if (livePos && isFinite(livePos) && (this.video.currentTime < livePos - 8)) {
-              console.log('[HLS Live Sync] Recalage sur le direct suite à pause/décalage');
-              this.video.currentTime = livePos;
-              hls.startLoad();
-            }
-          }
+        // Détection et saut automatique par-dessus les micro-trous de diffusion (anti-saccade & anti-coupure)
+        if (data.details === Hls.ErrorDetails.BUFFER_STALLED_ERROR || data.details === Hls.ErrorDetails.BUFFER_SEEK_OVER_HOLE || data.details === Hls.ErrorDetails.BUFFER_NUDGE_ON_STALL) {
+          console.warn('[HLS Watchdog] Micro-trou détecté, saut préventif anti-saccade');
+          this.video.currentTime += 0.2;
+          this.video.play().catch(() => {});
           return;
         }
+
+        if (!data.fatal) return;
 
         console.warn('[HLS Fatal Error]', data.type, data.details);
         switch (data.type) {

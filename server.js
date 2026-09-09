@@ -7,14 +7,6 @@ const path = require('path');
 const url = require('url');
 const querystring = require('querystring');
 const zlib = require('zlib');
-const { spawn } = require('child_process');
-
-let ffmpegPath = null;
-try {
-  ffmpegPath = require('ffmpeg-static');
-} catch (e) {
-  console.warn('[FFmpeg] ffmpeg-static non disponible:', e.message);
-}
 
 // ================= ROBUSTESSE & GESTION DES DÉCONNEXIONS RÉSEAU =================
 // Protection vitale anti-crash Render / Node.js :
@@ -3436,7 +3428,6 @@ const server = http.createServer((req, res) => {
       return res.end('Paramètre episode_id manquant');
     }
 
-    const isRaw = parsedUrl.query.raw === '1' || parsedUrl.query.format === 'raw';
     const cacheKey = `${episodeId}_${ext}`;
     const originUrl = `http://${XTREAM_CONFIG.host}:${XTREAM_CONFIG.port}/series/${XTREAM_CONFIG.username}/${XTREAM_CONFIG.password}/${episodeId}.${ext}`;
     const cachedEdge = xtreamSeriesEdgeCache.get(cacheKey);
@@ -3534,76 +3525,7 @@ const server = http.createServer((req, res) => {
           }
         });
 
-        // ── Détection automatique MKV/Matroska → Remuxage fMP4 temps réel ──
-        // Le serveur Xtream envoie les épisodes en MKV (H.264 + AAC), mais Chrome
-        // ne peut PAS décoder du MKV brut. On remuxe à la volée en fMP4 sans recoder
-        // (-c copy = 0% CPU, débit identique). Fallback proxy direct si ffmpeg absent.
-        const upstreamCt = (upstreamRes.headers['content-type'] || '').toLowerCase();
-        const isMkvContent = upstreamCt.includes('matroska') || upstreamCt.includes('octet-stream') || ext === 'mkv';
-        const needsRemux = isMkvContent && !isRaw;
-
-        if (needsRemux && ffmpegPath) {
-          console.log(`[Xtream Series fMP4] Remuxage automatique MKV→fMP4 pour épisode ${episodeId} (${upstreamCt || ext})`);
-
-          // Ne pas transférer le Range à ffmpeg — ffmpeg lit depuis le début et transcrit
-          const ffmpegArgs = [
-            '-loglevel', 'error',
-            '-i', 'pipe:0',
-            '-c:v', 'copy',
-            '-c:a', 'aac',
-            '-b:a', '128k',
-            '-ac', '2',
-            '-movflags', 'frag_keyframe+empty_moov+default_base_moof',
-            '-f', 'mp4',
-            'pipe:1'
-          ];
-
-          const ffmpeg = spawn(ffmpegPath, ffmpegArgs, {
-            stdio: ['pipe', 'pipe', 'pipe']
-          });
-
-          if (!res.headersSent) {
-            res.writeHead(200, {
-              'Content-Type': 'video/mp4',
-              'Accept-Ranges': 'none',
-              'Access-Control-Allow-Origin': '*',
-              'Access-Control-Allow-Headers': '*',
-              'Cache-Control': 'no-cache, no-store, must-revalidate',
-              'Connection': 'keep-alive'
-            });
-          }
-
-          upstreamRes.pipe(ffmpeg.stdin);
-          ffmpeg.stdout.pipe(res);
-
-          ffmpeg.stderr.on('data', (d) => {
-            const msg = d.toString();
-            if (msg.includes('Error') || msg.includes('Invalid')) {
-              console.warn('[FFmpeg Series Remux Error]:', msg.trim());
-            }
-          });
-
-          ffmpeg.on('error', (err) => {
-            console.warn('[FFmpeg Process Error]:', err.message);
-            try { ffmpeg.kill('SIGKILL'); } catch (e) {}
-          });
-
-          const cleanupRemux = () => {
-            try { upstreamRes.destroy(); } catch (e) {}
-            try { ffmpeg.stdin.destroy(); } catch (e) {}
-            try { ffmpeg.kill('SIGKILL'); } catch (e) {}
-          };
-
-          req.once('close', cleanupRemux);
-          res.once('close', cleanupRemux);
-          ffmpeg.once('close', () => {
-            req.removeListener('close', cleanupRemux);
-            res.removeListener('close', cleanupRemux);
-          });
-          return;
-        }
-
-        // Proxy direct HTTP Range avec support complet 206 Partial Content (fallback si ffmpeg absent ou ext=mp4)
+        // Proxy direct HTTP Range avec support complet 206 Partial Content (comme dans le deploy 4cdcad5)
         const outHeaders = {
           'Access-Control-Allow-Origin': '*',
           'Access-Control-Allow-Headers': '*',
