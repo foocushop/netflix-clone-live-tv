@@ -3902,10 +3902,15 @@ const server = http.createServer((req, res) => {
       return;
     }
 
+    // Cache-Control : JS/CSS no-cache (éviter CDN stale), images 1h
+    const cacheHeader = (ext === '.js' || ext === '.css' || ext === '.html')
+      ? 'no-cache, no-store, must-revalidate'
+      : 'public, max-age=3600';
     res.writeHead(200, {
       'Content-Length': total,
       'Content-Type': contentType,
-      'Accept-Ranges': 'bytes'
+      'Accept-Ranges': 'bytes',
+      'Cache-Control': cacheHeader
     });
     fs.createReadStream(filePath).pipe(res);
     return;
