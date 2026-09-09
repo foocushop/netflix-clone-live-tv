@@ -1958,9 +1958,6 @@ const server = http.createServer((req, res) => {
         const episodeId = fileWithExt.replace(/\.[a-zA-Z0-9]+$/, '');
         parsedUrl.query.episode_id = episodeId;
         parsedUrl.query.ext = ext;
-        if (ext === 'mkv') {
-          parsedUrl.query.raw = '1';
-        }
         pathname = '/api/stream/xtream-series';
       } else if (type === 'movie') {
         const movieId = fileWithExt.replace(/\.[a-zA-Z0-9]+$/, '');
@@ -3537,9 +3534,8 @@ const server = http.createServer((req, res) => {
           }
         });
 
-        // Remuxage fMP4 temps réel sans réencodage (-c copy, 0% CPU, 0ms latence)
-        // Permet une compatibilité 100% universelle avec les navigateurs web (Chrome, Edge, Safari, Firefox)
-        if (!isRaw && ffmpegPath) {
+        // Remuxage fMP4 temps réel optionnel si explicitement demandé (?remux=1)
+        if (parsedUrl.query.remux === '1' && ffmpegPath) {
           const ffmpegArgs = [
             '-loglevel', 'error',
             '-i', 'pipe:0',
@@ -3595,6 +3591,7 @@ const server = http.createServer((req, res) => {
           return;
         }
 
+        // Proxy direct HTTP Range avec support complet 206 Partial Content (comme avant)
         const outHeaders = {
           'Access-Control-Allow-Origin': '*',
           'Access-Control-Allow-Headers': '*',
@@ -3605,10 +3602,10 @@ const server = http.createServer((req, res) => {
         };
 
         const ct = (upstreamRes.headers['content-type'] || '').toLowerCase();
-        if (ct && !ct.includes('octet-stream')) {
+        if (ct && !ct.includes('matroska') && !ct.includes('octet-stream')) {
           outHeaders['Content-Type'] = upstreamRes.headers['content-type'];
         } else {
-          outHeaders['Content-Type'] = (ext === 'mkv') ? 'video/x-matroska' : 'video/mp4';
+          outHeaders['Content-Type'] = 'video/mp4';
         }
 
         if (upstreamRes.headers['content-length']) {

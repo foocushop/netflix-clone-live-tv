@@ -404,11 +404,20 @@ class NetflixPlayer {
   }
 
   initScrubberEvents() {
+    const getEffectiveDuration = () => {
+      let total = this.video.duration;
+      if (!total || isNaN(total) || total === Infinity) {
+        total = this.currentEpisodeDuration || 0;
+      }
+      return (total && isFinite(total) && total > 0) ? total : 0;
+    };
+
     const onScrub = (e) => {
-      if (!this.video.duration) return;
+      const duration = getEffectiveDuration();
+      if (!duration) return;
       const rect = this.scrubberContainer.getBoundingClientRect();
       const pos = Math.max(0, Math.min(1, (e.clientX - rect.left) / rect.width));
-      this.video.currentTime = pos * this.video.duration;
+      this.video.currentTime = pos * duration;
       this.updateScrubberProgress(pos * 100);
     };
 
@@ -438,10 +447,11 @@ class NetflixPlayer {
 
     // Tooltip au survol
     const updateTooltip = (e) => {
-      if (!this.video.duration) return;
+      const duration = getEffectiveDuration();
+      if (!duration) return;
       const rect = this.scrubberContainer.getBoundingClientRect();
       const pos = Math.max(0, Math.min(1, (e.clientX - rect.left) / rect.width));
-      const targetTime = pos * this.video.duration;
+      const targetTime = pos * duration;
 
       this.scrubberTooltip.textContent = this.formatTime(targetTime);
       this.scrubberTooltip.style.left = `${pos * 100}%`;
@@ -467,18 +477,26 @@ class NetflixPlayer {
         return;
       }
       const current = this.video.currentTime || 0;
-      const total = this.video.duration || 0;
+      let total = this.video.duration;
+      if (!total || isNaN(total) || total === Infinity) {
+        total = this.currentEpisodeDuration || 0;
+      }
 
       this.ctrlCurrentTime.textContent = this.formatTime(current);
 
-      if (total > 0 && !isNaN(total) && total !== Infinity) {
+      if (total > 0 && isFinite(total)) {
+        this.ctrlTotalDuration.textContent = this.formatTime(total);
         const percent = (current / total) * 100;
         this.updateScrubberProgress(percent);
       }
     });
 
     this.video.addEventListener('progress', () => {
-      if (!this.video.duration || !this.video.buffered.length) return;
+      let total = this.video.duration;
+      if (!total || isNaN(total) || total === Infinity) {
+        total = this.currentEpisodeDuration || 0;
+      }
+      if (!total || !this.video.buffered.length) return;
       try {
         const cur = this.video.currentTime || 0;
         let bufferedEnd = 0;
@@ -491,14 +509,26 @@ class NetflixPlayer {
         if (!bufferedEnd && this.video.buffered.length > 0) {
           bufferedEnd = this.video.buffered.end(this.video.buffered.length - 1);
         }
-        const percent = (bufferedEnd / this.video.duration) * 100;
+        const percent = (bufferedEnd / total) * 100;
         this.scrubberBuffered.style.width = `${Math.min(100, percent)}%`;
       } catch (e) {}
     });
 
     this.video.addEventListener('loadedmetadata', () => {
-      const total = this.video.duration || 0;
-      this.ctrlTotalDuration.textContent = this.formatTime(total);
+      const isChannel = (this.currentMovie?.media_type === 'channel' || this.currentMovie?.is_live);
+      if (isChannel) {
+        this.ctrlCurrentTime.textContent = 'LIVE';
+        this.ctrlTotalDuration.textContent = 'DIRECT';
+        this.updateScrubberProgress(100);
+        return;
+      }
+      let total = this.video.duration;
+      if (!total || isNaN(total) || total === Infinity) {
+        total = this.currentEpisodeDuration || 0;
+      }
+      if (total > 0 && isFinite(total)) {
+        this.ctrlTotalDuration.textContent = this.formatTime(total);
+      }
 
       // Reprendre à la position sauvegardée si changement de serveur
       if (this.savedPlaybackTime > 0 && this.savedPlaybackTime < total) {
@@ -781,8 +811,12 @@ class NetflixPlayer {
   }
 
   seekRelative(seconds) {
-    if (!this.video.duration) return;
-    const newTime = Math.max(0, Math.min(this.video.duration, this.video.currentTime + seconds));
+    let total = this.video.duration;
+    if (!total || isNaN(total) || total === Infinity) {
+      total = this.currentEpisodeDuration || 0;
+    }
+    if (!total || !isFinite(total)) return;
+    const newTime = Math.max(0, Math.min(total, this.video.currentTime + seconds));
     this.video.currentTime = newTime;
     this.triggerCenterRipple(seconds > 0 ? `+${seconds}s` : `${seconds}s`);
   }
@@ -944,8 +978,35 @@ class NetflixPlayer {
     this.scrubberThumb.style.left = `${clamped}%`;
   }
 
+  parseDurationToSeconds(dur) {
+    if (!dur) return 0;
+    if (typeof dur === 'number') return (isFinite(dur) && dur > 0) ? dur : 0;
+    const str = String(dur).trim();
+    if (/^\d+$/.test(str)) {
+      const n = parseInt(str, 10);
+      return (n > 0 && n < 86400) ? n : 0;
+    }
+    if (str.includes(':')) {
+      const parts = str.split(':').map(p => parseInt(p, 10) || 0);
+      if (parts.length === 3) {
+        return parts[0] * 3600 + parts[1] * 60 + parts[2];
+      }
+      if (parts.length === 2) {
+        return parts[0] * 60 + parts[1];
+      }
+    }
+    let totalSec = 0;
+    const hMatch = str.match(/(\d+)\s*h/i);
+    const mMatch = str.match(/(\d+)\s*m/i);
+    const sMatch = str.match(/(\d+)\s*s/i);
+    if (hMatch) totalSec += parseInt(hMatch[1], 10) * 3600;
+    if (mMatch) totalSec += parseInt(mMatch[1], 10) * 60;
+    if (sMatch) totalSec += parseInt(sMatch[1], 10);
+    return totalSec;
+  }
+
   formatTime(seconds) {
-    if (isNaN(seconds) || seconds < 0) return '00:00';
+    if (isNaN(seconds) || seconds < 0 || !isFinite(seconds)) return '00:00';
     const s = Math.floor(seconds % 60);
     const m = Math.floor((seconds / 60) % 60);
     const h = Math.floor(seconds / 3600);
@@ -960,6 +1021,7 @@ class NetflixPlayer {
   // ================= OUVERTURE & BASCULEMENT DE SERVEUR =================
   open(movie, initialServer = 1, season = null, episode = null) {
     this.currentMovie = movie;
+    this.currentEpisodeDuration = 0;
 
     if (this.video) {
       try {
@@ -1452,6 +1514,10 @@ class NetflixPlayer {
       if (epObj && epStreamUrl) {
         this.currentSeason = parseInt(sObj.season_number);
         this.currentEpisode = parseInt(epObj.episode_number);
+        this.currentEpisodeDuration = this.parseDurationToSeconds(epObj.duration || epObj.info?.duration || epObj.duration_secs || this.currentMovie.duration);
+        if (this.currentEpisodeDuration > 0 && this.ctrlTotalDuration) {
+          this.ctrlTotalDuration.textContent = this.formatTime(this.currentEpisodeDuration);
+        }
         try {
           const showKey = 'netflix_ep_' + (this.currentMovie.id || this.currentMovie.tmdb_id || this.currentMovie.series_id);
           localStorage.setItem(showKey, JSON.stringify({ season: this.currentSeason, episode: this.currentEpisode }));
@@ -1682,14 +1748,28 @@ class NetflixPlayer {
       this.bottomControls.classList.remove('iframe-mode');
     }
 
+    let hasReadied = false;
     const onReady = () => {
+      if (hasReadied) return;
+      hasReadied = true;
       this.setStep(4, 'done', `4. Flux connecté • Lecture active`);
       setTimeout(() => this.hideLoader(), 150);
     };
 
     this.video.addEventListener('loadeddata', onReady, { once: true });
+    this.video.addEventListener('loadedmetadata', onReady, { once: true });
     this.video.addEventListener('canplay', onReady, { once: true });
     this.video.addEventListener('playing', onReady, { once: true });
+    this.video.addEventListener('timeupdate', () => {
+      if (!hasReadied && this.video.currentTime > 0) onReady();
+    });
+
+    // Fallback de sécurité : masquer le loader après 2.5s maximum si le flux est en cours
+    setTimeout(() => {
+      if (!hasReadied) {
+        onReady();
+      }
+    }, 2500);
 
     if (window.Hls && Hls.isSupported()) {
       const isChannel = (this.currentMovie?.media_type === 'channel' || this.currentMovie?.is_live);
@@ -1697,25 +1777,25 @@ class NetflixPlayer {
       const hls = new Hls({
         enableWorker: true,
         lowLatencyMode: false,
-        liveSyncDurationCount: isChannel ? 2 : 2, // Démarrage immédiat en 1-2s dès le premier fragment disponible (style VLC)
-        liveMaxLatencyDurationCount: 5, // Recalage rapide si dérive
+        liveSyncDurationCount: isXtream ? 3 : (isChannel ? 3 : 3),
+        liveMaxLatencyDurationCount: 10,
         liveDurationInfinity: isChannel,
-        startLevel: -1, // Démarrage adaptatif automatique
-        capLevelToPlayerSize: true, // Optimisation Smart TV : adapter la résolution à l'écran
-        initialLiveManifestSize: 1, // Démarre dès le premier manifest
-        startFragPrefetch: true, // Précharge le fragment suivant en arrière-plan
-        backBufferLength: 5, // Ne conserve que 5s en arrière pour préserver la RAM TV
-        maxBufferLength: isChannel ? 12 : 25, // Tampon stable sans surcharger la mémoire
-        maxMaxBufferLength: isChannel ? 18 : 35,
-        maxBufferSize: 15 * 1024 * 1024, // 15 Mo alloués au tampon vidéo (idéal pour Android TV & Smart TV)
+        startLevel: -1,
+        capLevelToPlayerSize: false,
+        initialLiveManifestSize: 1,
+        startFragPrefetch: true,
+        backBufferLength: 15,
+        maxBufferLength: 30,
+        maxMaxBufferLength: 60,
+        maxBufferSize: 60 * 1024 * 1024,
         highBufferWatchdogPeriod: 2,
         nudgeOffset: 0.1,
         nudgeMaxRetry: 5,
         maxFragLookUpTolerance: 0.25,
-        fragLoadingTimeOut: 12000,
-        manifestLoadingTimeOut: 10000,
-        levelLoadingTimeOut: 10000,
-        fragLoadingMaxRetry: 3,
+        fragLoadingTimeOut: 20000,
+        manifestLoadingTimeOut: 15000,
+        levelLoadingTimeOut: 15000,
+        fragLoadingMaxRetry: 4,
         fragLoadingRetryDelay: 500
       });
       this.hls = hls;
@@ -1724,22 +1804,29 @@ class NetflixPlayer {
       hls.attachMedia(this.video);
 
       hls.on(Hls.Events.MANIFEST_PARSED, () => {
+        onReady();
         if (hls.levels && hls.levels.length > 0) {
           this.updateQualityMenuOptions();
           if (this.currentQuality === -1) {
-            // Auto ABR : laisser HLS s'adapter fluidement à la bande passante sans gel
             hls.currentLevel = -1;
           } else {
             this.applyQualityLevel();
           }
         }
 
-        this.video.play().catch(err => {
-          console.warn('[Player] Autoplay avec son restreint par le navigateur, démarrage en muet :', err.message);
-          this.video.muted = true;
-          this.syncVolumeUI();
-          this.video.play().catch(() => {});
-        });
+        const playPromise = this.video.play();
+        if (playPromise !== undefined) {
+          playPromise.catch(err => {
+            console.warn('[Player] Autoplay avec son restreint par le navigateur, démarrage en muet :', err.message);
+            this.video.muted = true;
+            this.syncVolumeUI();
+            this.video.play().catch(() => {});
+          });
+        }
+      });
+
+      hls.on(Hls.Events.FRAG_BUFFERED, () => {
+        onReady();
       });
 
       hls.on(Hls.Events.LEVEL_SWITCHED, (event, data) => {
@@ -1785,24 +1872,30 @@ class NetflixPlayer {
               hls.destroy();
             } catch(e) {}
             this.hls = null;
-            this.showStatusBanner(`Erreur de segment sur Serveur ${this.currentServer}. Basculement...`);
-            setTimeout(() => {
-              const isXtream = (this.currentMovie?.is_xtream || this.currentMovie?.stream_url?.includes('/api/stream/xtream'));
-              if (isXtream) {
-                this.loadStream();
-                return;
-              }
-              const isChannel = (this.currentMovie?.media_type === 'channel' || this.currentMovie?.is_live);
-              const maxSrv = isChannel ? 8 : 5;
-              const next = (this.currentServer % maxSrv) + 1;
-              this.switchServer(next);
-            }, 1200);
+            const isChannel = (this.currentMovie?.media_type === 'channel' || this.currentMovie?.is_live);
+            const isXtream = (this.currentMovie?.is_xtream || this.currentMovie?.stream_url?.includes('/api/stream/xtream'));
+            if (!isXtream && isChannel) {
+              this.showStatusBanner(`Erreur de segment sur Serveur ${this.currentServer}. Basculement...`);
+              setTimeout(() => {
+                const maxSrv = 8;
+                const next = (this.currentServer % maxSrv) + 1;
+                this.switchServer(next);
+              }, 1200);
+            } else {
+              this.showStatusBanner(`Flux direct temporairement instable. Reconnexion...`);
+              setTimeout(() => {
+                if (this.video && this.video.paused) {
+                  this.video.play().catch(() => {});
+                }
+              }, 1500);
+            }
             break;
         }
       });
     } else if (this.video.canPlayType('application/vnd.apple.mpegurl')) {
       this.video.src = streamUrl;
       this.video.onloadedmetadata = () => {
+        onReady();
         this.video.play().catch(() => {
           this.video.muted = true;
           this.syncVolumeUI();
