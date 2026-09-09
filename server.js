@@ -6,6 +6,7 @@ const fs = require('fs');
 const path = require('path');
 const url = require('url');
 const querystring = require('querystring');
+const zlib = require('zlib');
 
 // ================= ROBUSTESSE & GESTION DES DÉCONNEXIONS RÉSEAU =================
 // Protection vitale anti-crash Render / Node.js :
@@ -1434,6 +1435,7 @@ if (fs.existsSync(DATA_FILE)) {
   } catch (e) {}
 } else {
   fs.writeFileSync(DATA_FILE, JSON.stringify(catalog, null, 2));
+  invalidateCatalogCache();
 }
 
 function saveCatalog() {
@@ -1441,6 +1443,57 @@ function saveCatalog() {
 }
 
 const startTime = Date.now();
+
+
+// ================= HAUTE PERFORMANCE & COMPRESSION GZIP (Fort Trafic) =================
+function sendResponse(req, res, statusCode, contentType, bodyData, extraHeaders = {}, cacheSeconds = 300) {
+  const acceptEncoding = (req.headers['accept-encoding'] || '').toLowerCase();
+  const rawBuffer = Buffer.isBuffer(bodyData) ? bodyData : Buffer.from(typeof bodyData === 'string' ? bodyData : JSON.stringify(bodyData), 'utf8');
+
+  // Calcul ETag rapide
+  const etag = '"' + rawBuffer.length.toString(16) + '-' + (rawBuffer[0] || 0).toString(16) + '"';
+  if (req.headers['if-none-match'] === etag) {
+    res.writeHead(304, { 'ETag': etag, 'Cache-Control': `public, max-age=${cacheSeconds}, stale-while-revalidate=86400` });
+    return res.end();
+  }
+
+  const headers = Object.assign({
+    'Content-Type': contentType,
+    'ETag': etag,
+    'Access-Control-Allow-Origin': '*',
+    'Access-Control-Allow-Headers': '*',
+    'Vary': 'Accept-Encoding'
+  }, extraHeaders);
+
+  if (cacheSeconds > 0) {
+    headers['Cache-Control'] = `public, max-age=${cacheSeconds}, stale-while-revalidate=86400`;
+  }
+
+  if (acceptEncoding.includes('gzip')) {
+    headers['Content-Encoding'] = 'gzip';
+    const gzipped = zlib.gzipSync(rawBuffer);
+    headers['Content-Length'] = gzipped.length;
+    res.writeHead(statusCode, headers);
+    res.end(gzipped);
+  } else {
+    headers['Content-Length'] = rawBuffer.length;
+    res.writeHead(statusCode, headers);
+    res.end(rawBuffer);
+  }
+}
+
+// Caches pré-compressés en mémoire (0ms, 0 CPU en production)
+let cachedCatalogBuffer = null;
+let cachedCatalogGzip = null;
+let cachedXtreamChannelsPayload = null;
+let cachedXtreamChannelsGzip = null;
+let cachedXtreamTelePayload = null;
+let cachedXtreamTeleGzip = null;
+
+function invalidateCatalogCache() {
+  cachedCatalogBuffer = null;
+  cachedCatalogGzip = null;
+}
 
 const mimeTypes = {
   '.html': 'text/html',
@@ -1470,20 +1523,43 @@ const server = http.createServer((req, res) => {
 
   // ================= API REST =================
   if (pathname === '/api/catalog' && req.method === 'GET') {
-    const hero = catalog.movies.find(m => m.is_hero) || catalog.movies[0];
-    const rows = catalog.categories.map(cat => {
-      const catMovies = catalog.movies.filter(m =>
-        m.categories.some(c =>
-          c.toLowerCase().includes(cat.name.toLowerCase()) ||
-          cat.name.toLowerCase().includes(c.toLowerCase()) ||
-          c.toLowerCase().includes(cat.slug.toLowerCase())
-        )
-      );
-      return { category: cat, movies: catMovies };
-    }).filter(r => r.movies.length > 0);
+    if (!cachedCatalogBuffer) {
+      const hero = catalog.movies.find(m => m.is_hero) || catalog.movies[0];
+      const rows = catalog.categories.map(cat => {
+        const catMovies = catalog.movies.filter(m =>
+          m.categories.some(c =>
+            c.toLowerCase().includes(cat.name.toLowerCase()) ||
+            cat.name.toLowerCase().includes(c.toLowerCase()) ||
+            c.toLowerCase().includes(cat.slug.toLowerCase())
+          )
+        );
+        return { category: cat, movies: catMovies };
+      }).filter(r => r.movies.length > 0);
 
-    res.writeHead(200, { 'Content-Type': 'application/json' });
-    res.end(JSON.stringify({ success: true, data: { hero, rows } }));
+      const jsonStr = JSON.stringify({ success: true, data: { hero, rows } });
+      cachedCatalogBuffer = Buffer.from(jsonStr, 'utf8');
+      cachedCatalogGzip = zlib.gzipSync(cachedCatalogBuffer);
+    }
+
+    const acceptEncoding = (req.headers['accept-encoding'] || '').toLowerCase();
+    if (acceptEncoding.includes('gzip')) {
+      res.writeHead(200, {
+        'Content-Type': 'application/json',
+        'Content-Encoding': 'gzip',
+        'Content-Length': cachedCatalogGzip.length,
+        'Cache-Control': 'public, max-age=120, stale-while-revalidate=86400',
+        'Access-Control-Allow-Origin': '*'
+      });
+      res.end(cachedCatalogGzip);
+    } else {
+      res.writeHead(200, {
+        'Content-Type': 'application/json',
+        'Content-Length': cachedCatalogBuffer.length,
+        'Cache-Control': 'public, max-age=120, stale-while-revalidate=86400',
+        'Access-Control-Allow-Origin': '*'
+      });
+      res.end(cachedCatalogBuffer);
+    }
     return;
   }
 
@@ -1506,16 +1582,93 @@ const server = http.createServer((req, res) => {
     return;
   }
 
+  // ================= ROUTE RECHERCHE GLOBALE MULTI-CATALOGUES (/api/search) =================
+  // Recherche instantanée sur les 1 702 médias de la plateforme (Films, Séries, Télé-Réalités, Chaînes Live)
   if (pathname === '/api/search' && req.method === 'GET') {
-    const q = (parsedUrl.query.q || '').toLowerCase();
-    const results = catalog.movies.filter(m =>
-      m.title.toLowerCase().includes(q) ||
-      m.overview.toLowerCase().includes(q) ||
-      m.categories.some(c => c.toLowerCase().includes(q))
-    );
-    res.writeHead(200, { 'Content-Type': 'application/json' });
-    res.end(JSON.stringify({ success: true, data: results }));
-    return;
+    const rawQ = (parsedUrl.query.q || '').toString().toLowerCase().trim();
+    if (!rawQ) {
+      return sendResponse(req, res, 200, 'application/json', JSON.stringify({ success: true, data: [] }), {}, 60);
+    }
+
+    const terms = rawQ.split(/\s+/).filter(t => t.length > 0);
+    const results = [];
+    const seenTitles = new Set();
+
+    // 1. Recherche dans catalog.movies (Films & Séries Netflix + Top Titres)
+    for (const m of catalog.movies) {
+      const target = `${m.title} ${m.original_title || ''} ${m.overview || ''} ${(m.categories || []).join(' ')} ${(m.cast || []).join(' ')}`.toLowerCase();
+      if (terms.every(t => target.includes(t))) {
+        results.push(m);
+        seenTitles.add(m.title.toLowerCase());
+      }
+    }
+
+    // 2. Recherche dans XTREAM_TELEREALITE_CATALOG (221 Séries de Télé-Réalité)
+    for (const show of XTREAM_TELEREALITE_CATALOG) {
+      const showTitleLower = show.name.toLowerCase();
+      if (seenTitles.has(showTitleLower)) continue;
+      const target = `${show.name} ${show.raw_name || ''} ${show.plot || ''} ${show.genre || ''} ${show.cast || ''} ${show.year || ''}`.toLowerCase();
+      if (terms.every(t => target.includes(t))) {
+        results.push({
+          id: `xtream_series_${show.series_id}`,
+          title: show.name,
+          original_title: show.raw_name || show.name,
+          overview: show.plot || 'Émission authentique de Télé-Réalité en streaming HD.',
+          media_type: 'series',
+          poster_url: show.cover || 'assets/hero/live-tv-banner.webp',
+          backdrop_url: show.backdrop || show.cover || 'assets/hero/live-tv-banner.webp',
+          video_url: `/api/stream/xtream-series?series_id=${show.series_id}`,
+          categories: ['Télé-Réalité', 'Series Tendances'],
+          release_year: show.year || 2025,
+          match_score: Math.round(parseFloat(show.rating || '8.5') * 10) || 85,
+          age_rating: '12+',
+          duration: 'Saisons intégrales',
+          cast: show.cast ? show.cast.split(', ') : ['Télé-Réalité'],
+          director: 'Production Xtream',
+          quality_badges: ['1080p FHD Natif', 'Saisons Complètes', '💎 Xtream VIP'],
+          is_hero: false,
+          is_xtream_series: true,
+          series_id: show.series_id
+        });
+        seenTitles.add(showTitleLower);
+        if (results.length >= 60) break;
+      }
+    }
+
+    // 3. Recherche dans XTREAM_FR_CATALOG (1 268 Chaînes Françaises Direct)
+    if (results.length < 60) {
+      for (const ch of XTREAM_FR_CATALOG) {
+        const chTitleLower = ch.name.toLowerCase();
+        if (seenTitles.has(chTitleLower)) continue;
+        const target = `${ch.name} ${ch.raw_name || ''} ${ch.category_name || ''} ${ch.quality_badge || ''}`.toLowerCase();
+        if (terms.every(t => target.includes(t))) {
+          results.push({
+            id: `xtream_${ch.stream_id}`,
+            title: ch.name,
+            original_title: ch.raw_name || ch.name,
+            overview: `Chaîne de télévision française en direct (${ch.category_name}). Qualité ${ch.quality_badge}.`,
+            media_type: 'channel',
+            poster_url: ch.icon || 'assets/hero/live-tv-banner.webp',
+            backdrop_url: ch.icon || 'assets/hero/live-tv-banner.webp',
+            video_url: `/api/stream/xtream?stream_id=${ch.stream_id}`,
+            categories: ['Chaînes TV', 'Xtream VIP', ch.category_name],
+            release_year: 2026,
+            match_score: 99,
+            age_rating: 'Tous publics',
+            duration: 'En direct',
+            quality_badges: ['💎 Xtream VIP', ch.quality_badge, 'Anti-Saccades'],
+            is_live: true,
+            is_xtream: true,
+            stream_id: ch.stream_id,
+            player_type: 'direct_hls'
+          });
+          seenTitles.add(chTitleLower);
+          if (results.length >= 60) break;
+        }
+      }
+    }
+
+    return sendResponse(req, res, 200, 'application/json', JSON.stringify({ success: true, count: results.length, data: results }), {}, 180);
   }
 
   if (pathname === '/api/admin/stats' && req.method === 'GET') {
@@ -2984,9 +3137,12 @@ const server = http.createServer((req, res) => {
     }
   }
 
-  // ================= FICHIERS STATIQUES & STREAMING RANGE =================
+  // ================= FICHIERS STATIQUES, SPA ROUTING & COMPRESSION =================
+  const SPA_ROUTES = ['/series', '/films', '/telerealite', '/chaines', '/xtream', '/nouveautes', '/ma-liste'];
   let safePath = path.normalize(pathname).replace(/^(\.\.[\/\\])+/, '');
-  if (safePath === '/' || safePath === '\\') safePath = '/index.html';
+  if (SPA_ROUTES.includes(pathname.toLowerCase()) || safePath === '/' || safePath === '\\') {
+    safePath = '/index.html';
+  }
 
   const filePath = path.join(__dirname, 'static', safePath);
 

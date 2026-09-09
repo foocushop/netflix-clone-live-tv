@@ -165,11 +165,15 @@ class NetflixApp {
     document.querySelectorAll('.nav-link').forEach(link => {
       link.addEventListener('click', (e) => {
         e.preventDefault();
-        document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
-        link.classList.add('active');
         const filter = link.dataset.filter;
-        this.applyFilter(filter);
+        this.applyFilter(filter, true);
       });
+    });
+
+    // Navigation par l'historique navigateur (Boutons Précédent / Suivant)
+    window.addEventListener('popstate', (e) => {
+      const filter = (e.state && e.state.filter) || this.detectRouteFilter();
+      this.applyFilter(filter, false);
     });
 
     // Ouverture Mode Admin
@@ -200,6 +204,10 @@ class NetflixApp {
         this.originalHero = json.data.hero;
         this.setupHero(json.data.hero);
         this.renderCatalog(json.data);
+        const initialFilter = this.detectRouteFilter();
+        if (initialFilter && initialFilter !== 'all') {
+          this.applyFilter(initialFilter, false);
+        }
       }
     } catch (e) {
       console.error("Erreur lors du chargement du catalogue", e);
@@ -360,9 +368,24 @@ class NetflixApp {
         btn.textContent = this.myList.includes(movie.id) ? '✓' : '+';
         return;
       }
-      if (isChannel) {
+      if (isChannel || movie.is_xtream) {
         // Clic direct pour lancer la chaîne de télévision sans détour
         this.player.open(movie, 1);
+        return;
+      }
+      if (movie.is_xtream_series || (movie.id && String(movie.id).startsWith('xtream_series_'))) {
+        e.stopPropagation();
+        const isPlay = !!e.target.closest('.play-btn');
+        const seriesId = movie.series_id || parseInt(String(movie.id).replace('xtream_series_', ''), 10);
+        this.openTeleRealiteSeries({
+          series_id: seriesId,
+          name: movie.title,
+          cover: movie.poster_url,
+          backdrop: movie.backdrop_url,
+          plot: movie.overview,
+          genre: (movie.categories || []).join(' / '),
+          year: movie.release_year || 2025
+        }, isPlay);
         return;
       }
       if (e.target.closest('.play-btn')) {
@@ -608,7 +631,44 @@ class NetflixApp {
     }
   }
 
-  applyFilter(filter) {
+  detectRouteFilter() {
+    const p = window.location.pathname.replace(/^\/+/, '').toLowerCase();
+    const h = window.location.hash.replace(/^#\/?/, '').toLowerCase();
+    const route = p || h;
+    if (route === 'series') return 'series';
+    if (route === 'films' || route === 'movie' || route === 'movies') return 'movie';
+    if (route === 'telerealite' || route === 'tv-realite') return 'telerealite';
+    if (route === 'chaines' || route === 'channels' || route === 'live') return 'channels';
+    if (route === 'xtream') return 'xtream';
+    if (route === 'nouveautes') return 'nouveautes';
+    if (route === 'ma-liste' || route === 'my-list') return 'my-list';
+    return 'all';
+  }
+
+  setActiveNav(filter) {
+    document.querySelectorAll('.nav-link').forEach(l => {
+      l.classList.toggle('active', l.dataset.filter === filter);
+    });
+  }
+
+  applyFilter(filter, updateHistory = true) {
+    if (updateHistory && window.history && window.history.pushState) {
+      const filterToPath = {
+        'all': '/',
+        'series': '/series',
+        'movie': '/films',
+        'nouveautes': '/nouveautes',
+        'my-list': '/ma-liste',
+        'channels': '/chaines',
+        'xtream': '/xtream',
+        'telerealite': '/telerealite'
+      };
+      const targetPath = filterToPath[filter] || '/';
+      if (window.location.pathname !== targetPath) {
+        window.history.pushState({ filter }, '', targetPath);
+      }
+    }
+    this.setActiveNav(filter);
     const xtreamToolbar = document.getElementById('xtreamToolbar');
     const telerealiteToolbar = document.getElementById('telerealiteToolbar');
 
@@ -631,6 +691,21 @@ class NetflixApp {
     if (filter === 'all') {
       if (this.originalHero) this.setupHero(this.originalHero);
       this.renderCatalog(this.catalogData);
+      return;
+    }
+
+    if (filter === 'nouveautes') {
+      if (this.originalHero) this.setupHero(this.originalHero);
+      this.catalogRowsContainer.innerHTML = '';
+      const recentMovies = (this.catalogData?.movies || []).filter(m =>
+        (m.release_year && m.release_year >= 2025) ||
+        (m.created_at && m.created_at.startsWith('2026')) ||
+        (m.year && m.year >= 2025)
+      );
+      this.renderRow({
+        category: { name: "✨ Nouveautés 2025 - 2026", slug: "nouveautes" },
+        movies: recentMovies
+      });
       return;
     }
 

@@ -83,6 +83,18 @@
       "name": "📺 Chaînes Généralistes & TNT",
       "slug": "tnt_fr",
       "description": "TF1, M6, TMC, W9, France 2, France 3, Arte, BFM TV, CNews en direct"
+    },
+    {
+      "id": "c_telerealite",
+      "name": "Télé-Réalité",
+      "slug": "telerealite",
+      "description": "Émissions de télé-réalité authentiques, romances et compétitions"
+    },
+    {
+      "id": "c_series_tendances",
+      "name": "Series Tendances",
+      "slug": "series-tendances",
+      "description": "Les séries télévisées et télé-réalités les plus populaires"
     }
   ],
   "movies": [
@@ -10681,6 +10693,345 @@
       "cast": [],
       "is_hero": false,
       "logo_url": "/images/channels/tv_freesports.png"
+    },
+    {
+      "id": "xtream_series_4115",
+      "title": "Frenchie Shore",
+      "original_title": "Frenchie Shore",
+      "overview": "Dans la lignée de Jersey shore et Geordie Shore, les 10 plus grands fêtards de France sont réunis au Cap d’Agde pour des vacances de rêve.",
+      "media_type": "series",
+      "poster_url": "https://image.tmdb.org/t/p/w154/th98VuPadAIm9aPo9hzwsB6X6ht.jpg",
+      "backdrop_url": "https://image.tmdb.org/t/p/w154/th98VuPadAIm9aPo9hzwsB6X6ht.jpg",
+      "video_url": "/api/stream/xtream-series?series_id=4115",
+      "categories": [
+        "Télé-Réalité",
+        "Series Tendances"
+      ],
+      "release_year": 2023,
+      "match_score": 100,
+      "age_rating": "12+",
+      "duration": "Saisons intégrales",
+      "cast": [
+        "Antonin Portal",
+        "Nicolas Fouillot",
+        "Maxime Marciano",
+        "Julie Bacha",
+        "Iris Gaumont",
+        "Enzo Tripiana",
+        "Kara",
+        "Melvin Proix"
+      ],
+      "director": "Production Officielle",
+      "quality_badges": [
+        "1080p FHD Natif",
+        "Saisons Complètes",
+        "💎 Xtream VIP"
+      ],
+      "is_hero": false,
+      "is_xtream_series": true,
+      "series_id": 4115,
+      "created_at": "2026-09-09T00:54:35.332Z"
+    },
+    {
+      "id": "xtream_series_6717",
+      "title": "Les cinquante",
+      "original_title": "Les cinquante (2022)",
+      "overview": "A l'abri des regards, dans un château à l'univers unique, vit un propriétaire malicieux et joueur qui, caché derrière son masque de lion, aime se divertir. Véritable maître du jeu qui règne sans partage sur son royaume, il a décidé de mettre au défi 50 joueurs dans le plus grand jeu jamais organisé. Ils sont 50 et, à la fin de cette compétition, un seul d'entre eux sera l'élu. Stars de l'influence suivis par des millions de personnes à travers la France, les 50 doivent tout à leur public. Alors seront-ils capables de se battre jusqu'à la dernière seconde afin de faire gagner une grosse somme d'argent à l'un de leurs followers ? C'est le défi qui leur est lancé par le maître du jeu !",
+      "media_type": "series",
+      "poster_url": "https://image.tmdb.org/t/p/w600_and_h900_bestv2/3qUdS94KmIt0TSKQ1BJXqclzbGx.jpg",
+      "backdrop_url": "https://image.tmdb.org/t/p/w1280/tcC8sfJqOoiWnmPYKTvJqebVkMQ.jpg",
+      "video_url": "/api/stream/xtream-series?series_id=6717",
+      "categories": [
+        "Télé-Réalité",
+        "Series Tendances"
+      ],
+      "release_year": 2022,
+      "match_score": 50,
+      "age_rating": "12+",
+      "duration": "Saisons intégrales",
+      "cast": [
+        "Télé-Réalité"
+      ],
+      "director": "Production Officielle",
+      "quality_badges": [
+        "1080p FHD Natif",
+        "Saisons Complètes",
+        "💎 Xtream VIP"
+      ],
+      "is_hero": false,
+      "is_xtream_series": true,
+      "series_id": 6717,
+      "created_at": "2026-09-09T00:54:35.333Z"
+    },
+    {
+      "id": "xtream_series_5967",
+      "title": "Les Traîtres",
+      "original_title": "Les Traîtres (2022)",
+      "overview": "C’est dans un magnifique château que des personnalités vont participer à une expérience qu’ils n’oublieront jamais. Un jeu de mensonge, de manipulation et de trahison animé par Éric Antoine, où tous les coups seront permis. Parmi les joueurs, certains seront désignés comme des traîtres, les autres seront des loyaux. Jour et nuit, les traîtres devront mentir sur leur véritable identité, élaborer des stratégies pour tromper les loyaux et assurer leur place dans le jeu. Pour y parvenir, ils devront remporter des épreuves, résister à la pression psychologique, déjouer des stratégies, tromper l’ennemi. Et surtout éviter les éliminations pour arriver le dernier et remporter le jeu !",
+      "media_type": "series",
+      "poster_url": "https://image.tmdb.org/t/p/w600_and_h900_bestv2/vJ9JaLDeFzpdHsJOZ4RAHwKskk3.jpg",
+      "backdrop_url": "https://image.tmdb.org/t/p/w1280/bBtCLiBSyzqZ7L8oub9fPx9IOZN.jpg",
+      "video_url": "/api/stream/xtream-series?series_id=5967",
+      "categories": [
+        "Télé-Réalité",
+        "Series Tendances"
+      ],
+      "release_year": 2022,
+      "match_score": 80,
+      "age_rating": "12+",
+      "duration": "Saisons intégrales",
+      "cast": [
+        "Éric Antoine"
+      ],
+      "director": "Production Officielle",
+      "quality_badges": [
+        "1080p FHD Natif",
+        "Saisons Complètes",
+        "💎 Xtream VIP"
+      ],
+      "is_hero": false,
+      "is_xtream_series": true,
+      "series_id": 5967,
+      "created_at": "2026-09-09T00:54:35.333Z"
+    },
+    {
+      "id": "xtream_series_5572",
+      "title": "Koh-Lanta",
+      "original_title": "Koh-Lanta (2001)",
+      "overview": "Quatorze à dix-huit candidats doivent survivre sur une île inhabitée pendant 40 jours (20 jours dans les éditions spéciales). C’est à eux de trouver de la nourriture afin d’accompagner la maigre ration de riz qui leur est fournie en début d’aventure. Ils doivent construire un abri afin de se protéger des conditions extérieures (intempéries, insectes…) et entretenir le feu qu’ils sont parvenus à faire ou qu’ils ont remporté lors de la première épreuve de confort.",
+      "media_type": "series",
+      "poster_url": "https://image.tmdb.org/t/p/w600_and_h900_bestv2/wP2UMXAQrQBKVEyIlcKG4AMYRyz.jpg",
+      "backdrop_url": "https://image.tmdb.org/t/p/w1280/7mJAZW29Yi09vqNdRVYC1nfj10z.jpg",
+      "video_url": "/api/stream/xtream-series?series_id=5572",
+      "categories": [
+        "Télé-Réalité",
+        "Series Tendances"
+      ],
+      "release_year": 2001,
+      "match_score": 70,
+      "age_rating": "12+",
+      "duration": "Saisons intégrales",
+      "cast": [
+        "Ugo Lartiche",
+        "Vanessa Feuillatte",
+        "Thibault Bélanger",
+        "Sophia Mansouri",
+        "Sarah Aboudeine",
+        "Nathanaël Branchereau",
+        "Michel Huy",
+        "Maud Collas"
+      ],
+      "director": "Production Officielle",
+      "quality_badges": [
+        "1080p FHD Natif",
+        "Saisons Complètes",
+        "💎 Xtream VIP"
+      ],
+      "is_hero": false,
+      "is_xtream_series": true,
+      "series_id": 5572,
+      "created_at": "2026-09-09T00:54:35.333Z"
+    },
+    {
+      "id": "xtream_series_9066",
+      "title": "Les Apprentis Aventuriers",
+      "original_title": "Les Apprentis Aventuriers (2016)",
+      "overview": "Sur une plage, douze jeunes, plutôt habitués au confort moderne et aux boîtes de nuit, affrontent la nature et leurs peurs. Leur objectif : obtenir le titre de «meilleur aventurier», décerné à celui des candidats qui aura surmonté toutes les épreuves du jeu.",
+      "media_type": "series",
+      "poster_url": "https://image.tmdb.org/t/p/w600_and_h900_bestv2/6gsf9rODwLOqHuCZ1mZgjy348v1.jpg",
+      "backdrop_url": "https://image.tmdb.org/t/p/w1280/syWTu8PpnXScZmuOtnmlftjb6zr.jpg",
+      "video_url": "/api/stream/xtream-series?series_id=9066",
+      "categories": [
+        "Télé-Réalité",
+        "Series Tendances"
+      ],
+      "release_year": 2016,
+      "match_score": 70,
+      "age_rating": "12+",
+      "duration": "Saisons intégrales",
+      "cast": [
+        "Laurent Maistret"
+      ],
+      "director": "Production Officielle",
+      "quality_badges": [
+        "1080p FHD Natif",
+        "Saisons Complètes",
+        "💎 Xtream VIP"
+      ],
+      "is_hero": false,
+      "is_xtream_series": true,
+      "series_id": 9066,
+      "created_at": "2026-09-09T00:54:35.333Z"
+    },
+    {
+      "id": "xtream_series_4029",
+      "title": "Les Marseillais",
+      "original_title": "Les Marseillais (2012)",
+      "overview": "Cette téléréalité est née du succès de l'émission Les Ch'tis. Le programme suit les aventures d'une douzaine de candidats issus de la région de Marseille et travaillant dans le monde de la nuit. Leur but est de percer professionnellement dans différentes villes du monde.",
+      "media_type": "series",
+      "poster_url": "https://image.tmdb.org/t/p/w600_and_h900_bestv2/w6znhgPtDxw9gPyRCN0JrjjfnGC.jpg",
+      "backdrop_url": "https://image.tmdb.org/t/p/w1280/1ilujnifixOyyTFrPHjM7B3zZL3.jpg",
+      "video_url": "/api/stream/xtream-series?series_id=4029",
+      "categories": [
+        "Télé-Réalité",
+        "Series Tendances"
+      ],
+      "release_year": 2012,
+      "match_score": 75,
+      "age_rating": "12+",
+      "duration": "Saisons intégrales",
+      "cast": [
+        "Maeva Ghennam",
+        "Julien Tanti",
+        "Paga",
+        "Benjamin Samat",
+        "Greg Yega",
+        "Manon Tanti",
+        "Océane El Himer",
+        "Maddy Burciaga"
+      ],
+      "director": "Production Officielle",
+      "quality_badges": [
+        "1080p FHD Natif",
+        "Saisons Complètes",
+        "💎 Xtream VIP"
+      ],
+      "is_hero": false,
+      "is_xtream_series": true,
+      "series_id": 4029,
+      "created_at": "2026-09-09T00:54:35.334Z"
+    },
+    {
+      "id": "xtream_series_5724",
+      "title": "L'Île de la tentation",
+      "original_title": "L'Île de la tentation (2002)",
+      "overview": "12 jours, 12 nuits, 5 couples, 20 célibataires...  5 couples déterminés à mettre leur histoire d'amour à l'épreuve viennent sur l'île tester leur amour et tenter de répondre à ces questions que nous nous sommes tous posées un jour. Notre amour est-il assez sincère pour aller plus loin ensemble ? Puis-je lui faire confiance ? M'aime-t-il/elle autant que je l'aime ? Suis-je avec la bonne personne ? Puis-je penser sereinement à l'avenir avec lui/elle ?",
+      "media_type": "series",
+      "poster_url": "https://image.tmdb.org/t/p/w600_and_h900_bestv2/n9lTiM2OjBM4d8QusXnjm4EJR6T.jpg",
+      "backdrop_url": "https://image.tmdb.org/t/p/w1280/Aaa2Ynpsua51v1fi7f0eaXoEMIq.jpg",
+      "video_url": "/api/stream/xtream-series?series_id=5724",
+      "categories": [
+        "Télé-Réalité",
+        "Series Tendances"
+      ],
+      "release_year": 2002,
+      "match_score": 10,
+      "age_rating": "12+",
+      "duration": "Saisons intégrales",
+      "cast": [
+        "Télé-Réalité"
+      ],
+      "director": "Production Officielle",
+      "quality_badges": [
+        "1080p FHD Natif",
+        "Saisons Complètes",
+        "💎 Xtream VIP"
+      ],
+      "is_hero": false,
+      "is_xtream_series": true,
+      "series_id": 5724,
+      "created_at": "2026-09-09T00:54:35.334Z"
+    },
+    {
+      "id": "xtream_series_7817",
+      "title": "Les Apprentis Champions… au ski !",
+      "original_title": "Les Apprentis Champions… au ski ! (2026)",
+      "overview": "Les stars de la télé-réalité ont accepté de relever un nouveau défi sportif et de se transformer en champions… au ski ! Pour la bonne cause, les personnalités chaussent leurs skis et leur courage pour tenter de remporter un maximum de médailles et faire ainsi augmenter les cagnottes de leurs associations. Coachés par deux illustres sportifs, les apprentis champions vont se dépasser et battre des records dans des disciplines toutes plus difficiles les unes que les autres ! Seront-ils à la hauteur de l’événement ? Parviendront-ils à battre des records sans perdre leur humour ? Lesquels d’entre eux deviendront de véritables athlètes et rapporteront un maximum d’argent pour l’association ? Une production B Prod Format : 40mn",
+      "media_type": "series",
+      "poster_url": "https://image.tmdb.org/t/p/w600_and_h900_bestv2/8Am2j09msH6LS7OqTGg0MiQES9g.jpg",
+      "backdrop_url": "https://image.tmdb.org/t/p/w1280/nqJy3ml8GUwCOYcuvRxaeeUwAVZ.jpg",
+      "video_url": "/api/stream/xtream-series?series_id=7817",
+      "categories": [
+        "Télé-Réalité",
+        "Series Tendances"
+      ],
+      "release_year": 2026,
+      "match_score": 75,
+      "age_rating": "12+",
+      "duration": "Saisons intégrales",
+      "cast": [
+        "Télé-Réalité"
+      ],
+      "director": "Production Officielle",
+      "quality_badges": [
+        "1080p FHD Natif",
+        "Saisons Complètes",
+        "💎 Xtream VIP"
+      ],
+      "is_hero": false,
+      "is_xtream_series": true,
+      "series_id": 7817,
+      "created_at": "2026-09-09T00:54:35.334Z"
+    },
+    {
+      "id": "xtream_series_8603",
+      "title": "Excape Island : coincés avec nos ex",
+      "original_title": "Excape Island : coincés avec nos ex (2026)",
+      "overview": "C'est l'histoire de 12 candidats emblématiques de la télé-réalité qui pensent s'envoler pour des vacances de rêve... Soleil, piscine, villa, Marbella... Bref que du kiff...  Quand tout à coup.... Devine qui débarque et avec qui ils vont devoir passer l'aventure en binôme ?  Leur ex !!!!!!  Dans ce paradis devenu un piège, tout va (très) vite devenir un enfer.  Chaque jour, une seule chance de s'échapper. Et pour y parvenir, les ex vont devoir faire équipe, car impossible d'avancer l'un sans l'autre... et encore moins de sortir seul.  Pour espérer franchir la porte, ces duos devront montrer qu'ils sont encore capables de se supporter à travers des jeux mêlant complicité, communication et stratégie.  Les premiers partis raflent la mise, les derniers... restent coincés ensemble. Et pour ceux qui arrivent à sortir, le pire reste à venir : LE DILEMME.  Vont-ils partager le gain avec leur ex de l'enfer ou tenter de TOUT LUI VOLER ?",
+      "media_type": "series",
+      "poster_url": "https://image.tmdb.org/t/p/w600_and_h900_bestv2/uXqhWMQWU8LiFNCpyx9pwMCyjlw.jpg",
+      "backdrop_url": "https://image.tmdb.org/t/p/w600_and_h900_bestv2/uXqhWMQWU8LiFNCpyx9pwMCyjlw.jpg",
+      "video_url": "/api/stream/xtream-series?series_id=8603",
+      "categories": [
+        "Télé-Réalité",
+        "Series Tendances"
+      ],
+      "release_year": 2026,
+      "match_score": 75,
+      "age_rating": "12+",
+      "duration": "Saisons intégrales",
+      "cast": [
+        "Carla Moreau",
+        "Kévin Guedj",
+        "Beverly Bello",
+        "Vivian Grimigni",
+        "Solène Fouquez",
+        "Anthony Alcaraz",
+        "Lucille Moine",
+        "Hugo"
+      ],
+      "director": "Production Officielle",
+      "quality_badges": [
+        "1080p FHD Natif",
+        "Saisons Complètes",
+        "💎 Xtream VIP"
+      ],
+      "is_hero": false,
+      "is_xtream_series": true,
+      "series_id": 8603,
+      "created_at": "2026-09-09T00:54:35.334Z"
+    },
+    {
+      "id": "xtream_series_8394",
+      "title": "Les traîtres : Révélations sur la suite...",
+      "original_title": "Les traîtres : Révélations sur la suite... (2024)",
+      "overview": "Jujufitcats, la grande gagnante de la saison 2, présente une deuxième partie de soirée pleine de révélations sur la suite du jeu mais aussi des images inédites et des clés pour mieux comprendre et décrypter ce programme addictif.",
+      "media_type": "series",
+      "poster_url": "https://image.tmdb.org/t/p/w600_and_h900_bestv2/iuOufIt6eUNLP0hdvo0VxTFCmH4.jpg",
+      "backdrop_url": "https://image.tmdb.org/t/p/w1280/mWQWEGZyRJmWiBlL6ehIGzRfiBG.jpg",
+      "video_url": "/api/stream/xtream-series?series_id=8394",
+      "categories": [
+        "Télé-Réalité",
+        "Series Tendances"
+      ],
+      "release_year": 2024,
+      "match_score": 80,
+      "age_rating": "12+",
+      "duration": "Saisons intégrales",
+      "cast": [
+        "Justine Becattini",
+        "Elodie Mielczareck"
+      ],
+      "director": "Production Officielle",
+      "quality_badges": [
+        "1080p FHD Natif",
+        "Saisons Complètes",
+        "💎 Xtream VIP"
+      ],
+      "is_hero": false,
+      "is_xtream_series": true,
+      "series_id": 8394,
+      "created_at": "2026-09-09T00:54:35.334Z"
     }
   ]
 }
