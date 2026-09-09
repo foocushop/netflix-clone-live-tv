@@ -507,14 +507,47 @@ class NetflixPlayer {
       }
     });
 
+    let stallWatchdogTimer = null;
+
+    const handleStall = () => {
+      if (this.video.paused) return;
+      if (stallWatchdogTimer) clearTimeout(stallWatchdogTimer);
+
+      stallWatchdogTimer = setTimeout(() => {
+        if (this.video.paused) return;
+        console.warn('[Player Watchdog] Tampon bloqué depuis plus de 3.5s après pause ou instabilité réseau. Récupération...');
+        this.recoverStalledPlayback();
+      }, 3500);
+    };
+
+    const clearStall = () => {
+      if (stallWatchdogTimer) {
+        clearTimeout(stallWatchdogTimer);
+        stallWatchdogTimer = null;
+      }
+    };
+
+    this.video.addEventListener('waiting', handleStall);
+    this.video.addEventListener('stalled', handleStall);
+    this.video.addEventListener('playing', clearStall);
+    this.video.addEventListener('timeupdate', clearStall);
+
     this.video.addEventListener('play', () => {
       this.updatePlayPauseIcons(true);
       this.resetInactivityTimer();
+      const pausedFor = this.pauseTimestamp ? (Date.now() - this.pauseTimestamp) : 0;
+      this.pauseTimestamp = null;
+      if (pausedFor > 15000) {
+        this.handlePostPauseRecovery(pausedFor);
+      }
     });
 
     this.video.addEventListener('pause', () => {
       this.updatePlayPauseIcons(false);
       this.showControls();
+      this.pauseTimestamp = Date.now();
+      this.pausePosition = this.video.currentTime || 0;
+      clearStall();
     });
 
     this.video.addEventListener('ended', () => {
@@ -525,10 +558,6 @@ class NetflixPlayer {
       if (isTrulyFinished && this.currentMovie && this.currentMovie.media_type === 'series') {
         this.goToNextEpisode();
       }
-    });
-
-    this.video.addEventListener('waiting', () => {
-      // Tampon en cours de chargement réseau, ne rien interrompre
     });
 
     this.video.addEventListener('volumechange', () => {
@@ -635,14 +664,116 @@ class NetflixPlayer {
   // ================= ACTIONS LECTEUR NETFLIX =================
   togglePlayPause() {
     if (this.video.paused) {
+      const pausedFor = this.pauseTimestamp ? (Date.now() - this.pauseTimestamp) : 0;
+      const isChannel = (this.currentMovie?.media_type === 'channel' || this.currentMovie?.is_live);
+
+      // Si pause longue (> 20s), réactiver immédiatement le flux pour éviter les saccades dues aux sockets fermées
+      if (pausedFor > 20000) {
+        if (this.hls && isChannel) {
+          const livePos = this.hls.liveSyncPosition;
+          if (livePos && isFinite(livePos) && (this.video.currentTime < livePos - 8 || isNaN(this.video.currentTime))) {
+            this.video.currentTime = livePos;
+          }
+          this.hls.startLoad();
+        } else if (!this.hls && this.video && this.video.src && !this.video.classList.contains('hidden')) {
+          this.recoverDirectStream(this.video.currentTime);
+          this.triggerCenterRipple('▶');
+          return;
+        }
+      }
+
       this.video.play().then(() => {
         this.triggerCenterRipple('▶');
       }).catch(err => {
         console.warn('[Player] Échec lecture :', err.message);
+        if (!this.hls && this.video && this.video.src) {
+          this.recoverDirectStream(this.video.currentTime);
+        }
       });
     } else {
+      this.pauseTimestamp = Date.now();
+      this.pausePosition = this.video.currentTime;
       this.video.pause();
       this.triggerCenterRipple('❚❚');
+    }
+  }
+
+  handlePostPauseRecovery(pausedFor) {
+    const isChannel = (this.currentMovie?.media_type === 'channel' || this.currentMovie?.is_live);
+
+    // Cas 1 : Flux HLS en Direct (Chaînes TV Xtream)
+    if (this.hls && isChannel) {
+      try {
+        this.hls.startLoad();
+        const livePos = this.hls.liveSyncPosition;
+        const curTime = this.video.currentTime;
+        if (livePos && isFinite(livePos) && (curTime < livePos - 8 || isNaN(curTime))) {
+          console.log(`[Player Live Sync] Recalage sur le direct après pause de ${Math.round(pausedFor / 1000)}s (${livePos.toFixed(1)}s)`);
+          this.video.currentTime = livePos;
+        }
+      } catch (e) {
+        console.warn('[Player Live Sync Err]:', e);
+      }
+      return;
+    }
+
+    // Cas 2 : Flux VOD Direct (Séries Xtream, Télé-Réalité, MP4 Range 206)
+    if (!this.hls && this.video && this.video.src && !this.video.classList.contains('hidden')) {
+      const curTime = (this.pausePosition !== undefined && isFinite(this.pausePosition)) ? this.pausePosition : (this.video.currentTime || 0);
+
+      let bufferAhead = 0;
+      try {
+        for (let i = 0; i < this.video.buffered.length; i++) {
+          if (this.video.buffered.start(i) <= curTime + 0.2 && curTime <= this.video.buffered.end(i) + 0.2) {
+            bufferAhead = this.video.buffered.end(i) - curTime;
+            break;
+          }
+        }
+      } catch (e) {}
+
+      console.log(`[Player VOD Resume] Reprise après pause de ${Math.round(pausedFor / 1000)}s. Buffer restant : ${bufferAhead.toFixed(1)}s`);
+
+      // Si pause > 20s et buffer restant faible (< 3s), réinitialiser la connexion
+      if (pausedFor > 20000 && bufferAhead < 3) {
+        this.recoverDirectStream(curTime);
+      }
+    }
+  }
+
+  recoverStalledPlayback() {
+    const isChannel = (this.currentMovie?.media_type === 'channel' || this.currentMovie?.is_live);
+    if (this.hls) {
+      if (isChannel) {
+        const livePos = this.hls.liveSyncPosition;
+        if (livePos && isFinite(livePos)) {
+          this.video.currentTime = livePos;
+        }
+      }
+      this.hls.startLoad();
+      this.hls.recoverMediaError();
+    } else if (this.video && this.video.src && !this.video.classList.contains('hidden')) {
+      this.recoverDirectStream(this.video.currentTime);
+    }
+  }
+
+  recoverDirectStream(targetTime) {
+    if (!this.video || !this.video.src) return;
+    const t = (targetTime !== undefined && isFinite(targetTime) && targetTime >= 0) ? targetTime : (this.video.currentTime || 0);
+    const originalSrc = this.video.currentSrc || this.video.src;
+    console.log(`[Player Recovery] Reconnexion instantanée du flux direct à ${t.toFixed(1)}s (Anti-saccade post-pause)`);
+    try {
+      const u = new URL(originalSrc, window.location.href);
+      u.searchParams.set('_t', Date.now());
+      this.video.src = u.href;
+      this.video.currentTime = t;
+      const p = this.video.play();
+      if (p !== undefined) p.catch(() => {});
+    } catch (e) {
+      try {
+        this.video.load();
+        this.video.currentTime = t;
+        this.video.play().catch(() => {});
+      } catch (err) {}
     }
   }
 
@@ -1576,8 +1707,17 @@ class NetflixPlayer {
       });
 
       hls.on(Hls.Events.ERROR, (event, data) => {
-        // En cas d'erreur fatale non-récupérable automatiquement par le moteur de buffering interne
-        if (data.fatal) {
+        if (!data.fatal) {
+          if (data.details === 'bufferStalledError' && isChannel) {
+            const livePos = hls.liveSyncPosition;
+            if (livePos && isFinite(livePos) && (this.video.currentTime < livePos - 8)) {
+              console.log('[HLS Live Sync] Recalage sur le direct suite à pause/décalage');
+              this.video.currentTime = livePos;
+              hls.startLoad();
+            }
+          }
+          return;
+        }
           console.warn('[HLS Fatal Error]', data.type, data.details);
           switch (data.type) {
             case Hls.ErrorTypes.NETWORK_ERROR:

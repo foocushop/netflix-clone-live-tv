@@ -177,7 +177,7 @@ const xtreamSeriesHttpsAgent = new https.Agent({
 const xtreamEdgeCache = new Map();
 // Cache ultra-rapide des manifests réécrits (TTL 1500ms) pour démarrage immédiat (0ms)
 const xtreamManifestCache = new Map();
-// Cache d'adresses Edge directes pour les épisodes séries Xtream VOD (TTL court 25s pour renouveler les jetons)
+// Cache d'adresses Edge directes pour les épisodes séries Xtream VOD (TTL 10 min pour éviter les re-redirections après pause)
 const xtreamSeriesEdgeCache = new Map();
 
 // Purge automatique périodique pour garantir zéro accumulation RAM dans le temps
@@ -2842,7 +2842,7 @@ const server = http.createServer((req, res) => {
           if (loc) {
             cleanupListeners();
             const nextUrl = loc.startsWith('http') ? loc : new URL(loc, targetUrl).href;
-            xtreamSeriesEdgeCache.set(cacheKey, { url: nextUrl, expiresAt: Date.now() + 25000 });
+            xtreamSeriesEdgeCache.set(cacheKey, { url: nextUrl, expiresAt: Date.now() + 10 * 60 * 1000 });
             return pipeSeriesStream(nextUrl, hops + 1, true);
           }
         }
