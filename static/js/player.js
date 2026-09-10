@@ -44,6 +44,7 @@ class NetflixPlayer {
 
     // 5. Média Vidéo & Iframe de secours
     this.mediaContainer = document.getElementById('playerMediaContainer');
+    this.backdrop = document.getElementById('playerBackdrop');
     this.video = document.getElementById('mainVideo');
     this.iframe = document.getElementById('streamIframe');
     this.ripple = document.getElementById('centerPlayRipple');
@@ -949,6 +950,23 @@ class NetflixPlayer {
 
     if (this.titleDisplay) this.titleDisplay.textContent = movie.title;
     if (this.ctrlMediaTitle) this.ctrlMediaTitle.textContent = movie.title;
+
+    // Configuration de l'affiche cinématographique d'attente (Zéro écran noir)
+    let posterImg = movie.backdrop_url || movie.poster_url || '';
+    if (movie.seasons && movie.seasons.length > 0) {
+      const sObj = movie.seasons.find(s => parseInt(s.season_number, 10) === this.currentSeason) || movie.seasons[0];
+      const epObj = sObj?.episodes?.find(e => parseInt(e.episode_number, 10) === this.currentEpisode) || sObj?.episodes?.[0];
+      if (epObj?.still_url) posterImg = epObj.still_url;
+    }
+    if (this.backdrop) {
+      this.backdrop.style.backgroundImage = posterImg ? `url('${posterImg}')` : 'none';
+      this.backdrop.classList.remove('fade-out');
+    }
+    if (this.video) {
+      if (posterImg) this.video.poster = posterImg;
+      else this.video.removeAttribute('poster');
+    }
+
     this.overlay.classList.add('active');
     this.showControls();
 
@@ -1017,8 +1035,14 @@ class NetflixPlayer {
       try {
         this.video.pause();
         this.video.removeAttribute('src');
+        this.video.removeAttribute('poster');
         this.video.load();
       } catch (e) {}
+    }
+
+    if (this.backdrop) {
+      this.backdrop.classList.remove('fade-out');
+      this.backdrop.style.backgroundImage = 'none';
     }
 
     if (this.iframe) {
@@ -1217,22 +1241,36 @@ class NetflixPlayer {
     let hasReadied = false;
     const onReady = () => {
       if (hasReadied) return;
+      // Ne masquer le loader et l'affiche que si la première frame est prête ou que le temps avance
+      if (this.video.readyState < 2 && this.video.currentTime <= 0) return;
       hasReadied = true;
       this.setStep(4, 'done', `4. Flux connecté • Lecture active`);
-      setTimeout(() => this.hideLoader(), 150);
+      setTimeout(() => {
+        this.hideLoader();
+        if (this.backdrop) this.backdrop.classList.add('fade-out');
+        // Élargir le buffer HLS en arrière-plan une fois lancé pour une grande stabilité
+        if (this.hls && this.hls.config) {
+          this.hls.config.maxBufferLength = isChannel ? 30 : 60;
+          this.hls.config.maxMaxBufferLength = isChannel ? 60 : 120;
+        }
+      }, 150);
     };
 
-    this.video.addEventListener('loadeddata', onReady, { once: true });
-    this.video.addEventListener('canplay', onReady, { once: true });
-    this.video.addEventListener('playing', onReady, { once: true });
+    this.video.addEventListener('loadeddata', () => onReady());
+    this.video.addEventListener('canplay', () => onReady());
+    this.video.addEventListener('playing', () => onReady());
     this.video.addEventListener('timeupdate', () => {
       if (this.video.currentTime > 0) onReady();
-    }, { once: true });
+    });
 
-    // Sécurité absolue : masquer le loader après 3.5s quoi qu'il arrive
+    // Sécurité absolue : masquer le loader après 4s quoi qu'il arrive
     setTimeout(() => {
-      onReady();
-    }, 3500);
+      if (!hasReadied) {
+        hasReadied = true;
+        this.hideLoader();
+        if (this.backdrop) this.backdrop.classList.add('fade-out');
+      }
+    }, 4000);
 
     // Protection Anti-Rollback / Anti-Boucle Xtream (PTS/PCR resets)
     this.lastLiveMaxTime = 0;
@@ -1260,18 +1298,19 @@ class NetflixPlayer {
       const hls = new Hls({
         enableWorker: true,
         lowLatencyMode: false,
-        liveSyncDurationCount: isChannel ? 4 : 3,
-        liveMaxLatencyDurationCount: isChannel ? 12 : 10,
+        liveSyncDurationCount: isChannel ? 3 : 2,
+        liveMaxLatencyDurationCount: isChannel ? 10 : 8,
         liveDurationInfinity: isChannel,
         startLevel: -1,
         capLevelToPlayerSize: false,
         initialLiveManifestSize: 1,
         startFragPrefetch: true,
+        progressive: true,
         backBufferLength: 30,
-        maxBufferLength: isChannel ? 30 : 60,
-        maxMaxBufferLength: isChannel ? 60 : 120,
-        maxBufferSize: 60 * 1024 * 1024,
-        highBufferWatchdogPeriod: 3,
+        maxBufferLength: isChannel ? 15 : 20, // Faible au démarrage pour un lancement ultra-rapide sans surcharger le buffer
+        maxMaxBufferLength: isChannel ? 40 : 60,
+        maxBufferSize: 30 * 1024 * 1024,
+        highBufferWatchdogPeriod: 2,
         nudgeOffset: 0.1,
         nudgeMaxRetry: 5,
         maxFragLookUpTolerance: 0.25,
@@ -1288,7 +1327,8 @@ class NetflixPlayer {
       hls.attachMedia(this.video);
 
       hls.on(Hls.Events.MANIFEST_PARSED, () => {
-        onReady();
+        this.setStep(3, 'done', `3. Playlist & fragments HLS initialisés`);
+        this.setStep(4, 'active', `4. Démarrage instantané du flux vidéo...`);
         if (hls.levels && hls.levels.length > 0) {
           this.updateQualityMenuOptions();
           if (this.currentQuality === -1) {
@@ -1429,22 +1469,30 @@ class NetflixPlayer {
     let hasReadied = false;
     const onReady = () => {
       if (hasReadied) return;
+      if (this.video.readyState < 2 && this.video.currentTime <= 0) return;
       hasReadied = true;
       this.setStep(4, 'done', `4. Épisode connecté • Lecture active 1080p FHD`);
-      setTimeout(() => this.hideLoader(), 200);
+      setTimeout(() => {
+        this.hideLoader();
+        if (this.backdrop) this.backdrop.classList.add('fade-out');
+      }, 150);
     };
 
-    this.video.addEventListener('loadeddata', onReady, { once: true });
-    this.video.addEventListener('canplay', onReady, { once: true });
-    this.video.addEventListener('playing', onReady, { once: true });
+    this.video.addEventListener('loadeddata', () => onReady());
+    this.video.addEventListener('canplay', () => onReady());
+    this.video.addEventListener('playing', () => onReady());
     this.video.addEventListener('timeupdate', () => {
       if (this.video.currentTime > 0) onReady();
-    }, { once: true });
+    });
 
-    // Sécurité absolue : masquer le loader après 3.5s quoi qu'il arrive
+    // Sécurité absolue : masquer le loader après 4s quoi qu'il arrive
     setTimeout(() => {
-      onReady();
-    }, 3500);
+      if (!hasReadied) {
+        hasReadied = true;
+        this.hideLoader();
+        if (this.backdrop) this.backdrop.classList.add('fade-out');
+      }
+    }, 4000);
 
     this.video.addEventListener('error', () => {
       onReady();

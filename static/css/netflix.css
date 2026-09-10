@@ -1296,6 +1296,30 @@ body {
   z-index: 1;
 }
 
+/* Fond cinématographique anti-écran noir pendant le préchargement */
+.player-backdrop {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-size: cover;
+  background-position: center center;
+  background-repeat: no-repeat;
+  z-index: 2;
+  opacity: 1;
+  transition: opacity 0.5s ease-out;
+  filter: brightness(0.6) blur(2px);
+  transform: scale(1.02);
+  pointer-events: none;
+}
+
+.player-backdrop.fade-out {
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.5s ease-out, visibility 0.5s;
+}
+
 .netflix-video {
   position: absolute;
   top: 0;
@@ -1303,8 +1327,8 @@ body {
   width: 100vw;
   height: 100vh;
   object-fit: contain;
-  background: #000;
-  z-index: 2;
+  background: transparent;
+  z-index: 3;
   display: block;
 }
 
