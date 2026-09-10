@@ -1172,12 +1172,15 @@ async function extractChannelMultiProvider(channelId, serverNum) {
 
   const liveChannelParam = encodeURIComponent(channelId || daddyId);
 
-  // ── PRIORITÉ ABSOLUE N°1 : SERVEUR 1 = DIRECT XTREAM VIP ──
+  // ── PRIORITÉ ABSOLUE N°1 : SERVEUR 1 = DIRECT XTREAM VIP (H.264/AAC) ──
   if (srvNum === 1) {
     const rawChan = (channelId || '').toString().toLowerCase().trim();
-    const hasXtream = XTREAM_CHANNELS[rawChan] 
+    // Les flux TV avec audio Dolby EC-3 dans M2TS ne peuvent pas être décodés par MSE dans les navigateurs web.
+    // Pour ces chaînes spécifiques, redirection automatique vers le miroir Ultra HD 1080p/60fps compatible AAC.
+    const isEc3Xtream = (rawChan === 'tv_canal_sport' || rawChan === 'canal_sport');
+    const hasXtream = !isEc3Xtream && (XTREAM_CHANNELS[rawChan] 
       || XTREAM_CHANNELS[rawChan.replace(/^tv_/, '')] 
-      || XTREAM_CHANNELS[rawChan.replace(/_/g, ' ')];
+      || XTREAM_CHANNELS[rawChan.replace(/_/g, ' ')]);
 
     if (hasXtream) {
       return {

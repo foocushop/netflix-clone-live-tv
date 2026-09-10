@@ -342,9 +342,14 @@ class NetflixPlayer {
       window.addEventListener('mouseup', onMouseUp);
     });
 
-    // Progression temps réel
+    // Progression temps réel allégée (optimisation 60fps : DOM throttlé à 4Hz max)
+    let lastTimeUpdate = 0;
     this.video.addEventListener('timeupdate', () => {
       if (this.isScrubbing) return;
+      const now = performance.now();
+      if (now - lastTimeUpdate < 250) return;
+      lastTimeUpdate = now;
+
       const isChannel = (this.currentMovie?.media_type === 'channel' || this.currentMovie?.is_live);
       if (isChannel) {
         this.ctrlCurrentTime.textContent = 'LIVE';
@@ -412,14 +417,13 @@ class NetflixPlayer {
     if (!total || total <= 0) return;
 
     const cur = this.video.currentTime || 0;
-    const playedPercent = (cur / total) * 100;
     let bufferedEnd = 0;
 
     if (this.video.buffered && this.video.buffered.length > 0) {
       for (let i = 0; i < this.video.buffered.length; i++) {
         const start = this.video.buffered.start(i);
         const end = this.video.buffered.end(i);
-        if (start <= cur + 1.0 && cur <= end + 0.5) {
+        if (start <= cur + 1.5 && cur <= end + 0.5) {
           bufferedEnd = Math.max(bufferedEnd, end);
         }
       }
@@ -428,16 +432,8 @@ class NetflixPlayer {
       }
     }
 
-    let percent = (bufferedEnd / total) * 100;
-
-    // Assurance visuelle du buffer : dès que le flux a des données actives (readyState >= 2),
-    // garantir que le trait blanc dépasse distinctement la pastille rouge (au moins +1.8% en avance)
-    // pour éviter qu'il ne soit masqué sous la pastille rouge de 16px.
-    if (this.video.readyState >= 2 && percent < playedPercent + 1.8) {
-      percent = Math.min(100, playedPercent + 1.8);
-    }
-
-    this.scrubberBuffered.style.width = `${Math.min(100, Math.max(0, percent))}%`;
+    const percent = Math.min(100, Math.max(0, (bufferedEnd / total) * 100));
+    this.scrubberBuffered.style.width = `${percent}%`;
   }
 
   updateScrubberProgress(percent) {
@@ -960,6 +956,7 @@ class NetflixPlayer {
     }
     if (this.backdrop) {
       this.backdrop.style.backgroundImage = posterImg ? `url('${posterImg}')` : 'none';
+      this.backdrop.style.display = 'block';
       this.backdrop.classList.remove('fade-out');
     }
     if (this.video) {
@@ -1016,12 +1013,16 @@ class NetflixPlayer {
     this.switchServer(initialServer, false);
   }
 
-  close() {
-    if (this.activeExtractionAbort) {
-      this.activeExtractionAbort.abort();
-      this.activeExtractionAbort = null;
+  // Nettoyage complet et étanche de la session de streaming en cours
+  cleanupActivePlayback() {
+    if (this.streamAbortController) {
+      try { this.streamAbortController.abort(); } catch (e) {}
+      this.streamAbortController = null;
     }
-
+    if (this._antiLoopHandler) {
+      try { this.video.removeEventListener('timeupdate', this._antiLoopHandler); } catch (e) {}
+      this._antiLoopHandler = null;
+    }
     if (this.hls) {
       try {
         this.hls.stopLoad();
@@ -1030,18 +1031,26 @@ class NetflixPlayer {
       } catch (e) {}
       this.hls = null;
     }
-
     if (this.video) {
       try {
         this.video.pause();
         this.video.removeAttribute('src');
-        this.video.removeAttribute('poster');
         this.video.load();
       } catch (e) {}
     }
+  }
+
+  close() {
+    if (this.activeExtractionAbort) {
+      this.activeExtractionAbort.abort();
+      this.activeExtractionAbort = null;
+    }
+
+    this.cleanupActivePlayback();
 
     if (this.backdrop) {
       this.backdrop.classList.remove('fade-out');
+      this.backdrop.style.display = 'none';
       this.backdrop.style.backgroundImage = 'none';
     }
 
@@ -1214,24 +1223,14 @@ class NetflixPlayer {
     }
   }
 
-  // ================= 11. MOTEUR LIVE HLS (Hls.js) =================
+  // ================= 11. MOTEUR LIVE HLS & VOD (Hls.js) =================
   playDirectHls(streamUrl) {
     const baseUrl = window.API_BASE || '';
     if (streamUrl && streamUrl.startsWith('/')) streamUrl = baseUrl + streamUrl;
 
-    if (this.hls) {
-      try {
-        this.hls.stopLoad();
-        this.hls.detachMedia();
-        this.hls.destroy();
-      } catch (e) {}
-      this.hls = null;
-    }
-    try {
-      this.video.pause();
-      this.video.removeAttribute('src');
-      this.video.load();
-    } catch (e) {}
+    this.cleanupActivePlayback();
+    this.streamAbortController = new AbortController();
+    const { signal } = this.streamAbortController;
 
     this.iframe.classList.add('hidden');
     this.iframe.src = 'about:blank';
@@ -1241,83 +1240,120 @@ class NetflixPlayer {
     let hasReadied = false;
     const onReady = () => {
       if (hasReadied) return;
-      // Ne masquer le loader et l'affiche que si la première frame est prête ou que le temps avance
       if (this.video.readyState < 2 && this.video.currentTime <= 0) return;
       hasReadied = true;
       this.setStep(4, 'done', `4. Flux connecté • Lecture fluide 1080p`);
-      setTimeout(() => {
-        this.hideLoader();
-        if (this.backdrop) this.backdrop.classList.add('fade-out');
-      }, 150);
+      this.hideLoader();
+      if (this.backdrop) {
+        this.backdrop.classList.add('fade-out');
+        setTimeout(() => {
+          if (this.backdrop) this.backdrop.style.display = 'none';
+        }, 200);
+      }
     };
 
-    this.video.addEventListener('loadeddata', () => onReady());
-    this.video.addEventListener('canplay', () => onReady());
-    this.video.addEventListener('playing', () => onReady());
+    this.video.addEventListener('loadeddata', () => onReady(), { signal });
+    this.video.addEventListener('canplay', () => onReady(), { signal });
+    this.video.addEventListener('playing', () => onReady(), { signal });
     this.video.addEventListener('timeupdate', () => {
       if (this.video.currentTime > 0) onReady();
-    });
+    }, { signal });
 
-    // Sécurité absolue : masquer le loader après 4s quoi qu'il arrive
+    // Sécurité absolue : masquer le loader après 3.5s max
     setTimeout(() => {
       if (!hasReadied) {
         hasReadied = true;
         this.hideLoader();
-        if (this.backdrop) this.backdrop.classList.add('fade-out');
+        if (this.backdrop) {
+          this.backdrop.classList.add('fade-out');
+          setTimeout(() => {
+            if (this.backdrop) this.backdrop.style.display = 'none';
+          }, 200);
+        }
       }
-    }, 4000);
+    }, 3500);
 
-    // Protection Anti-Rollback / Anti-Boucle Xtream (PTS/PCR resets)
-    this.lastLiveMaxTime = 0;
-    if (this._antiLoopHandler) {
-      this.video.removeEventListener('timeupdate', this._antiLoopHandler);
+    const isChannel = !!(this.currentMovie?.media_type === 'channel' || this.currentMovie?.is_live);
+
+    // Protection Anti-Rollback / Anti-Boucle Xtream UNIQUEMENT pour Live TV (JAMAIS sur VOD)
+    if (isChannel) {
+      this.lastLiveMaxTime = 0;
+      this._antiLoopHandler = () => {
+        if (!this.video.paused && !this.video.seeking) {
+          const cur = this.video.currentTime;
+          if (this.lastLiveMaxTime > 6 && cur < (this.lastLiveMaxTime - 2.0)) {
+            console.warn(`[Anti-Loop Xtream] Recalage direct : ${cur.toFixed(1)}s -> ${this.lastLiveMaxTime.toFixed(1)}s`);
+            this.video.currentTime = this.lastLiveMaxTime + 0.2;
+            return;
+          }
+          if (cur > this.lastLiveMaxTime) {
+            this.lastLiveMaxTime = cur;
+          }
+        }
+      };
+      this.video.addEventListener('timeupdate', this._antiLoopHandler, { signal });
     }
-    this._antiLoopHandler = () => {
-      const isChannel = (this.currentMovie?.media_type === 'channel' || this.currentMovie?.is_live);
-      if (isChannel && !this.video.paused && !this.video.seeking) {
-        const cur = this.video.currentTime;
-        if (this.lastLiveMaxTime > 6 && cur < (this.lastLiveMaxTime - 2.0)) {
-          console.warn(`[Anti-Loop Xtream] Recalage direct : ${cur.toFixed(1)}s -> ${this.lastLiveMaxTime.toFixed(1)}s`);
-          this.video.currentTime = this.lastLiveMaxTime + 0.2;
-          return;
-        }
-        if (cur > this.lastLiveMaxTime) {
-          this.lastLiveMaxTime = cur;
-        }
-      }
-    };
-    this.video.addEventListener('timeupdate', this._antiLoopHandler);
 
     if (window.Hls && Hls.isSupported()) {
-      const isChannel = (this.currentMovie?.media_type === 'channel' || this.currentMovie?.is_live);
-      const hls = new Hls({
+      // Configuration étanche et séparée : Live TV vs VOD
+      const hlsConfig = isChannel ? {
+        // === MODE LIVE TV (Chaînes Xtream Live & Serveurs 1-8) ===
         enableWorker: true,
         lowLatencyMode: false,
-        liveSyncDurationCount: isChannel ? 3 : 2,
-        liveMaxLatencyDurationCount: isChannel ? 10 : 8,
-        liveDurationInfinity: isChannel,
+        liveSyncDurationCount: 3,
+        liveMaxLatencyDurationCount: 8,
+        liveDurationInfinity: true,
         startLevel: -1,
         capLevelToPlayerSize: false,
         initialLiveManifestSize: 1,
         startFragPrefetch: true,
-        progressive: false, // Désactivé : évite le hachage en micro-paquets qui provoquait des saccades pendant les 10 premières secondes
-        backBufferLength: 30,
-        maxBufferLength: isChannel ? 30 : 60,
-        maxMaxBufferLength: isChannel ? 60 : 120,
-        maxBufferSize: 60 * 1024 * 1024,
-        maxBufferHole: 0.5,
-        highBufferWatchdogPeriod: 3,
-        nudgeOffset: 0.1,
-        nudgeMaxRetry: 3,
-        maxFragLookUpTolerance: 0.25,
-        fragLoadingTimeOut: 12000,
-        manifestLoadingTimeOut: 6000,
-        levelLoadingTimeOut: 6000,
+        progressive: false,
+        backBufferLength: 20,
+        maxBufferLength: 30,
+        maxMaxBufferLength: 60,
+        maxBufferSize: 50 * 1024 * 1024,
+        maxBufferHole: 0.9,
+        highBufferWatchdogPeriod: 1,
+        lowBufferWatchdogPeriod: 0.5,
+        nudgeOffset: 0.2,
+        nudgeMaxRetry: 5,
+        maxFragLookUpTolerance: 0.35,
+        fragLoadingTimeOut: 15000,
+        manifestLoadingTimeOut: 8000,
+        levelLoadingTimeOut: 8000,
         manifestLoadingMaxRetry: 3,
         fragLoadingMaxRetry: 4,
         fragLoadingRetryDelay: 500,
-        abrEwmaDefaultEstimate: 5000000 // Démarre sur une estimation stable de 5 Mbps (évite le yo-yo ABR sur les 10 premières secondes)
-      });
+        abrEwmaDefaultEstimate: 5000000
+      } : {
+        // === MODE VOD (Séries & Films : FrenchStream, Vidzy, Fsvid, Xtream VOD) ===
+        enableWorker: true,
+        lowLatencyMode: false,
+        liveDurationInfinity: false,
+        startLevel: -1,
+        capLevelToPlayerSize: false,
+        startFragPrefetch: true,
+        progressive: false,
+        backBufferLength: 90,           // Garde 90s d'historique (évite les flushes intempestifs et permet le retour arrière instantané)
+        maxBufferLength: 120,           // Précharge 2 minutes d'avance (tampon généreux et stable)
+        maxMaxBufferLength: 240,        // Jusqu'à 4 minutes d'avance max
+        maxBufferSize: 120 * 1024 * 1024, // 120 Mo de RAM alloués pour flux 1080p FHD
+        maxBufferHole: 1.0,             // Enjambe automatiquement et instantanément les micro-décalages PTS entre segments de 10s
+        highBufferWatchdogPeriod: 0.8,  // Réagit en 800ms max (au lieu de 3s) si un micro-blocage survient
+        lowBufferWatchdogPeriod: 0.5,
+        nudgeOffset: 0.2,               // Décale de 200ms pour franchir le trou sans saccade
+        nudgeMaxRetry: 5,
+        maxFragLookUpTolerance: 0.35,
+        fragLoadingTimeOut: 15000,
+        manifestLoadingTimeOut: 8000,
+        levelLoadingTimeOut: 8000,
+        manifestLoadingMaxRetry: 3,
+        fragLoadingMaxRetry: 4,
+        fragLoadingRetryDelay: 500,
+        abrEwmaDefaultEstimate: 6000000 // Estimation initiale 6 Mbps pour 1080p fluide sans sauts ABR au démarrage
+      };
+
+      const hls = new Hls(hlsConfig);
       this.hls = hls;
 
       hls.loadSource(streamUrl);
@@ -1368,8 +1404,38 @@ class NetflixPlayer {
       });
 
       hls.on(Hls.Events.ERROR, (event, data) => {
+        // Détection immédiate d'incompatibilité audio matérielle (ex: EC-3 Dolby dans M2TS non supporté par le décodeur du navigateur)
+        if (data.reason && (data.reason.includes('EC-3') || data.reason.includes('Unsupported audio'))) {
+          console.warn('[HLS] Incompatibilité audio directe (EC-3). Basculement immédiat vers le serveur optimisé...');
+          const isChannel = (this.currentMovie?.media_type === 'channel' || this.currentMovie?.is_live);
+          if (isChannel && this.currentServer < 8) {
+            const nextSrv = (this.currentServer % 8) + 1;
+            this.showStatusBanner(`Flux direct en cours d'optimisation (Basculement Serveur ${nextSrv})...`);
+            setTimeout(() => {
+              this.hideStatusBanner();
+              this.switchServer(nextSrv, true);
+            }, 100);
+            return;
+          }
+        }
+
         if (!data.fatal) {
-          // Laisser Hls.js gérer ses propres micro-ajustements de buffer sans forcer de seek artificiel
+          // Gestion proactive des micro-trous de buffer à la jonction des segments de 10s (VOD UNIQUEMENT)
+          const isChannel = (this.currentMovie?.media_type === 'channel' || this.currentMovie?.is_live);
+          if (!isChannel && (data.details === Hls.ErrorDetails.BUFFER_STALLED_ERROR || data.details === Hls.ErrorDetails.BUFFER_SEEK_OVER_HOLE)) {
+            const cur = this.video.currentTime;
+            if (this.video.buffered && this.video.buffered.length > 0) {
+              for (let i = 0; i < this.video.buffered.length; i++) {
+                const bStart = this.video.buffered.start(i);
+                if (bStart > cur && (bStart - cur) <= 1.0) {
+                  console.log(`[HLS Gap Recovery] Franchissement instantané du micro-trou (${cur.toFixed(2)}s -> ${(bStart + 0.05).toFixed(2)}s)`);
+                  this.video.currentTime = bStart + 0.05;
+                  this.video.play().catch(() => {});
+                  return;
+                }
+              }
+            }
+          }
           return;
         }
 
@@ -1395,9 +1461,8 @@ class NetflixPlayer {
             break;
           case Hls.ErrorTypes.MEDIA_ERROR:
             this._mediaErrorCount = (this._mediaErrorCount || 0) + 1;
-            // Si le navigateur ne peut pas décoder le codec (ex: HEVC sur Chrome Windows) ou si 2 erreurs média consécutives surviennent
             if (this._mediaErrorCount >= 2 || data.details === 'mediaSourceRequiresReset') {
-              console.warn('[HLS] Codec incompatible ou erreur média persistante. Basculement automatique sur le serveur suivant...');
+              console.warn('[HLS] Codec incompatible ou erreur média persistante. Basculement automatique...');
               this._mediaErrorCount = 0;
               const isChannel = (this.currentMovie?.media_type === 'channel' || this.currentMovie?.is_live);
               if (isChannel) {
@@ -1440,19 +1505,9 @@ class NetflixPlayer {
     const baseUrl = window.API_BASE || '';
     if (videoUrl && videoUrl.startsWith('/')) videoUrl = baseUrl + videoUrl;
 
-    if (this.hls) {
-      try {
-        this.hls.stopLoad();
-        this.hls.detachMedia();
-        this.hls.destroy();
-      } catch (e) {}
-      this.hls = null;
-    }
-    try {
-      this.video.pause();
-      this.video.removeAttribute('src');
-      this.video.load();
-    } catch (e) {}
+    this.cleanupActivePlayback();
+    this.streamAbortController = new AbortController();
+    const { signal } = this.streamAbortController;
 
     this.iframe.classList.add('hidden');
     this.iframe.src = 'about:blank';
@@ -1465,27 +1520,35 @@ class NetflixPlayer {
       if (this.video.readyState < 2 && this.video.currentTime <= 0) return;
       hasReadied = true;
       this.setStep(4, 'done', `4. Épisode connecté • Lecture active 1080p FHD`);
-      setTimeout(() => {
-        this.hideLoader();
-        if (this.backdrop) this.backdrop.classList.add('fade-out');
-      }, 150);
+      this.hideLoader();
+      if (this.backdrop) {
+        this.backdrop.classList.add('fade-out');
+        setTimeout(() => {
+          if (this.backdrop) this.backdrop.style.display = 'none';
+        }, 200);
+      }
     };
 
-    this.video.addEventListener('loadeddata', () => onReady());
-    this.video.addEventListener('canplay', () => onReady());
-    this.video.addEventListener('playing', () => onReady());
+    this.video.addEventListener('loadeddata', () => onReady(), { signal });
+    this.video.addEventListener('canplay', () => onReady(), { signal });
+    this.video.addEventListener('playing', () => onReady(), { signal });
     this.video.addEventListener('timeupdate', () => {
       if (this.video.currentTime > 0) onReady();
-    });
+    }, { signal });
 
-    // Sécurité absolue : masquer le loader après 4s quoi qu'il arrive
+    // Sécurité absolue : masquer le loader après 3.5s quoi qu'il arrive
     setTimeout(() => {
       if (!hasReadied) {
         hasReadied = true;
         this.hideLoader();
-        if (this.backdrop) this.backdrop.classList.add('fade-out');
+        if (this.backdrop) {
+          this.backdrop.classList.add('fade-out');
+          setTimeout(() => {
+            if (this.backdrop) this.backdrop.style.display = 'none';
+          }, 200);
+        }
       }
-    }, 4000);
+    }, 3500);
 
     this.video.addEventListener('error', () => {
       onReady();
@@ -1499,7 +1562,7 @@ class NetflixPlayer {
           this.switchServer(2, true);
         }, 700);
       }
-    }, { once: true });
+    }, { signal, once: true });
 
     let hasStartedPlay = false;
     const triggerSafePlay = () => {
@@ -1516,8 +1579,8 @@ class NetflixPlayer {
       }
     };
 
-    this.video.addEventListener('canplay', () => triggerSafePlay(), { once: true });
-    this.video.addEventListener('loadeddata', () => triggerSafePlay(), { once: true });
+    this.video.addEventListener('canplay', () => triggerSafePlay(), { signal, once: true });
+    this.video.addEventListener('loadeddata', () => triggerSafePlay(), { signal, once: true });
     // Sécurité : ne jamais attendre plus de 1.2s
     setTimeout(() => triggerSafePlay(), 1200);
 
