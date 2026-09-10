@@ -988,8 +988,8 @@ class NetflixPlayer {
       this.langSwitch.style.display = isLive ? 'none' : 'flex';
     }
 
-    const isXtreamOnly = movie.is_xtream || movie.is_xtream_series || movie.series_id || (movie.id && String(movie.id).startsWith('xtream_series_'));
-    const hasMultipleServers = isLive && !isXtreamOnly;
+    const isSingleXtreamLive = (movie.media_type === 'channel' || movie.is_live) && movie.is_xtream;
+    const hasMultipleServers = !isSingleXtreamLive;
     if (this.serverWrapper) {
       this.serverWrapper.style.display = hasMultipleServers ? 'flex' : 'none';
     }
@@ -1086,7 +1086,13 @@ class NetflixPlayer {
       const epObj = sObj?.episodes?.find(e => parseInt(e.episode_number, 10) === this.currentEpisode) || sObj?.episodes?.[0];
       const epStreamUrl = epObj ? (epObj.video_url || epObj.stream_url || epObj.sources?.vf) : null;
 
-      if (epObj && epStreamUrl) {
+      // Détection de compatibilité du codec vidéo pour le navigateur web
+      const epCodec = (epObj?.video_codec || epObj?.info?.video?.codec_name || epObj?.video?.codec_name || '').toLowerCase();
+      const isHevc = (epCodec === 'hevc' || epCodec === 'h265');
+      const browserCanPlayHevc = (this.video.canPlayType('video/mp4; codecs="hvc1.1.6.L93.B0"') === 'probably' ||
+                                  this.video.canPlayType('video/mp4; codecs="hev1.1.6.L93.B0"') === 'probably');
+
+      if (epObj && epStreamUrl && this.currentServer === 1 && (!isHevc || browserCanPlayHevc)) {
         this.currentSeason = parseInt(sObj.season_number, 10);
         this.currentEpisode = parseInt(epObj.episode_number, 10);
         this.currentEpisodeDuration = this.parseDurationToSeconds(epObj.duration || epObj.info?.duration || this.currentMovie.duration);
@@ -1107,10 +1113,17 @@ class NetflixPlayer {
         this.playDirectVideo(targetStreamUrl);
         return;
       }
+
+      if (isHevc && !browserCanPlayHevc) {
+        console.log(`[Player] Flux direct HEVC détecté (${epCodec}) sans support natif navigateur. Redirection automatique vers /api/extract avec flux HLS compatible...`);
+      }
     }
 
     // C. Chemin Standard : Extraction API (/api/extract)
-    const id = this.currentMovie.tmdb_id || this.currentMovie.id;
+    let id = this.currentMovie.tmdb_id || this.currentMovie.id;
+    if (this.currentMovie.is_xtream_series || this.currentMovie.series_id || (this.currentMovie.id && String(this.currentMovie.id).startsWith('xtream_series_'))) {
+      id = this.currentMovie.id || `xtream_series_${this.currentMovie.series_id}`;
+    }
     const isChannel = (this.currentMovie.media_type === 'channel' || this.currentMovie.is_live);
     const isMovie = (this.currentMovie.media_type === 'movie');
     const mediaType = isChannel ? 'channel' : (isMovie ? 'movie' : 'series');
@@ -1127,7 +1140,9 @@ class NetflixPlayer {
 
     try {
       const baseUrl = window.API_BASE || '';
-      const url = `${baseUrl}/api/extract?id=${encodeURIComponent(id)}&type=${mediaType}&season=${s}&episode=${e}&server=${this.currentServer}&lang=${this.currentLang}`;
+      const seriesIdParam = this.currentMovie.series_id ? `&series_id=${encodeURIComponent(this.currentMovie.series_id)}` : '';
+      const titleParam = this.currentMovie.title ? `&title=${encodeURIComponent(this.currentMovie.title)}` : '';
+      const url = `${baseUrl}/api/extract?id=${encodeURIComponent(id)}&type=${mediaType}&season=${s}&episode=${e}&server=${this.currentServer}&lang=${this.currentLang}&fallback=1${seriesIdParam}${titleParam}`;
       const res = await fetch(url, { signal: abortController.signal });
       const data = await res.json();
 
@@ -1155,7 +1170,7 @@ class NetflixPlayer {
         targetStreamUrl = baseUrl + targetStreamUrl;
       }
 
-      if (isChannel) {
+      if (isChannel || data.player_type === 'direct_hls' || (targetStreamUrl && targetStreamUrl.includes('.m3u8'))) {
         this.playDirectHls(targetStreamUrl);
       } else if (data.player_type === 'direct_video' || targetStreamUrl.includes('/api/stream/xtream-series')) {
         this.playDirectVideo(targetStreamUrl);
@@ -1435,6 +1450,14 @@ class NetflixPlayer {
       onReady();
       const err = this.video.error;
       console.warn('[Direct Video Error]:', err?.message || err?.code);
+
+      // Récupération automatique si le format n'est pas supporté (ex: HEVC/MKV dans Chrome)
+      if (this.currentMovie && (err?.code === 4 || !this.video.readyState)) {
+        this.showStatusBanner("Format vidéo non supporté par ce navigateur (HEVC). Basculement automatique vers le flux HLS compatible...");
+        setTimeout(() => {
+          this.switchServer(2, true);
+        }, 700);
+      }
     }, { once: true });
 
     this.video.preload = 'auto';
@@ -1475,6 +1498,11 @@ class NetflixPlayer {
 
   // ================= 14. UTILITAIRES D'AFFICHAGE & LOADER =================
   togglePlay() {
+    if (this.video && this.video.error) {
+      console.warn('[Player] Clic Play/Pause sur vidéo en erreur, relance automatique du flux...');
+      this.loadStream();
+      return;
+    }
     if (this.video.paused) {
       this.video.play().catch(() => {
         this.video.muted = true;

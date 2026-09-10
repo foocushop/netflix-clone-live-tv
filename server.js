@@ -1422,7 +1422,7 @@ function searchFrenchStream(query) {
         let d = '';
         res.on('data', c => d += c);
         res.on('end', () => {
-          const matches = [...d.matchAll(/href='\/([0-9]+)-([^']+)\.html'[^>]*>[\s\S]*?<div class='search-title'>([^<]+)<\/div>/g)];
+          const matches = [...d.matchAll(/(?:href=['"]|location\.href=['"])\/([0-9]+)-([^"'\/]+)\.html['"][^>]*>[\s\S]*?<div class=['"]search-title['"]>([^<]+)<\/div>/g)];
           resolve(matches.map(m => ({ id: m[1], slug: m[2], title: m[3] })));
         });
       });
@@ -1438,19 +1438,23 @@ function searchFrenchStream(query) {
 
 async function extractFrenchStream(title, isMovie = true, season = 1, episode = 1, serverIndex = 0) {
   console.log(`[French Extractor] Recherche de "${title}" (Movie: ${isMovie}, S:${season}, E:${episode}, Server:${serverIndex})...`);
-  let searchQuery = title;
-  if (!isMovie) {
-    searchQuery = `${title} Saison ${season}`;
-  }
-  let results = await searchFrenchStream(searchQuery);
-  if (!results.length && !isMovie) {
-    results = await searchFrenchStream(title);
-  }
-  if (!results.length) {
-    const cleanTitle = title.split(/[:\-–]/)[0].trim();
-    if (cleanTitle !== title) {
-      results = await searchFrenchStream(cleanTitle);
-    }
+  
+  // Nettoyage complet du titre : suppression de l'année entre parenthèses "(2021)" et des sous-titres
+  const strippedYear = title.replace(/\s*\(\d{4}\).*$/, '').trim();
+  const baseTitle = strippedYear.split(/[:\-–]/)[0].trim();
+
+  const candidates = [
+    !isMovie ? `${strippedYear} Saison ${season}` : null,
+    !isMovie ? `${baseTitle} Saison ${season}` : null,
+    strippedYear,
+    baseTitle,
+    title
+  ].filter((q, idx, arr) => q && arr.indexOf(q) === idx);
+
+  let results = [];
+  for (const q of candidates) {
+    results = await searchFrenchStream(q);
+    if (results.length > 0) break;
   }
 
   if (!results.length) {
@@ -1525,6 +1529,8 @@ async function extractFrenchStream(title, isMovie = true, season = 1, episode = 
     hoster: finalHosterName,
     title: target.title,
     stream_url: finalStream,
+    player_type: finalStream.includes('.m3u8') ? 'direct_hls' : 'direct_video',
+    sources_count: 5,
     lang: 'vf'
   };
 }
@@ -2474,6 +2480,49 @@ const server = http.createServer((req, res) => {
       }
     }
 
+    // 2b. Recherche dans les séries en cache disque (ex: The White Lotus)
+    try {
+      const cacheDir = path.join(__dirname, 'data', 'cache');
+      if (fs.existsSync(cacheDir)) {
+        const cacheFiles = fs.readdirSync(cacheDir).filter(f => f.startsWith('series_') && f.endsWith('.json'));
+        for (const cf of cacheFiles) {
+          try {
+            const raw = JSON.parse(fs.readFileSync(path.join(cacheDir, cf), 'utf8'));
+            const sId = cf.replace(/^series_/, '').replace(/\.json$/, '');
+            const name = raw.info?.name || '';
+            const nameLower = name.toLowerCase();
+            if (seenTitles.has(nameLower)) continue;
+            const target = `${name} ${raw.info?.plot || ''} ${raw.info?.genre || ''} ${raw.info?.cast || ''}`.toLowerCase();
+            if (terms.every(t => target.includes(t))) {
+              results.push({
+                id: `xtream_series_${sId}`,
+                title: name,
+                original_title: name,
+                overview: raw.info?.plot || 'Série en streaming HD.',
+                media_type: 'series',
+                poster_url: raw.info?.cover || 'assets/hero/live-tv-banner.webp',
+                backdrop_url: (Array.isArray(raw.info?.backdrop_path) && raw.info.backdrop_path[0]) || raw.info?.cover || 'assets/hero/live-tv-banner.webp',
+                video_url: `/api/stream/xtream-series?series_id=${sId}`,
+                categories: ['Séries Tendances', 'Xtream VIP'],
+                release_year: parseInt(raw.info?.releaseDate || 2025, 10) || 2025,
+                match_score: 90,
+                age_rating: '16+',
+                duration: 'Saisons intégrales',
+                cast: (raw.info?.cast || '').split(', '),
+                director: raw.info?.director || 'Production HBO / Xtream',
+                quality_badges: ['1080p FHD', 'Saisons Complètes', '💎 Xtream VIP'],
+                is_hero: false,
+                is_xtream_series: true,
+                series_id: sId
+              });
+              seenTitles.add(nameLower);
+              if (results.length >= 60) break;
+            }
+          } catch (ce) {}
+        }
+      }
+    } catch (e) {}
+
     // 3. Recherche dans XTREAM_FR_CATALOG (1 268 Chaînes Françaises Direct)
     if (results.length < 60) {
       for (const ch of XTREAM_FR_CATALOG) {
@@ -3082,14 +3131,16 @@ const server = http.createServer((req, res) => {
       }
 
       // ── Cas spécial : Séries Télé-Réalité Xtream (La Villa 68628 & séries Xtream Catégorie 947) ──
-      if (id === '68628' || tmdbId === '68628' || (id && String(id).startsWith('xtream_series_')) || (tmdbId && String(tmdbId).startsWith('xtream_series_'))) {
+      const querySeriesId = parsedUrl.query.series_id;
+      const isXtreamSeries = querySeriesId || id === '68628' || tmdbId === '68628' || (id && String(id).startsWith('xtream_series_')) || (tmdbId && String(tmdbId).startsWith('xtream_series_'));
+      if (isXtreamSeries) {
         const sNum = parseInt(season) || 1;
         const eNum = parseInt(episode) || 1;
         
         // Chercher d'abord dans catalog.movies
         const catShow = catalog.movies.find(m => m.id === id || m.tmdb_id === tmdbId);
         let episodeObj = null;
-        let showTitle = catShow?.title || 'Télé-Réalité Xtream';
+        let showTitle = catShow?.title || parsedUrl.query.title || 'Télé-Réalité Xtream';
 
         if (catShow && catShow.seasons) {
           const sObj = catShow.seasons.find(s => s.season_number === sNum) || catShow.seasons[0];
@@ -3098,7 +3149,7 @@ const server = http.createServer((req, res) => {
 
         // Si non trouvé dans catalog.json, chercher dans le cache disque Xtream
         if (!episodeObj) {
-          const realSeriesId = (id === '68628' || tmdbId === '68628') ? '6715' : String(id || tmdbId || '').replace(/^xtream_series_/, '');
+          const realSeriesId = querySeriesId || ((id === '68628' || tmdbId === '68628') ? '6715' : String(id || tmdbId || '').replace(/^xtream_series_/, ''));
           const cacheFile = path.join(__dirname, 'data', 'cache', `series_${realSeriesId}.json`);
           if (fs.existsSync(cacheFile)) {
             try {
@@ -3111,7 +3162,8 @@ const server = http.createServer((req, res) => {
                 episodeObj = {
                   episode_number: parseInt(foundEp.episode_num) || eNum,
                   title: foundEp.title || `Épisode ${eNum}`,
-                  video_url: `/api/stream/xtream-series?episode_id=${foundEp.id}&ext=${ext}`
+                  video_url: `/api/stream/xtream-series?episode_id=${foundEp.id}&ext=${ext}`,
+                  video: foundEp.info?.video || {}
                 };
               }
             } catch (e) {}
@@ -3139,7 +3191,8 @@ const server = http.createServer((req, res) => {
                   episodeObj = {
                     episode_number: parseInt(foundEp.episode_num) || eNum,
                     title: foundEp.title || `Épisode ${eNum}`,
-                    video_url: `/api/stream/xtream-series?episode_id=${foundEp.id}&ext=${ext}`
+                    video_url: `/api/stream/xtream-series?episode_id=${foundEp.id}&ext=${ext}`,
+                    video: foundEp.info?.video || {}
                   };
                 }
               }
@@ -3152,6 +3205,35 @@ const server = http.createServer((req, res) => {
         const streamUrlToUse = episodeObj ? (episodeObj.video_url || episodeObj.stream_url || episodeObj.sources?.vf) : null;
 
         if (episodeObj && streamUrlToUse) {
+          const epCodec = (episodeObj.video?.codec_name || '').toLowerCase();
+          const isHevcEp = epCodec === 'hevc' || epCodec === 'h265';
+          const wantsFallback = (serverNum > 1) || (isHevcEp && (parsedUrl.query.format === 'hls' || parsedUrl.query.fallback === '1'));
+
+          if (wantsFallback) {
+            try {
+              console.log(`[extract] Recherche d'un flux compatible HLS/H.264 pour "${showTitle}" (S${sNum}:E${eNum})...`);
+              const altStream = await extractFrenchStream(showTitle, false, sNum, eNum, serverIndex > 0 ? (serverIndex - 1) : 0);
+              if (altStream && altStream.stream_url) {
+                return {
+                  success: true,
+                  server: serverNum,
+                  server_name: `Serveur ${serverNum} (${altStream.hoster || 'HLS 1080p'} • Compatible Web)`,
+                  hoster: altStream.hoster || 'HLS Multi-Navigateurs',
+                  quality: '1080p FHD',
+                  title: `${showTitle} - S${sNum}:E${eNum}`,
+                  stream_url: altStream.stream_url.startsWith('http') ? `/api/stream/proxy?url=${encodeURIComponent(altStream.stream_url)}` : altStream.stream_url,
+                  raw_stream_url: altStream.stream_url,
+                  player_type: 'direct_hls',
+                  is_embed: false,
+                  sources_count: 5,
+                  lang: 'vf'
+                };
+              }
+            } catch (fallbackErr) {
+              console.warn(`[extract] Fallback HLS indisponible pour "${showTitle}":`, fallbackErr.message);
+            }
+          }
+
           return {
             success: true,
             server: serverNum,
@@ -3163,14 +3245,15 @@ const server = http.createServer((req, res) => {
             raw_stream_url: streamUrlToUse,
             player_type: 'direct_video',
             is_embed: false,
+            codec: epCodec,
             sources_count: 5,
             lang: 'vf'
           };
         }
 
         // ── GUARD FINAL : Série Xtream détectée mais épisode introuvable → ne pas tomber dans extractFrenchStream ──
-        if (id === '68628' || tmdbId === '68628' || (id && String(id).startsWith('xtream_series_')) || (tmdbId && String(tmdbId).startsWith('xtream_series_'))) {
-          const sId = (id === '68628' || tmdbId === '68628') ? '6715' : String(id || tmdbId || '').replace(/^xtream_series_/, '');
+        if (isXtreamSeries) {
+          const sId = querySeriesId || ((id === '68628' || tmdbId === '68628') ? '6715' : String(id || tmdbId || '').replace(/^xtream_series_/, ''));
           return {
             success: false,
             error: 'Épisode introuvable dans la bibliothèque Xtream. Veuillez ouvrir la fiche série pour charger les épisodes.',
@@ -3579,6 +3662,8 @@ const server = http.createServer((req, res) => {
             duration: ep.info?.duration || '45m',
             video_url: streamUrl,
             still_url: ep.info?.movie_image || rawData.info?.cover || '',
+            video: ep.info?.video || {},
+            video_codec: ep.info?.video?.codec_name || null,
             sources: {
               direct: streamUrl,
               fhd: streamUrl
@@ -4194,7 +4279,13 @@ const server = http.createServer((req, res) => {
         };
 
         const ct = (upstreamRes.headers['content-type'] || '').toLowerCase();
-        if (ct && !ct.includes('matroska') && !ct.includes('octet-stream')) {
+        if (ext === 'mkv' || ct.includes('matroska')) {
+          outHeaders['Content-Type'] = 'video/x-matroska';
+        } else if (ext === 'mp4' || ct.includes('mp4')) {
+          outHeaders['Content-Type'] = 'video/mp4';
+        } else if (ext === 'ts' || ct.includes('mp2t')) {
+          outHeaders['Content-Type'] = 'video/mp2t';
+        } else if (ct && !ct.includes('octet-stream')) {
           outHeaders['Content-Type'] = upstreamRes.headers['content-type'];
         } else {
           outHeaders['Content-Type'] = 'video/mp4';
