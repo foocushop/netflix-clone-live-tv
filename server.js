@@ -229,6 +229,160 @@ try {
 
 
 
+// ================= SYSTÈME DE TÉLÉMÉTRIE EN DIRECT DES SESSIONS XTREAM =================
+const activeStreamingSessions = new Map();
+
+function detectClientApp(userAgent = '') {
+  const ua = (userAgent || '').toLowerCase();
+  if (ua.includes('televizo')) return { name: 'Televizo', icon: '📺', badge: 'televizo' };
+  if (ua.includes('tivimate')) return { name: 'TiviMate', icon: '📺', badge: 'tivimate' };
+  if (ua.includes('smarters') || ua.includes('iptvsmarters')) return { name: 'IPTV Smarters', icon: '📱', badge: 'smarters' };
+  if (ua.includes('vlc')) return { name: 'VLC Media Player', icon: '🟧', badge: 'vlc' };
+  if (ua.includes('kodi')) return { name: 'Kodi', icon: '🍿', badge: 'kodi' };
+  if (ua.includes('ott navigator') || ua.includes('ottnavigator')) return { name: 'OTT Navigator', icon: '🧭', badge: 'ott' };
+  if (ua.includes('exoplayer')) return { name: 'ExoPlayer (Android)', icon: '🤖', badge: 'android' };
+  if (ua.includes('applecoremedia')) return { name: 'Apple TV / iOS', icon: '🍏', badge: 'apple' };
+  if (ua.includes('chrome') || ua.includes('firefox') || ua.includes('safari') || ua.includes('edge')) return { name: 'Lecteur Web Netflix', icon: '💻', badge: 'web' };
+  return { name: userAgent ? userAgent.split('/')[0].substring(0, 16) : 'Client IPTV', icon: '📡', badge: 'other' };
+}
+
+function resolveStreamMediaInfo(streamId, type = 'channel', customName = '') {
+  if (type === 'channel' || type === 'live') {
+    if (streamId) {
+      const ch = XTREAM_FR_CATALOG.find(c => String(c.stream_id) === String(streamId));
+      if (ch) {
+        return {
+          id: String(ch.stream_id),
+          name: ch.name,
+          category: ch.category_name || 'Chaînes TV',
+          icon: ch.icon || 'assets/hero/live-tv-banner.webp',
+          quality: ch.quality_badge || 'HD',
+          type: 'live'
+        };
+      }
+    }
+  } else if (type === 'series') {
+    if (streamId) {
+      const show = XTREAM_TELEREALITE_CATALOG.find(s => String(s.series_id) === String(streamId));
+      if (show) {
+        return {
+          id: String(show.series_id),
+          name: show.name,
+          category: 'Télé-Réalité',
+          icon: show.cover || 'assets/hero/live-tv-banner.webp',
+          quality: '1080p FHD',
+          type: 'series'
+        };
+      }
+    }
+  }
+
+  // Fallback direct
+  return {
+    id: streamId ? String(streamId) : 'custom',
+    name: customName || (streamId ? `Flux #${streamId}` : 'Flux Multimédia'),
+    category: type === 'series' ? 'Série VOD' : (type === 'movie' ? 'Film VOD' : 'Chaîne Direct'),
+    icon: 'assets/hero/live-tv-banner.webp',
+    quality: 'Direct HD',
+    type: type || 'live'
+  };
+}
+
+function getClientIp(req) {
+  const forwarded = req.headers['x-forwarded-for'];
+  if (forwarded) {
+    return forwarded.split(',')[0].trim();
+  }
+  return req.socket ? (req.socket.remoteAddress || '127.0.0.1') : '127.0.0.1';
+}
+
+function trackStreamingSession(req, res, streamId, type = 'live', customName = '') {
+  if (!streamId && !customName) return;
+
+  const clientIp = getClientIp(req);
+  const userAgent = req.headers['user-agent'] || '';
+  const clientApp = detectClientApp(userAgent);
+  const mediaInfo = resolveStreamMediaInfo(streamId, type, customName);
+
+  // Clé unique de la session : IP + StreamId + Type
+  const sessionKey = `${clientIp}_${mediaInfo.id}_${mediaInfo.type}`;
+  const now = Date.now();
+
+  let session = activeStreamingSessions.get(sessionKey);
+  if (session) {
+    session.lastActivityAt = now;
+    session.requestCount++;
+    session.clientApp = clientApp;
+  } else {
+    session = {
+      id: `sess_${now}_${Math.random().toString(36).substr(2, 6)}`,
+      key: sessionKey,
+      clientIp,
+      userAgent,
+      clientApp,
+      media: mediaInfo,
+      startedAt: now,
+      lastActivityAt: now,
+      requestCount: 1,
+      estimatedRamMb: 8.5, // ~8.5 Mo de buffer RAM par flux HLS/TS
+      serverNode: process.env.NODE_NAME || 'Serveur 1 (Principal)'
+    };
+    activeStreamingSessions.set(sessionKey, session);
+  }
+
+  // Nettoyage si connexion persistante fermée
+  const onSocketClose = () => {
+    if (req.url && req.url.includes('.ts') && !req.url.includes('.m3u8')) {
+      activeStreamingSessions.delete(sessionKey);
+    }
+  };
+  req.once('close', onSocketClose);
+  res.once('finish', onSocketClose);
+
+  return session;
+}
+
+// Nettoyage automatique des sessions inactives (> 35 secondes sans requête de segment)
+setInterval(() => {
+  const now = Date.now();
+  for (const [key, session] of activeStreamingSessions.entries()) {
+    if (now - session.lastActivityAt > 35000) {
+      activeStreamingSessions.delete(key);
+    }
+  }
+  activeStreamsCount = activeStreamingSessions.size;
+}, 5000);
+
+function getActiveSessionsMetrics() {
+  const now = Date.now();
+  const sessionsList = [];
+  let totalRamMb = 0;
+
+  for (const session of activeStreamingSessions.values()) {
+    const durationSeconds = Math.max(0, Math.floor((now - session.startedAt) / 1000));
+    totalRamMb += session.estimatedRamMb;
+    sessionsList.push({
+      id: session.id,
+      client_ip: session.clientIp,
+      client_app: session.clientApp,
+      media: session.media,
+      duration_seconds: durationSeconds,
+      request_count: session.requestCount,
+      estimated_ram_mb: session.estimatedRamMb,
+      server_node: session.serverNode,
+      started_at: session.startedAt
+    });
+  }
+
+  sessionsList.sort((a, b) => b.started_at - a.started_at);
+
+  return {
+    count: sessionsList.length,
+    total_ram_mb: parseFloat(totalRamMb.toFixed(1)),
+    sessions: sessionsList
+  };
+}
+
 // Fallbacks de sécurité pour les variantes de flux (si un flux FHD est en panne, basculer sur HD ou UHD)
 const XTREAM_STREAM_FALLBACKS = {
   '13739': ['13916', '479236', '47475'], // France 2 FHD -> HD -> UHD -> HEVC
@@ -2128,6 +2282,7 @@ const server = http.createServer((req, res) => {
         const streamId = fileWithExt.replace(/\.(m3u8|ts)$/i, '');
         parsedUrl.query.stream_id = streamId;
         pathname = '/api/stream/xtream';
+        trackStreamingSession(req, res, streamId, 'live');
       } else if (type === 'series') {
         const extMatch = fileWithExt.match(/\.([a-zA-Z0-9]+)$/);
         const ext = extMatch ? extMatch[1] : 'mkv';
@@ -2135,10 +2290,12 @@ const server = http.createServer((req, res) => {
         parsedUrl.query.episode_id = episodeId;
         parsedUrl.query.ext = ext;
         pathname = '/api/stream/xtream-series';
+        trackStreamingSession(req, res, episodeId, 'series');
       } else if (type === 'movie') {
         const movieId = fileWithExt.replace(/\.[a-zA-Z0-9]+$/, '');
         const catMovie = (catalog.movies || []).find(m => m.id === movieId || m.tmdb_id === movieId);
         if (catMovie && catMovie.video_url) {
+          trackStreamingSession(req, res, movieId, 'movie', catMovie.title);
           res.writeHead(302, { 'Location': catMovie.video_url, 'Access-Control-Allow-Origin': '*' });
           return res.end();
         }
@@ -2498,8 +2655,9 @@ const server = http.createServer((req, res) => {
     return;
   }
 
-  // 2. Route Métriques Locales du Serveur (CPU %, RAM, Flux actifs)
+  // 2. Route Métriques Locales du Serveur (CPU %, RAM, Flux actifs & Sessions Xtream)
   if (pathname === '/api/cluster/metrics' && req.method === 'GET') {
+    const sessionsMetrics = getActiveSessionsMetrics();
     const metrics = {
       success: true,
       node_id: process.env.NODE_ID || 'node-1',
@@ -2507,7 +2665,8 @@ const server = http.createServer((req, res) => {
       online: true,
       cpu_percent: getCpuUsagePercent(),
       memory: getMemoryMetrics(),
-      active_streams: activeStreamsCount,
+      active_streams: sessionsMetrics.count,
+      active_xtream_sessions: sessionsMetrics,
       total_requests: totalRequestsCount,
       uptime_seconds: Math.floor((Date.now() - startTime) / 1000),
       timestamp: Date.now()
@@ -2517,7 +2676,7 @@ const server = http.createServer((req, res) => {
     return;
   }
 
-  // 3. Route Statut Global du Cluster (Supervision en temps réel de tous les nœuds)
+  // 3. Route Statut Global du Cluster (Supervision en temps réel de tous les nœuds & Sessions)
   if (pathname === '/api/cluster/status' && req.method === 'GET') {
     const currentExternalUrl = (process.env.RENDER_EXTERNAL_URL || '').replace(/\/$/, '');
     const isLocalNode = (urlStr) => {
@@ -2529,6 +2688,7 @@ const server = http.createServer((req, res) => {
       const nodeUrl = (node.url || '').replace(/\/$/, '');
       const isLocal = idx === 0 || isLocalNode(nodeUrl) || nodeUrl === 'local';
       if (isLocal) {
+        const localSessions = getActiveSessionsMetrics();
         return {
           id: node.id,
           name: node.name,
@@ -2539,7 +2699,9 @@ const server = http.createServer((req, res) => {
           is_current: true,
           cpu_percent: getCpuUsagePercent(),
           memory: getMemoryMetrics(),
-          active_streams: activeStreamsCount,
+          active_streams: localSessions.count,
+          active_sessions: localSessions.sessions,
+          total_sessions_ram_mb: localSessions.total_ram_mb,
           total_requests: totalRequestsCount,
           uptime_seconds: Math.floor((Date.now() - startTime) / 1000)
         };
@@ -2553,6 +2715,7 @@ const server = http.createServer((req, res) => {
         });
         if (resNode.ok) {
           const data = await resNode.json();
+          const sessData = data.active_xtream_sessions || { count: data.active_streams || 0, sessions: [], total_ram_mb: 0 };
           return {
             id: node.id,
             name: node.name,
@@ -2563,7 +2726,9 @@ const server = http.createServer((req, res) => {
             is_current: false,
             cpu_percent: data.cpu_percent || 0,
             memory: data.memory || { usedMb: 0, totalMb: 512, percent: 0 },
-            active_streams: data.active_streams || 0,
+            active_streams: sessData.count,
+            active_sessions: sessData.sessions || [],
+            total_sessions_ram_mb: sessData.total_ram_mb || 0,
             total_requests: data.total_requests || 0,
             uptime_seconds: data.uptime_seconds || 0
           };
@@ -2581,17 +2746,71 @@ const server = http.createServer((req, res) => {
         cpu_percent: 0,
         memory: { usedMb: 0, totalMb: 512, percent: 0 },
         active_streams: 0,
+        active_sessions: [],
+        total_sessions_ram_mb: 0,
         total_requests: 0,
         uptime_seconds: 0
       };
     });
 
     Promise.all(statusPromises).then(results => {
+      const allActiveSessions = [];
+      results.forEach(n => {
+        if (Array.isArray(n.active_sessions)) {
+          n.active_sessions.forEach(s => {
+            allActiveSessions.push(Object.assign({}, s, { server_node: n.name, is_local: n.is_current }));
+          });
+        }
+      });
+
       res.writeHead(200, { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' });
-      res.end(JSON.stringify({ success: true, nodes: results, count: results.length }));
+      res.end(JSON.stringify({
+        success: true,
+        nodes: results,
+        count: results.length,
+        active_sessions: allActiveSessions,
+        total_active_sessions: allActiveSessions.length,
+        total_sessions_ram_mb: parseFloat(allActiveSessions.reduce((acc, s) => acc + (s.estimated_ram_mb || 8.5), 0).toFixed(1))
+      }));
     }).catch(err => {
       res.writeHead(500, { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' });
       res.end(JSON.stringify({ success: false, message: err.message }));
+    });
+    return;
+  }
+
+  // 3b. Route Supervision Télémétrique Xtream Sessions
+  if (pathname === '/api/admin/xtream/sessions' && req.method === 'GET') {
+    const metrics = getActiveSessionsMetrics();
+    res.writeHead(200, { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' });
+    res.end(JSON.stringify({ success: true, data: metrics }));
+    return;
+  }
+
+  if (pathname === '/api/admin/xtream/sessions' && req.method === 'DELETE') {
+    let body = '';
+    req.on('data', chunk => body += chunk);
+    req.on('end', () => {
+      try {
+        const payload = JSON.parse(body || '{}');
+        const targetId = payload.id;
+        let deleted = false;
+        for (const [key, session] of activeStreamingSessions.entries()) {
+          if (session.id === targetId || session.key === targetId || session.clientIp === targetId) {
+            activeStreamingSessions.delete(key);
+            deleted = true;
+          }
+        }
+        res.writeHead(200, { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' });
+        res.end(JSON.stringify({
+          success: true,
+          message: deleted ? 'Session Xtream interrompue' : 'Session introuvable',
+          data: getActiveSessionsMetrics()
+        }));
+      } catch (e) {
+        res.writeHead(400, { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' });
+        res.end(JSON.stringify({ success: false, message: e.message }));
+      }
     });
     return;
   }
@@ -3486,6 +3705,10 @@ const server = http.createServer((req, res) => {
       return res.end(`Chaîne Xtream non trouvée pour: ${rawChannel}`);
     }
 
+    if (streamId) {
+      trackStreamingSession(req, res, streamId, 'live', rawChannel);
+    }
+
     // Accélération 1 : Cache mémoire RAM instantané (1500ms) pour rafraîchissement à 0 ms
     if (!parsedUrl.query.target && streamId) {
       const cachedManifest = xtreamManifestCache.get(streamId);
@@ -3849,6 +4072,8 @@ const server = http.createServer((req, res) => {
       res.writeHead(400, { 'Content-Type': 'text/plain', 'Access-Control-Allow-Origin': '*' });
       return res.end('Paramètre episode_id manquant');
     }
+
+    trackStreamingSession(req, res, episodeId, 'series');
 
     const cacheKey = `${episodeId}_${ext}`;
     const originUrl = `http://${XTREAM_CONFIG.host}:${XTREAM_CONFIG.port}/series/${XTREAM_CONFIG.username}/${XTREAM_CONFIG.password}/${episodeId}.${ext}`;

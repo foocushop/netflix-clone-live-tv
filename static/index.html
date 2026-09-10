@@ -668,6 +668,44 @@
         </div>
       </div>
 
+      <!-- ================= SECTION SURVEILLANCE XTREAM SESSIONS EN DIRECT ================= -->
+      <div class="admin-xtream-monitor-container" id="adminXtreamMonitorSection">
+        <div class="xtream-monitor-header">
+          <div class="monitor-title-wrap">
+            <span class="monitor-icon">📡</span>
+            <div class="monitor-title-group">
+              <h2 class="monitor-title">SESSIONS XTREAM EN DIRECT (TÉLÉMÉTRIE TEMPS RÉEL)</h2>
+              <p class="monitor-subtitle">Visualisation en direct des flux en cours (Televizo, TiviMate, VLC, Web), chaînes diffusées et impact mémoire RAM</p>
+            </div>
+          </div>
+          <div class="monitor-header-badges">
+            <div class="badge-sessions-live" id="xtreamSessionsLiveBadge">
+              <span class="pulse-dot-red"></span>
+              <span id="xtreamActiveCountText">0 SESSION ACTIVE</span>
+            </div>
+            <div class="badge-sessions-ram">
+              <span>🧠 RAM Allouée : </span>
+              <strong id="xtreamTotalRamText">0 Mo</strong>
+            </div>
+            <button type="button" class="btn-admin btn-admin-secondary btn-sm" id="xtreamSessionsRefreshBtn" title="Actualiser les sessions en direct">
+              🔄 Actualiser
+            </button>
+          </div>
+        </div>
+
+        <!-- Liste des flux en cours de visionnage -->
+        <div class="xtream-sessions-table-wrap">
+          <div class="xtream-sessions-grid" id="xtreamSessionsGrid">
+            <!-- Rempli dynamiquement par admin.js -->
+            <div class="xtream-empty-sessions" id="xtreamEmptySessions">
+              <span style="font-size: 1.6rem; display: block; margin-bottom: 6px;">📡</span>
+              Aucun flux Xtream en cours de diffusion pour le moment.<br>
+              <span style="font-size: 0.8rem; color: var(--admin-text-muted);">Lancez une chaîne sur Televizo, TiviMate ou le lecteur web pour voir la session s'afficher en direct ici.</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
       <!-- Barre d'outils pratique : Recherche instantanée & Filtres de type -->
       <div class="admin-toolbar">
         <div class="admin-search-wrapper">

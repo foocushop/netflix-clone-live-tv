@@ -26,6 +26,12 @@ class NetflixAdmin {
     this.clusterAddNodeForm = document.getElementById('clusterAddNodeForm');
     this.clusterRefreshBtn = document.getElementById('clusterRefreshBtn');
 
+    // Télémétrie Sessions Xtream
+    this.xtreamSessionsGrid = document.getElementById('xtreamSessionsGrid');
+    this.xtreamActiveCountText = document.getElementById('xtreamActiveCountText');
+    this.xtreamTotalRamText = document.getElementById('xtreamTotalRamText');
+    this.xtreamSessionsRefreshBtn = document.getElementById('xtreamSessionsRefreshBtn');
+
     this.initEvents();
   }
 
@@ -196,6 +202,11 @@ class NetflixAdmin {
     if (this.clusterAddNodeForm) {
       this.clusterAddNodeForm.addEventListener('submit', (e) => this.handleClusterAddNodeSubmit(e));
     }
+
+    // Gestion de la Télémétrie des Sessions Xtream
+    if (this.xtreamSessionsRefreshBtn) {
+      this.xtreamSessionsRefreshBtn.addEventListener('click', () => this.loadXtreamSessions(true));
+    }
   }
 
   // ================= FLUX DE SÉCURITÉ & CONNEXION =================
@@ -209,6 +220,7 @@ class NetflixAdmin {
     this.loadCatalog();
     this.loadGitHubStatus();
     this.loadClusterStatus();
+    this.loadXtreamSessions();
     this.startClusterPolling();
   }
 
@@ -924,6 +936,9 @@ class NetflixAdmin {
       const data = await res.json();
       if (data && data.success && Array.isArray(data.nodes)) {
         this.renderClusterNodes(data.nodes);
+        if (Array.isArray(data.active_sessions)) {
+          this.renderXtreamSessions(data.active_sessions, data.total_sessions_ram_mb);
+        }
         if (showNotification) {
           this.showToast(`⚡ Cluster synchronisé : ${data.nodes.length} nœud(s)`);
         }
@@ -1122,6 +1137,142 @@ class NetflixAdmin {
         this.showToast(data.message || "Erreur lors de la suppression", true);
       }
     } catch (err) {
+      this.showToast("Erreur de communication avec le serveur", true);
+    }
+  }
+
+  // ================= TÉLÉMÉTRIE EN DIRECT DES SESSIONS XTREAM =================
+  async loadXtreamSessions(showNotification = false) {
+    try {
+      const res = await fetch(`${this.apiBase()}/api/admin/xtream/sessions`, {
+        headers: this.authHeaders()
+      });
+      if (res.status === 401) {
+        this.handleUnauthorized();
+        return;
+      }
+      const json = await res.json();
+      if (json && json.success && json.data) {
+        this.renderXtreamSessions(json.data.sessions || [], json.data.total_ram_mb || 0);
+        if (showNotification) {
+          this.showToast(`📡 Télémétrie Xtream actualisée : ${json.data.count || 0} session(s) active(s)`);
+        }
+      }
+    } catch (err) {
+      console.warn('[Xtream Telemetry Error]:', err.message);
+    }
+  }
+
+  renderXtreamSessions(sessions = [], totalRamMb = 0) {
+    if (!this.xtreamSessionsGrid) {
+      this.xtreamSessionsGrid = document.getElementById('xtreamSessionsGrid');
+    }
+    if (!this.xtreamActiveCountText) {
+      this.xtreamActiveCountText = document.getElementById('xtreamActiveCountText');
+    }
+    if (!this.xtreamTotalRamText) {
+      this.xtreamTotalRamText = document.getElementById('xtreamTotalRamText');
+    }
+
+    const count = Array.isArray(sessions) ? sessions.length : 0;
+    if (this.xtreamActiveCountText) {
+      this.xtreamActiveCountText.textContent = `${count} SESSION${count > 1 ? 'S' : ''} ACTIVE${count > 1 ? 'S' : ''}`;
+    }
+    if (this.xtreamTotalRamText) {
+      this.xtreamTotalRamText.textContent = `${totalRamMb || (count * 8.5).toFixed(1)} Mo`;
+    }
+
+    if (!this.xtreamSessionsGrid) return;
+
+    if (!sessions || sessions.length === 0) {
+      this.xtreamSessionsGrid.innerHTML = `
+        <div class="xtream-empty-sessions" id="xtreamEmptySessions">
+          <span style="font-size: 1.6rem; display: block; margin-bottom: 6px;">📡</span>
+          Aucun flux Xtream en cours de diffusion pour le moment.<br>
+          <span style="font-size: 0.8rem; color: var(--admin-text-muted);">Lancez une chaîne sur Televizo, TiviMate ou le lecteur web pour voir la session s'afficher en direct ici.</span>
+        </div>
+      `;
+      return;
+    }
+
+    const html = sessions.map(s => {
+      const app = s.client_app || { name: 'Client IPTV', icon: '📡', badge: 'other' };
+      const media = s.media || { name: 'Flux Direct', category: 'TV', icon: 'assets/hero/live-tv-banner.webp', quality: 'HD' };
+      const durationStr = this.formatUptime(s.duration_seconds || 0);
+      const ramMb = s.estimated_ram_mb ? `${s.estimated_ram_mb} Mo` : '8.5 Mo';
+      const serverName = s.server_node || 'Serveur 1';
+      const safeIp = (s.client_ip || '127.0.0.1').replace(/::ffff:/, '');
+
+      return `
+        <div class="xtream-session-card" data-session-id="${this.escapeHtml(s.id)}">
+          <div class="session-left">
+            <img class="session-channel-icon" src="${this.escapeHtml(media.icon || 'assets/hero/live-tv-banner.webp')}" alt="${this.escapeHtml(media.name)}" onerror="this.src='assets/hero/live-tv-banner.webp'">
+            <div class="session-info">
+              <span class="session-channel-name" title="${this.escapeHtml(media.name)}">${this.escapeHtml(media.name)}</span>
+              <span class="session-category">${this.escapeHtml(media.category)} • ${this.escapeHtml(media.quality || 'HD')}</span>
+            </div>
+          </div>
+
+          <div class="session-center">
+            <span class="badge-app ${this.escapeHtml(app.badge || 'other')}">
+              <span>${app.icon || '📺'}</span> ${this.escapeHtml(app.name)}
+            </span>
+            <span class="badge-server-node" title="Serveur qui délivre le flux">
+              🖥️ ${this.escapeHtml(serverName)}
+            </span>
+            <span class="session-stat-pill duration" title="Durée de visionnage active">
+              ⏱️ ${durationStr}
+            </span>
+            <span class="session-stat-pill ram" title="Mémoire RAM allouée au buffer">
+              🧠 ${ramMb} RAM
+            </span>
+            <span class="session-stat-pill ip" title="Adresse IP cliente">
+              🌐 ${this.escapeHtml(safeIp)}
+            </span>
+          </div>
+
+          <div class="session-right">
+            <button type="button" class="btn-kill-session" data-session-id="${this.escapeHtml(s.id)}" data-channel-name="${this.escapeHtml(media.name)}" title="Couper cette diffusion">
+              ✕ Interrompre
+            </button>
+          </div>
+        </div>
+      `;
+    }).join('');
+
+    this.xtreamSessionsGrid.innerHTML = html;
+
+    // Lier les boutons d'interruption
+    this.xtreamSessionsGrid.querySelectorAll('.btn-kill-session').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const id = btn.getAttribute('data-session-id');
+        const chName = btn.getAttribute('data-channel-name');
+        this.killXtreamSession(id, chName);
+      });
+    });
+  }
+
+  async killXtreamSession(sessionId, channelName) {
+    if (!sessionId) return;
+    if (!confirm(`Voulez-vous vraiment couper la session de diffusion de "${channelName || 'cette chaîne'}" ?`)) {
+      return;
+    }
+
+    try {
+      const res = await fetch(`${this.apiBase()}/api/admin/xtream/sessions`, {
+        method: 'DELETE',
+        headers: this.authHeaders({ 'Content-Type': 'application/json' }),
+        body: JSON.stringify({ id: sessionId })
+      });
+
+      const data = await res.json();
+      if (res.ok && data.success) {
+        this.showToast(`🛑 Session "${channelName || sessionId}" interrompue`);
+        this.renderXtreamSessions(data.data?.sessions || [], data.data?.total_ram_mb || 0);
+      } else {
+        this.showToast(data.message || "Erreur lors de l'interruption", true);
+      }
+    } catch (e) {
       this.showToast("Erreur de communication avec le serveur", true);
     }
   }
