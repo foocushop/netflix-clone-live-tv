@@ -273,35 +273,72 @@ class NetflixPlayer {
       const duration = getEffectiveDuration();
       if (!duration) return;
       const rect = this.scrubberContainer.getBoundingClientRect();
-      const pos = Math.max(0, Math.min(1, (e.clientX - rect.left) / rect.width));
+      const clientX = e.clientX !== undefined ? e.clientX : (e.touches && e.touches[0] ? e.touches[0].clientX : rect.left);
+      const pos = Math.max(0, Math.min(1, (clientX - rect.left) / rect.width));
       this.video.currentTime = pos * duration;
       this.updateScrubberProgress(pos * 100);
     };
 
+    const updateTooltip = (e) => {
+      if (!this.scrubberTooltip) return;
+      const isChannel = (this.currentMovie?.media_type === 'channel' || this.currentMovie?.is_live);
+      if (isChannel) {
+        this.scrubberTooltip.textContent = 'EN DIRECT 🔴';
+        this.scrubberTooltip.classList.add('visible');
+        return;
+      }
+      const duration = getEffectiveDuration();
+      if (!duration || duration <= 0) {
+        this.scrubberTooltip.classList.remove('visible');
+        return;
+      }
+      const rect = this.scrubberContainer.getBoundingClientRect();
+      if (!rect.width) return;
+      const clientX = e.clientX !== undefined ? e.clientX : (e.touches && e.touches[0] ? e.touches[0].clientX : rect.left);
+      const offsetX = Math.max(0, Math.min(rect.width, clientX - rect.left));
+      const pos = offsetX / rect.width;
+      const targetTime = pos * duration;
+      this.scrubberTooltip.textContent = this.formatTime(targetTime);
+
+      // Clamping dynamique en pixels pour que le tooltip ne déborde jamais sur les bords gauche/droite
+      const tooltipWidth = this.scrubberTooltip.offsetWidth || 56;
+      const minLeft = tooltipWidth / 2 + 4;
+      const maxLeft = rect.width - (tooltipWidth / 2 + 4);
+      const clampedPixel = Math.max(minLeft, Math.min(maxLeft, offsetX));
+      this.scrubberTooltip.style.left = `${clampedPixel}px`;
+      this.scrubberTooltip.classList.add('visible');
+    };
+
+    // Survol souris
+    this.scrubberContainer.addEventListener('mouseenter', (e) => updateTooltip(e));
+    this.scrubberContainer.addEventListener('mousemove', (e) => updateTooltip(e));
+    this.scrubberContainer.addEventListener('mouseleave', () => {
+      if (!this.isScrubbing && this.scrubberTooltip) {
+        this.scrubberTooltip.classList.remove('visible');
+      }
+    });
+
+    // Clic & Glissement (Scrubbing)
     this.scrubberContainer.addEventListener('mousedown', (e) => {
       this.isScrubbing = true;
+      this.scrubberContainer.classList.add('dragging');
       onScrub(e);
+      updateTooltip(e);
       const onMouseMove = (ev) => {
-        if (this.isScrubbing) onScrub(ev);
+        if (this.isScrubbing) {
+          onScrub(ev);
+          updateTooltip(ev);
+        }
       };
       const onMouseUp = () => {
         this.isScrubbing = false;
+        this.scrubberContainer.classList.remove('dragging');
+        if (this.scrubberTooltip) this.scrubberTooltip.classList.remove('visible');
         window.removeEventListener('mousemove', onMouseMove);
         window.removeEventListener('mouseup', onMouseUp);
       };
       window.addEventListener('mousemove', onMouseMove);
       window.addEventListener('mouseup', onMouseUp);
-    });
-
-    // Tooltip dynamique au survol
-    this.scrubberContainer.addEventListener('mousemove', (e) => {
-      const duration = getEffectiveDuration();
-      if (!duration) return;
-      const rect = this.scrubberContainer.getBoundingClientRect();
-      const pos = Math.max(0, Math.min(1, (e.clientX - rect.left) / rect.width));
-      const targetTime = pos * duration;
-      this.scrubberTooltip.textContent = this.formatTime(targetTime);
-      this.scrubberTooltip.style.left = `${pos * 100}%`;
     });
 
     // Progression temps réel
@@ -327,32 +364,11 @@ class NetflixPlayer {
         const percent = (current / total) * 100;
         this.updateScrubberProgress(percent);
       }
+      this.updateBufferedProgress();
     });
 
-    // Buffer progressif (bande blanche)
-    this.video.addEventListener('progress', () => {
-      let total = this.video.duration;
-      if (!total || isNaN(total) || total === Infinity) {
-        total = this.currentEpisodeDuration || 0;
-      }
-      if (!total || !this.video.buffered.length) return;
-      try {
-        const cur = this.video.currentTime || 0;
-        let bufferedEnd = 0;
-        for (let i = 0; i < this.video.buffered.length; i++) {
-          if (this.video.buffered.start(i) <= cur + 0.5 && cur <= this.video.buffered.end(i) + 0.5) {
-            bufferedEnd = this.video.buffered.end(i);
-            break;
-          }
-        }
-        if (!bufferedEnd && this.video.buffered.length > 0) {
-          bufferedEnd = this.video.buffered.end(this.video.buffered.length - 1);
-        }
-        const percent = (bufferedEnd / total) * 100;
-        this.scrubberBuffered.style.width = `${Math.min(100, percent)}%`;
-      } catch (e) {}
-    });
-
+    // Buffer progressif (bande blanche) continu
+    this.video.addEventListener('progress', () => this.updateBufferedProgress());
     this.video.addEventListener('loadedmetadata', () => {
       const isChannel = (this.currentMovie?.media_type === 'channel' || this.currentMovie?.is_live);
       if (isChannel) {
@@ -373,7 +389,54 @@ class NetflixPlayer {
         this.video.currentTime = this.savedPlaybackTime;
         this.savedPlaybackTime = 0;
       }
+      this.updateBufferedProgress();
     });
+    this.video.addEventListener('canplay', () => this.updateBufferedProgress());
+    this.video.addEventListener('playing', () => this.updateBufferedProgress());
+    this.video.addEventListener('seeked', () => this.updateBufferedProgress());
+  }
+
+  updateBufferedProgress() {
+    if (!this.scrubberBuffered) return;
+    const isChannel = (this.currentMovie?.media_type === 'channel' || this.currentMovie?.is_live);
+    if (isChannel) {
+      this.scrubberBuffered.style.width = '100%';
+      return;
+    }
+
+    let total = this.video.duration;
+    if (!total || isNaN(total) || total === Infinity) {
+      total = this.currentEpisodeDuration || 0;
+    }
+    if (!total || total <= 0) return;
+
+    const cur = this.video.currentTime || 0;
+    const playedPercent = (cur / total) * 100;
+    let bufferedEnd = 0;
+
+    if (this.video.buffered && this.video.buffered.length > 0) {
+      for (let i = 0; i < this.video.buffered.length; i++) {
+        const start = this.video.buffered.start(i);
+        const end = this.video.buffered.end(i);
+        if (start <= cur + 1.0 && cur <= end + 0.5) {
+          bufferedEnd = Math.max(bufferedEnd, end);
+        }
+      }
+      if (!bufferedEnd && this.video.buffered.length > 0) {
+        bufferedEnd = this.video.buffered.end(this.video.buffered.length - 1);
+      }
+    }
+
+    let percent = (bufferedEnd / total) * 100;
+
+    // Assurance visuelle du buffer : dès que le flux a des données actives (readyState >= 2),
+    // garantir que le trait blanc dépasse distinctement la pastille rouge (au moins +1.8% en avance)
+    // pour éviter qu'il ne soit masqué sous la pastille rouge de 16px.
+    if (this.video.readyState >= 2 && percent < playedPercent + 1.8) {
+      percent = Math.min(100, playedPercent + 1.8);
+    }
+
+    this.scrubberBuffered.style.width = `${Math.min(100, Math.max(0, percent))}%`;
   }
 
   updateScrubberProgress(percent) {
@@ -832,6 +895,14 @@ class NetflixPlayer {
 
   // ================= 9. OUVERTURE & FERMETURE DU LECTEUR =================
   open(movie, initialServer = 1, season = null, episode = null) {
+    window.isVideoPlaying = true;
+    if (window.netflixApp && typeof window.netflixApp.pauseBackgroundTasks === 'function') {
+      window.netflixApp.pauseBackgroundTasks();
+    }
+    if (window.app && typeof window.app.pauseBackgroundTasks === 'function') {
+      window.app.pauseBackgroundTasks();
+    }
+
     this.currentMovie = movie;
     this.currentEpisodeDuration = 0;
 
@@ -962,6 +1033,14 @@ class NetflixPlayer {
 
     if (document.fullscreenElement) {
       document.exitFullscreen().catch(() => {});
+    }
+
+    window.isVideoPlaying = false;
+    if (window.netflixApp && typeof window.netflixApp.resumeBackgroundTasks === 'function') {
+      window.netflixApp.resumeBackgroundTasks();
+    }
+    if (window.app && typeof window.app.resumeBackgroundTasks === 'function') {
+      window.app.resumeBackgroundTasks();
     }
   }
 

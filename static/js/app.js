@@ -12,11 +12,26 @@ class NetflixApp {
     this.admin = new NetflixAdmin();
     window.netflixPlayer = this.player;
     window.netflixAdmin = this.admin;
+    window.netflixApp = this;
+    window.app = this;
+    this.bgAbortController = new AbortController();
 
     this.initElements();
     this.initEvents();
     this.loadCatalog();
     this.player.setLanguage(localStorage.getItem('netflix_lang') || 'vo', false);
+  }
+
+  pauseBackgroundTasks() {
+    window.isVideoPlaying = true;
+    if (this.bgAbortController) {
+      try { this.bgAbortController.abort(); } catch (e) {}
+    }
+    this.bgAbortController = new AbortController();
+  }
+
+  resumeBackgroundTasks() {
+    window.isVideoPlaying = false;
   }
 
   normalizeImageUrl(url) {

@@ -1591,20 +1591,44 @@ body {
 
 .scrubber-tooltip {
   position: absolute;
-  bottom: 26px;
+  bottom: 24px;
   left: 0;
   transform: translateX(-50%);
-  background: rgba(15, 15, 15, 0.95);
-  color: #fff;
-  padding: 4px 8px;
+  background: rgba(18, 18, 18, 0.96);
+  color: #ffffff;
+  padding: 4px 10px;
   border-radius: 4px;
-  font-size: 0.78rem;
+  font-size: 0.82rem;
   font-weight: 700;
+  letter-spacing: 0.5px;
   pointer-events: none;
   display: none;
-  border: 1px solid rgba(255, 255, 255, 0.2);
+  align-items: center;
+  justify-content: center;
+  border: 1px solid rgba(255, 255, 255, 0.25);
   white-space: nowrap;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.8);
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.9);
+  z-index: 1000;
+}
+
+.scrubber-tooltip::after {
+  content: '';
+  position: absolute;
+  bottom: -5px;
+  left: 50%;
+  transform: translateX(-50%);
+  border-width: 5px 5px 0 5px;
+  border-style: solid;
+  border-color: rgba(18, 18, 18, 0.96) transparent transparent transparent;
+  display: block;
+  width: 0;
+  height: 0;
+}
+
+.netflix-scrubber-container:hover .scrubber-tooltip,
+.netflix-scrubber-container.dragging .scrubber-tooltip,
+.scrubber-tooltip.visible {
+  display: flex !important;
 }
 
 /* Ligne des Contrôles */

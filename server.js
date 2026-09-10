@@ -178,18 +178,18 @@ const xtreamHttpsAgent = new https.Agent({
 // Agents dédiés au streaming VOD Séries Xtream (Range requests volumineuses, tolérance aux coupures)
 const xtreamSeriesHttpAgent = new http.Agent({
   keepAlive: true,
-  maxSockets: 40,
-  maxFreeSockets: 8,
-  keepAliveMsecs: 4000,
-  timeout: 25000
+  maxSockets: 100,
+  maxFreeSockets: 25,
+  keepAliveMsecs: 10000,
+  timeout: 30000
 });
 
 const xtreamSeriesHttpsAgent = new https.Agent({
   keepAlive: true,
-  maxSockets: 40,
-  maxFreeSockets: 8,
-  keepAliveMsecs: 4000,
-  timeout: 25000
+  maxSockets: 100,
+  maxFreeSockets: 25,
+  keepAliveMsecs: 10000,
+  timeout: 30000
 });
 
 // Cache d'adresses Edge directes (TTL 60s) pour contourner les redirections 302 à répétition
@@ -3592,7 +3592,7 @@ const server = http.createServer((req, res) => {
           if (loc) {
             cleanupListeners();
             const nextUrl = loc.startsWith('http') ? loc : new URL(loc, targetUrl).href;
-            xtreamSeriesEdgeCache.set(cacheKey, { url: nextUrl, expiresAt: Date.now() + 10 * 60 * 1000 });
+            xtreamSeriesEdgeCache.set(cacheKey, { url: nextUrl, expiresAt: Date.now() + 60 * 60 * 1000 });
             return pipeSeriesStream(nextUrl, hops + 1, true);
           }
         }
@@ -3617,6 +3617,16 @@ const server = http.createServer((req, res) => {
         // Désactiver le timeout de connexion dès que la transmission démarre
         clientReq.setTimeout(0);
 
+        // Optimisation haute performance TCP : désactivation du délai Nagle et Keep-Alive
+        if (res.socket) {
+          res.socket.setNoDelay(true);
+          res.socket.setKeepAlive(true, 5000);
+        }
+        if (upstreamRes.socket) {
+          upstreamRes.socket.setNoDelay(true);
+          upstreamRes.socket.setKeepAlive(true, 5000);
+        }
+
         upstreamRes.on('error', (err) => {
           if (isAborted || req.destroyed || res.destroyed || res.writableEnded) return;
           console.warn('[Xtream Series Stream Error]:', err.message);
@@ -3638,7 +3648,8 @@ const server = http.createServer((req, res) => {
           'Accept-Ranges': 'bytes',
           'Cache-Control': 'public, max-age=86400, stale-while-revalidate=86400',
           'Connection': 'keep-alive',
-          'Keep-Alive': 'timeout=60, max=1000'
+          'Keep-Alive': 'timeout=60, max=1000',
+          'X-Content-Type-Options': 'nosniff'
         };
 
         const ct = (upstreamRes.headers['content-type'] || '').toLowerCase();
