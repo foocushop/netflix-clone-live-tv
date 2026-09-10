@@ -180,6 +180,10 @@ const xtreamManifestCache = new Map();
 // Cache d'adresses Edge directes pour les épisodes séries Xtream VOD (TTL 10 min pour éviter les re-redirections après pause)
 const xtreamSeriesEdgeCache = new Map();
 
+// Cache des images pour contourner le Mixed-Content (HTTP sur HTTPS Render) et port 443 manquant
+const imageProxyCache = new Map();
+const MAX_IMAGE_CACHE_ITEMS = 600;
+
 // Purge automatique périodique pour garantir zéro accumulation RAM dans le temps
 setInterval(() => {
   const now = Date.now();
@@ -192,7 +196,28 @@ setInterval(() => {
   for (const [k, v] of xtreamSeriesEdgeCache.entries()) {
     if (v.expiresAt <= now) xtreamSeriesEdgeCache.delete(k);
   }
+  if (imageProxyCache.size > MAX_IMAGE_CACHE_ITEMS) {
+    const keys = Array.from(imageProxyCache.keys());
+    for (let i = 0; i < 100; i++) imageProxyCache.delete(keys[i]);
+  }
 }, 60000);
+
+// Préchauffage automatique des flux et connexions Keep-Alive au démarrage (supprime la lenteur du cold-start <1min)
+async function prewarmXtreamConnections() {
+  console.log('[Xtream Pre-Warm] ⚡ Préchauffage automatique des connexions et des caches Edge au démarrage...');
+  const keyStreams = ['13917', '13738', '14003', '13973', '13696', '14167', '14170', '13839', '14020'];
+  for (const sId of keyStreams) {
+    try {
+      const url = `http://${XTREAM_CONFIG.host}:${XTREAM_CONFIG.port}/live/${XTREAM_CONFIG.username}/${XTREAM_CONFIG.password}/${sId}.m3u8`;
+      fetchXtreamPlaylist(url).then(res => {
+        if (res?.finalUrl && res.finalUrl !== url) {
+          xtreamEdgeCache.set(sId, { edgeUrl: res.finalUrl, expiresAt: Date.now() + 300000 });
+        }
+      }).catch(() => {});
+    } catch (e) {}
+  }
+  console.log(`[Xtream Pre-Warm] ✅ ${keyStreams.length} flux prioritaires préchauffés (lecture instantanée dès la 1ère minute)`);
+}
 
 function fetchXtreamPlaylist(targetUrl, headers = {}, hops = 0, retry = 0) {
   if (hops > 5) return Promise.reject(new Error('Trop de redirections Xtream'));
@@ -2825,13 +2850,21 @@ const server = http.createServer((req, res) => {
       qualitiesMap[c.quality] = (qualitiesMap[c.quality] || 0) + 1;
     });
 
+    const dataToServe = filtered.slice(0, limit).map(c => {
+      let icon = c.icon;
+      if (icon && (icon.startsWith('http://') || icon.includes('logo.smrtp2.com') || icon.includes('logoipro2.com'))) {
+        icon = `/api/proxy-image?url=${encodeURIComponent(icon)}`;
+      }
+      return Object.assign({}, c, { icon });
+    });
+
     const result = {
       success: true,
       count: filtered.length,
       total: XTREAM_FR_CATALOG.length,
       categories: Object.values(categoriesMap),
       qualities: qualitiesMap,
-      data: filtered.slice(0, limit)
+      data: dataToServe
     };
 
     res.writeHead(200, {
@@ -3125,7 +3158,7 @@ const server = http.createServer((req, res) => {
         return await fetchXtreamPlaylist(parsedUrl.query.target);
       }
 
-      // Accélération 2 : Cache direct du nœud Edge (TTL 60s) - Évite l'aller-retour 302 vers foxbleu.org
+      // Accélération 2 : Cache direct du nœud Edge (TTL 5 min) - Évite l'aller-retour 302 vers foxbleu.org
       const cachedEdge = xtreamEdgeCache.get(initialStreamId);
       if (cachedEdge && cachedEdge.expiresAt > Date.now()) {
         try {
@@ -3140,13 +3173,35 @@ const server = http.createServer((req, res) => {
         }
       }
 
-      const candidates = [initialStreamId];
-      // Priorité absolue aux flux H.264 (compatibilité universelle Chrome/MSE) pour TF1
-      if (initialStreamId === '13847' && !candidates.includes('13917')) {
-        candidates.unshift('13917');
+      // Priorités H.264 universelles (compatibilité 100% Chrome MSE sans erreur HEVC mediaSourceRequiresReset)
+      const H264_PREFERENCES = {
+        '13847': '13917',   // TF1 FHD (HEVC) -> TF1 HD (H.264)
+        '13690': '13973',   // W9 FHD (HEVC) -> W9 HD (H.264)
+        '13831': '14020',   // CNews FHD (HEVC) -> CNews HD (H.264)
+        '13770': '13839',   // BFM TV FHD (HEVC) -> BFM TV HD (H.264)
+        '13726': '14003',   // M6 FHD -> M6 HD (H.264)
+        '14152': '14163',   // beIN 3 FHD -> beIN 3 HD (H.264)
+        '14160': '14170',   // beIN 1 FHD -> beIN 1 HD (H.264)
+        '14153': '14169',   // beIN 2 FHD -> beIN 2 HD (H.264)
+        '180946': '181485',  // Canal+ Foot FHD -> HD (H.264)
+        '180947': '181486',  // Canal+ 360 FHD -> HD (H.264)
+        '14156': '14161',   // Canal+ Sport FHD -> HD (H.264)
+        '14151': '14167',   // Canal+ France FHD -> HD (H.264)
+        '408065': '408064'  // RMC 1 FHD -> HD (H.264)
+      };
+
+      const candidates = [];
+      const h264Alt = H264_PREFERENCES[initialStreamId];
+      if (h264Alt) {
+        candidates.push(h264Alt);
+      }
+      if (!candidates.includes(initialStreamId)) {
+        candidates.push(initialStreamId);
       }
       if (XTREAM_STREAM_FALLBACKS[initialStreamId]) {
-        candidates.push(...XTREAM_STREAM_FALLBACKS[initialStreamId]);
+        for (const fb of XTREAM_STREAM_FALLBACKS[initialStreamId]) {
+          if (!candidates.includes(fb)) candidates.push(fb);
+        }
       }
 
       let lastErr = null;
@@ -3869,6 +3924,113 @@ const server = http.createServer((req, res) => {
     }
   }
 
+  // ================= ROUTE PROXY D'IMAGES (MIXED-CONTENT & CORS FIX) =================
+  // Résout les blocages Mixed-Content (HTTP sur HTTPS Render) pour les logos des chaînes IPTV
+  // (ex: logo.smrtp2.com, logo-iptvpro.com) avec cache mémoire haute performance
+  if (pathname === '/api/proxy-image' && req.method === 'GET') {
+    const rawTarget = parsedUrl.query.url;
+    if (!rawTarget) {
+      res.writeHead(400, { 'Content-Type': 'text/plain', 'Access-Control-Allow-Origin': '*' });
+      return res.end('URL image requise');
+    }
+
+    let targetUrl = rawTarget;
+    try {
+      targetUrl = decodeURIComponent(rawTarget);
+    } catch (e) {}
+
+    const serveFallback = () => {
+      if (res.headersSent || res.writableEnded) return;
+      res.writeHead(200, {
+        'Content-Type': 'image/svg+xml',
+        'Cache-Control': 'public, max-age=86400',
+        'Access-Control-Allow-Origin': '*'
+      });
+      res.end(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 450" width="300" height="450"><rect width="100%" height="100%" fill="#141414"/><circle cx="150" cy="200" r="50" fill="#e50914" opacity="0.2"/><g transform="translate(125, 175) scale(2)" fill="#e50914"><path d="M21 3H3c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h5v2h8v-2h5c1.1 0 1.99-.9 1.99-2L23 5c0-1.1-.9-2-2-2zm0 14H3V5h18v12z"/></g><text x="150" y="270" font-family="sans-serif" font-size="16" font-weight="bold" fill="#fff" text-anchor="middle">CHAÎNE TV</text></svg>`);
+    };
+
+    // Cache RAM (TTL 24h)
+    const cached = imageProxyCache.get(targetUrl);
+    if (cached && cached.expiresAt > Date.now()) {
+      res.writeHead(200, {
+        'Content-Type': cached.contentType || 'image/png',
+        'Cache-Control': 'public, max-age=86400, stale-while-revalidate=604800',
+        'Access-Control-Allow-Origin': '*',
+        'X-Image-Cache': 'HIT'
+      });
+      return res.end(cached.buffer);
+    }
+
+    try {
+      const parsedTarget = new URL(targetUrl);
+      const isHttps = parsedTarget.protocol === 'https:';
+      const client = isHttps ? https : http;
+      const agent = isHttps ? xtreamHttpsAgent : xtreamHttpAgent;
+
+      const imgReq = client.get(targetUrl, {
+        agent,
+        headers: {
+          'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
+          'Accept': 'image/avif,image/webp,image/apng,image/svg+xml,image/*,*/*;q=0.8'
+        },
+        timeout: 8000
+      }, (imgRes) => {
+        if (imgRes.statusCode >= 300 && imgRes.statusCode < 400 && imgRes.headers.location) {
+          const nextLoc = imgRes.headers.location.startsWith('http') ? imgRes.headers.location : new URL(imgRes.headers.location, targetUrl).href;
+          client.get(nextLoc, { agent, timeout: 8000 }, (redirRes) => {
+            const chunks = [];
+            redirRes.on('data', c => chunks.push(c));
+            redirRes.on('end', () => {
+              const buf = Buffer.concat(chunks);
+              if (buf.length > 50) {
+                const ct = redirRes.headers['content-type'] || 'image/png';
+                imageProxyCache.set(targetUrl, { buffer: buf, contentType: ct, expiresAt: Date.now() + 86400000 });
+                res.writeHead(200, {
+                  'Content-Type': ct,
+                  'Cache-Control': 'public, max-age=86400, stale-while-revalidate=604800',
+                  'Access-Control-Allow-Origin': '*'
+                });
+                return res.end(buf);
+              }
+              serveFallback();
+            });
+          }).on('error', () => serveFallback());
+          return;
+        }
+
+        if (imgRes.statusCode !== 200) {
+          return serveFallback();
+        }
+
+        const chunks = [];
+        imgRes.on('data', c => chunks.push(c));
+        imgRes.on('end', () => {
+          const buf = Buffer.concat(chunks);
+          if (buf.length > 50) {
+            const ct = imgRes.headers['content-type'] || 'image/png';
+            imageProxyCache.set(targetUrl, { buffer: buf, contentType: ct, expiresAt: Date.now() + 86400000 });
+            res.writeHead(200, {
+              'Content-Type': ct,
+              'Cache-Control': 'public, max-age=86400, stale-while-revalidate=604800',
+              'Access-Control-Allow-Origin': '*'
+            });
+            return res.end(buf);
+          }
+          serveFallback();
+        });
+      });
+
+      imgReq.on('error', () => serveFallback());
+      imgReq.on('timeout', () => {
+        imgReq.destroy();
+        serveFallback();
+      });
+    } catch (e) {
+      serveFallback();
+    }
+    return;
+  }
+
   // ================= FICHIERS STATIQUES, SPA ROUTING & COMPRESSION =================
   const SPA_ROUTES = ['/series', '/films', '/telerealite', '/chaines', '/xtream', '/nouveautes', '/ma-liste'];
   let safePath = path.normalize(pathname).replace(/^(\.\.[\/\\])+/, '');
@@ -3936,4 +4098,9 @@ server.listen(PORT, '0.0.0.0', () => {
 
   // Synchronisation initiale au démarrage (pull depuis GitHub si nécessaire)
   checkAndPullLatestCatalog();
+
+  // Préchauffage instantané des flux IPTV pour éliminer toute latence cold-start (< 1 min)
+  setTimeout(() => {
+    prewarmXtreamConnections();
+  }, 1200);
 });

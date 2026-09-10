@@ -500,92 +500,127 @@
       <!-- Statistiques du catalogue -->
       <div class="stats-grid">
         <div class="stat-card">
-          <div class="stat-label">Titres au Catalogue</div>
+          <div class="stat-header">
+            <span class="stat-icon">🎬</span>
+            <span class="stat-label">Titres Catalogue</span>
+          </div>
           <div class="stat-value stat-highlight" id="statTotalTitles">0</div>
         </div>
         <div class="stat-card">
-          <div class="stat-label">Films Disponibles</div>
+          <div class="stat-header">
+            <span class="stat-icon">🎥</span>
+            <span class="stat-label">Films Actifs</span>
+          </div>
           <div class="stat-value" id="statTotalMovies">0</div>
         </div>
         <div class="stat-card">
-          <div class="stat-label">Séries Disponibles</div>
+          <div class="stat-header">
+            <span class="stat-icon">📺</span>
+            <span class="stat-label">Séries TV</span>
+          </div>
           <div class="stat-value" id="statTotalSeries">0</div>
         </div>
         <div class="stat-card">
-          <div class="stat-label">Titre en Vedette (Hero)</div>
-          <div class="stat-value" id="statHeroTitle" style="font-size: 1.25rem; font-weight: 700; color: #fff;">-</div>
+          <div class="stat-header">
+            <span class="stat-icon">⭐</span>
+            <span class="stat-label">Tête d'Affiche</span>
+          </div>
+          <div class="stat-value stat-hero-text" id="statHeroTitle">-</div>
         </div>
         <div class="stat-card">
-          <div class="stat-label">Uptime Serveur Rust</div>
-          <div class="stat-value" id="statUptime" style="font-size: 1.35rem; color: #46d369;">0s</div>
+          <div class="stat-header">
+            <span class="stat-icon">⚡</span>
+            <span class="stat-label">Uptime Serveur</span>
+          </div>
+          <div class="stat-value stat-uptime-text" id="statUptime">0s</div>
         </div>
         <div class="stat-card">
-          <div class="stat-label">Moteur Backend</div>
-      </div>
-
-      <!-- Connexion Serveur Xtream Codes pour TiviMate, IPTV Smarters Pro & VLC -->
-      <div class="admin-xtream-box" style="margin-bottom: 24px; padding: 18px 24px; background: linear-gradient(135deg, rgba(229, 9, 20, 0.15) 0%, rgba(20, 20, 20, 0.9) 100%); border: 1px solid rgba(229, 9, 20, 0.4); border-radius: 12px; display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 16px;">
-        <div style="flex: 1; min-width: 280px;">
-          <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 6px;">
-            <span style="font-size: 1.3rem;">📡</span>
-            <span style="font-weight: 800; font-size: 1.05rem; color: #fff; letter-spacing: 0.5px;">SERVEUR XTREAM CODES INTÉGRÉ (TIVIMATE / SMARTERS PRO / VLC)</span>
-            <span style="background: #46d369; color: #000; font-size: 0.72rem; font-weight: 800; padding: 2px 8px; border-radius: 4px;">ACTIF</span>
+          <div class="stat-header">
+            <span class="stat-icon">🦀</span>
+            <span class="stat-label">Moteur Backend</span>
           </div>
-          <div style="font-size: 0.88rem; color: #ccc; line-height: 1.5;">
-            Connectez n'importe quelle application IPTV avec vos accès privés (1 268 chaînes FR + séries Télé-Réalité intégrées).
-          </div>
-          <div style="display: flex; flex-wrap: wrap; gap: 18px; margin-top: 10px; font-size: 0.85rem; font-family: monospace;">
-            <span style="color: #bbb;">URL Serveur : <strong id="xtreamHostDisplay" style="color: #fff; user-select: all;">https://...</strong></span>
-            <span style="color: #bbb;">Identifiant : <strong style="color: #ff5252; user-select: all;">jose</strong></span>
-            <span style="color: #bbb;">Mot de passe : <strong style="color: #ff5252; user-select: all;">1965</strong></span>
-          </div>
-        </div>
-        <div style="display: flex; gap: 10px; align-items: center;">
-          <button type="button" class="btn-admin btn-admin-secondary" id="copyXtreamUrlBtn" style="padding: 8px 16px; font-size: 0.85rem; white-space: nowrap;">
-            📋 Copier l'URL Xtream
-          </button>
-          <button type="button" class="btn-admin" id="copyM3uUrlBtn" style="padding: 8px 16px; font-size: 0.85rem; background: var(--netflix-red); white-space: nowrap;">
-            🔗 Copier le Lien M3U (VLC)
-          </button>
+          <div class="stat-value stat-engine-text">Rust / Node</div>
         </div>
       </div>
 
-      <!-- Sauvegarde Permanente GitHub Cloud (Zéro Perte de Données au Redéploiement) -->
-      <div class="admin-github-box" style="margin-bottom: 24px; padding: 18px 24px; background: linear-gradient(135deg, rgba(35, 134, 54, 0.15) 0%, rgba(20, 20, 20, 0.9) 100%); border: 1px solid rgba(35, 134, 54, 0.4); border-radius: 12px; display: flex; flex-direction: column; gap: 14px;">
-        <div style="display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 16px;">
-          <div style="flex: 1; min-width: 280px;">
-            <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 6px;">
-              <span style="font-size: 1.3rem;">☁️</span>
-              <span style="font-weight: 800; font-size: 1.05rem; color: #fff; letter-spacing: 0.5px;">SAUVEGARDE PERMANENTE GITHUB CLOUD</span>
-              <span id="githubSyncBadge" style="background: #238636; color: #fff; font-size: 0.72rem; font-weight: 800; padding: 2px 8px; border-radius: 4px; transition: background 0.3s ease;">SYNCHRONISÉ</span>
+      <!-- Section Intégrations : Xtream Codes & GitHub Cloud -->
+      <div class="admin-integrations-grid">
+        <!-- Connexion Serveur Xtream Codes pour TiviMate, IPTV Smarters Pro & VLC -->
+        <div class="admin-integration-card admin-xtream-card">
+          <div class="integration-main">
+            <div class="integration-header">
+              <span class="integration-icon">📡</span>
+              <span class="integration-title">SERVEUR XTREAM CODES INTÉGRÉ</span>
+              <span class="badge-status-active">ACTIF</span>
             </div>
-            <div style="font-size: 0.88rem; color: #ccc; line-height: 1.5;">
-              Toutes vos modifications (ajouts, modifications, suppressions de chaînes ou séries) sont automatiquement sauvegardées sur votre compte GitHub. Même en cas de redéploiement ou redémarrage de Render, aucune donnée n'est perdue.
-            </div>
-            <div style="display: flex; flex-wrap: wrap; gap: 18px; margin-top: 10px; font-size: 0.85rem; font-family: monospace;">
-              <span style="color: #bbb;">Dépôt : <strong style="color: #58a6ff;">foocushop/netflix-clone-live-tv (main)</strong></span>
-              <span style="color: #bbb;">Dernière synchro : <strong id="githubLastSyncDisplay" style="color: #46d369;">Il y a quelques instants</strong></span>
+            <p class="integration-desc">
+              Connectez n'importe quelle application IPTV (TiviMate, IPTV Smarters Pro, VLC) avec vos identifiants privés.
+            </p>
+            <div class="integration-credentials">
+              <div class="cred-item">
+                <span class="cred-label">Hôte API :</span>
+                <code class="cred-value" id="xtreamHostDisplay">https://...</code>
+              </div>
+              <div class="cred-item">
+                <span class="cred-label">Identifiant :</span>
+                <code class="cred-value cred-highlight">jose</code>
+              </div>
+              <div class="cred-item">
+                <span class="cred-label">Mot de passe :</span>
+                <code class="cred-value cred-highlight">1965</code>
+              </div>
             </div>
           </div>
-          <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
-            <button type="button" class="btn-admin btn-admin-secondary" id="toggleGithubTokenBtn" style="padding: 8px 14px; font-size: 0.82rem; white-space: nowrap;">
-              🔑 Clé GitHub
+          <div class="integration-actions">
+            <button type="button" class="btn-admin btn-admin-secondary" id="copyXtreamUrlBtn">
+              📋 Copier URL Xtream
             </button>
-            <button type="button" class="btn-admin" id="manualGithubSyncBtn" style="padding: 8px 16px; font-size: 0.85rem; background: #238636; white-space: nowrap; cursor: pointer;">
-              ☁️ Synchroniser maintenant
+            <button type="button" class="btn-admin btn-admin-red" id="copyM3uUrlBtn">
+              🔗 Copier Lien M3U (VLC)
             </button>
           </div>
         </div>
 
-        <!-- Section de configuration de la clé GitHub -->
-        <div id="githubTokenSection" style="display: none; padding-top: 12px; border-top: 1px solid rgba(255,255,255,0.1);">
-          <div style="display: flex; flex-wrap: wrap; gap: 10px; align-items: center;">
-            <input type="password" id="githubTokenInput" placeholder="Coller votre nouvelle clé GitHub (ghp_...)" style="flex: 1; min-width: 260px; padding: 8px 14px; background: rgba(0,0,0,0.6); border: 1px solid #444; color: #fff; border-radius: 6px; font-size: 0.85rem;">
-            <button type="button" class="btn-admin" id="saveGithubTokenBtn" style="padding: 8px 16px; font-size: 0.85rem; background: #1f6feb; white-space: nowrap;">
-              💾 Enregistrer la clé
+        <!-- Sauvegarde Permanente GitHub Cloud -->
+        <div class="admin-integration-card admin-github-card">
+          <div class="integration-main">
+            <div class="integration-header">
+              <span class="integration-icon">☁️</span>
+              <span class="integration-title">SYNCHRONISATION GITHUB CLOUD</span>
+              <span class="badge-status-sync" id="githubSyncBadge">SYNCHRONISÉ</span>
+            </div>
+            <p class="integration-desc">
+              Sauvegarde en temps réel sur GitHub : aucune perte de données lors des redémarrages ou redéploiements Render.
+            </p>
+            <div class="integration-credentials">
+              <div class="cred-item">
+                <span class="cred-label">Dépôt :</span>
+                <code class="cred-value cred-blue">foocushop/netflix-clone-live-tv (main)</code>
+              </div>
+              <div class="cred-item">
+                <span class="cred-label">Dernière synchro :</span>
+                <span class="cred-value cred-green" id="githubLastSyncDisplay">À l'instant</span>
+              </div>
+            </div>
+          </div>
+          <div class="integration-actions">
+            <button type="button" class="btn-admin btn-admin-secondary" id="toggleGithubTokenBtn">
+              🔑 Clé Token
+            </button>
+            <button type="button" class="btn-admin btn-admin-green" id="manualGithubSyncBtn">
+              ☁️ Synchroniser
             </button>
           </div>
-          <div id="githubTokenFeedback" style="font-size: 0.82rem; margin-top: 8px; display: none;"></div>
+          <!-- Configuration de la clé GitHub -->
+          <div id="githubTokenSection" class="github-token-drawer" style="display: none;">
+            <div class="token-input-row">
+              <input type="password" id="githubTokenInput" placeholder="Coller votre token GitHub (ghp_...)" class="admin-form-input token-input">
+              <button type="button" class="btn-admin btn-admin-blue" id="saveGithubTokenBtn">
+                💾 Enregistrer
+              </button>
+            </div>
+            <div id="githubTokenFeedback" class="token-feedback" style="display: none;"></div>
+          </div>
         </div>
       </div>
 

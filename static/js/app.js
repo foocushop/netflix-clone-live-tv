@@ -19,6 +19,26 @@ class NetflixApp {
     this.player.setLanguage(localStorage.getItem('netflix_lang') || 'vo', false);
   }
 
+  normalizeImageUrl(url) {
+    if (!url) return '';
+    if (url.startsWith('/api/proxy-image') || url.includes('/api/proxy-image')) return url;
+    if (url.startsWith('http://') || url.includes('logo.smrtp2.com') || url.includes('logoipro2.com')) {
+      const baseUrl = window.API_BASE || '';
+      return `${baseUrl}/api/proxy-image?url=${encodeURIComponent(url)}`;
+    }
+    return url;
+  }
+
+  getMovieFallbackSvg(title) {
+    const clean = (title || 'Titre Netflix').replace(/["'<>\\]/g, '').trim().substring(0, 24);
+    return `data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="300" height="450" viewBox="0 0 300 450"><rect fill="%231f1f1f" width="300" height="450"/><text fill="%23E50914" font-family="sans-serif" font-size="32" font-weight="800" x="50%" y="45%" text-anchor="middle">NETFLIX</text><text fill="%23888" font-family="sans-serif" font-size="13" x="50%" y="55%" text-anchor="middle">${clean}</text></svg>`;
+  }
+
+  getChannelFallbackSvg(channelName) {
+    const clean = (channelName || 'TV DIRECT').replace(/["'<>\\]/g, '').trim().substring(0, 22);
+    return `data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 450" width="300" height="450"><defs><linearGradient id="g" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="%2318181b"/><stop offset="100%" stop-color="%23050505"/></linearGradient></defs><rect width="100%" height="100%" fill="url(%23g)"/><rect x="15" y="15" width="270" height="420" rx="14" fill="none" stroke="rgba(255,255,255,0.08)" stroke-width="1.5"/><circle cx="150" cy="180" r="55" fill="%23e50914" opacity="0.15"/><g transform="translate(125, 155) scale(2.2)" fill="%23e50914"><path d="M21 3H3c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h5v2h8v-2h5c1.1 0 1.99-.9 1.99-2L23 5c0-1.1-.9-2-2-2zm0 14H3V5h18v12z"/></g><text x="150" y="270" font-family="system-ui, -apple-system, sans-serif" font-size="16" font-weight="800" fill="%23ffffff" text-anchor="middle">${clean}</text><rect x="95" y="292" width="110" height="22" rx="11" fill="%23e50914"/><text x="150" y="307" font-family="system-ui, sans-serif" font-size="10" font-weight="800" fill="%23ffffff" text-anchor="middle">● EN DIRECT</text></svg>`;
+  }
+
   initElements() {
     this.header = document.querySelector('.netflix-header');
     this.heroBanner = document.getElementById('heroBanner');
@@ -343,8 +363,11 @@ class NetflixApp {
       `;
     }
 
+    const securePoster = this.normalizeImageUrl(movie.poster_url);
+    const channelFallback = isChannel ? this.getChannelFallbackSvg(movie.title) : this.getMovieFallbackSvg(movie.title);
+
     card.innerHTML = `
-      <img src="${movie.poster_url}" alt="${movie.title}" class="card-image" loading="lazy" decoding="async" onerror="this.onerror=null; this.src='data:image/svg+xml;charset=UTF-8,<svg xmlns=\\'http://www.w3.org/2000/svg\\' width=\\'300\\' height=\\'450\\' viewBox=\\'0 0 300 450\\'><rect fill=\\'%231f1f1f\\' width=\\'300\\' height=\\'450\\'/><text fill=\\'%23E50914\\' font-family=\\'sans-serif\\' font-size=\\'36\\' font-weight=\\'800\\' x=\\'50%25\\' y=\\'45%25\\' text-anchor=\\'middle\\'>NETFLIX</text><text fill=\\'%23888\\' font-family=\\'sans-serif\\' font-size=\\'13\\' x=\\'50%25\\' y=\\'55%25\\' text-anchor=\\'middle\\'>${isChannel ? 'Chaîne TV' : 'Titre Netflix'}</text></svg>'">
+      <img src="${securePoster}" alt="${movie.title}" class="card-image" loading="lazy" decoding="async" onerror="this.onerror=null; this.src='${channelFallback}'">
       ${topBadges}
       <div class="card-overlay">
         <div class="card-title">${movie.title}</div>
@@ -842,14 +865,17 @@ class NetflixApp {
     card.setAttribute('tabindex', '0');
     card.setAttribute('data-id', `xtream_${channel.stream_id}`);
 
+    const secureIcon = this.normalizeImageUrl(channel.icon) || 'assets/hero/live-tv-banner.webp';
+    const fallbackSvg = this.getChannelFallbackSvg(channel.name);
+
     const movieObj = {
       id: `xtream_${channel.stream_id}`,
       title: channel.name,
       overview: `Chaîne Xtream VIP — Catégorie : ${channel.category_name} • Qualité : ${channel.quality_badge}`,
-      poster_url: channel.icon || 'assets/hero/live-tv-banner.webp',
-      poster_path: channel.icon || 'assets/hero/live-tv-banner.webp',
-      backdrop_url: channel.icon || 'assets/hero/live-tv-banner.webp',
-      backdrop_path: channel.icon || 'assets/hero/live-tv-banner.webp',
+      poster_url: secureIcon,
+      poster_path: secureIcon,
+      backdrop_url: secureIcon,
+      backdrop_path: secureIcon,
       media_type: 'channel',
       is_live: true,
       is_xtream: true,
@@ -860,7 +886,7 @@ class NetflixApp {
     };
 
     card.innerHTML = `
-      <img src="${movieObj.poster_url}" alt="${channel.name}" class="card-image" loading="lazy" decoding="async" onerror="this.onerror=null; this.src='assets/hero/live-tv-banner.webp'">
+      <img src="${secureIcon}" alt="${channel.name}" class="card-image" loading="lazy" decoding="async" onerror="this.onerror=null; this.src='${fallbackSvg}'">
       <span class="xtream-card-quality-badge badge-${qClass}">${channel.quality_badge}</span>
       <span class="live-badge-card" style="top: 8px; right: 8px; left: auto;"><span class="live-pulse">●</span> DIRECT</span>
       <div class="card-overlay">
