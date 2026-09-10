@@ -5,5 +5,12 @@
     "url": "https://netflix-clone-live-tv-j9ta.onrender.com",
     "role": "master",
     "addedAt": "2026-09-10T18:07:55.247Z"
+  },
+  {
+    "id": "node-1789064255699",
+    "name": "Serveur 2 (Edge Sport)",
+    "url": "https://netflix-sport-edge.onrender.com",
+    "role": "edge",
+    "addedAt": "2026-09-10T18:17:35.699Z"
   }
 ]
