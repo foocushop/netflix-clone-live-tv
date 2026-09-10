@@ -1156,7 +1156,8 @@
             }
           ]
         }
-      ]
+      ],
+      "is_hero": false
     },
     {
       "id": "1108427",
@@ -1194,7 +1195,7 @@
         "Spatial Audio",
         "5.1"
       ],
-      "is_hero": true,
+      "is_hero": false,
       "created_at": "2026-09-07T18:36:50.015Z"
     },
     {
@@ -7406,7 +7407,7 @@
         "DIRECT",
         "Anti-Pubs 🛡️"
       ],
-      "is_hero": true,
+      "is_hero": false,
       "created_at": "2026-09-08T12:53:58.891Z",
       "cast": [],
       "logo_url": "/images/channels/tv_canal_sport.png"
@@ -10740,7 +10741,7 @@
         "Saisons Complètes",
         "💎 Xtream VIP"
       ],
-      "is_hero": false,
+      "is_hero": true,
       "is_xtream_series": true,
       "series_id": 9066,
       "created_at": "2026-09-09T00:54:35.333Z"
