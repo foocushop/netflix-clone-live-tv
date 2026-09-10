@@ -4456,6 +4456,11 @@ const server = http.createServer((req, res) => {
       activeProxyRes = proxyRes;
       const statusCode = proxyRes.statusCode || 200;
 
+      if (proxyRes.socket) {
+        proxyRes.socket.setNoDelay(true);
+        proxyRes.socket.setKeepAlive(true, 5000);
+      }
+
       proxyRes.on('error', (err) => {
         if (isAborted || req.destroyed || res.destroyed || res.writableEnded) return;
         console.warn('[Proxy Res Error]:', err.message);

@@ -1244,15 +1244,10 @@ class NetflixPlayer {
       // Ne masquer le loader et l'affiche que si la première frame est prête ou que le temps avance
       if (this.video.readyState < 2 && this.video.currentTime <= 0) return;
       hasReadied = true;
-      this.setStep(4, 'done', `4. Flux connecté • Lecture active`);
+      this.setStep(4, 'done', `4. Flux connecté • Lecture fluide 1080p`);
       setTimeout(() => {
         this.hideLoader();
         if (this.backdrop) this.backdrop.classList.add('fade-out');
-        // Élargir le buffer HLS en arrière-plan une fois lancé pour une grande stabilité
-        if (this.hls && this.hls.config) {
-          this.hls.config.maxBufferLength = isChannel ? 30 : 60;
-          this.hls.config.maxMaxBufferLength = isChannel ? 60 : 120;
-        }
       }, 150);
     };
 
@@ -1305,21 +1300,23 @@ class NetflixPlayer {
         capLevelToPlayerSize: false,
         initialLiveManifestSize: 1,
         startFragPrefetch: true,
-        progressive: true,
+        progressive: false, // Désactivé : évite le hachage en micro-paquets qui provoquait des saccades pendant les 10 premières secondes
         backBufferLength: 30,
-        maxBufferLength: isChannel ? 15 : 20, // Faible au démarrage pour un lancement ultra-rapide sans surcharger le buffer
-        maxMaxBufferLength: isChannel ? 40 : 60,
-        maxBufferSize: 30 * 1024 * 1024,
-        highBufferWatchdogPeriod: 2,
+        maxBufferLength: isChannel ? 30 : 60,
+        maxMaxBufferLength: isChannel ? 60 : 120,
+        maxBufferSize: 60 * 1024 * 1024,
+        maxBufferHole: 0.5,
+        highBufferWatchdogPeriod: 3,
         nudgeOffset: 0.1,
-        nudgeMaxRetry: 5,
+        nudgeMaxRetry: 3,
         maxFragLookUpTolerance: 0.25,
-        fragLoadingTimeOut: 8000,
-        manifestLoadingTimeOut: 4500,
-        levelLoadingTimeOut: 4500,
-        manifestLoadingMaxRetry: 2,
-        fragLoadingMaxRetry: 3,
-        fragLoadingRetryDelay: 500
+        fragLoadingTimeOut: 12000,
+        manifestLoadingTimeOut: 6000,
+        levelLoadingTimeOut: 6000,
+        manifestLoadingMaxRetry: 3,
+        fragLoadingMaxRetry: 4,
+        fragLoadingRetryDelay: 500,
+        abrEwmaDefaultEstimate: 5000000 // Démarre sur une estimation stable de 5 Mbps (évite le yo-yo ABR sur les 10 premières secondes)
       });
       this.hls = hls;
 
@@ -1328,7 +1325,7 @@ class NetflixPlayer {
 
       hls.on(Hls.Events.MANIFEST_PARSED, () => {
         this.setStep(3, 'done', `3. Playlist & fragments HLS initialisés`);
-        this.setStep(4, 'active', `4. Démarrage instantané du flux vidéo...`);
+        this.setStep(4, 'active', `4. Démarrage fluide du flux vidéo...`);
         if (hls.levels && hls.levels.length > 0) {
           this.updateQualityMenuOptions();
           if (this.currentQuality === -1) {
@@ -1372,11 +1369,7 @@ class NetflixPlayer {
 
       hls.on(Hls.Events.ERROR, (event, data) => {
         if (!data.fatal) {
-          if (data.details === 'bufferStalledError' || data.details === 'bufferSeekOverHole' || data.details === 'bufferNudgeOnStall') {
-            console.warn('[HLS Watchdog] Saut anti-saccade sur micro-trou');
-            this.video.currentTime += 0.2;
-            this.video.play().catch(() => {});
-          }
+          // Laisser Hls.js gérer ses propres micro-ajustements de buffer sans forcer de seek artificiel
           return;
         }
 
@@ -1508,19 +1501,29 @@ class NetflixPlayer {
       }
     }, { once: true });
 
+    let hasStartedPlay = false;
+    const triggerSafePlay = () => {
+      if (hasStartedPlay) return;
+      hasStartedPlay = true;
+      const playPromise = this.video.play();
+      if (playPromise !== undefined) {
+        playPromise.catch(err => {
+          console.warn('[Direct Video Autoplay Warn]: Autoplay restreint, passage en muet :', err.message);
+          this.video.muted = true;
+          this.syncVolumeUI();
+          this.video.play().catch(() => {});
+        });
+      }
+    };
+
+    this.video.addEventListener('canplay', () => triggerSafePlay(), { once: true });
+    this.video.addEventListener('loadeddata', () => triggerSafePlay(), { once: true });
+    // Sécurité : ne jamais attendre plus de 1.2s
+    setTimeout(() => triggerSafePlay(), 1200);
+
     this.video.preload = 'auto';
     this.video.src = videoUrl;
     this.video.load();
-
-    const playPromise = this.video.play();
-    if (playPromise !== undefined) {
-      playPromise.catch(err => {
-        console.warn('[Direct Video Autoplay Warn]: Autoplay restreint, passage en muet :', err.message);
-        this.video.muted = true;
-        this.syncVolumeUI();
-        this.video.play().catch(() => {});
-      });
-    }
   }
 
   // ================= 13. MOTEUR IFRAME DE SECOURS =================
