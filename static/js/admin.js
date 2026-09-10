@@ -21,6 +21,10 @@ class NetflixAdmin {
     this.activeFilter = 'all';
     this.searchQuery = '';
     this.searchDebounce = null;
+    this.clusterPollingTimer = null;
+    this.clusterNodesGrid = document.getElementById('clusterNodesGrid');
+    this.clusterAddNodeForm = document.getElementById('clusterAddNodeForm');
+    this.clusterRefreshBtn = document.getElementById('clusterRefreshBtn');
 
     this.initEvents();
   }
@@ -183,6 +187,15 @@ class NetflixAdmin {
     if (saveTokenBtn) {
       saveTokenBtn.addEventListener('click', () => this.saveGitHubToken());
     }
+
+    // Gestion du Cluster Multi-Serveurs Render
+    if (this.clusterRefreshBtn) {
+      this.clusterRefreshBtn.addEventListener('click', () => this.loadClusterStatus(true));
+    }
+
+    if (this.clusterAddNodeForm) {
+      this.clusterAddNodeForm.addEventListener('submit', (e) => this.handleClusterAddNodeSubmit(e));
+    }
   }
 
   // ================= FLUX DE SÉCURITÉ & CONNEXION =================
@@ -195,6 +208,8 @@ class NetflixAdmin {
     this.loadStats();
     this.loadCatalog();
     this.loadGitHubStatus();
+    this.loadClusterStatus();
+    this.startClusterPolling();
   }
 
   openAuthModal() {
@@ -269,12 +284,14 @@ class NetflixAdmin {
   }
 
   logout() {
+    this.stopClusterPolling();
     sessionStorage.removeItem('netflix_admin_authenticated');
     this.close();
     this.showToast("🔒 Mode Administrateur verrouillé et déconnecté");
   }
 
   close() {
+    this.stopClusterPolling();
     this.overlay.classList.remove('active');
     // Rafraîchir l'application principale pour synchroniser les changements
     if (window.netflixApp && typeof window.netflixApp.loadCatalog === 'function') {
@@ -847,6 +864,266 @@ class NetflixAdmin {
       toast.style.transition = 'all 0.3s ease';
       setTimeout(() => toast.remove(), 300);
     }, 3500);
+  }
+
+  // ================= CLUSTER MULTI-SERVEURS & TÉLÉMÉTRIE =================
+  escapeHtml(str) {
+    if (!str) return '';
+    return String(str)
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#039;');
+  }
+
+  startClusterPolling() {
+    this.stopClusterPolling();
+    this.clusterPollingTimer = setInterval(() => {
+      if (this.overlay && this.overlay.classList.contains('active')) {
+        this.loadClusterStatus(false);
+      } else {
+        this.stopClusterPolling();
+      }
+    }, 4500);
+  }
+
+  stopClusterPolling() {
+    if (this.clusterPollingTimer) {
+      clearInterval(this.clusterPollingTimer);
+      this.clusterPollingTimer = null;
+    }
+  }
+
+  formatUptime(seconds) {
+    if (!seconds || seconds <= 0) return '0s';
+    const d = Math.floor(seconds / (3600 * 24));
+    const h = Math.floor((seconds % (3600 * 24)) / 3600);
+    const m = Math.floor((seconds % 3600) / 60);
+    const s = Math.floor(seconds % 60);
+    if (d > 0) return `${d}j ${h}h ${m}m`;
+    if (h > 0) return `${h}h ${m}m`;
+    if (m > 0) return `${m}m ${s}s`;
+    return `${s}s`;
+  }
+
+  async loadClusterStatus(showNotification = false) {
+    if (!this.clusterNodesGrid) {
+      this.clusterNodesGrid = document.getElementById('clusterNodesGrid');
+    }
+    if (!this.clusterNodesGrid) return;
+
+    try {
+      const res = await fetch(`${this.apiBase()}/api/cluster/status`, {
+        headers: this.authHeaders()
+      });
+      if (res.status === 401) {
+        this.handleUnauthorized();
+        return;
+      }
+      const data = await res.json();
+      if (data && data.success && Array.isArray(data.nodes)) {
+        this.renderClusterNodes(data.nodes);
+        if (showNotification) {
+          this.showToast(`⚡ Cluster synchronisé : ${data.nodes.length} nœud(s)`);
+        }
+      }
+    } catch (err) {
+      console.warn('[Cluster] Erreur supervision:', err.message);
+      if (showNotification) {
+        this.showToast("Erreur lors de la lecture du cluster", true);
+      }
+    }
+  }
+
+  renderClusterNodes(nodes) {
+    if (!this.clusterNodesGrid) return;
+    if (!nodes || nodes.length === 0) {
+      this.clusterNodesGrid.innerHTML = `
+        <div style="grid-column: 1/-1; text-align:center; padding:30px; color:var(--admin-text-secondary);">
+          Aucun serveur configuré dans le cluster.
+        </div>`;
+      return;
+    }
+
+    const html = nodes.map(node => {
+      const isCurrent = !!node.is_current;
+      const isOnline = !!node.online;
+      const cpu = Math.min(100, Math.max(0, Math.round(node.cpu_percent || 0)));
+      const ramMb = node.memory ? Math.round(node.memory.usedMb ?? node.memory.rss_mb ?? 0) : 0;
+      const ramPercent = node.memory ? Math.min(100, Math.round(node.memory.percent ?? node.memory.percent_of_512mb ?? ((ramMb / 512) * 100))) : 0;
+      const streams = node.active_streams || 0;
+      const requests = node.total_requests || 0;
+      const uptimeStr = this.formatUptime(node.uptime_seconds);
+      const latencyStr = node.latency_ms !== null && node.latency_ms !== undefined ? `${node.latency_ms} ms` : 'N/A';
+
+      const cpuLevelClass = cpu > 80 ? 'danger' : (cpu > 50 ? 'warn' : 'normal');
+      const ramLevelClass = ramPercent > 80 ? 'danger' : (ramPercent > 65 ? 'warn' : 'normal');
+
+      const roleBadge = (node.role || 'edge').toLowerCase();
+      const roleText = roleBadge === 'master' ? '👑 Nœud Maître' : (roleBadge === 'backup' ? '🛡️ Secours' : '⚡ Nœud Edge');
+
+      return `
+        <div class="cluster-node-card ${isCurrent ? 'node-current' : ''} ${!isOnline ? 'node-offline' : ''}">
+          <div class="node-card-top">
+            <div class="node-identity">
+              <div class="node-name-wrap">
+                <span class="node-name">${this.escapeHtml(node.name || 'Serveur')}</span>
+                ${isCurrent ? '<span class="node-current-tag">LOCAL ACTIF</span>' : ''}
+              </div>
+              <div class="node-badges">
+                <span class="node-role-badge ${roleBadge}">${roleText}</span>
+              </div>
+            </div>
+            <div class="node-status-pill ${isOnline ? 'online' : 'offline'}">
+              <span class="status-dot ${isOnline ? 'online' : 'offline'}"></span>
+              <span>${isOnline ? 'EN LIGNE' : 'HORS LIGNE'}</span>
+            </div>
+          </div>
+
+          <div class="node-url-row">
+            <span class="node-url-text" title="${this.escapeHtml(node.url || '')}">
+              ${this.escapeHtml(node.url || 'http://localhost')}
+            </span>
+            <span class="node-latency-pill" title="Latence du ping keep-alive">${latencyStr}</span>
+          </div>
+
+          <div class="node-metrics-wrap">
+            <!-- CPU Gauge -->
+            <div class="node-metric-row">
+              <div class="metric-header">
+                <span class="metric-title">⚙️ Processeur (CPU)</span>
+                <span class="metric-value">${cpu}%</span>
+              </div>
+              <div class="metric-bar-track">
+                <div class="metric-bar-fill ${cpuLevelClass}" style="width: ${cpu}%"></div>
+              </div>
+            </div>
+
+            <!-- RAM Gauge -->
+            <div class="node-metric-row">
+              <div class="metric-header">
+                <span class="metric-title">🧠 Mémoire RAM (${ramMb} Mo / 512 Mo)</span>
+                <span class="metric-value">${ramPercent}%</span>
+              </div>
+              <div class="metric-bar-track">
+                <div class="metric-bar-fill ${ramLevelClass}" style="width: ${ramPercent}%"></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="node-stats-grid">
+            <div class="node-stat-col">
+              <span class="node-stat-label">Flux Vidéo</span>
+              <span class="node-stat-val" style="color: ${streams > 0 ? '#00e676' : '#fff'}">${streams}</span>
+            </div>
+            <div class="node-stat-col">
+              <span class="node-stat-label">Requêtes</span>
+              <span class="node-stat-val">${requests}</span>
+            </div>
+            <div class="node-stat-col">
+              <span class="node-stat-label">Uptime</span>
+              <span class="node-stat-val" style="font-size:0.82rem;">${uptimeStr}</span>
+            </div>
+          </div>
+
+          <div class="node-card-footer">
+            <span class="node-uptime-label">
+              ${isOnline ? '🟢 Keep-Alive actif (4.5 min)' : '🔴 Injoignable / Endormi'}
+            </span>
+            ${!isCurrent ? `
+              <button type="button" class="btn-delete-node" data-node-id="${this.escapeHtml(node.id || '')}" data-node-name="${this.escapeHtml(node.name || '')}">
+                🗑️ Supprimer
+              </button>
+            ` : ''}
+          </div>
+        </div>
+      `;
+    }).join('');
+
+    this.clusterNodesGrid.innerHTML = html;
+
+    // Lier les boutons de suppression
+    const deleteBtns = this.clusterNodesGrid.querySelectorAll('.btn-delete-node');
+    deleteBtns.forEach(btn => {
+      btn.addEventListener('click', () => {
+        const id = btn.getAttribute('data-node-id');
+        const name = btn.getAttribute('data-node-name');
+        this.deleteClusterNode(id, name);
+      });
+    });
+  }
+
+  async handleClusterAddNodeSubmit(e) {
+    e.preventDefault();
+    const nameInput = document.getElementById('clusterNodeNameInput');
+    const urlInput = document.getElementById('clusterNodeUrlInput');
+    const roleSelect = document.getElementById('clusterNodeRoleSelect');
+    const addBtn = document.getElementById('clusterAddNodeBtn');
+
+    const name = nameInput ? nameInput.value.trim() : '';
+    const url = urlInput ? urlInput.value.trim() : '';
+    const role = roleSelect ? roleSelect.value : 'edge';
+
+    if (!url) {
+      this.showToast("Veuillez renseigner l'URL du serveur Render", true);
+      return;
+    }
+
+    if (addBtn) {
+      addBtn.disabled = true;
+      addBtn.textContent = 'Connexion...';
+    }
+
+    try {
+      const res = await fetch(`${this.apiBase()}/api/admin/cluster/nodes`, {
+        method: 'POST',
+        headers: this.authHeaders({ 'Content-Type': 'application/json' }),
+        body: JSON.stringify({ name, url, role })
+      });
+
+      const data = await res.json();
+      if (res.ok && data.success) {
+        this.showToast(`✅ ${data.message || 'Serveur ajouté au cluster avec succès'}`);
+        if (nameInput) nameInput.value = '';
+        if (urlInput) urlInput.value = '';
+        await this.loadClusterStatus();
+      } else {
+        this.showToast(data.message || "Erreur lors de l'ajout au cluster", true);
+      }
+    } catch (err) {
+      this.showToast("Erreur de communication avec le serveur", true);
+    } finally {
+      if (addBtn) {
+        addBtn.disabled = false;
+        addBtn.textContent = '🔗 Connecter au Cluster';
+      }
+    }
+  }
+
+  async deleteClusterNode(nodeId, nodeName) {
+    if (!nodeId) return;
+    if (!confirm(`Confirmez-vous le retrait de "${nodeName || 'ce serveur'}" du cluster ?`)) {
+      return;
+    }
+
+    try {
+      const res = await fetch(`${this.apiBase()}/api/admin/cluster/nodes`, {
+        method: 'DELETE',
+        headers: this.authHeaders({ 'Content-Type': 'application/json' }),
+        body: JSON.stringify({ id: nodeId })
+      });
+
+      const data = await res.json();
+      if (res.ok && data.success) {
+        this.showToast(`🗑️ Serveur retiré du cluster`);
+        await this.loadClusterStatus();
+      } else {
+        this.showToast(data.message || "Erreur lors de la suppression", true);
+      }
+    } catch (err) {
+      this.showToast("Erreur de communication avec le serveur", true);
+    }
   }
 }
 

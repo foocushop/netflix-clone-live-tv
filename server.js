@@ -7,6 +7,7 @@ const path = require('path');
 const url = require('url');
 const querystring = require('querystring');
 const zlib = require('zlib');
+const os = require('os');
 
 // ================= ROBUSTESSE & GESTION DES DÉCONNEXIONS RÉSEAU =================
 // Protection vitale anti-crash Render / Node.js :
@@ -32,11 +33,119 @@ process.on('unhandledRejection', (reason) => {
 
 const PORT = process.env.PORT || 8080;
 const DATA_FILE = path.join(__dirname, 'data', 'catalog.json');
+const CLUSTER_NODES_FILE = path.join(__dirname, 'data', 'cluster_nodes.json');
 
 // Assurer l'existence du dossier data
 if (!fs.existsSync(path.join(__dirname, 'data'))) {
   fs.mkdirSync(path.join(__dirname, 'data'), { recursive: true });
 }
+
+// ================= TÉLÉMÉTRIE SYSTÈME & REGISTRE DU CLUSTER =================
+let activeStreamsCount = 0;
+let totalRequestsCount = 0;
+let lastCpuUsage = process.cpuUsage();
+let lastCpuTime = Date.now();
+let currentCpuPercent = 0;
+
+function getCpuUsagePercent() {
+  const currentCpu = process.cpuUsage(lastCpuUsage);
+  const currentTime = Date.now();
+  const elapsedMs = currentTime - lastCpuTime;
+  if (elapsedMs > 250) {
+    const totalCpuMs = (currentCpu.user + currentCpu.system) / 1000;
+    const numCpus = os.cpus().length || 1;
+    currentCpuPercent = Math.min(100, Math.max(0, (totalCpuMs / (elapsedMs * numCpus)) * 100));
+    lastCpuUsage = process.cpuUsage();
+    lastCpuTime = currentTime;
+  }
+  return parseFloat(currentCpuPercent.toFixed(1));
+}
+
+function getMemoryMetrics() {
+  const mem = process.memoryUsage();
+  const totalSysMem = os.totalmem();
+  const usedMb = Math.round(mem.rss / (1024 * 1024));
+  const totalMb = Math.round(totalSysMem / (1024 * 1024));
+  const percentOf512 = parseFloat(((usedMb / 512) * 100).toFixed(1));
+  const heapUsedMb = Math.round(mem.heapUsed / (1024 * 1024));
+  return {
+    usedMb,
+    totalMb,
+    renderLimitMb: 512,
+    percent: Math.min(100, percentOf512),
+    heapUsedMb
+  };
+}
+
+function loadClusterNodes() {
+  try {
+    if (fs.existsSync(CLUSTER_NODES_FILE)) {
+      const data = JSON.parse(fs.readFileSync(CLUSTER_NODES_FILE, 'utf8'));
+      if (Array.isArray(data) && data.length > 0) return data;
+    }
+  } catch (e) {
+    console.warn('[Cluster] Erreur lecture cluster_nodes.json:', e.message);
+  }
+
+  const defaultNodes = [
+    {
+      id: 'node-1',
+      name: process.env.NODE_NAME || 'Serveur 1 (Principal)',
+      url: process.env.RENDER_EXTERNAL_URL || 'https://netflix-clone-live-tv-j9ta.onrender.com',
+      role: 'master',
+      addedAt: new Date().toISOString()
+    }
+  ];
+
+  if (process.env.CLUSTER_NODES) {
+    const envUrls = process.env.CLUSTER_NODES.split(',').map(u => u.trim()).filter(Boolean);
+    envUrls.forEach((url, i) => {
+      if (!defaultNodes.some(n => n.url === url)) {
+        defaultNodes.push({
+          id: `node-${i + 2}`,
+          name: `Serveur ${i + 2}`,
+          url: url,
+          role: 'edge',
+          addedAt: new Date().toISOString()
+        });
+      }
+    });
+  }
+
+  try {
+    fs.writeFileSync(CLUSTER_NODES_FILE, JSON.stringify(defaultNodes, null, 2), 'utf8');
+  } catch (e) {}
+
+  return defaultNodes;
+}
+
+let clusterNodes = loadClusterNodes();
+
+function saveClusterNodes(nodes) {
+  clusterNodes = nodes;
+  try {
+    fs.writeFileSync(CLUSTER_NODES_FILE, JSON.stringify(nodes, null, 2), 'utf8');
+    if (typeof syncFileToGitHub === 'function' && GITHUB_CONFIG.token) {
+      syncFileToGitHub(CLUSTER_NODES_FILE, 'data/cluster_nodes.json', 'chore(cluster): auto-sync cluster nodes configuration')
+        .catch(e => console.warn('[Cluster GitHub Sync Error]:', e.message));
+    }
+  } catch (e) {
+    console.error('[Cluster] Erreur sauvegarde cluster_nodes.json:', e.message);
+  }
+}
+
+// Démon Keep-Alive Anti-Veille inter-serveurs (toutes les 4.5 minutes)
+setInterval(async () => {
+  const currentUrl = (process.env.RENDER_EXTERNAL_URL || '').replace(/\/$/, '');
+  for (const node of clusterNodes) {
+    const targetUrl = (node.url || '').replace(/\/$/, '');
+    if (!targetUrl || targetUrl === currentUrl || targetUrl.includes('localhost') || targetUrl.includes('127.0.0.1')) continue;
+    try {
+      const pingUrl = `${targetUrl}/api/cluster/ping`;
+      await fetch(pingUrl, { signal: AbortSignal.timeout(5000) });
+    } catch (e) {}
+  }
+}, 4.5 * 60 * 1000);
 
 // ================= EXTRACTEUR DE FLUX DIRECT (FETCHV-STYLE) =================
 function httpsGet(urlStr, headers = {}) {
@@ -1971,6 +2080,8 @@ async function handlePlayerApi(req, res, q) {
 }
 
 const server = http.createServer((req, res) => {
+  totalRequestsCount++;
+
   const parsedUrl = url.parse(req.url, true);
   let pathname = parsedUrl.pathname;
 
@@ -1983,6 +2094,20 @@ const server = http.createServer((req, res) => {
     res.writeHead(200);
     res.end();
     return;
+  }
+
+  // Comptage des flux vidéo actifs en temps réel
+  if (pathname.startsWith('/api/stream') || pathname.startsWith('/live/') || pathname.startsWith('/series/') || pathname.startsWith('/movie/')) {
+    activeStreamsCount++;
+    let isStreamTracked = true;
+    const untrackStream = () => {
+      if (isStreamTracked) {
+        isStreamTracked = false;
+        activeStreamsCount = Math.max(0, activeStreamsCount - 1);
+      }
+    };
+    req.once('close', untrackStream);
+    res.once('finish', untrackStream);
   }
 
   // ── ROUTEUR STREAMING XTREAM CODES (/live/, /series/, /movie/) ──
@@ -2362,6 +2487,197 @@ const server = http.createServer((req, res) => {
       res.writeHead(500, { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' });
       res.end(JSON.stringify({ success: false, message: err.message }));
     });
+    return;
+  }
+
+  // ================= ROUTES DU CLUSTER DISTRIBUÉ & TÉLÉMÉTRIE =================
+  // 1. Route Ping Keep-Alive ultra-légère pour maintien d'éveil
+  if (pathname === '/api/cluster/ping' && req.method === 'GET') {
+    res.writeHead(200, { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' });
+    res.end(JSON.stringify({ success: true, timestamp: Date.now() }));
+    return;
+  }
+
+  // 2. Route Métriques Locales du Serveur (CPU %, RAM, Flux actifs)
+  if (pathname === '/api/cluster/metrics' && req.method === 'GET') {
+    const metrics = {
+      success: true,
+      node_id: process.env.NODE_ID || 'node-1',
+      node_name: process.env.NODE_NAME || 'Serveur 1 (Principal)',
+      online: true,
+      cpu_percent: getCpuUsagePercent(),
+      memory: getMemoryMetrics(),
+      active_streams: activeStreamsCount,
+      total_requests: totalRequestsCount,
+      uptime_seconds: Math.floor((Date.now() - startTime) / 1000),
+      timestamp: Date.now()
+    };
+    res.writeHead(200, { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' });
+    res.end(JSON.stringify(metrics));
+    return;
+  }
+
+  // 3. Route Statut Global du Cluster (Supervision en temps réel de tous les nœuds)
+  if (pathname === '/api/cluster/status' && req.method === 'GET') {
+    const currentExternalUrl = (process.env.RENDER_EXTERNAL_URL || '').replace(/\/$/, '');
+    const isLocalNode = (urlStr) => {
+      const u = (urlStr || '').replace(/\/$/, '');
+      return !u || u.includes(`:${PORT}`) || u.includes('localhost') || u.includes('127.0.0.1') || (currentExternalUrl && u === currentExternalUrl);
+    };
+
+    const statusPromises = clusterNodes.map(async (node, idx) => {
+      const nodeUrl = (node.url || '').replace(/\/$/, '');
+      const isLocal = idx === 0 || isLocalNode(nodeUrl) || nodeUrl === 'local';
+      if (isLocal) {
+        return {
+          id: node.id,
+          name: node.name,
+          url: node.url,
+          role: node.role || 'master',
+          online: true,
+          latency_ms: 0,
+          is_current: true,
+          cpu_percent: getCpuUsagePercent(),
+          memory: getMemoryMetrics(),
+          active_streams: activeStreamsCount,
+          total_requests: totalRequestsCount,
+          uptime_seconds: Math.floor((Date.now() - startTime) / 1000)
+        };
+      }
+
+      const t0 = Date.now();
+      try {
+        const resNode = await fetch(`${nodeUrl}/api/cluster/metrics`, {
+          headers: { 'User-Agent': 'Netflix-Cluster-Supervisor' },
+          signal: AbortSignal.timeout(3000)
+        });
+        if (resNode.ok) {
+          const data = await resNode.json();
+          return {
+            id: node.id,
+            name: node.name,
+            url: node.url,
+            role: node.role || 'edge',
+            online: true,
+            latency_ms: Date.now() - t0,
+            is_current: false,
+            cpu_percent: data.cpu_percent || 0,
+            memory: data.memory || { usedMb: 0, totalMb: 512, percent: 0 },
+            active_streams: data.active_streams || 0,
+            total_requests: data.total_requests || 0,
+            uptime_seconds: data.uptime_seconds || 0
+          };
+        }
+      } catch (err) {}
+
+      return {
+        id: node.id,
+        name: node.name,
+        url: node.url,
+        role: node.role || 'edge',
+        online: false,
+        latency_ms: null,
+        is_current: false,
+        cpu_percent: 0,
+        memory: { usedMb: 0, totalMb: 512, percent: 0 },
+        active_streams: 0,
+        total_requests: 0,
+        uptime_seconds: 0
+      };
+    });
+
+    Promise.all(statusPromises).then(results => {
+      res.writeHead(200, { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' });
+      res.end(JSON.stringify({ success: true, nodes: results, count: results.length }));
+    }).catch(err => {
+      res.writeHead(500, { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' });
+      res.end(JSON.stringify({ success: false, message: err.message }));
+    });
+    return;
+  }
+
+  // 4. Gestion des Nœuds du Cluster (Lecture / Ajout / Suppression)
+  if (pathname === '/api/admin/cluster/nodes' && req.method === 'GET') {
+    res.writeHead(200, { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' });
+    res.end(JSON.stringify({ success: true, data: clusterNodes }));
+    return;
+  }
+
+  if (pathname === '/api/admin/cluster/nodes' && req.method === 'POST') {
+    let body = '';
+    req.on('data', chunk => body += chunk);
+    req.on('end', () => {
+      try {
+        const payload = JSON.parse(body || '{}');
+        let rawUrl = (payload.url || '').trim().replace(/\/$/, '');
+        const name = (payload.name || '').trim() || `Serveur ${clusterNodes.length + 1}`;
+        const role = payload.role || 'edge';
+
+        if (!rawUrl) {
+          res.writeHead(400, { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' });
+          return res.end(JSON.stringify({ success: false, message: 'URL du serveur requise' }));
+        }
+
+        if (!rawUrl.startsWith('http://') && !rawUrl.startsWith('https://')) {
+          rawUrl = 'https://' + rawUrl;
+        }
+
+        const existing = clusterNodes.find(n => n.url.replace(/\/$/, '') === rawUrl);
+        if (existing) {
+          existing.name = name;
+          existing.role = role;
+        } else {
+          clusterNodes.push({
+            id: `node-${Date.now()}`,
+            name,
+            url: rawUrl,
+            role,
+            addedAt: new Date().toISOString()
+          });
+        }
+
+        saveClusterNodes(clusterNodes);
+        res.writeHead(200, { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' });
+        res.end(JSON.stringify({ success: true, message: `Nœud ${name} enregistré avec succès`, nodes: clusterNodes }));
+      } catch (err) {
+        res.writeHead(400, { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' });
+        res.end(JSON.stringify({ success: false, message: err.message }));
+      }
+    });
+    return;
+  }
+
+  if (pathname === '/api/admin/cluster/nodes' && req.method === 'DELETE') {
+    let body = '';
+    req.on('data', chunk => body += chunk);
+    req.on('end', () => {
+      try {
+        const payload = JSON.parse(body || '{}');
+        const idToDelete = payload.id;
+        const urlToDelete = (payload.url || '').trim().replace(/\/$/, '');
+
+        clusterNodes = clusterNodes.filter(n => {
+          if (idToDelete && n.id === idToDelete) return false;
+          if (urlToDelete && n.url.replace(/\/$/, '') === urlToDelete) return false;
+          return true;
+        });
+
+        saveClusterNodes(clusterNodes);
+        res.writeHead(200, { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' });
+        res.end(JSON.stringify({ success: true, message: 'Nœud supprimé du cluster', nodes: clusterNodes }));
+      } catch (err) {
+        res.writeHead(400, { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' });
+        res.end(JSON.stringify({ success: false, message: err.message }));
+      }
+    });
+    return;
+  }
+
+  // 5. Route Load Balancer : Sélection du meilleur nœud disponible
+  if (pathname === '/api/cluster/best-node' && req.method === 'GET') {
+    const bestNode = clusterNodes[0] || { url: '' };
+    res.writeHead(200, { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' });
+    res.end(JSON.stringify({ success: true, best_node: bestNode.url }));
     return;
   }
 

@@ -543,6 +543,50 @@
         </div>
       </div>
 
+      <!-- ================= SECTION SUPERVISION CLUSTER & SANTÉ SERVEURS ================= -->
+      <div class="admin-cluster-container" id="adminClusterSection">
+        <div class="cluster-header">
+          <div class="cluster-title-wrap">
+            <span class="cluster-icon">🌐</span>
+            <div class="cluster-title-group">
+              <h2 class="cluster-title">INFRASTRUCTURE CLUSTER MULTI-SERVEURS (RENDER POOL)</h2>
+              <p class="cluster-subtitle">Supervision télémétrique en direct (CPU, RAM, flux actifs, latence) & Keep-Alive anti-sommeil automatique 24/7</p>
+            </div>
+          </div>
+          <div class="cluster-header-actions">
+            <div class="cluster-live-indicator">
+              <span class="pulse-dot"></span>
+              <span class="live-text">SUPERVISION LIVE (5s)</span>
+            </div>
+            <button type="button" class="btn-admin btn-admin-secondary btn-sm" id="clusterRefreshBtn" title="Actualiser les métriques du cluster">
+              🔄 Actualiser
+            </button>
+          </div>
+        </div>
+
+        <!-- Grille dynamique des cartes serveurs -->
+        <div class="cluster-nodes-grid" id="clusterNodesGrid">
+          <!-- Rempli dynamiquement par admin.js -->
+        </div>
+
+        <!-- Formulaire d'ajout rapide d'un serveur au cluster -->
+        <div class="cluster-add-bar">
+          <div class="add-bar-title">➕ Enregistrer un nouveau nœud Render dans le cluster :</div>
+          <form id="clusterAddNodeForm" class="cluster-add-form">
+            <input type="text" id="clusterNodeNameInput" class="admin-form-input cluster-input-name" placeholder="Nom du nœud (ex: Serveur 2 - Edge Sport)" required>
+            <input type="url" id="clusterNodeUrlInput" class="admin-form-input cluster-input-url" placeholder="URL Render (ex: https://mon-serveur-2.onrender.com)" required>
+            <select id="clusterNodeRoleSelect" class="admin-form-select cluster-select-role">
+              <option value="edge">Nœud Relais (Edge)</option>
+              <option value="master">Nœud Principal (Master)</option>
+              <option value="backup">Nœud Secours (Backup)</option>
+            </select>
+            <button type="submit" class="btn-admin btn-admin-blue" id="clusterAddNodeBtn">
+              🔗 Connecter au Cluster
+            </button>
+          </form>
+        </div>
+      </div>
+
       <!-- Section Intégrations : Xtream Codes & GitHub Cloud -->
       <div class="admin-integrations-grid">
         <!-- Connexion Serveur Xtream Codes pour TiviMate, IPTV Smarters Pro & VLC -->
