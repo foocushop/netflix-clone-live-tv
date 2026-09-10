@@ -668,6 +668,53 @@ class NetflixPlayer {
     }
   }
 
+  // ================= INACTIVITÉ SOURIS : MASQUAGE AUTOMATIQUE =================
+  initInactivityTimer() {
+    const IDLE_DELAY = 4000; // 4 secondes d'inactivité
+
+    const showControls = () => {
+      if (!this.overlay) return;
+      this.overlay.classList.remove('user-idle');
+    };
+
+    const hideControls = () => {
+      if (!this.overlay) return;
+      // Ne pas cacher si on est en train de scrubber ou si la vidéo est en pause
+      if (this.isScrubbing) return;
+      if (this.video && this.video.paused && !this.video.ended) return;
+      this.overlay.classList.add('user-idle');
+    };
+
+    const resetTimer = () => {
+      showControls();
+      clearTimeout(this.inactivityTimer);
+      this.inactivityTimer = setTimeout(hideControls, IDLE_DELAY);
+    };
+
+    // Écouter les mouvements souris sur le player overlay
+    if (this.overlay) {
+      this.overlay.addEventListener('mousemove', resetTimer);
+      this.overlay.addEventListener('mousedown', resetTimer);
+      this.overlay.addEventListener('touchstart', resetTimer, { passive: true });
+      this.overlay.addEventListener('touchmove', resetTimer, { passive: true });
+
+      // Quand la souris quitte le player, cacher les contrôles immédiatement
+      this.overlay.addEventListener('mouseleave', () => {
+        clearTimeout(this.inactivityTimer);
+        hideControls();
+      });
+
+      // Quand la souris entre dans le player, montrer les contrôles
+      this.overlay.addEventListener('mouseenter', resetTimer);
+    }
+
+    // Les raccourcis clavier doivent aussi réinitialiser le timer
+    document.addEventListener('keydown', (e) => {
+      if (!this.overlay || !this.overlay.classList.contains('active')) return;
+      resetTimer();
+    });
+  }
+
   populateSeasons() {
     if (!this.seasonSelect) return;
     this.seasonSelect.innerHTML = '';
@@ -771,16 +818,16 @@ class NetflixPlayer {
   }
 
   showControls() {
-    if (this.topBar) this.topBar.classList.remove('hidden-anim');
-    if (this.bottomControls) this.bottomControls.classList.remove('hidden-anim');
-    if (this.overlay) this.overlay.style.cursor = 'default';
+    if (this.overlay) this.overlay.classList.remove('user-idle');
+    // Redémarrer le timer d'inactivité
+    clearTimeout(this.inactivityTimer);
+    this.inactivityTimer = setTimeout(() => this.hideControls(), 4000);
   }
 
   hideControls() {
-    if (this.video.paused || this.isScrubbing) return;
-    if (this.topBar) this.topBar.classList.add('hidden-anim');
-    if (this.bottomControls) this.bottomControls.classList.add('hidden-anim');
-    if (this.overlay) this.overlay.style.cursor = 'none';
+    if (this.video && this.video.paused && !this.video.ended) return;
+    if (this.isScrubbing) return;
+    if (this.overlay) this.overlay.classList.add('user-idle');
   }
 
   // ================= 9. OUVERTURE & FERMETURE DU LECTEUR =================
@@ -910,7 +957,7 @@ class NetflixPlayer {
 
     this.hideLoader();
     this.hideStatusBanner();
-    this.overlay.classList.remove('active');
+    this.overlay.classList.remove('active', 'user-idle');
     clearTimeout(this.inactivityTimer);
 
     if (document.fullscreenElement) {
