@@ -1167,7 +1167,9 @@ class NetflixPlayer {
         }
       });
 
+      this._mediaErrorCount = 0;
       hls.on(Hls.Events.FRAG_BUFFERED, () => {
+        this._mediaErrorCount = 0;
         onReady();
       });
 
@@ -1201,6 +1203,22 @@ class NetflixPlayer {
             hls.startLoad();
             break;
           case Hls.ErrorTypes.MEDIA_ERROR:
+            this._mediaErrorCount = (this._mediaErrorCount || 0) + 1;
+            // Si le navigateur ne peut pas décoder le codec (ex: HEVC sur Chrome Windows) ou si 2 erreurs média consécutives surviennent
+            if (this._mediaErrorCount >= 2 || data.details === 'mediaSourceRequiresReset') {
+              console.warn('[HLS] Codec incompatible ou erreur média persistante. Basculement automatique sur le serveur suivant...');
+              this._mediaErrorCount = 0;
+              const isChannel = (this.currentMovie?.media_type === 'channel' || this.currentMovie?.is_live);
+              if (isChannel) {
+                const nextSrv = (this.currentServer % 8) + 1;
+                this.showStatusBanner(`Flux direct en cours d'optimisation (Basculement Serveur ${nextSrv})...`);
+                setTimeout(() => {
+                  this.hideStatusBanner();
+                  this.switchServer(nextSrv, true);
+                }, 800);
+                return;
+              }
+            }
             console.log('[HLS] Récupération média automatique...');
             hls.recoverMediaError();
             break;

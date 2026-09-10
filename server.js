@@ -3141,6 +3141,10 @@ const server = http.createServer((req, res) => {
       }
 
       const candidates = [initialStreamId];
+      // Priorité absolue aux flux H.264 (compatibilité universelle Chrome/MSE) pour TF1
+      if (initialStreamId === '13847' && !candidates.includes('13917')) {
+        candidates.unshift('13917');
+      }
       if (XTREAM_STREAM_FALLBACKS[initialStreamId]) {
         candidates.push(...XTREAM_STREAM_FALLBACKS[initialStreamId]);
       }
