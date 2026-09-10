@@ -458,16 +458,17 @@ body {
   position: relative;
   border-radius: 6px;
   cursor: pointer;
-  transition: transform 0.25s cubic-bezier(0.25, 1, 0.5, 1), box-shadow 0.25s ease;
+  transition: transform 0.2s cubic-bezier(0.25, 1, 0.5, 1), box-shadow 0.2s ease, border-color 0.2s ease;
   background-color: var(--card-bg);
   overflow: hidden;
   contain: layout paint;
+  will-change: transform;
 }
 
 .movie-card:hover {
-  transform: scale(1.08) translateY(-6px);
+  transform: scale(1.04) translateY(-3px);
   z-index: 15;
-  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.9);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.8);
 }
 
 .card-image {
@@ -2098,7 +2099,7 @@ body {
 
 /* Carte de Chaîne TV avec Logo PNG Haute Définition */
 .movie-card.channel-card {
-  background: radial-gradient(circle at 50% 45%, #2a2a3e 0%, #151520 70%, #0c0c14 100%) !important;
+  background: radial-gradient(circle at 50% 45%, #222232 0%, #13131c 70%, #0c0c14 100%) !important;
   border: 1px solid rgba(255, 255, 255, 0.12) !important;
   display: flex !important;
   flex-direction: column !important;
@@ -2107,6 +2108,8 @@ body {
   padding: 16px 12px 14px !important;
   box-sizing: border-box !important;
   overflow: hidden !important;
+  will-change: transform;
+  transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease !important;
 }
 
 .movie-card.channel-card .card-image {
@@ -2115,14 +2118,13 @@ body {
   max-width: 82% !important;
   max-height: 58% !important;
   margin: auto !important;
-  filter: drop-shadow(0 6px 14px rgba(0, 0, 0, 0.85)) !important;
-  transition: transform 0.25s ease, filter 0.25s ease !important;
 }
 
-.movie-card.channel-card:hover .card-image,
-.movie-card.channel-card.tv-focused .card-image {
-  transform: scale(1.14) !important;
-  filter: drop-shadow(0 8px 20px rgba(229, 9, 20, 0.6)) !important;
+.movie-card.channel-card:hover,
+.movie-card.channel-card.tv-focused {
+  transform: scale(1.04) translateY(-3px) !important;
+  border-color: #e50914 !important;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.8), 0 0 14px rgba(229, 9, 20, 0.4) !important;
 }
 
 /* Badges TV et indicateurs directs */

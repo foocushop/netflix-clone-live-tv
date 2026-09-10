@@ -31,12 +31,14 @@ class NetflixApp {
 
   getMovieFallbackSvg(title) {
     const clean = (title || 'Titre Netflix').replace(/["'<>\\]/g, '').trim().substring(0, 24);
-    return `data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="300" height="450" viewBox="0 0 300 450"><rect fill="%231f1f1f" width="300" height="450"/><text fill="%23E50914" font-family="sans-serif" font-size="32" font-weight="800" x="50%" y="45%" text-anchor="middle">NETFLIX</text><text fill="%23888" font-family="sans-serif" font-size="13" x="50%" y="55%" text-anchor="middle">${clean}</text></svg>`;
+    const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="300" height="450" viewBox="0 0 300 450"><rect fill="#1f1f1f" width="300" height="450"/><text fill="#E50914" font-family="sans-serif" font-size="32" font-weight="800" x="50%" y="45%" text-anchor="middle">NETFLIX</text><text fill="#888" font-family="sans-serif" font-size="13" x="50%" y="55%" text-anchor="middle">${clean}</text></svg>`;
+    return 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(svg);
   }
 
   getChannelFallbackSvg(channelName) {
     const clean = (channelName || 'TV DIRECT').replace(/["'<>\\]/g, '').trim().substring(0, 22);
-    return `data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 450" width="300" height="450"><defs><linearGradient id="g" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="%2318181b"/><stop offset="100%" stop-color="%23050505"/></linearGradient></defs><rect width="100%" height="100%" fill="url(%23g)"/><rect x="15" y="15" width="270" height="420" rx="14" fill="none" stroke="rgba(255,255,255,0.08)" stroke-width="1.5"/><circle cx="150" cy="180" r="55" fill="%23e50914" opacity="0.15"/><g transform="translate(125, 155) scale(2.2)" fill="%23e50914"><path d="M21 3H3c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h5v2h8v-2h5c1.1 0 1.99-.9 1.99-2L23 5c0-1.1-.9-2-2-2zm0 14H3V5h18v12z"/></g><text x="150" y="270" font-family="system-ui, -apple-system, sans-serif" font-size="16" font-weight="800" fill="%23ffffff" text-anchor="middle">${clean}</text><rect x="95" y="292" width="110" height="22" rx="11" fill="%23e50914"/><text x="150" y="307" font-family="system-ui, sans-serif" font-size="10" font-weight="800" fill="%23ffffff" text-anchor="middle">● EN DIRECT</text></svg>`;
+    const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 450" width="300" height="450"><defs><linearGradient id="g" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#18181b"/><stop offset="100%" stop-color="#050505"/></linearGradient></defs><rect width="100%" height="100%" fill="url(#g)"/><rect x="15" y="15" width="270" height="420" rx="14" fill="none" stroke="rgba(255,255,255,0.08)" stroke-width="1.5"/><circle cx="150" cy="180" r="55" fill="#e50914" opacity="0.15"/><g transform="translate(125, 155) scale(2.2)" fill="#e50914"><path d="M21 3H3c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h5v2h8v-2h5c1.1 0 1.99-.9 1.99-2L23 5c0-1.1-.9-2-2-2zm0 14H3V5h18v12z"/></g><text x="150" y="270" font-family="system-ui, -apple-system, sans-serif" font-size="16" font-weight="800" fill="#ffffff" text-anchor="middle">${clean}</text><rect x="95" y="292" width="110" height="22" rx="11" fill="#e50914"/><text x="150" y="307" font-family="system-ui, sans-serif" font-size="10" font-weight="800" fill="#ffffff" text-anchor="middle">● EN DIRECT</text></svg>`;
+    return 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(svg);
   }
 
   initElements() {
@@ -367,7 +369,7 @@ class NetflixApp {
     const channelFallback = isChannel ? this.getChannelFallbackSvg(movie.title) : this.getMovieFallbackSvg(movie.title);
 
     card.innerHTML = `
-      <img src="${securePoster}" alt="${movie.title}" class="card-image" loading="lazy" decoding="async" onerror="this.onerror=null; this.src='${channelFallback}'">
+      <img src="${securePoster}" alt="${movie.title}" class="card-image" loading="lazy" decoding="async">
       ${topBadges}
       <div class="card-overlay">
         <div class="card-title">${movie.title}</div>
@@ -381,6 +383,13 @@ class NetflixApp {
         </div>
       </div>
     `;
+
+    const imgEl = card.querySelector('.card-image');
+    if (imgEl) {
+      imgEl.addEventListener('error', () => {
+        imgEl.src = channelFallback;
+      }, { once: true });
+    }
 
     // Événements sur la carte
     card.addEventListener('click', (e) => {
@@ -886,7 +895,7 @@ class NetflixApp {
     };
 
     card.innerHTML = `
-      <img src="${secureIcon}" alt="${channel.name}" class="card-image" loading="lazy" decoding="async" onerror="this.onerror=null; this.src='${fallbackSvg}'">
+      <img src="${secureIcon}" alt="${channel.name}" class="card-image" loading="lazy" decoding="async">
       <span class="xtream-card-quality-badge badge-${qClass}">${channel.quality_badge}</span>
       <span class="live-badge-card" style="top: 8px; right: 8px; left: auto;"><span class="live-pulse">●</span> DIRECT</span>
       <div class="card-overlay">
@@ -900,6 +909,13 @@ class NetflixApp {
         </div>
       </div>
     `;
+
+    const imgEl = card.querySelector('.card-image');
+    if (imgEl) {
+      imgEl.addEventListener('error', () => {
+        imgEl.src = fallbackSvg;
+      }, { once: true });
+    }
 
     card.addEventListener('click', (e) => {
       e.stopPropagation();
@@ -1006,14 +1022,42 @@ class NetflixApp {
       return;
     }
 
-    // Si recherche active ou filtre qualité actif -> Grille fluide et complète
-    if (q || qual !== 'all' || (cat !== 'all' && filtered.length > 60)) {
+    // Si recherche active ou filtre qualité actif -> Grille progressive ultra-fluide (36 par lot)
+    if (q || qual !== 'all' || (cat !== 'all' && filtered.length > 36)) {
       const grid = document.createElement('div');
       grid.className = 'xtream-grid-container';
-      filtered.forEach(channel => {
-        grid.appendChild(this.createXtreamCard(channel));
-      });
+      
+      const BATCH_SIZE = 36;
+      let renderedCount = 0;
+
+      const renderNextBatch = () => {
+        const nextBatch = filtered.slice(renderedCount, renderedCount + BATCH_SIZE);
+        const frag = document.createDocumentFragment();
+        nextBatch.forEach(channel => {
+          frag.appendChild(this.createXtreamCard(channel));
+        });
+        grid.appendChild(frag);
+        renderedCount += nextBatch.length;
+
+        const oldMoreBtn = grid.parentElement?.querySelector('.xtream-load-more-container');
+        if (oldMoreBtn) oldMoreBtn.remove();
+
+        if (renderedCount < filtered.length) {
+          const loadMoreDiv = document.createElement('div');
+          loadMoreDiv.className = 'xtream-load-more-container';
+          loadMoreDiv.style.cssText = 'text-align: center; margin: 32px 0 48px; width: 100%;';
+          loadMoreDiv.innerHTML = `
+            <button class="btn btn-secondary" style="padding: 12px 28px; font-weight: 700; border-radius: 24px; background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.2); color: #fff; cursor: pointer; transition: all 0.2s;">
+              Afficher plus de chaînes (${renderedCount} / ${filtered.length})
+            </button>
+          `;
+          loadMoreDiv.querySelector('button').addEventListener('click', () => renderNextBatch());
+          this.catalogRowsContainer.appendChild(loadMoreDiv);
+        }
+      };
+
       this.catalogRowsContainer.appendChild(grid);
+      renderNextBatch();
       return;
     }
 
@@ -1049,11 +1093,11 @@ class NetflixApp {
       });
 
       const fragment = document.createDocumentFragment();
-      const visibleChannels = channels.slice(0, 50);
+      const visibleChannels = channels.slice(0, 24);
       visibleChannels.forEach(ch => {
         fragment.appendChild(this.createXtreamCard(ch));
       });
-      if (channels.length > 50) {
+      if (channels.length > 24) {
         const moreCard = document.createElement('div');
         moreCard.className = 'movie-card channel-card xtream-card focusable';
         moreCard.style.display = 'flex';

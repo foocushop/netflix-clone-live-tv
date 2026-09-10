@@ -1181,11 +1181,12 @@ class NetflixPlayer {
         nudgeOffset: 0.1,
         nudgeMaxRetry: 5,
         maxFragLookUpTolerance: 0.25,
-        fragLoadingTimeOut: 30000,
-        manifestLoadingTimeOut: 20000,
-        levelLoadingTimeOut: 20000,
-        fragLoadingMaxRetry: 6,
-        fragLoadingRetryDelay: 800
+        fragLoadingTimeOut: 8000,
+        manifestLoadingTimeOut: 4500,
+        levelLoadingTimeOut: 4500,
+        manifestLoadingMaxRetry: 2,
+        fragLoadingMaxRetry: 3,
+        fragLoadingRetryDelay: 500
       });
       this.hls = hls;
 
@@ -1215,8 +1216,10 @@ class NetflixPlayer {
       });
 
       this._mediaErrorCount = 0;
+      this._networkErrorCount = 0;
       hls.on(Hls.Events.FRAG_BUFFERED, () => {
         this._mediaErrorCount = 0;
+        this._networkErrorCount = 0;
         onReady();
       });
 
@@ -1246,6 +1249,20 @@ class NetflixPlayer {
         console.warn('[HLS Fatal Error]', data.type, data.details);
         switch (data.type) {
           case Hls.ErrorTypes.NETWORK_ERROR:
+            this._networkErrorCount = (this._networkErrorCount || 0) + 1;
+            if (this._networkErrorCount >= 2 || data.details === 'manifestLoadError' || data.details === 'manifestLoadTimeOut') {
+              this._networkErrorCount = 0;
+              const isChannel = (this.currentMovie?.media_type === 'channel' || this.currentMovie?.is_live);
+              if (isChannel && (this.currentServer < 8)) {
+                const nextSrv = (this.currentServer % 8) + 1;
+                this.showStatusBanner(`Flux principal indisponible (Basculement automatique Serveur ${nextSrv})...`);
+                setTimeout(() => {
+                  this.hideStatusBanner();
+                  this.switchServer(nextSrv, true);
+                }, 600);
+                return;
+              }
+            }
             console.log('[HLS] Récupération réseau automatique...');
             hls.startLoad();
             break;

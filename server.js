@@ -48,7 +48,7 @@ function httpsGet(urlStr, headers = {}) {
     const finalHeaders = Object.assign({}, defaultHeaders, headers);
     const req = https.get(urlStr, {
       headers: finalHeaders,
-      timeout: 8000
+      timeout: 3500
     }, res => {
       res.on('error', reject);
       let chunks = [];
@@ -135,7 +135,26 @@ const XTREAM_STREAM_FALLBACKS = {
   '13726': ['14003', '222569'],          // M6 FHD -> HD -> 4K
   '13690': ['13973', '47481'],           // W9 FHD -> HD -> HEVC
   '13696': ['13979', '47494'],           // TMC FHD -> HD -> HEVC
-  '479050': ['479049', '479051']         // Ligue 1+ FHD -> HD -> UHD
+  '479050': ['479049', '479051'],        // Ligue 1+ FHD -> HD -> UHD
+  // Disney+ Événements & Disney Channel
+  '479269': ['479270', '39524', '13861', '24946'],
+  '479270': ['479269', '39524', '13861', '24946'],
+  '479271': ['479269', '39524', '13861', '24946'],
+  '479272': ['479269', '39524', '13861', '24946'],
+  '479273': ['479269', '39524', '13861', '24946'],
+  '479274': ['479269', '39524', '13861', '24946'],
+  '479275': ['479269', '39524', '13861', '24946'],
+  '479276': ['479269', '39524', '13861', '24946'],
+  '479277': ['479269', '39524', '13861', '24946'],
+  '479278': ['479269', '39524', '13861', '24946'],
+  '39524':  ['13861', '24946', '479269'],
+  '13861':  ['24946', '39524', '1040'],
+  // DAZN LaLiga 1-5
+  '327338': ['327339', '327340', '180946'],
+  '327339': ['327338', '327340', '180946'],
+  '327340': ['327338', '327339', '180946'],
+  '327341': ['327338', '327339', '180946'],
+  '327342': ['327338', '327339', '180946']
 };
 
 // Agents HTTP/HTTPS persistants avec réutilisation de sockets (Keep-Alive Pool)
@@ -238,13 +257,13 @@ function fetchXtreamPlaylist(targetUrl, headers = {}, hops = 0, retry = 0) {
         'User-Agent': 'IPTVSmartersPro/1.0',
         'Accept': '*/*'
       }, headers),
-      timeout: 10000
+      timeout: 3500
     }, (res) => {
       res.on('error', (err) => {
         if (settled) return;
         settled = true;
         try { req.destroy(); } catch (e) {}
-        if (retry < 2 && (err.code === 'ECONNRESET' || err.message?.includes('socket hang up') || err.code === 'ETIMEDOUT')) {
+        if (retry < 1 && (err.code === 'ECONNRESET' || err.message?.includes('socket hang up') || err.code === 'ETIMEDOUT')) {
           return resolve(fetchXtreamPlaylist(targetUrl, headers, hops, retry + 1));
         }
         reject(err);
@@ -261,6 +280,21 @@ function fetchXtreamPlaylist(targetUrl, headers = {}, hops = 0, retry = 0) {
         if (!settled) {
           settled = true;
           return resolve(fetchXtreamPlaylist(nextUrl, headers, hops + 1, retry));
+        }
+        return;
+      }
+
+      if (res.statusCode >= 400) {
+        try { res.destroy(); } catch (e) {}
+        if (!settled) {
+          settled = true;
+          return resolve({
+            statusCode: res.statusCode,
+            headers: res.headers,
+            finalUrl: targetUrl,
+            body: '',
+            buffer: Buffer.alloc(0)
+          });
         }
         return;
       }
@@ -284,7 +318,7 @@ function fetchXtreamPlaylist(targetUrl, headers = {}, hops = 0, retry = 0) {
     req.on('error', (err) => {
       if (settled) return;
       settled = true;
-      if (retry < 2 && (err.message.includes('socket hang up') || err.code === 'ECONNRESET' || err.code === 'ETIMEDOUT')) {
+      if (retry < 1 && (err.message.includes('socket hang up') || err.code === 'ECONNRESET' || err.code === 'ETIMEDOUT')) {
         return resolve(fetchXtreamPlaylist(targetUrl, headers, hops, retry + 1));
       }
       reject(err);
@@ -294,7 +328,7 @@ function fetchXtreamPlaylist(targetUrl, headers = {}, hops = 0, retry = 0) {
       try { req.destroy(); } catch (e) {}
       if (settled) return;
       settled = true;
-      if (retry < 2) {
+      if (retry < 1) {
         return resolve(fetchXtreamPlaylist(targetUrl, headers, hops, retry + 1));
       }
       reject(new Error('Timeout de connexion Xtream'));
@@ -3204,6 +3238,19 @@ const server = http.createServer((req, res) => {
         }
       }
 
+      if (candidates.length <= 1) {
+        const item = XTREAM_FR_CATALOG.find(c => String(c.stream_id) === String(initialStreamId));
+        if (item) {
+          const peers = XTREAM_FR_CATALOG.filter(c => 
+            c.category_id === item.category_id && String(c.stream_id) !== String(initialStreamId)
+          ).slice(0, 3);
+          for (const p of peers) {
+            const pid = String(p.stream_id);
+            if (!candidates.includes(pid)) candidates.push(pid);
+          }
+        }
+      }
+
       let lastErr = null;
       for (const sId of candidates) {
         const urlToFetch = `http://${XTREAM_CONFIG.host}:${XTREAM_CONFIG.port}/live/${XTREAM_CONFIG.username}/${XTREAM_CONFIG.password}/${sId}.m3u8`;
@@ -3534,7 +3581,7 @@ const server = http.createServer((req, res) => {
       const clientReq = client.get(targetUrl, {
         headers: headersToForward,
         agent: agent,
-        timeout: 25000
+        timeout: 6000
       }, (upstreamRes) => {
         activeUpstreamRes = upstreamRes;
 
