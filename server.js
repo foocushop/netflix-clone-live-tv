@@ -1,4 +1,4 @@
-// ================= PREVIEW / TEST SERVER =================
+// ================= PREVIEW / TEST SERVER (AUTO-DEPLOY ENABLED) =================
 // Ce serveur reproduit fidèlement les endpoints de l'API Axum/Rust pour un test immédiat
 const http = require('http');
 const https = require('https');
