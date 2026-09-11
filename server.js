@@ -64,16 +64,62 @@ function getCpuUsagePercent() {
 function getMemoryMetrics() {
   const mem = process.memoryUsage();
   const totalSysMem = os.totalmem();
-  const usedMb = Math.round(mem.rss / (1024 * 1024));
+  const freeSysMem = os.freemem();
+  
+  const processUsedMb = Math.round(mem.rss / (1024 * 1024));
   const totalMb = Math.round(totalSysMem / (1024 * 1024));
-  const percentOf512 = parseFloat(((usedMb / 512) * 100).toFixed(1));
+  let availableMb = Math.round(freeSysMem / (1024 * 1024));
+  let swapTotalMb = 0;
+  let swapUsedMb = 0;
+
+  // Lecture fidèle sous Linux de /proc/meminfo
+  try {
+    if (fs.existsSync('/proc/meminfo')) {
+      const txt = fs.readFileSync('/proc/meminfo', 'utf8');
+      const mAvail = txt.match(/MemAvailable:\s+(\d+)\s+kB/);
+      if (mAvail) availableMb = Math.round(parseInt(mAvail[1], 10) / 1024);
+      const sTotal = txt.match(/SwapTotal:\s+(\d+)\s+kB/);
+      const sFree = txt.match(/SwapFree:\s+(\d+)\s+kB/);
+      if (sTotal) swapTotalMb = Math.round(parseInt(sTotal[1], 10) / 1024);
+      if (sTotal && sFree) {
+        swapUsedMb = Math.max(0, swapTotalMb - Math.round(parseInt(sFree[1], 10) / 1024));
+      }
+    }
+  } catch (e) {}
+
+  const systemUsedMb = Math.max(0, totalMb - availableMb);
+  const sysPercent = parseFloat(((systemUsedMb / totalMb) * 100).toFixed(1));
+  const processPercent = parseFloat(((processUsedMb / totalMb) * 100).toFixed(1));
   const heapUsedMb = Math.round(mem.heapUsed / (1024 * 1024));
+
+  // Lecture fidèle de l'espace disque du VPS
+  let diskTotalGb = 0;
+  let diskUsedGb = 0;
+  let diskPercent = 0;
+  try {
+    if (typeof fs.statfsSync === 'function') {
+      const stat = fs.statfsSync(process.platform === 'win32' ? process.cwd() : '/');
+      diskTotalGb = parseFloat(((stat.blocks * stat.bsize) / (1024 * 1024 * 1024)).toFixed(1));
+      const freeGb = parseFloat(((stat.bfree * stat.bsize) / (1024 * 1024 * 1024)).toFixed(1));
+      diskUsedGb = parseFloat((diskTotalGb - freeGb).toFixed(1));
+      diskPercent = parseFloat(((diskUsedGb / diskTotalGb) * 100).toFixed(1));
+    }
+  } catch (e) {}
+
   return {
-    usedMb,
-    totalMb,
-    renderLimitMb: 512,
-    percent: Math.min(100, percentOf512),
-    heapUsedMb
+    usedMb: processUsedMb,        // RAM consommée par l'application Node.js
+    processUsedMb: processUsedMb,
+    systemUsedMb: systemUsedMb,   // RAM totale consommée par le VPS
+    totalMb: totalMb,             // RAM physique totale du VPS (ex: 1967 Mo ~ 2048 Mo)
+    availableMb: availableMb,     // RAM libre disponible sur le VPS
+    percent: sysPercent,          // Pourcentage réel utilisé sur tout le VPS
+    processPercent: processPercent,
+    heapUsedMb: heapUsedMb,
+    swapTotalMb: swapTotalMb,
+    swapUsedMb: swapUsedMb,
+    diskTotalGb: diskTotalGb,
+    diskUsedGb: diskUsedGb,
+    diskPercent: diskPercent
   };
 }
 
@@ -89,9 +135,9 @@ function loadClusterNodes() {
 
   const defaultNodes = [
     {
-      id: 'node-1',
-      name: process.env.NODE_NAME || 'Serveur 1 (Principal)',
-      url: process.env.RENDER_EXTERNAL_URL || 'https://netflix-clone-live-tv-wu8x.onrender.com',
+      id: 'node-vps-1',
+      name: process.env.NODE_NAME || 'VPS InterServer (Production)',
+      url: process.env.SERVER_URL || 'http://74.50.66.196',
       role: 'master',
       addedAt: new Date().toISOString()
     }
@@ -154,10 +200,9 @@ const keepAliveStats = {
 
 function getKeepAliveTargetUrl() {
   const envUrl = process.env.KEEP_ALIVE_URL ||
-                 process.env.RENDER_EXTERNAL_URL ||
                  process.env.APP_URL ||
                  process.env.PUBLIC_URL ||
-                 'https://netflix-clone-live-tv-wu8x.onrender.com';
+                 `http://127.0.0.1:${PORT}`;
   return envUrl.trim().replace(/\/$/, '');
 }
 
@@ -3022,7 +3067,7 @@ const server = http.createServer((req, res) => {
             latency_ms: Date.now() - t0,
             is_current: false,
             cpu_percent: data.cpu_percent || 0,
-            memory: data.memory || { usedMb: 0, totalMb: 512, percent: 0 },
+            memory: data.memory || { usedMb: 0, totalMb: Math.round(os.totalmem() / 1048576), percent: 0 },
             active_streams: sessData.count,
             active_sessions: sessData.sessions || [],
             total_sessions_ram_mb: sessData.total_ram_mb || 0,
@@ -3041,7 +3086,7 @@ const server = http.createServer((req, res) => {
         latency_ms: null,
         is_current: false,
         cpu_percent: 0,
-        memory: { usedMb: 0, totalMb: 512, percent: 0 },
+        memory: { usedMb: 0, totalMb: Math.round(os.totalmem() / 1048576), percent: 0 },
         active_streams: 0,
         active_sessions: [],
         total_sessions_ram_mb: 0,

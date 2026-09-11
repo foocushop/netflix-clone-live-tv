@@ -965,8 +965,14 @@ class NetflixAdmin {
       const isCurrent = !!node.is_current;
       const isOnline = !!node.online;
       const cpu = Math.min(100, Math.max(0, Math.round(node.cpu_percent || 0)));
-      const ramMb = node.memory ? Math.round(node.memory.usedMb ?? node.memory.rss_mb ?? 0) : 0;
-      const ramPercent = node.memory ? Math.min(100, Math.round(node.memory.percent ?? node.memory.percent_of_512mb ?? ((ramMb / 512) * 100))) : 0;
+      
+      const mem = node.memory || {};
+      const ramProcessMb = Math.round(mem.processUsedMb ?? mem.usedMb ?? mem.rss_mb ?? 0);
+      const ramTotalMb = Math.round(mem.totalMb ?? 2048);
+      const ramSystemUsedMb = Math.round(mem.systemUsedMb ?? ramProcessMb);
+      const ramPercent = Math.min(100, Math.max(0, Math.round(mem.percent ?? ((ramSystemUsedMb / ramTotalMb) * 100))));
+      const ramAvailableMb = Math.round(mem.availableMb ?? (ramTotalMb - ramSystemUsedMb));
+
       const streams = node.active_streams || 0;
       const requests = node.total_requests || 0;
       const uptimeStr = this.formatUptime(node.uptime_seconds);
@@ -976,7 +982,7 @@ class NetflixAdmin {
       const ramLevelClass = ramPercent > 80 ? 'danger' : (ramPercent > 65 ? 'warn' : 'normal');
 
       const roleBadge = (node.role || 'edge').toLowerCase();
-      const roleText = roleBadge === 'master' ? '👑 Nœud Maître' : (roleBadge === 'backup' ? '🛡️ Secours' : '⚡ Nœud Edge');
+      const roleText = roleBadge === 'master' ? '👑 Serveur Maître VPS' : (roleBadge === 'backup' ? '🛡️ Secours' : '⚡ Nœud Edge');
 
       return `
         <div class="cluster-node-card ${isCurrent ? 'node-current' : ''} ${!isOnline ? 'node-offline' : ''}">
@@ -984,7 +990,7 @@ class NetflixAdmin {
             <div class="node-identity">
               <div class="node-name-wrap">
                 <span class="node-name">${this.escapeHtml(node.name || 'Serveur')}</span>
-                ${isCurrent ? '<span class="node-current-tag">LOCAL ACTIF</span>' : ''}
+                ${isCurrent ? '<span class="node-current-tag">PROD ACTIVE</span>' : ''}
               </div>
               <div class="node-badges">
                 <span class="node-role-badge ${roleBadge}">${roleText}</span>
@@ -998,9 +1004,9 @@ class NetflixAdmin {
 
           <div class="node-url-row">
             <span class="node-url-text" title="${this.escapeHtml(node.url || '')}">
-              ${this.escapeHtml(node.url || 'http://localhost')}
+              ${this.escapeHtml(node.url || 'http://74.50.66.196')}
             </span>
-            <span class="node-latency-pill" title="Latence du ping keep-alive">${latencyStr}</span>
+            <span class="node-latency-pill" title="Latence de réponse">${latencyStr}</span>
           </div>
 
           <div class="node-metrics-wrap">
@@ -1015,16 +1021,33 @@ class NetflixAdmin {
               </div>
             </div>
 
-            <!-- RAM Gauge -->
+            <!-- RAM Gauge Réelle -->
             <div class="node-metric-row">
               <div class="metric-header">
-                <span class="metric-title">🧠 Mémoire RAM (${ramMb} Mo / 512 Mo)</span>
+                <span class="metric-title">🧠 Mémoire RAM (${ramSystemUsedMb} Mo / ${ramTotalMb} Mo)</span>
                 <span class="metric-value">${ramPercent}%</span>
               </div>
               <div class="metric-bar-track">
                 <div class="metric-bar-fill ${ramLevelClass}" style="width: ${ramPercent}%"></div>
               </div>
+              <div style="font-size:0.75rem; color:#aaa; margin-top:3px; display:flex; justify-content:space-between;">
+                <span>App Node.js : <strong>${ramProcessMb} Mo</strong></span>
+                <span>Libre : <strong>${ramAvailableMb} Mo</strong></span>
+              </div>
             </div>
+
+            <!-- Disque SSD Réel si disponible -->
+            ${mem.diskTotalGb ? `
+            <div class="node-metric-row" style="margin-top:6px;">
+              <div class="metric-header">
+                <span class="metric-title">💾 Stockage Disque (${mem.diskUsedGb} Go / ${mem.diskTotalGb} Go)</span>
+                <span class="metric-value">${mem.diskPercent}%</span>
+              </div>
+              <div class="metric-bar-track">
+                <div class="metric-bar-fill ${mem.diskPercent > 80 ? 'danger' : 'normal'}" style="width: ${mem.diskPercent}%"></div>
+              </div>
+            </div>
+            ` : ''}
           </div>
 
           <div class="node-stats-grid">
@@ -1044,7 +1067,7 @@ class NetflixAdmin {
 
           <div class="node-card-footer">
             <span class="node-uptime-label">
-              ${isOnline ? '🟢 Keep-Alive actif (4.5 min)' : '🔴 Injoignable / Endormi'}
+              ${isOnline ? '🟢 VPS Dédié 24/7 (En ligne)' : '🔴 Injoignable'}
             </span>
             ${!isCurrent ? `
               <button type="button" class="btn-delete-node" data-node-id="${this.escapeHtml(node.id || '')}" data-node-name="${this.escapeHtml(node.name || '')}">
