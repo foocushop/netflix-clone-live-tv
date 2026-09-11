@@ -361,6 +361,54 @@ try {
   console.warn('[Xtream] Impossible de charger xtream_fr_catalog.json:', e.message);
 }
 
+// Index dynamique des variantes multi-qualités de la MÊME chaîne (zéro mélange entre chaînes distinctes)
+const XTREAM_SAME_CHANNEL_MAP = new Map();
+
+function normalizeChannelVariantName(name) {
+  return (name || '')
+    .replace(/^FR\s*\|\s*/i, '')
+    .replace(/^AF\s*\|\s*/i, '')
+    .replace(/\b(UHD|4K|FHD|HD|SD|HEVC|H\.265|HDR|Bas Débit)\b/gi, '')
+    .replace(/[\(\)\|]/g, '')
+    .replace(/\s+/g, ' ')
+    .trim()
+    .toLowerCase();
+}
+
+function getChannelQualityScore(name) {
+  const n = (name || '').toUpperCase();
+  if (n.includes('FHD')) return 5;
+  if (n.includes('HD') && !n.includes('UHD')) return 4;
+  if (n.includes('UHD') || n.includes('4K')) return 3;
+  if (n.includes('SD')) return 2;
+  if (n.includes('HEVC')) return 1;
+  return 0;
+}
+
+function buildSameChannelVariantIndex() {
+  const groups = new Map();
+  XTREAM_FR_CATALOG.forEach(c => {
+    const norm = normalizeChannelVariantName(c.name || c.raw_name || '');
+    if (!norm) return;
+    if (!groups.has(norm)) groups.set(norm, []);
+    groups.get(norm).push(c);
+  });
+
+  groups.forEach((items) => {
+    if (items.length > 1) {
+      items.forEach(c => {
+        const others = items
+          .filter(x => String(x.stream_id) !== String(c.stream_id))
+          .sort((a, b) => getChannelQualityScore(b.name) - getChannelQualityScore(a.name))
+          .map(x => String(x.stream_id));
+        XTREAM_SAME_CHANNEL_MAP.set(String(c.stream_id), others);
+      });
+    }
+  });
+  console.log(`[Xtream] ${XTREAM_SAME_CHANNEL_MAP.size} variantes multi-qualités indexées pour secours intra-chaîne strict`);
+}
+buildSameChannelVariantIndex();
+
 // Catalogue complet des séries Télé-Réalité Xtream (Catégorie 947)
 let XTREAM_TELEREALITE_CATALOG = [];
 try {
@@ -529,22 +577,40 @@ function getActiveSessionsMetrics() {
   };
 }
 
-// Fallbacks de sécurité pour les variantes de flux (si un flux FHD est en panne, basculer sur HD ou UHD)
+// Fallbacks de sécurité pour les variantes de flux (secours STRICTEMENT au sein de la même chaîne)
 const XTREAM_STREAM_FALLBACKS = {
   '13739': ['13916', '479236', '47475'], // France 2 FHD -> HD -> UHD -> HEVC
+  '13916': ['13739', '479236', '47475'], // France 2 HD -> FHD -> UHD -> HEVC
+  '13738': ['13915', '1008', '47476'],   // France 3 FHD -> HD -> SD -> HEVC
+  '13915': ['13738', '1008', '47476'],   // France 3 HD -> FHD -> SD -> HEVC
   '14152': ['14163', '94'],              // beIN 3 FHD -> HD -> SD
+  '14163': ['14152', '94'],              // beIN 3 HD -> FHD -> SD
   '408065': ['408064', '47502'],         // RMC 1 FHD -> HD -> HEVC
-  '180946': ['181485', '84801'],         // Canal+ Foot FHD -> HD -> SD
+  '408064': ['408065', '47502'],         // RMC 1 HD -> FHD -> HEVC
+  '180946': ['181485', '479238', '84801'], // Canal+ Foot FHD -> HD -> UHD -> SD
+  '181485': ['180946', '479238', '84801'], // Canal+ Foot HD -> FHD -> UHD -> SD
+  '84801':  ['180946', '181485', '479238'], // Canal+ Foot SD -> FHD -> HD -> UHD
+  '479238': ['180946', '181485', '84801'], // Canal+ Foot UHD -> FHD -> HD -> SD
   '180947': ['181486', '84802'],         // Canal+ 360 FHD -> HD -> SD
+  '181486': ['180947', '84802'],         // Canal+ 360 HD -> FHD -> SD
   '14156': ['14161', '13936'],           // Canal+ Sport FHD -> HD -> SD
+  '14161': ['14156', '13936'],           // Canal+ Sport HD -> FHD -> SD
   '14151': ['14167', '479240'],          // Canal+ France FHD -> HD -> Direct
+  '14167': ['14151', '479240'],          // Canal+ France HD -> FHD -> Direct
   '14160': ['14170', '92'],              // beIN 1 FHD -> HD -> SD
+  '14170': ['14160', '92'],              // beIN 1 HD -> FHD -> SD
   '14153': ['14169', '93'],              // beIN 2 FHD -> HD -> SD
+  '14169': ['14153', '93'],              // beIN 2 HD -> FHD -> SD
   '13847': ['13917', '177689'],          // TF1 FHD -> HD -> 4K
+  '13917': ['13847', '177689'],          // TF1 HD -> FHD -> 4K
   '13726': ['14003', '222569'],          // M6 FHD -> HD -> 4K
+  '14003': ['13726', '222569'],          // M6 HD -> FHD -> 4K
   '13690': ['13973', '47481'],           // W9 FHD -> HD -> HEVC
+  '13973': ['13690', '47481'],           // W9 HD -> FHD -> HEVC
   '13696': ['13979', '47494'],           // TMC FHD -> HD -> HEVC
+  '13979': ['13696', '47494'],           // TMC HD -> FHD -> HEVC
   '479050': ['479049', '479051'],        // Ligue 1+ FHD -> HD -> UHD
+  '479049': ['479050', '479051'],        // Ligue 1+ HD -> FHD -> UHD
   // Disney+ Événements & Disney Channel
   '479269': ['479270', '39524', '13861', '24946'],
   '479270': ['479269', '39524', '13861', '24946'],
@@ -558,12 +624,12 @@ const XTREAM_STREAM_FALLBACKS = {
   '479278': ['479269', '39524', '13861', '24946'],
   '39524':  ['13861', '24946', '479269'],
   '13861':  ['24946', '39524', '1040'],
-  // DAZN LaLiga 1-5
-  '327338': ['327339', '327340', '180946'],
-  '327339': ['327338', '327340', '180946'],
-  '327340': ['327338', '327339', '180946'],
-  '327341': ['327338', '327339', '180946'],
-  '327342': ['327338', '327339', '180946']
+  // DAZN LaLiga 1-5 (aucune chaîne extérieure)
+  '327338': ['327339', '327340'],
+  '327339': ['327338', '327340'],
+  '327340': ['327338', '327339'],
+  '327341': ['327338', '327339'],
+  '327342': ['327338', '327339']
 };
 
 // Agents HTTP/HTTPS persistants avec réutilisation de sockets (Keep-Alive Pool)
@@ -4124,7 +4190,8 @@ const server = http.createServer((req, res) => {
         }
       }
 
-      // Priorités H.264 universelles (compatibilité 100% Chrome MSE sans erreur HEVC mediaSourceRequiresReset)
+      // Priorités H.264 spécifiques pour navigateurs Web (Chrome/Firefox MSE sans HEVC)
+      // Note : Canal+ Foot FHD (180946) est nativement encodé en H.264 AVC, donc PAS de bridage forcé en HD !
       const H264_PREFERENCES = {
         '13847': '13917',   // TF1 FHD (HEVC) -> TF1 HD (H.264)
         '13690': '13973',   // W9 FHD (HEVC) -> W9 HD (H.264)
@@ -4134,7 +4201,6 @@ const server = http.createServer((req, res) => {
         '14152': '14163',   // beIN 3 FHD -> beIN 3 HD (H.264)
         '14160': '14170',   // beIN 1 FHD -> beIN 1 HD (H.264)
         '14153': '14169',   // beIN 2 FHD -> beIN 2 HD (H.264)
-        '180946': '181485',  // Canal+ Foot FHD -> HD (H.264)
         '180947': '181486',  // Canal+ 360 FHD -> HD (H.264)
         '14156': '14161',   // Canal+ Sport FHD -> HD (H.264)
         '14151': '14167',   // Canal+ France FHD -> HD (H.264)
@@ -4142,31 +4208,36 @@ const server = http.createServer((req, res) => {
       };
 
       const candidates = [];
-      const h264Alt = H264_PREFERENCES[initialStreamId];
-      if (h264Alt) {
-        candidates.push(h264Alt);
+      const userAgent = (req.headers['user-agent'] || '');
+      const isWebClient = userAgent.includes('Mozilla') && 
+                          !userAgent.match(/Televizio|ExoPlayer|VLC|Lavf|okhttp|TiviMate|Smarters|Kodi|AppleCoreMedia/i);
+
+      // Si c'est un navigateur Web de bureau, privilégier le format H.264 si spécifié
+      if (isWebClient && H264_PREFERENCES[initialStreamId]) {
+        candidates.push(H264_PREFERENCES[initialStreamId]);
       }
+
+      // Le flux initial demandé est TOUJOURS candidat prioritaire (surtout pour Televizio / TV / VLC)
       if (!candidates.includes(initialStreamId)) {
         candidates.push(initialStreamId);
       }
+
+      // 1. Fallbacks explicites personnalisés (XTREAM_STREAM_FALLBACKS)
       if (XTREAM_STREAM_FALLBACKS[initialStreamId]) {
         for (const fb of XTREAM_STREAM_FALLBACKS[initialStreamId]) {
           if (!candidates.includes(fb)) candidates.push(fb);
         }
       }
 
-      if (candidates.length <= 1) {
-        const item = XTREAM_FR_CATALOG.find(c => String(c.stream_id) === String(initialStreamId));
-        if (item) {
-          const peers = XTREAM_FR_CATALOG.filter(c => 
-            c.category_id === item.category_id && String(c.stream_id) !== String(initialStreamId)
-          ).slice(0, 3);
-          for (const p of peers) {
-            const pid = String(p.stream_id);
-            if (!candidates.includes(pid)) candidates.push(pid);
-          }
+      // 2. Fallbacks automatiques intelligents : UNIQUEMENT les variantes de la MÊME chaîne (FHD <-> HD <-> SD <-> UHD <-> HEVC)
+      const sisterVariants = XTREAM_SAME_CHANNEL_MAP.get(String(initialStreamId));
+      if (sisterVariants) {
+        for (const sId of sisterVariants) {
+          if (!candidates.includes(sId)) candidates.push(sId);
         }
       }
+
+      // SÉCURITÉ ABSOLUE : Zéro fallback sur les pairs de catégorie pour empêcher toute bascule vers une autre chaîne (ex: Canal+ Foot vers Canal+ Sport ou France 3)
 
       let lastErr = null;
       for (const sId of candidates) {
@@ -4174,8 +4245,13 @@ const server = http.createServer((req, res) => {
         try {
           const resObj = await fetchXtreamPlaylist(urlToFetch);
           if (resObj.statusCode === 200 && resObj.body && (resObj.body.includes('#EXTM3U') || resObj.buffer.length > 500)) {
+            // Mettre en cache l'edge URL UNIQUEMENT pour le flux réel qui a répondu (évite de corrompre initialStreamId si c'est un secours)
             if (resObj.finalUrl && resObj.finalUrl !== urlToFetch) {
-              xtreamEdgeCache.set(initialStreamId, { edgeUrl: resObj.finalUrl, expiresAt: Date.now() + 60000 });
+              if (sId === initialStreamId) {
+                xtreamEdgeCache.set(initialStreamId, { edgeUrl: resObj.finalUrl, expiresAt: Date.now() + 60000 });
+              } else {
+                xtreamEdgeCache.set(sId, { edgeUrl: resObj.finalUrl, expiresAt: Date.now() + 60000 });
+              }
             }
             return resObj;
           }
