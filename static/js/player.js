@@ -14,7 +14,7 @@
 // =========================================================================
 
 window.API_BASE = window.API_BASE || ((window.location.protocol === 'file:' || !window.location.origin || window.location.origin === 'null' || window.location.origin.startsWith('file:'))
-  ? 'https://netflix-clone-live-tv-j9ta.onrender.com'
+  ? 'https://netflix-clone-live-tv-wu8x.onrender.com'
   : '');
 
 class NetflixPlayer {

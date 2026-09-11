@@ -270,7 +270,7 @@ async function runTests() {
     // =========================================================================
     total++;
     console.log('\n[3/4] Inspection de l\'instance de production Render...');
-    await runner.navigate('https://netflix-clone-live-tv-j9ta.onrender.com');
+    await runner.navigate('https://netflix-clone-live-tv-wu8x.onrender.com');
 
     const renderAudit = await runner.eval(`
       (() => {
@@ -289,7 +289,7 @@ async function runTests() {
     // Vérifier la taille exacte du fichier player.js servi par Render
     const renderPlayerSize = await new Promise(resolve => {
       const https = require('https');
-      https.get('https://netflix-clone-live-tv-j9ta.onrender.com/js/player.js', res => {
+      https.get('https://netflix-clone-live-tv-wu8x.onrender.com/js/player.js', res => {
         let len = 0;
         res.on('data', c => len += c.length);
         res.on('end', () => resolve(len));

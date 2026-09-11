@@ -91,7 +91,7 @@ function loadClusterNodes() {
     {
       id: 'node-1',
       name: process.env.NODE_NAME || 'Serveur 1 (Principal)',
-      url: process.env.RENDER_EXTERNAL_URL || 'https://netflix-clone-live-tv-j9ta.onrender.com',
+      url: process.env.RENDER_EXTERNAL_URL || 'https://netflix-clone-live-tv-wu8x.onrender.com',
       role: 'master',
       addedAt: new Date().toISOString()
     }
@@ -157,7 +157,7 @@ function getKeepAliveTargetUrl() {
                  process.env.RENDER_EXTERNAL_URL ||
                  process.env.APP_URL ||
                  process.env.PUBLIC_URL ||
-                 'https://netflix-clone-live-tv-j9ta.onrender.com';
+                 'https://netflix-clone-live-tv-wu8x.onrender.com';
   return envUrl.trim().replace(/\/$/, '');
 }
 
