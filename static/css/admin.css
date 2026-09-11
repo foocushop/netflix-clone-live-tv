@@ -286,18 +286,12 @@
   font-weight: 800;
 }
 
-/* ================= GRILLE DES INTÉGRATIONS XTREAM & GITHUB ================= */
+/* ================= INTÉGRATION SERVEUR XTREAM ================= */
 .admin-integrations-grid {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: 1fr;
   gap: 20px;
   margin-bottom: 28px;
-}
-
-@media (max-width: 1024px) {
-  .admin-integrations-grid {
-    grid-template-columns: 1fr;
-  }
 }
 
 .admin-integration-card {

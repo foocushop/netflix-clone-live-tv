@@ -2305,31 +2305,74 @@ const mimeTypes = {
 // ================= MODULE SERVEUR XTREAM CODES API =================
 // Rend le serveur 100% compatible avec IPTV Smarters Pro, TiviMate, XCIPTV, VLC, etc.
 let XTREAM_USERS = [];
+const SYSTEM_PERSISTENT_DIR = process.platform === 'win32'
+  ? path.join(__dirname, 'data', 'backup')
+  : '/var/lib/netflix-clone';
+
 function loadXtreamUsers() {
-  try {
-    const p = path.join(__dirname, 'data', 'xtream_users.json');
-    if (fs.existsSync(p)) {
-      XTREAM_USERS = JSON.parse(fs.readFileSync(p, 'utf8'));
+  const localPath = path.join(__dirname, 'data', 'xtream_users.json');
+  const backupPath = path.join(SYSTEM_PERSISTENT_DIR, 'xtream_users.json');
+
+  let localData = null;
+  let backupData = null;
+
+  if (fs.existsSync(localPath)) {
+    try {
+      localData = JSON.parse(fs.readFileSync(localPath, 'utf8'));
+    } catch (e) {}
+  }
+  if (fs.existsSync(backupPath)) {
+    try {
+      backupData = JSON.parse(fs.readFileSync(backupPath, 'utf8'));
+    } catch (e) {}
+  }
+
+  // Si le fichier local a été réinitialisé/écrasé (<= 2 comptes) alors que la sauvegarde système en a plus,
+  // on restaure automatiquement la sauvegarde système complète.
+  let source = null;
+  if (Array.isArray(backupData) && backupData.length > 0) {
+    if (!Array.isArray(localData) || (localData.length <= 2 && backupData.length > 2)) {
+      console.log(`[Xtream Users] Restauration automatique de ${backupData.length} comptes depuis la sauvegarde persistante`);
+      source = backupData;
+    } else {
+      source = localData;
     }
-  } catch (e) {}
-  if (!XTREAM_USERS || XTREAM_USERS.length === 0) {
+  } else {
+    source = localData;
+  }
+
+  if (Array.isArray(source) && source.length > 0) {
+    XTREAM_USERS = source;
+  } else {
     XTREAM_USERS = [
-      { username: 'jose', password: '1965', status: 'Active', exp_date: 1893456000, max_connections: 5 },
-      { username: 'admin', password: '1965', status: 'Active', exp_date: 1893456000, max_connections: 10 }
+      { username: 'jose', password: '1965', status: 'Active', exp_date: 1893456000, max_connections: 5, created_at: 1788967335 },
+      { username: 'admin', password: '1965', status: 'Active', exp_date: 1893456000, max_connections: 10, created_at: 1788967335 }
     ];
   }
+  saveXtreamUsers();
 }
 loadXtreamUsers();
 
 function saveXtreamUsers() {
+  const localPath = path.join(__dirname, 'data', 'xtream_users.json');
+  const backupPath = path.join(SYSTEM_PERSISTENT_DIR, 'xtream_users.json');
+
   try {
-    const p = path.join(__dirname, 'data', 'xtream_users.json');
-    fs.writeFileSync(p, JSON.stringify(XTREAM_USERS, null, 2), 'utf8');
-    return true;
+    const dir = path.dirname(localPath);
+    if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
+    fs.writeFileSync(localPath, JSON.stringify(XTREAM_USERS, null, 2), 'utf8');
   } catch (e) {
-    console.error('[Xtream Users] Erreur sauvegarde:', e.message);
-    return false;
+    console.error('[Xtream Users] Erreur sauvegarde locale:', e.message);
   }
+
+  try {
+    const bDir = path.dirname(backupPath);
+    if (!fs.existsSync(bDir)) fs.mkdirSync(bDir, { recursive: true });
+    fs.writeFileSync(backupPath, JSON.stringify(XTREAM_USERS, null, 2), 'utf8');
+  } catch (e) {
+    // Silencieux si permissions limitées hors Linux
+  }
+  return true;
 }
 
 function authenticateXtreamClient(username, password) {

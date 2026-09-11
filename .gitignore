@@ -5,3 +5,5 @@ xtream_streams_all.json
 .env
 data/.github_token
 data/cache_xmltv.xml.gz
+data/xtream_users.json
+data/backup/
