@@ -134,18 +134,119 @@ function saveClusterNodes(nodes) {
   }
 }
 
-// Démon Keep-Alive Anti-Veille inter-serveurs (toutes les 4.5 minutes)
-setInterval(async () => {
-  const currentUrl = (process.env.RENDER_EXTERNAL_URL || '').replace(/\/$/, '');
-  for (const node of clusterNodes) {
-    const targetUrl = (node.url || '').replace(/\/$/, '');
-    if (!targetUrl || targetUrl === currentUrl || targetUrl.includes('localhost') || targetUrl.includes('127.0.0.1')) continue;
-    try {
-      const pingUrl = `${targetUrl}/api/cluster/ping`;
-      await fetch(pingUrl, { signal: AbortSignal.timeout(5000) });
-    } catch (e) {}
+// ================= SYSTÈME KEEP-ALIVE ANTI-VEILLE RENDER =================
+// Render met les instances gratuites en veille après 15 minutes sans requête HTTP entrante.
+// Ce module effectue un self-ping périodique externe (toutes les 10 min) sur l'URL publique
+// pour maintenir l'instance éveillée 24h/24 sans interruption de service ni coupure de stream.
+
+const keepAliveStats = {
+  enabled: process.env.KEEP_ALIVE_DISABLE !== 'true',
+  targetUrl: '',
+  intervalMinutes: 10,
+  lastPingAt: null,
+  lastPingStatus: null,
+  lastPingDurationMs: 0,
+  totalPings: 0,
+  successfulPings: 0,
+  failedPings: 0,
+  lastError: null
+};
+
+function getKeepAliveTargetUrl() {
+  const envUrl = process.env.KEEP_ALIVE_URL ||
+                 process.env.RENDER_EXTERNAL_URL ||
+                 process.env.APP_URL ||
+                 process.env.PUBLIC_URL ||
+                 'https://netflix-clone-live-tv-j9ta.onrender.com';
+  return envUrl.trim().replace(/\/$/, '');
+}
+
+async function pingExternalUrl(targetUrl, endpoint = '/api/ping') {
+  const cleanUrl = targetUrl.replace(/\/$/, '');
+  const fullUrl = `${cleanUrl}${endpoint}`;
+  const start = Date.now();
+  try {
+    const res = await fetch(fullUrl, {
+      method: 'GET',
+      headers: {
+        'User-Agent': 'Netflix-Clone-KeepAlive/1.0',
+        'Accept': 'application/json, text/plain, */*'
+      },
+      signal: AbortSignal.timeout(20000)
+    });
+    const duration = Date.now() - start;
+    if (res.ok) {
+      console.log(`[Keep-Alive] 🟢 Self-ping réussi : ${fullUrl} [Status ${res.status}] en ${duration}ms`);
+      return { success: true, status: res.status, duration };
+    } else {
+      console.warn(`[Keep-Alive] 🟡 Self-ping réponse HTTP non-200 : ${fullUrl} [Status ${res.status}] en ${duration}ms`);
+      return { success: false, status: res.status, duration };
+    }
+  } catch (err) {
+    const duration = Date.now() - start;
+    console.warn(`[Keep-Alive] ⚠️ Ping avertissement sur ${fullUrl} (${duration}ms) : ${err.message}`);
+    return { success: false, error: err.message, duration };
   }
-}, 4.5 * 60 * 1000);
+}
+
+async function performKeepAliveCycle() {
+  if (!keepAliveStats.enabled) return;
+
+  const publicUrl = getKeepAliveTargetUrl();
+  keepAliveStats.targetUrl = publicUrl;
+  keepAliveStats.totalPings++;
+  keepAliveStats.lastPingAt = new Date().toISOString();
+
+  // 1. Self-ping prioritaire vers l'URL externe Render
+  const selfResult = await pingExternalUrl(publicUrl, '/api/ping');
+  keepAliveStats.lastPingStatus = selfResult.status || (selfResult.success ? 200 : 'ERROR');
+  keepAliveStats.lastPingDurationMs = selfResult.duration;
+  if (selfResult.success) {
+    keepAliveStats.successfulPings++;
+    keepAliveStats.lastError = null;
+  } else {
+    keepAliveStats.failedPings++;
+    keepAliveStats.lastError = selfResult.error || `HTTP ${selfResult.status}`;
+  }
+
+  // 2. Ping des autres nœuds du cluster s'ils existent
+  if (Array.isArray(clusterNodes)) {
+    for (const node of clusterNodes) {
+      const nodeUrl = (node.url || '').replace(/\/$/, '');
+      if (nodeUrl && nodeUrl !== publicUrl && !nodeUrl.includes('localhost') && !nodeUrl.includes('127.0.0.1')) {
+        await pingExternalUrl(nodeUrl, '/api/cluster/ping');
+      }
+    }
+  }
+}
+
+function initRenderKeepAlive() {
+  if (!keepAliveStats.enabled) {
+    console.log('[Keep-Alive] ℹ️ Système de maintien en éveil désactivé via KEEP_ALIVE_DISABLE');
+    return;
+  }
+
+  const publicUrl = getKeepAliveTargetUrl();
+  keepAliveStats.targetUrl = publicUrl;
+  const intervalMinutes = parseInt(process.env.KEEP_ALIVE_INTERVAL_MINUTES, 10) || 10;
+  keepAliveStats.intervalMinutes = intervalMinutes;
+  const intervalMs = intervalMinutes * 60 * 1000;
+
+  console.log(`[Keep-Alive] 🛡️ Service Keep-Alive anti-veille Render actif pour : ${publicUrl}`);
+  console.log(`[Keep-Alive] ⏱️ Fréquence programmée : toutes les ${intervalMinutes} minutes (Render dort à 15 min)`);
+
+  // Premier ping test 20 secondes après le démarrage
+  const initialTimer = setTimeout(() => {
+    performKeepAliveCycle().catch(e => console.warn('[Keep-Alive Initial Error]:', e.message));
+  }, 20000);
+  if (initialTimer.unref) initialTimer.unref();
+
+  // Démon périodique
+  const recurringTimer = setInterval(() => {
+    performKeepAliveCycle().catch(e => console.warn('[Keep-Alive Interval Error]:', e.message));
+  }, intervalMs);
+  if (recurringTimer.unref) recurringTimer.unref();
+}
 
 // ================= EXTRACTEUR DE FLUX DIRECT (FETCHV-STYLE) =================
 function httpsGet(urlStr, headers = {}) {
@@ -2257,6 +2358,24 @@ const server = http.createServer((req, res) => {
     res.writeHead(200);
     res.end();
     return;
+  }
+
+  // ── HEALTHCHECK / PING KEEP-ALIVE RAPIDE (ANTI-VEILLE RENDER) ──
+  if (pathname === '/api/ping' || pathname === '/api/health' || pathname === '/ping' || pathname === '/healthz') {
+    res.writeHead(200, {
+      'Content-Type': 'application/json; charset=utf-8',
+      'Cache-Control': 'no-cache, no-store, must-revalidate',
+      'Access-Control-Allow-Origin': '*'
+    });
+    return res.end(JSON.stringify({
+      status: 'ok',
+      uptime_seconds: Math.floor((Date.now() - (typeof startTime !== 'undefined' ? startTime : Date.now())) / 1000),
+      timestamp: new Date().toISOString(),
+      active_streams: activeStreamsCount,
+      memory: typeof getMemoryMetrics === 'function' ? getMemoryMetrics() : undefined,
+      service: 'netflix-clone-live-tv',
+      keep_alive: keepAliveStats
+    }));
   }
 
   // Comptage des flux vidéo actifs en temps réel
@@ -4801,4 +4920,7 @@ server.listen(PORT, '0.0.0.0', () => {
   setTimeout(() => {
     prewarmXtreamConnections();
   }, 1200);
+
+  // Maintien en éveil automatique anti-veille Render (Self-Ping 10 min)
+  initRenderKeepAlive();
 });
