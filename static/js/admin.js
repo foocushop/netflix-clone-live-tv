@@ -32,6 +32,16 @@ class NetflixAdmin {
     this.xtreamTotalRamText = document.getElementById('xtreamTotalRamText');
     this.xtreamSessionsRefreshBtn = document.getElementById('xtreamSessionsRefreshBtn');
 
+    // Gestion des Comptes Xtream Codes
+    this.xtreamUsersTableBody = document.getElementById('xtreamUsersTableBody');
+    this.addXtreamUserContainer = document.getElementById('addXtreamUserContainer');
+    this.addXtreamUserForm = document.getElementById('addXtreamUserForm');
+    this.openAddXtreamUserBtn = document.getElementById('openAddXtreamUserBtn');
+    this.closeAddXtreamUserBtn = document.getElementById('closeAddXtreamUserBtn');
+    this.xtreamUsersRefreshBtn = document.getElementById('xtreamUsersRefreshBtn');
+
+    window.netflixAdmin = this;
+
     this.initEvents();
   }
 
@@ -95,6 +105,18 @@ class NetflixAdmin {
           navigator.clipboard.writeText(m3uUrl);
         }
         this.showToast('🔗 Lien M3U copié ! Prêt pour VLC ou TiviMate.');
+      });
+    }
+
+    const copyEpgBtn = document.getElementById('copyEpgUrlBtn');
+    if (copyEpgBtn) {
+      copyEpgBtn.addEventListener('click', () => {
+        const serverOrigin = this.apiBase() || window.location.origin;
+        const epgUrl = `${serverOrigin}/xmltv.php?username=jose&password=1965`;
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+          navigator.clipboard.writeText(epgUrl);
+        }
+        this.showToast('📅 Lien Guide TV EPG copié ! Prêt pour Televizo / TiviMate.');
       });
     }
 
@@ -207,6 +229,32 @@ class NetflixAdmin {
     if (this.xtreamSessionsRefreshBtn) {
       this.xtreamSessionsRefreshBtn.addEventListener('click', () => this.loadXtreamSessions(true));
     }
+
+    // Gestion des Utilisateurs Xtream Codes
+    if (this.openAddXtreamUserBtn && this.addXtreamUserContainer) {
+      this.openAddXtreamUserBtn.addEventListener('click', () => {
+        const isHidden = this.addXtreamUserContainer.style.display === 'none';
+        this.addXtreamUserContainer.style.display = isHidden ? 'block' : 'none';
+        if (isHidden) {
+          const uInput = document.getElementById('newXtreamUsername');
+          if (uInput) uInput.focus();
+        }
+      });
+    }
+
+    if (this.closeAddXtreamUserBtn && this.addXtreamUserContainer) {
+      this.closeAddXtreamUserBtn.addEventListener('click', () => {
+        this.addXtreamUserContainer.style.display = 'none';
+      });
+    }
+
+    if (this.addXtreamUserForm) {
+      this.addXtreamUserForm.addEventListener('submit', (e) => this.handleCreateXtreamUser(e));
+    }
+
+    if (this.xtreamUsersRefreshBtn) {
+      this.xtreamUsersRefreshBtn.addEventListener('click', () => this.loadXtreamUsers(true));
+    }
   }
 
   // ================= FLUX DE SÉCURITÉ & CONNEXION =================
@@ -221,6 +269,7 @@ class NetflixAdmin {
     this.loadGitHubStatus();
     this.loadClusterStatus();
     this.loadXtreamSessions();
+    this.loadXtreamUsers();
     this.startClusterPolling();
   }
 
@@ -264,6 +313,9 @@ class NetflixAdmin {
         this.showToast("🔓 Studio Administrateur déverrouillé avec succès !");
         this.loadStats();
         this.loadCatalog();
+        this.loadClusterStatus();
+        this.loadXtreamSessions();
+        this.loadXtreamUsers();
       } else {
         this.showAuthError(data.message || "Code PIN ou mot de passe incorrect");
       }
@@ -276,6 +328,9 @@ class NetflixAdmin {
         this.showToast("🔓 Studio Administrateur déverrouillé !");
         this.loadStats();
         this.loadCatalog();
+        this.loadClusterStatus();
+        this.loadXtreamSessions();
+        this.loadXtreamUsers();
       } else {
         this.showAuthError("Code PIN incorrect. Veuillez réessayer.");
       }
@@ -1296,6 +1351,185 @@ class NetflixAdmin {
         this.showToast(data.message || "Erreur lors de l'interruption", true);
       }
     } catch (e) {
+      this.showToast("Erreur de communication avec le serveur", true);
+    }
+  }
+
+  // ================= GESTION DES COMPTES UTILISATEURS XTREAM CODES =================
+  async loadXtreamUsers(showNotification = false) {
+    if (!this.isAuthenticated()) return;
+    try {
+      const res = await fetch(`${this.apiBase()}/api/admin/xtream/users`, {
+        headers: this.authHeaders()
+      });
+      if (res.status === 401) {
+        this.handleUnauthorized();
+        return;
+      }
+      const json = await res.json();
+      if (res.ok && json.success && Array.isArray(json.data)) {
+        this.renderXtreamUsers(json.data);
+        if (showNotification) {
+          this.showToast('👥 Liste des comptes IPTV actualisée');
+        }
+      }
+    } catch (err) {
+      console.error('Erreur chargement utilisateurs Xtream:', err);
+    }
+  }
+
+  renderXtreamUsers(users) {
+    if (!this.xtreamUsersTableBody) return;
+    if (!users || users.length === 0) {
+      this.xtreamUsersTableBody.innerHTML = `
+        <tr>
+          <td colspan="6" style="text-align: center; padding: 24px; color: var(--admin-text-muted);">
+            Aucun compte IPTV configuré pour le moment.
+          </td>
+        </tr>
+      `;
+      return;
+    }
+
+    const serverOrigin = this.apiBase() || window.location.origin;
+
+    const html = users.map(user => {
+      const username = this.escapeHtml(user.username || '');
+      const password = this.escapeHtml(user.password || '');
+      const maxCons = user.max_connections || 1;
+      const status = user.status || 'Active';
+      const isActive = status === 'Active';
+
+      let expStr = 'Illimité (Permanent)';
+      if (user.exp_date && user.exp_date < 2000000000) {
+        const expDate = new Date(user.exp_date * 1000);
+        expStr = expDate.toLocaleDateString('fr-FR', { day: '2-digit', month: 'short', year: 'numeric' });
+      }
+
+      const m3uUrl = `${serverOrigin}/get.php?username=${encodeURIComponent(user.username)}&password=${encodeURIComponent(user.password)}`;
+      const epgUrl = `${serverOrigin}/xmltv.php?username=${encodeURIComponent(user.username)}&password=${encodeURIComponent(user.password)}`;
+
+      return `
+        <tr style="border-bottom: 1px solid rgba(255,255,255,0.05); transition: background 0.2s;" onmouseover="this.style.background='rgba(255,255,255,0.02)'" onmouseout="this.style.background='transparent'">
+          <td style="padding: 14px 16px; font-weight: 600; color: #fff;">
+            <div style="display: flex; align-items: center; gap: 8px;">
+              <span style="font-size: 1.2rem;">👤</span>
+              <span>${username}</span>
+            </div>
+          </td>
+          <td style="padding: 14px 16px;">
+            <code style="background: rgba(255,255,255,0.08); padding: 4px 8px; border-radius: 4px; color: #46d369; font-family: monospace; font-size: 0.9rem;">${password}</code>
+          </td>
+          <td style="padding: 14px 16px; text-align: center;">
+            <span style="background: rgba(255,255,255,0.06); padding: 3px 8px; border-radius: 20px; font-size: 0.82rem; color: var(--admin-text-secondary);">
+              📺 ${maxCons} max
+            </span>
+          </td>
+          <td style="padding: 14px 16px; text-align: center; font-size: 0.85rem; color: ${expStr.includes('Illimité') ? '#46d369' : 'var(--admin-text-secondary)'};">
+            ${expStr}
+          </td>
+          <td style="padding: 14px 16px; text-align: center;">
+            <span style="display: inline-block; padding: 3px 10px; border-radius: 12px; font-size: 0.75rem; font-weight: 700; ${isActive ? 'background: rgba(70,211,105,0.15); color: #46d369; border: 1px solid rgba(70,211,105,0.3);' : 'background: rgba(255,255,255,0.1); color: var(--admin-text-muted); border: 1px solid rgba(255,255,255,0.1);'}">
+              ${isActive ? 'ACTIF' : 'SUSPENDU'}
+            </span>
+          </td>
+          <td style="padding: 14px 16px; text-align: right;">
+            <div style="display: inline-flex; gap: 6px; align-items: center; justify-content: flex-end;">
+              <button type="button" class="btn-admin btn-admin-secondary btn-sm" onclick="navigator.clipboard.writeText('${m3uUrl}'); window.netflixAdmin.showToast('🔗 Lien M3U pour ${username} copié !');" title="Copier lien M3U">
+                🔗 M3U
+              </button>
+              <button type="button" class="btn-admin btn-admin-blue btn-sm" onclick="navigator.clipboard.writeText('${epgUrl}'); window.netflixAdmin.showToast('📅 Lien EPG XMLTV pour ${username} copié !');" title="Copier lien XMLTV EPG">
+                📅 EPG
+              </button>
+              <button type="button" class="btn-admin btn-admin-red btn-sm" onclick="window.netflixAdmin.deleteXtreamUser('${username}')" title="Supprimer ce compte" ${users.length <= 1 ? 'disabled style="opacity:0.4;cursor:not-allowed;"' : ''}>
+                🗑️
+              </button>
+            </div>
+          </td>
+        </tr>
+      `;
+    }).join('');
+
+    this.xtreamUsersTableBody.innerHTML = html;
+  }
+
+  async handleCreateXtreamUser(e) {
+    e.preventDefault();
+    const uInput = document.getElementById('newXtreamUsername');
+    const pInput = document.getElementById('newXtreamPassword');
+    const mInput = document.getElementById('newXtreamMaxCons');
+    const dInput = document.getElementById('newXtreamDuration');
+
+    const username = (uInput ? uInput.value : '').trim();
+    const password = (pInput ? pInput.value : '').trim();
+    const maxCons = parseInt(mInput ? mInput.value : '5', 10) || 5;
+    const duration = dInput ? dInput.value : 'unlimited';
+
+    if (!username || !password) {
+      this.showToast("Veuillez renseigner un identifiant et un mot de passe", true);
+      return;
+    }
+
+    let expDate = 2147483647; // 2038 / unlimited
+    const nowSec = Math.floor(Date.now() / 1000);
+    if (duration === '1m') expDate = nowSec + 30 * 86400;
+    else if (duration === '3m') expDate = nowSec + 90 * 86400;
+    else if (duration === '6m') expDate = nowSec + 180 * 86400;
+    else if (duration === '1y') expDate = nowSec + 365 * 86400;
+
+    try {
+      const res = await fetch(`${this.apiBase()}/api/admin/xtream/users`, {
+        method: 'POST',
+        headers: this.authHeaders({ 'Content-Type': 'application/json' }),
+        body: JSON.stringify({
+          username,
+          password,
+          max_connections: maxCons,
+          exp_date: expDate,
+          status: 'Active'
+        })
+      });
+
+      const data = await res.json();
+      if (res.ok && data.success) {
+        this.showToast(`🎉 Compte IPTV "${username}" créé avec succès !`);
+        if (uInput) uInput.value = '';
+        if (pInput) pInput.value = '';
+        if (this.addXtreamUserContainer) {
+          this.addXtreamUserContainer.style.display = 'none';
+        }
+        await this.loadXtreamUsers();
+      } else {
+        this.showToast(data.message || "Erreur lors de la création du compte", true);
+      }
+    } catch (err) {
+      console.error('Erreur création compte Xtream:', err);
+      this.showToast("Erreur de connexion au serveur", true);
+    }
+  }
+
+  async deleteXtreamUser(username) {
+    if (!username) return;
+    if (!confirm(`Voulez-vous vraiment supprimer le compte abonné "${username}" ?`)) {
+      return;
+    }
+
+    try {
+      const res = await fetch(`${this.apiBase()}/api/admin/xtream/users`, {
+        method: 'DELETE',
+        headers: this.authHeaders({ 'Content-Type': 'application/json' }),
+        body: JSON.stringify({ username })
+      });
+
+      const data = await res.json();
+      if (res.ok && data.success) {
+        this.showToast(`🗑️ Compte "${username}" supprimé avec succès`);
+        this.renderXtreamUsers(data.data || []);
+      } else {
+        this.showToast(data.message || "Erreur lors de la suppression", true);
+      }
+    } catch (err) {
+      console.error('Erreur suppression compte Xtream:', err);
       this.showToast("Erreur de communication avec le serveur", true);
     }
   }

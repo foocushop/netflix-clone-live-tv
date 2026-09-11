@@ -337,6 +337,108 @@ const XTREAM_CONFIG = {
   password: '21321'
 };
 
+// Caches et gestionnaire haute performance du Guide TV EPG (XMLTV & Player API)
+const xtreamEpgShortCache = new Map();
+let xmltvEpgPromise = null;
+const XMLTV_CACHE_FILE = path.join(__dirname, 'data', 'cache_xmltv.xml.gz');
+const XMLTV_CACHE_TTL = 2 * 3600 * 1000; // 2 heures de fraîcheur EPG
+
+function fetchFreshXmltv() {
+  if (xmltvEpgPromise) return xmltvEpgPromise;
+
+  xmltvEpgPromise = new Promise((resolve, reject) => {
+    const upstreamUrl = `http://${XTREAM_CONFIG.host}:${XTREAM_CONFIG.port}/xmltv.php?username=${XTREAM_CONFIG.username}&password=${XTREAM_CONFIG.password}`;
+    console.log('[XMLTV] 📥 Téléchargement du guide EPG complet depuis le serveur source...');
+
+    http.get(upstreamUrl, { timeout: 90000 }, (upRes) => {
+      if (upRes.statusCode !== 200) {
+        xmltvEpgPromise = null;
+        return reject(new Error(`Serveur XMLTV amont code HTTP ${upRes.statusCode}`));
+      }
+
+      const tempFile = `${XMLTV_CACHE_FILE}.tmp`;
+      const gzipStream = zlib.createGzip({ level: 6 });
+      const outStream = fs.createWriteStream(tempFile);
+
+      upRes.pipe(gzipStream).pipe(outStream);
+
+      outStream.on('finish', () => {
+        try {
+          if (fs.existsSync(XMLTV_CACHE_FILE)) {
+            fs.unlinkSync(XMLTV_CACHE_FILE);
+          }
+          fs.renameSync(tempFile, XMLTV_CACHE_FILE);
+          const stats = fs.statSync(XMLTV_CACHE_FILE);
+          console.log(`[XMLTV] ✅ Guide EPG mis en cache (${(stats.size / (1024 * 1024)).toFixed(2)} Mo gzip)`);
+          xmltvEpgPromise = null;
+          resolve(XMLTV_CACHE_FILE);
+        } catch (e) {
+          xmltvEpgPromise = null;
+          reject(e);
+        }
+      });
+
+      outStream.on('error', (err) => {
+        xmltvEpgPromise = null;
+        try { if (fs.existsSync(tempFile)) fs.unlinkSync(tempFile); } catch (e) {}
+        reject(err);
+      });
+    }).on('error', (err) => {
+      xmltvEpgPromise = null;
+      reject(err);
+    });
+  });
+
+  return xmltvEpgPromise;
+}
+
+async function serveXmltvEpg(req, res) {
+  try {
+    let needFetch = true;
+    if (fs.existsSync(XMLTV_CACHE_FILE)) {
+      const stat = fs.statSync(XMLTV_CACHE_FILE);
+      if (Date.now() - stat.mtimeMs < XMLTV_CACHE_TTL && stat.size > 1000) {
+        needFetch = false;
+      }
+    }
+
+    if (needFetch) {
+      if (fs.existsSync(XMLTV_CACHE_FILE)) {
+        fetchFreshXmltv().catch(e => console.warn('[XMLTV Background Refresh]:', e.message));
+      } else {
+        await fetchFreshXmltv();
+      }
+    }
+
+    const acceptEncoding = (req.headers['accept-encoding'] || '').toLowerCase();
+    const canGzip = acceptEncoding.includes('gzip');
+
+    if (canGzip) {
+      res.writeHead(200, {
+        'Content-Type': 'application/xml; charset=utf-8',
+        'Content-Encoding': 'gzip',
+        'Cache-Control': 'public, max-age=3600',
+        'Access-Control-Allow-Origin': '*'
+      });
+      fs.createReadStream(XMLTV_CACHE_FILE).pipe(res);
+    } else {
+      res.writeHead(200, {
+        'Content-Type': 'application/xml; charset=utf-8',
+        'Cache-Control': 'public, max-age=3600',
+        'Access-Control-Allow-Origin': '*'
+      });
+      const gunzip = zlib.createGunzip();
+      fs.createReadStream(XMLTV_CACHE_FILE).pipe(gunzip).pipe(res);
+    }
+  } catch (err) {
+    console.error('[XMLTV Error]:', err.message);
+    if (!res.headersSent) {
+      res.writeHead(502, { 'Content-Type': 'text/plain; charset=utf-8', 'Access-Control-Allow-Origin': '*' });
+      res.end('Erreur lors du chargement du guide XMLTV: ' + err.message);
+    }
+  }
+}
+
 // Chargement automatique des 128 correspondances de chaînes françaises vérifiées
 // Chargement automatique des correspondances de chaînes françaises vérifiées
 let XTREAM_CHANNELS = {};
@@ -2209,6 +2311,17 @@ function loadXtreamUsers() {
 }
 loadXtreamUsers();
 
+function saveXtreamUsers() {
+  try {
+    const p = path.join(__dirname, 'data', 'xtream_users.json');
+    fs.writeFileSync(p, JSON.stringify(XTREAM_USERS, null, 2), 'utf8');
+    return true;
+  } catch (e) {
+    console.error('[Xtream Users] Erreur sauvegarde:', e.message);
+    return false;
+  }
+}
+
 function authenticateXtreamClient(username, password) {
   loadXtreamUsers();
   const u = String(username || '').trim();
@@ -2450,6 +2563,40 @@ async function handlePlayerApi(req, res, q) {
     return res.end(JSON.stringify({ message: "Série introuvable" }));
   }
 
+  // CAS 9 : Guide TV EPG individuel par flux (get_short_epg & get_simple_data_table)
+  if (action === 'get_short_epg' || action === 'get_simple_data_table') {
+    const streamId = String(q.stream_id || '');
+    if (!streamId) {
+      res.writeHead(200, { 'Content-Type': 'application/json; charset=utf-8', 'Access-Control-Allow-Origin': '*' });
+      return res.end(JSON.stringify({ epg_listings: [] }));
+    }
+    const limit = q.limit ? `&limit=${encodeURIComponent(q.limit)}` : '';
+    const cacheKey = `${action}_${streamId}_${q.limit || ''}`;
+    const cached = xtreamEpgShortCache.get(cacheKey);
+    if (cached && cached.expiresAt > Date.now()) {
+      res.writeHead(200, { 'Content-Type': 'application/json; charset=utf-8', 'Access-Control-Allow-Origin': '*' });
+      return res.end(cached.body);
+    }
+    const upstreamUrl = `http://${XTREAM_CONFIG.host}:${XTREAM_CONFIG.port}/player_api.php?username=${XTREAM_CONFIG.username}&password=${XTREAM_CONFIG.password}&action=${action}&stream_id=${streamId}${limit}`;
+    http.get(upstreamUrl, { timeout: 8000 }, (upRes) => {
+      let data = '';
+      upRes.on('data', c => data += c);
+      upRes.on('end', () => {
+        if (upRes.statusCode === 200 && data) {
+          xtreamEpgShortCache.set(cacheKey, { body: data, expiresAt: Date.now() + 300000 });
+          res.writeHead(200, { 'Content-Type': 'application/json; charset=utf-8', 'Access-Control-Allow-Origin': '*' });
+          return res.end(data);
+        }
+        res.writeHead(200, { 'Content-Type': 'application/json; charset=utf-8', 'Access-Control-Allow-Origin': '*' });
+        return res.end(JSON.stringify({ epg_listings: [] }));
+      });
+    }).on('error', () => {
+      res.writeHead(200, { 'Content-Type': 'application/json; charset=utf-8', 'Access-Control-Allow-Origin': '*' });
+      res.end(JSON.stringify({ epg_listings: [] }));
+    });
+    return;
+  }
+
   res.writeHead(200, { 'Content-Type': 'application/json; charset=utf-8', 'Access-Control-Allow-Origin': '*' });
   return res.end(JSON.stringify({ message: "Action non supportée" }));
 }
@@ -2629,7 +2776,7 @@ const server = http.createServer((req, res) => {
     const proto = req.headers['x-forwarded-proto'] || (req.connection?.encrypted ? 'https' : 'http');
     const baseUrl = `${proto}://${host}`;
 
-    let m3u = '#EXTM3U\n';
+    let m3u = `#EXTM3U url-tvg="${baseUrl}/xmltv.php?username=${encodeURIComponent(username)}&password=${encodeURIComponent(password)}"\n`;
     XTREAM_FR_CATALOG.forEach(ch => {
       const epg = ch.epg_channel_id || '';
       const icon = ch.icon || '';
@@ -2644,6 +2791,20 @@ const server = http.createServer((req, res) => {
       'Access-Control-Allow-Origin': '*'
     });
     return res.end(m3u);
+  }
+
+  // ── ROUTE GUIDE TV EPG UNIVERSEL (/xmltv.php) ──
+  if (pathname === '/xmltv.php' && req.method === 'GET') {
+    const q = parsedUrl.query || {};
+    const username = q.username;
+    const password = q.password;
+    if (!username || !password || !authenticateXtreamClient(username, password)) {
+      res.writeHead(403, { 'Content-Type': 'text/plain; charset=utf-8', 'Access-Control-Allow-Origin': '*' });
+      return res.end('Accès refusé : Identifiants XMLTV incorrects');
+    }
+
+    serveXmltvEpg(req, res);
+    return;
   }
 
   // ================= API REST =================
@@ -3218,6 +3379,123 @@ const server = http.createServer((req, res) => {
       } catch (e) {
         res.writeHead(400, { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' });
         res.end(JSON.stringify({ success: false, message: e.message }));
+      }
+    });
+    return;
+  }
+
+  // 3c. Gestion des Utilisateurs & Abonnés Xtream Codes
+  if (pathname === '/api/admin/xtream/users' && req.method === 'GET') {
+    loadXtreamUsers();
+    res.writeHead(200, { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' });
+    return res.end(JSON.stringify({ success: true, data: XTREAM_USERS }));
+  }
+
+  if (pathname === '/api/admin/xtream/users' && req.method === 'POST') {
+    let body = '';
+    req.on('data', chunk => body += chunk);
+    req.on('end', () => {
+      try {
+        const payload = JSON.parse(body || '{}');
+        const username = String(payload.username || '').trim();
+        const password = String(payload.password || '').trim();
+        const maxCons = parseInt(payload.max_connections, 10) || 1;
+        const status = payload.status === 'Disabled' ? 'Disabled' : 'Active';
+        const expDate = payload.exp_date ? parseInt(payload.exp_date, 10) : (Math.floor(Date.now() / 1000) + 365 * 86400);
+
+        if (!username || username.length < 2) {
+          res.writeHead(400, { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' });
+          return res.end(JSON.stringify({ success: false, message: "Nom d'utilisateur requis (au moins 2 caractères)" }));
+        }
+        if (!password || password.length < 2) {
+          res.writeHead(400, { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' });
+          return res.end(JSON.stringify({ success: false, message: 'Mot de passe requis (au moins 2 caractères)' }));
+        }
+
+        loadXtreamUsers();
+        if (XTREAM_USERS.some(u => u.username.toLowerCase() === username.toLowerCase())) {
+          res.writeHead(400, { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' });
+          return res.end(JSON.stringify({ success: false, message: `L'utilisateur "${username}" existe déjà` }));
+        }
+
+        const newUser = {
+          username,
+          password,
+          status,
+          exp_date: expDate,
+          max_connections: maxCons,
+          created_at: Math.floor(Date.now() / 1000)
+        };
+
+        XTREAM_USERS.push(newUser);
+        saveXtreamUsers();
+
+        res.writeHead(200, { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' });
+        return res.end(JSON.stringify({ success: true, message: `Compte Xtream "${username}" créé avec succès`, data: newUser }));
+      } catch (e) {
+        res.writeHead(400, { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' });
+        return res.end(JSON.stringify({ success: false, message: e.message }));
+      }
+    });
+    return;
+  }
+
+  if (pathname === '/api/admin/xtream/users' && req.method === 'PUT') {
+    let body = '';
+    req.on('data', chunk => body += chunk);
+    req.on('end', () => {
+      try {
+        const payload = JSON.parse(body || '{}');
+        const username = String(payload.username || '').trim();
+        loadXtreamUsers();
+        const user = XTREAM_USERS.find(u => u.username === username);
+        if (!user) {
+          res.writeHead(404, { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' });
+          return res.end(JSON.stringify({ success: false, message: 'Utilisateur introuvable' }));
+        }
+
+        if (payload.password) user.password = String(payload.password).trim();
+        if (payload.status) user.status = payload.status === 'Disabled' ? 'Disabled' : 'Active';
+        if (payload.max_connections) user.max_connections = parseInt(payload.max_connections, 10) || 1;
+        if (payload.exp_date) user.exp_date = parseInt(payload.exp_date, 10);
+
+        saveXtreamUsers();
+        res.writeHead(200, { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' });
+        return res.end(JSON.stringify({ success: true, message: `Compte "${username}" mis à jour`, data: user }));
+      } catch (e) {
+        res.writeHead(400, { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' });
+        return res.end(JSON.stringify({ success: false, message: e.message }));
+      }
+    });
+    return;
+  }
+
+  if (pathname === '/api/admin/xtream/users' && req.method === 'DELETE') {
+    let body = '';
+    req.on('data', chunk => body += chunk);
+    req.on('end', () => {
+      try {
+        const payload = JSON.parse(body || '{}');
+        const username = String(payload.username || '').trim();
+        loadXtreamUsers();
+        if (XTREAM_USERS.length <= 1) {
+          res.writeHead(400, { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' });
+          return res.end(JSON.stringify({ success: false, message: 'Impossible de supprimer le dernier compte actif' }));
+        }
+
+        const idx = XTREAM_USERS.findIndex(u => u.username === username);
+        if (idx === -1) {
+          res.writeHead(404, { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' });
+          return res.end(JSON.stringify({ success: false, message: 'Utilisateur introuvable' }));
+        }
+
+        XTREAM_USERS.splice(idx, 1);
+        saveXtreamUsers();
+        res.writeHead(200, { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' });
+        return res.end(JSON.stringify({ success: true, message: `Compte "${username}" supprimé`, data: XTREAM_USERS }));
+      } catch (e) {
+        res.writeHead(400, { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' });
+        return res.end(JSON.stringify({ success: false, message: e.message }));
       }
     });
     return;

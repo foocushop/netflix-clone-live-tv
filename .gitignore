@@ -4,3 +4,4 @@ node_modules/
 xtream_streams_all.json
 .env
 data/.github_token
+data/cache_xmltv.xml.gz

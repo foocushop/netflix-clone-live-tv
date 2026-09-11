@@ -638,6 +638,9 @@
             <button type="button" class="btn-admin btn-admin-red" id="copyM3uUrlBtn">
               🔗 Copier Lien M3U (VLC)
             </button>
+            <button type="button" class="btn-admin btn-admin-blue" id="copyEpgUrlBtn">
+              📅 Copier Guide EPG (XMLTV)
+            </button>
           </div>
         </div>
 
@@ -650,36 +653,122 @@
               <span class="badge-status-sync" id="githubSyncBadge">SYNCHRONISÉ</span>
             </div>
             <p class="integration-desc">
-              Sauvegarde en temps réel sur GitHub : aucune perte de données lors des redémarrages ou redéploiements Render.
+              Chaque modification (ajout, édition, suppression) est sauvegardée directement sur votre dépôt GitHub.
             </p>
-            <div class="integration-credentials">
-              <div class="cred-item">
-                <span class="cred-label">Dépôt :</span>
-                <code class="cred-value cred-blue">foocushop/netflix-clone-live-tv (main)</code>
-              </div>
-              <div class="cred-item">
-                <span class="cred-label">Dernière synchro :</span>
-                <span class="cred-value cred-green" id="githubLastSyncDisplay">À l'instant</span>
-              </div>
+            <div class="integration-meta">
+              <span class="meta-item">
+                <span class="meta-label">Dépôt :</span>
+                <code class="meta-val">foocushop/netflix-clone-live-tv</code>
+              </span>
+              <span class="meta-item">
+                <span class="meta-label">Branche :</span>
+                <code class="meta-val">main</code>
+              </span>
             </div>
           </div>
           <div class="integration-actions">
             <button type="button" class="btn-admin btn-admin-secondary" id="toggleGithubTokenBtn">
-              🔑 Clé Token
+              🔑 Configurer Token
             </button>
             <button type="button" class="btn-admin btn-admin-green" id="manualGithubSyncBtn">
-              ☁️ Synchroniser
+              🔄 Forcer Synchronisation
             </button>
           </div>
-          <!-- Configuration de la clé GitHub -->
-          <div id="githubTokenSection" class="github-token-drawer" style="display: none;">
+          <div class="github-token-box" id="githubTokenSection" style="display: none;">
             <div class="token-input-row">
               <input type="password" id="githubTokenInput" placeholder="Coller votre token GitHub (ghp_...)" class="admin-form-input token-input">
               <button type="button" class="btn-admin btn-admin-blue" id="saveGithubTokenBtn">
-                💾 Enregistrer
+                Valider
               </button>
             </div>
             <div id="githubTokenFeedback" class="token-feedback" style="display: none;"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ================= SECTION GESTION DES COMPTES XTREAM / ABONNÉS IPTV ================= -->
+      <div class="admin-xtream-users-container" id="adminXtreamUsersSection" style="margin-bottom: 28px;">
+        <div class="xtream-monitor-header" style="margin-bottom: 16px;">
+          <div class="monitor-title-wrap">
+            <span class="monitor-icon">👥</span>
+            <div class="monitor-title-group">
+              <h2 class="monitor-title">COMPTES XTREAM & ABONNÉS IPTV</h2>
+              <p class="monitor-subtitle">Créez et gérez les identifiants d'accès pour votre télé, votre famille ou vos amis avec limitation d'écrans simultanés</p>
+            </div>
+          </div>
+          <div class="monitor-header-badges" style="gap: 10px;">
+            <button type="button" class="btn-admin btn-admin-secondary btn-sm" id="xtreamUsersRefreshBtn" title="Actualiser la liste des comptes">
+              🔄 Actualiser
+            </button>
+            <button type="button" class="btn-admin btn-admin-blue btn-sm" id="openAddXtreamUserBtn">
+              ➕ Nouveau Compte IPTV
+            </button>
+          </div>
+        </div>
+
+        <!-- Formulaire de création de compte Xtream (Masqué par défaut) -->
+        <div id="addXtreamUserContainer" style="display: none; background: rgba(20, 20, 28, 0.95); border: 1px solid rgba(229, 9, 20, 0.3); border-radius: 10px; padding: 20px; margin-bottom: 18px; box-shadow: 0 8px 30px rgba(0,0,0,0.5);">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px;">
+            <h3 style="margin: 0; font-size: 1.05rem; color: #fff; font-weight: 700; display: flex; align-items: center; gap: 8px;">
+              <span style="color: var(--admin-red);">➕</span> Créer un nouvel abonné IPTV
+            </h3>
+            <button type="button" id="closeAddXtreamUserBtn" style="background: none; border: none; color: var(--admin-text-muted); font-size: 1.2rem; cursor: pointer;">✕</button>
+          </div>
+          <form id="addXtreamUserForm" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)) 140px; gap: 14px; align-items: end;">
+            <div>
+              <label style="display: block; font-size: 0.8rem; color: var(--admin-text-secondary); margin-bottom: 6px; font-weight: 600;">Nom d'utilisateur / Identifiant</label>
+              <input type="text" id="newXtreamUsername" class="admin-form-input" placeholder="ex: salon, chambre, ami" required autocomplete="off" style="width: 100%;">
+            </div>
+            <div>
+              <label style="display: block; font-size: 0.8rem; color: var(--admin-text-secondary); margin-bottom: 6px; font-weight: 600;">Mot de passe</label>
+              <input type="text" id="newXtreamPassword" class="admin-form-input" placeholder="ex: 2025" required autocomplete="off" style="width: 100%;">
+            </div>
+            <div>
+              <label style="display: block; font-size: 0.8rem; color: var(--admin-text-secondary); margin-bottom: 6px; font-weight: 600;">Écrans simultanés max</label>
+              <select id="newXtreamMaxCons" class="admin-form-select" style="width: 100%;">
+                <option value="1">1 écran (Personnel)</option>
+                <option value="2">2 écrans</option>
+                <option value="3">3 écrans</option>
+                <option value="5" selected>5 écrans (Standard)</option>
+                <option value="10">10 écrans (Famille)</option>
+              </select>
+            </div>
+            <div>
+              <label style="display: block; font-size: 0.8rem; color: var(--admin-text-secondary); margin-bottom: 6px; font-weight: 600;">Durée de validité</label>
+              <select id="newXtreamDuration" class="admin-form-select" style="width: 100%;">
+                <option value="1m">1 mois</option>
+                <option value="3m">3 mois</option>
+                <option value="6m">6 mois</option>
+                <option value="1y">1 an</option>
+                <option value="unlimited" selected>Illimité (Permanent)</option>
+              </select>
+            </div>
+            <div>
+              <button type="submit" class="btn-admin btn-admin-green" style="width: 100%; height: 42px; font-weight: 700;">
+                Enregistrer ✔
+              </button>
+            </div>
+          </form>
+        </div>
+
+        <!-- Table des utilisateurs Xtream -->
+        <div style="background: var(--admin-surface-card); border: 1px solid var(--admin-border); border-radius: 12px; overflow: hidden;">
+          <div style="overflow-x: auto;">
+            <table class="admin-table" style="width: 100%; border-collapse: collapse; margin: 0;">
+              <thead>
+                <tr style="background: rgba(255,255,255,0.03); border-bottom: 1px solid var(--admin-border);">
+                  <th style="text-align: left; padding: 14px 16px; font-size: 0.8rem; color: var(--admin-text-muted); text-transform: uppercase; letter-spacing: 0.5px;">Identifiant</th>
+                  <th style="text-align: left; padding: 14px 16px; font-size: 0.8rem; color: var(--admin-text-muted); text-transform: uppercase; letter-spacing: 0.5px;">Mot de passe</th>
+                  <th style="text-align: center; padding: 14px 16px; font-size: 0.8rem; color: var(--admin-text-muted); text-transform: uppercase; letter-spacing: 0.5px;">Écrans</th>
+                  <th style="text-align: center; padding: 14px 16px; font-size: 0.8rem; color: var(--admin-text-muted); text-transform: uppercase; letter-spacing: 0.5px;">Expiration</th>
+                  <th style="text-align: center; padding: 14px 16px; font-size: 0.8rem; color: var(--admin-text-muted); text-transform: uppercase; letter-spacing: 0.5px;">Statut</th>
+                  <th style="text-align: right; padding: 14px 16px; font-size: 0.8rem; color: var(--admin-text-muted); text-transform: uppercase; letter-spacing: 0.5px;">Actions & Liens</th>
+                </tr>
+              </thead>
+              <tbody id="xtreamUsersTableBody">
+                <!-- Rempli dynamiquement par admin.js -->
+              </tbody>
+            </table>
           </div>
         </div>
       </div>
