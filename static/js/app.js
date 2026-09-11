@@ -171,8 +171,19 @@ class NetflixApp {
 
     this.modalPlayBtn.addEventListener('click', () => {
       if (this.currentModalMovie) {
-        const s = (this.currentModalMovie.media_type === 'series') ? (this.selectedModalSeason || 1) : 1;
-        const e = (this.currentModalMovie.media_type === 'series') ? (this.selectedModalEpisode || 1) : 1;
+        let s = null;
+        let e = null;
+        if (this.currentModalMovie.media_type === 'series' || this.currentModalMovie.is_xtream_series) {
+          const seasons = this.getMovieSeasons(this.currentModalMovie);
+          const validSeasons = seasons.filter(sec => Array.isArray(sec.episodes) && sec.episodes.length > 0);
+          const targetSeasons = validSeasons.length > 0 ? validSeasons : seasons;
+
+          let sObj = targetSeasons.find(sec => parseInt(sec.season_number, 10) === parseInt(this.selectedModalSeason, 10));
+          if (!sObj) sObj = targetSeasons[0];
+          s = sObj ? sObj.season_number : 1;
+          const epObj = (sObj?.episodes?.find(ep => parseInt(ep.episode_number, 10) === parseInt(this.selectedModalEpisode, 10))) || sObj?.episodes?.[0];
+          e = epObj ? epObj.episode_number : 1;
+        }
         this.closeModal();
         this.player.open(this.currentModalMovie, 1, s, e);
       }
@@ -238,6 +249,21 @@ class NetflixApp {
       const json = await res.json();
       if (json.success && json.data) {
         this.catalogData = json.data;
+        const allMovies = [];
+        const seen = new Set();
+        (json.data.rows || []).forEach(r => {
+          (r.movies || []).forEach(m => {
+            if (!seen.has(m.id)) {
+              seen.add(m.id);
+              allMovies.push(m);
+            }
+          });
+        });
+        if (json.data.hero && !seen.has(json.data.hero.id)) {
+          allMovies.unshift(json.data.hero);
+        }
+        this.catalogData.movies = allMovies;
+
         this.originalHero = json.data.hero;
         this.setupHero(json.data.hero);
         this.renderCatalog(json.data);
@@ -469,23 +495,26 @@ class NetflixApp {
     this.updateModalListButton();
 
     // Gestion des saisons & épisodes pour les séries
-    if (movie.media_type === 'series') {
+    if (movie.media_type === 'series' || movie.is_xtream_series) {
       if (this.modalEpisodesSection) {
         this.modalEpisodesSection.classList.remove('hidden');
       }
       const seasons = this.getMovieSeasons(movie);
+      const validSeasons = seasons.filter(s => Array.isArray(s.episodes) && s.episodes.length > 0);
+      const targetSeasons = validSeasons.length > 0 ? validSeasons : seasons;
+
       const showKey = 'netflix_ep_' + (movie.id || movie.tmdb_id || movie.series_id);
-      let defaultS = (seasons && seasons[0]) ? seasons[0].season_number : 1;
-      let defaultE = (seasons && seasons[0] && seasons[0].episodes && seasons[0].episodes[0]) ? seasons[0].episodes[0].episode_number : 1;
+      let defaultS = (targetSeasons && targetSeasons[0]) ? targetSeasons[0].season_number : 1;
+      let defaultE = (targetSeasons && targetSeasons[0] && targetSeasons[0].episodes && targetSeasons[0].episodes[0]) ? targetSeasons[0].episodes[0].episode_number : 1;
       try {
         const saved = JSON.parse(localStorage.getItem(showKey));
         if (saved && saved.season && saved.episode) {
-          const sExists = seasons.some(s => parseInt(s.season_number) === parseInt(saved.season));
+          const sExists = targetSeasons.some(s => parseInt(s.season_number, 10) === parseInt(saved.season, 10));
           if (sExists) {
-            defaultS = parseInt(saved.season);
-            const foundS = seasons.find(s => parseInt(s.season_number) === defaultS);
-            if (foundS && foundS.episodes && foundS.episodes.some(e => parseInt(e.episode_number) === parseInt(saved.episode))) {
-              defaultE = parseInt(saved.episode);
+            defaultS = parseInt(saved.season, 10);
+            const foundS = targetSeasons.find(s => parseInt(s.season_number, 10) === defaultS);
+            if (foundS && foundS.episodes && foundS.episodes.some(e => parseInt(e.episode_number, 10) === parseInt(saved.episode, 10))) {
+              defaultE = parseInt(saved.episode, 10);
             }
           }
         }
@@ -499,12 +528,19 @@ class NetflixApp {
       // Si les saisons ne sont pas encore chargées sur l'objet local, interrogation de l'API
       if (!movie.seasons || movie.seasons.length === 0) {
         const baseUrl = window.API_BASE || '';
-        fetch(`${baseUrl}/api/movies/${encodeURIComponent(movie.id)}`)
+        const sId = movie.series_id || (String(movie.id).startsWith('xtream_series_') ? String(movie.id).replace('xtream_series_', '') : null);
+        const endpoint = sId ? `${baseUrl}/api/xtream/series-info?series_id=${sId}` : `${baseUrl}/api/movies/${encodeURIComponent(movie.id)}`;
+        fetch(endpoint)
           .then(res => res.json())
           .then(res => {
-            if (res.success && res.data && res.data.seasons && res.data.seasons.length > 0) {
-              movie.seasons = res.data.seasons;
+            const freshSeasons = res.seasons || (res.data && res.data.seasons);
+            if (freshSeasons && freshSeasons.length > 0) {
+              movie.seasons = freshSeasons;
               if (this.currentModalMovie && this.currentModalMovie.id === movie.id) {
+                const fValid = freshSeasons.filter(s => Array.isArray(s.episodes) && s.episodes.length > 0);
+                const fTarget = fValid.length > 0 ? fValid : freshSeasons;
+                this.selectedModalSeason = fTarget[0] ? fTarget[0].season_number : 1;
+                this.selectedModalEpisode = (fTarget[0]?.episodes?.[0]) ? fTarget[0].episodes[0].episode_number : 1;
                 this.setupModalSeasons(movie);
                 this.renderModalEpisodes();
               }
@@ -526,13 +562,20 @@ class NetflixApp {
     if (!this.modalSeasonSelect) return;
     this.modalSeasonSelect.innerHTML = '';
     const seasons = this.getMovieSeasons(movie);
-    seasons.forEach(s => {
+    const validSeasons = seasons.filter(s => Array.isArray(s.episodes) && s.episodes.length > 0);
+    const seasonsToDisplay = validSeasons.length > 0 ? validSeasons : seasons;
+
+    seasonsToDisplay.forEach(s => {
       const opt = document.createElement('option');
       opt.value = s.season_number;
-      opt.textContent = s.name || `Saison ${s.season_number}`;
+      opt.textContent = s.name || s.title || `Saison ${s.season_number}`;
       this.modalSeasonSelect.appendChild(opt);
     });
-    this.modalSeasonSelect.value = this.selectedModalSeason;
+
+    if (!seasonsToDisplay.some(s => parseInt(s.season_number, 10) === parseInt(this.selectedModalSeason, 10))) {
+      this.selectedModalSeason = seasonsToDisplay[0] ? seasonsToDisplay[0].season_number : 1;
+    }
+    this.modalSeasonSelect.value = String(this.selectedModalSeason);
     if (this.modalEpisodesSubtitle) {
       this.modalEpisodesSubtitle.textContent = `Saison ${this.selectedModalSeason}`;
     }
@@ -1252,7 +1295,10 @@ class NetflixApp {
     const cached = this.telerealiteSeriesCache.get(show.series_id);
     if (cached) {
       if (directPlay) {
-        this.player.open(cached, 1);
+        const validSeasons = (cached.seasons || []).filter(s => Array.isArray(s.episodes) && s.episodes.length > 0);
+        const sNum = validSeasons[0] ? validSeasons[0].season_number : null;
+        const epNum = (validSeasons[0]?.episodes?.[0]) ? validSeasons[0].episodes[0].episode_number : null;
+        this.player.open(cached, 1, sNum, epNum);
       } else {
         this.openModal(cached);
       }
@@ -1304,8 +1350,11 @@ class NetflixApp {
       }
 
       if (directPlay) {
+        const validSeasons = (seriesObj.seasons || []).filter(s => Array.isArray(s.episodes) && s.episodes.length > 0);
+        const sNum = validSeasons[0] ? validSeasons[0].season_number : null;
+        const epNum = (validSeasons[0]?.episodes?.[0]) ? validSeasons[0].episodes[0].episode_number : null;
         this.player.setStep(1, 'done', `1. ${seriesObj.seasons.length} saison(s) chargée(s) avec succès`);
-        this.player.open(seriesObj, 1);
+        this.player.open(seriesObj, 1, sNum, epNum);
       } else {
         this.openModal(seriesObj);
       }
@@ -1379,7 +1428,7 @@ class NetflixApp {
       });
       if (this.heroPlayBtn) {
         this.heroPlayBtn.onclick = () => {
-          this.openTeleRealiteSeries(featured);
+          this.openTeleRealiteSeries(featured, true);
         };
       }
     }

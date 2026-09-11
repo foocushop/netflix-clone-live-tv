@@ -2530,6 +2530,49 @@ const server = http.createServer((req, res) => {
     return;
   }
 
+  function formatXtreamSeasonsList(rawData) {
+    const episodesMap = rawData.episodes || {};
+    const seasonsList = [];
+    const seasonNums = Object.keys(episodesMap).map(n => parseInt(n, 10)).filter(n => !isNaN(n)).sort((a, b) => a - b);
+
+    seasonNums.forEach(sNum => {
+      const eps = episodesMap[String(sNum)] || [];
+      if (!Array.isArray(eps) || eps.length === 0) return;
+
+      const formattedEpisodes = eps.map((ep, idx) => {
+        const epNum = ep.episode_num ? parseInt(ep.episode_num, 10) : (idx + 1);
+        const ext = ep.container_extension || 'mkv';
+        const epId = ep.id;
+        const streamUrl = `/api/stream/xtream-series?episode_id=${epId}&ext=${ext}`;
+        return {
+          episode_number: epNum,
+          title: ep.title || `Épisode ${epNum}`,
+          overview: ep.info?.plot || ep.info?.overview || '',
+          duration: ep.info?.duration || '45m',
+          video_url: streamUrl,
+          still_url: ep.info?.movie_image || rawData.info?.cover || '',
+          video: ep.info?.video || {},
+          video_codec: ep.info?.video?.codec_name || null,
+          sources: {
+            direct: streamUrl,
+            fhd: streamUrl,
+            vf: streamUrl
+          }
+        };
+      });
+
+      seasonsList.push({
+        season_number: sNum,
+        name: `Saison ${sNum}`,
+        overview: `Saison ${sNum} (${formattedEpisodes.length} épisodes)`,
+        episode_count: formattedEpisodes.length,
+        episodes: formattedEpisodes
+      });
+    });
+
+    return seasonsList;
+  }
+
   if (pathname === '/api/movies' && req.method === 'GET') {
     res.writeHead(200, { 'Content-Type': 'application/json' });
     res.end(JSON.stringify({ success: true, data: catalog.movies }));
@@ -2538,10 +2581,46 @@ const server = http.createServer((req, res) => {
 
   if (pathname.startsWith('/api/movies/') && !pathname.endsWith('/hero') && req.method === 'GET') {
     const id = pathname.replace('/api/movies/', '');
-    const movie = catalog.movies.find(m => m.id === id);
+    let movie = catalog.movies.find(m => m.id === id);
+    if (!movie && id.startsWith('xtream_series_')) {
+      const sId = parseInt(id.replace('xtream_series_', ''), 10);
+      const sShow = Array.isArray(XTREAM_TELEREALITE_CATALOG) ? XTREAM_TELEREALITE_CATALOG.find(s => s.series_id === sId) : null;
+      if (sShow) {
+        movie = {
+          id: `xtream_series_${sId}`,
+          series_id: sId,
+          title: sShow.name,
+          poster_url: sShow.cover,
+          backdrop_url: sShow.backdrop || sShow.cover,
+          overview: sShow.plot || '',
+          media_type: 'series',
+          is_xtream_series: true,
+          release_year: sShow.year || 2025,
+          genres: ['Télé-Réalité'],
+          seasons: []
+        };
+      }
+    }
+
     if (movie) {
-      res.writeHead(200, { 'Content-Type': 'application/json' });
-      res.end(JSON.stringify({ success: true, data: movie }));
+      let finalMovie = movie;
+      // Si la série n'a pas encore de saisons complètes, tenter de les charger depuis le cache disque
+      if ((!movie.seasons || movie.seasons.length === 0) && (movie.is_xtream_series || movie.series_id || id.startsWith('xtream_series_') || id === '68628')) {
+        const sId = movie.series_id || ((id === '68628') ? 6715 : id.replace('xtream_series_', ''));
+        const cacheFile = path.join(__dirname, 'data', 'cache', `series_${sId}.json`);
+        if (fs.existsSync(cacheFile)) {
+          try {
+            const raw = JSON.parse(fs.readFileSync(cacheFile, 'utf8'));
+            const sList = formatXtreamSeasonsList(raw);
+            if (sList && sList.length > 0) {
+              finalMovie = Object.assign({}, movie, { seasons: sList });
+            }
+          } catch (e) {}
+        }
+      }
+
+      res.writeHead(200, { 'Content-Type': 'application/json; charset=utf-8', 'Access-Control-Allow-Origin': '*' });
+      res.end(JSON.stringify({ success: true, data: finalMovie }));
     } else {
       res.writeHead(404, { 'Content-Type': 'application/json' });
       res.end(JSON.stringify({ success: false, message: 'Média introuvable' }));
