@@ -413,6 +413,16 @@ async function serveXmltvEpg(req, res) {
     const acceptEncoding = (req.headers['accept-encoding'] || '').toLowerCase();
     const canGzip = acceptEncoding.includes('gzip');
 
+    if (req.method === 'HEAD') {
+      res.writeHead(200, {
+        'Content-Type': 'application/xml; charset=utf-8',
+        ...(canGzip ? { 'Content-Encoding': 'gzip' } : {}),
+        'Cache-Control': 'public, max-age=3600',
+        'Access-Control-Allow-Origin': '*'
+      });
+      return res.end();
+    }
+
     if (canGzip) {
       res.writeHead(200, {
         'Content-Type': 'application/xml; charset=utf-8',
@@ -2763,7 +2773,7 @@ const server = http.createServer((req, res) => {
   }
 
   // ── ROUTE TÉLÉCHARGEMENT PLAYLIST M3U UNIVERSELLE (/get.php) ──
-  if (pathname === '/get.php' && req.method === 'GET') {
+  if (pathname === '/get.php' && (req.method === 'GET' || req.method === 'HEAD')) {
     const q = parsedUrl.query || {};
     const username = q.username;
     const password = q.password;
@@ -2775,6 +2785,15 @@ const server = http.createServer((req, res) => {
     const host = req.headers.host || '127.0.0.1:8080';
     const proto = req.headers['x-forwarded-proto'] || (req.connection?.encrypted ? 'https' : 'http');
     const baseUrl = `${proto}://${host}`;
+
+    if (req.method === 'HEAD') {
+      res.writeHead(200, {
+        'Content-Type': 'application/vnd.apple.mpegurl; charset=utf-8',
+        'Content-Disposition': 'attachment; filename="iptv_playlist.m3u"',
+        'Access-Control-Allow-Origin': '*'
+      });
+      return res.end();
+    }
 
     let m3u = `#EXTM3U url-tvg="${baseUrl}/xmltv.php?username=${encodeURIComponent(username)}&password=${encodeURIComponent(password)}"\n`;
     XTREAM_FR_CATALOG.forEach(ch => {
@@ -2794,7 +2813,7 @@ const server = http.createServer((req, res) => {
   }
 
   // ── ROUTE GUIDE TV EPG UNIVERSEL (/xmltv.php) ──
-  if (pathname === '/xmltv.php' && req.method === 'GET') {
+  if (pathname === '/xmltv.php' && (req.method === 'GET' || req.method === 'HEAD')) {
     const q = parsedUrl.query || {};
     const username = q.username;
     const password = q.password;
