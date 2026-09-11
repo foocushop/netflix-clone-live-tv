@@ -525,29 +525,36 @@ class NetflixApp {
       this.setupModalSeasons(movie);
       this.renderModalEpisodes();
 
-      // Si les saisons ne sont pas encore chargées sur l'objet local, interrogation de l'API
-      if (!movie.seasons || movie.seasons.length === 0) {
-        const baseUrl = window.API_BASE || '';
-        const sId = movie.series_id || (String(movie.id).startsWith('xtream_series_') ? String(movie.id).replace('xtream_series_', '') : null);
-        const endpoint = sId ? `${baseUrl}/api/xtream/series-info?series_id=${sId}` : `${baseUrl}/api/movies/${encodeURIComponent(movie.id)}`;
-        fetch(endpoint)
-          .then(res => res.json())
-          .then(res => {
-            const freshSeasons = res.seasons || (res.data && res.data.seasons);
-            if (freshSeasons && freshSeasons.length > 0) {
+      // Toujours vérifier en direct si de nouveaux épisodes sont sortis sur FoxBleu / Xtream
+      const baseUrl = window.API_BASE || '';
+      const sId = movie.series_id || (String(movie.id).startsWith('xtream_series_') ? String(movie.id).replace('xtream_series_', '') : ((String(movie.id) === '68628' || String(movie.tmdb_id) === '68628') ? 6715 : null));
+      const endpoint = sId ? `${baseUrl}/api/xtream/series-info?series_id=${sId}&refresh=1` : `${baseUrl}/api/movies/${encodeURIComponent(movie.id)}`;
+      fetch(endpoint)
+        .then(res => res.json())
+        .then(res => {
+          const freshSeasons = res.seasons || (res.data && res.data.seasons);
+          if (freshSeasons && freshSeasons.length > 0) {
+            const oldTotalEps = (movie.seasons || []).reduce((acc, s) => acc + (s.episodes ? s.episodes.length : 0), 0);
+            const newTotalEps = freshSeasons.reduce((acc, s) => acc + (s.episodes ? s.episodes.length : 0), 0);
+            if (newTotalEps !== oldTotalEps || !movie.seasons || movie.seasons.length === 0) {
               movie.seasons = freshSeasons;
-              if (this.currentModalMovie && this.currentModalMovie.id === movie.id) {
-                const fValid = freshSeasons.filter(s => Array.isArray(s.episodes) && s.episodes.length > 0);
-                const fTarget = fValid.length > 0 ? fValid : freshSeasons;
-                this.selectedModalSeason = fTarget[0] ? fTarget[0].season_number : 1;
-                this.selectedModalEpisode = (fTarget[0]?.episodes?.[0]) ? fTarget[0].episodes[0].episode_number : 1;
+              if (this.catalogData && this.catalogData.movies) {
+                const catMovie = this.catalogData.movies.find(m => m.id === movie.id || (sId && (m.series_id == sId || (sId == 6715 && m.id === '68628'))));
+                if (catMovie) catMovie.seasons = freshSeasons;
+              }
+              if (this.currentModalMovie && (this.currentModalMovie.id === movie.id || (sId && this.currentModalMovie.series_id == sId))) {
+                const currentS = this.selectedModalSeason;
                 this.setupModalSeasons(movie);
+                if (freshSeasons.some(s => parseInt(s.season_number, 10) === parseInt(currentS, 10))) {
+                  this.selectedModalSeason = currentS;
+                  if (this.modalSeasonSelect) this.modalSeasonSelect.value = String(currentS);
+                }
                 this.renderModalEpisodes();
               }
             }
-          })
-          .catch(() => {});
-      }
+          }
+        })
+        .catch(() => {});
     } else {
       if (this.modalEpisodesSection) {
         this.modalEpisodesSection.classList.add('hidden');

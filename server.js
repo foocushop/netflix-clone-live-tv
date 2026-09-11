@@ -2291,6 +2291,106 @@ function invalidateCatalogCache() {
   cachedCatalogGzip = null;
 }
 
+function formatXtreamSeasonsList(rawData) {
+  const episodesMap = rawData.episodes || {};
+  const seasonsList = [];
+  const seasonNums = Object.keys(episodesMap).map(n => parseInt(n, 10)).filter(n => !isNaN(n)).sort((a, b) => a - b);
+
+  seasonNums.forEach(sNum => {
+    const eps = episodesMap[String(sNum)] || [];
+    if (!Array.isArray(eps) || eps.length === 0) return;
+
+    const formattedEpisodes = eps.map((ep, idx) => {
+      const epNum = ep.episode_num ? parseInt(ep.episode_num, 10) : (idx + 1);
+      const ext = ep.container_extension || 'mkv';
+      const epId = ep.id;
+      const streamUrl = `/api/stream/xtream-series?episode_id=${epId}&ext=${ext}`;
+      return {
+        episode_number: epNum,
+        title: ep.title || `Épisode ${epNum}`,
+        overview: ep.info?.plot || ep.info?.overview || '',
+        duration: ep.info?.duration || '45m',
+        video_url: streamUrl,
+        still_url: ep.info?.movie_image || rawData.info?.cover || '',
+        video: ep.info?.video || {},
+        video_codec: ep.info?.video?.codec_name || null,
+        sources: {
+          direct: streamUrl,
+          fhd: streamUrl,
+          vf: streamUrl
+        }
+      };
+    });
+
+    seasonsList.push({
+      season_number: sNum,
+      name: `Saison ${sNum}`,
+      overview: `Saison ${sNum} (${formattedEpisodes.length} épisodes)`,
+      episode_count: formattedEpisodes.length,
+      episodes: formattedEpisodes
+    });
+  });
+
+  return seasonsList;
+}
+
+function updateCatalogSeriesSeasons(seriesId, rawXtreamData) {
+  try {
+    const sList = formatXtreamSeasonsList(rawXtreamData);
+    if (!sList || sList.length === 0) return;
+
+    let updated = false;
+    for (const m of (catalog.movies || [])) {
+      const mId = String(m.id || '');
+      const mSeriesId = String(m.series_id || '');
+      const targetId = String(seriesId);
+      if (mSeriesId === targetId || mId === targetId || mId === `xtream_series_${targetId}` || (targetId === '6715' && (mId === '68628' || String(m.tmdb_id) === '68628'))) {
+        m.seasons = sList;
+        updated = true;
+      }
+    }
+    if (updated) {
+      invalidateCatalogCache();
+      try {
+        fs.writeFileSync(DATA_FILE, JSON.stringify(catalog, null, 2), 'utf8');
+        console.log(`[Xtream Sync] Saisons et épisodes mis à jour dans catalog.json pour la série ${seriesId}`);
+      } catch (e) {
+        console.warn(`[Xtream Sync] Erreur écriture catalog.json:`, e.message);
+      }
+    }
+  } catch (e) {
+    console.warn('[Xtream Sync] Erreur updateCatalogSeriesSeasons:', e.message);
+  }
+}
+
+function fetchFreshSeriesFromXtream(seriesId, onDone) {
+  const apiUrl = `http://${XTREAM_CONFIG.host}:${XTREAM_CONFIG.port}/player_api.php?username=${XTREAM_CONFIG.username}&password=${XTREAM_CONFIG.password}&action=get_series_info&series_id=${seriesId}`;
+  http.get(apiUrl, { timeout: 12000 }, (apiRes) => {
+    let data = '';
+    apiRes.on('data', chunk => data += chunk);
+    apiRes.on('end', () => {
+      try {
+        const parsed = JSON.parse(data);
+        if (parsed && (parsed.info || parsed.episodes)) {
+          const cacheDir = path.join(__dirname, 'data', 'cache');
+          if (!fs.existsSync(cacheDir)) fs.mkdirSync(cacheDir, { recursive: true });
+          const cacheFile = path.join(cacheDir, `series_${seriesId}.json`);
+          fs.writeFileSync(cacheFile, JSON.stringify(parsed, null, 2), 'utf8');
+          updateCatalogSeriesSeasons(seriesId, parsed);
+          console.log(`[Xtream Auto-Sync] Série ${seriesId} mise à jour avec les derniers épisodes.`);
+          if (onDone) onDone(null, parsed);
+        } else if (onDone) {
+          onDone(new Error('Données Xtream incomplètes'));
+        }
+      } catch (e) {
+        if (onDone) onDone(e);
+      }
+    });
+  }).on('error', (err) => {
+    if (onDone) onDone(err);
+  });
+}
+
 const mimeTypes = {
   '.html': 'text/html',
   '.css': 'text/css',
@@ -2544,77 +2644,37 @@ async function handlePlayerApi(req, res, q) {
       return res.end(JSON.stringify({ message: "series_id requis" }));
     }
 
-    // 1. Vérifier si c'est La Villa (6715 / 68628) dans catalog.json
-    const catVilla = (catalog.movies || []).find(m => m.id === '68628' || m.series_id === 6715);
-    if ((seriesId === '6715' || seriesId === '68628') && catVilla && catVilla.seasons) {
-      const episodesMap = {};
-      catVilla.seasons.forEach(s => {
-        const sNumStr = String(s.season_number);
-        episodesMap[sNumStr] = (s.episodes || []).map((e, idx) => ({
-          id: parseInt(e.id, 10) || (385600 + idx),
-          episode_num: e.episode_number,
-          title: e.title || `Épisode ${e.episode_number}`,
-          container_extension: "mkv",
-          info: {
-            duration_secs: 2700,
-            duration: e.duration || "45:00",
-            video: {},
-            audio: {},
-            bitrate: 0
-          }
-        }));
-      });
-
-      res.writeHead(200, { 'Content-Type': 'application/json; charset=utf-8', 'Access-Control-Allow-Origin': '*' });
-      return res.end(JSON.stringify({
-        seasons: catVilla.seasons.map(s => ({
-          season_number: s.season_number,
-          name: s.title || `Saison ${s.season_number}`,
-          episode_count: s.episode_count || (s.episodes?.length || 0),
-          air_date: "2025-08-11"
-        })),
-        info: {
-          name: catVilla.title,
-          cover: catVilla.poster_url,
-          plot: catVilla.overview,
-          cast: (catVilla.cast || []).join(', '),
-          director: catVilla.director || "",
-          genre: (catVilla.genres || []).join(' / '),
-          releaseDate: "2025",
-          rating: "8.5"
-        },
-        episodes: episodesMap
-      }));
-    }
-
-    // 2. Vérifier dans le cache disque
     const cacheFile = path.join(__dirname, 'data', 'cache', `series_${seriesId}.json`);
     if (fs.existsSync(cacheFile)) {
       try {
-        const cachedJson = fs.readFileSync(cacheFile, 'utf8');
-        res.writeHead(200, { 'Content-Type': 'application/json; charset=utf-8', 'Access-Control-Allow-Origin': '*' });
-        return res.end(cachedJson);
+        const stats = fs.statSync(cacheFile);
+        // TTL de 3 minutes pour garantir des données fraîches
+        if (Date.now() - stats.mtimeMs < 180000) {
+          const cachedJson = fs.readFileSync(cacheFile, 'utf8');
+          res.writeHead(200, { 'Content-Type': 'application/json; charset=utf-8', 'Access-Control-Allow-Origin': '*' });
+          return res.end(cachedJson);
+        }
       } catch (e) {}
     }
 
-    // 3. Appel live Xtream si pas en cache
-    try {
-      const upstreamUrl = `http://${XTREAM_CONFIG.host}:${XTREAM_CONFIG.port}/player_api.php?username=${XTREAM_CONFIG.username}&password=${XTREAM_CONFIG.password}&action=get_series_info&series_id=${seriesId}`;
-      const fRes = await fetch(upstreamUrl, { signal: AbortSignal.timeout(8000) });
-      if (fRes.ok) {
-        const text = await fRes.text();
-        try {
-          const cacheDir = path.join(__dirname, 'data', 'cache');
-          if (!fs.existsSync(cacheDir)) fs.mkdirSync(cacheDir, { recursive: true });
-          fs.writeFileSync(cacheFile, text, 'utf8');
-        } catch (e) {}
+    // Récupérer en direct depuis Xtream
+    fetchFreshSeriesFromXtream(seriesId, (err, fresh) => {
+      if (!err && fresh) {
         res.writeHead(200, { 'Content-Type': 'application/json; charset=utf-8', 'Access-Control-Allow-Origin': '*' });
-        return res.end(text);
+        return res.end(JSON.stringify(fresh));
       }
-    } catch (err) {}
-
-    res.writeHead(404, { 'Content-Type': 'application/json; charset=utf-8', 'Access-Control-Allow-Origin': '*' });
-    return res.end(JSON.stringify({ message: "Série introuvable" }));
+      // Fallback sur cache existant si indisponible
+      if (fs.existsSync(cacheFile)) {
+        try {
+          const cachedJson = fs.readFileSync(cacheFile, 'utf8');
+          res.writeHead(200, { 'Content-Type': 'application/json; charset=utf-8', 'Access-Control-Allow-Origin': '*' });
+          return res.end(cachedJson);
+        } catch (e) {}
+      }
+      res.writeHead(404, { 'Content-Type': 'application/json; charset=utf-8', 'Access-Control-Allow-Origin': '*' });
+      return res.end(JSON.stringify({ message: "Série introuvable" }));
+    });
+    return;
   }
 
   // CAS 9 : Guide TV EPG individuel par flux (get_short_epg & get_simple_data_table)
@@ -2904,49 +2964,6 @@ const server = http.createServer((req, res) => {
     return;
   }
 
-  function formatXtreamSeasonsList(rawData) {
-    const episodesMap = rawData.episodes || {};
-    const seasonsList = [];
-    const seasonNums = Object.keys(episodesMap).map(n => parseInt(n, 10)).filter(n => !isNaN(n)).sort((a, b) => a - b);
-
-    seasonNums.forEach(sNum => {
-      const eps = episodesMap[String(sNum)] || [];
-      if (!Array.isArray(eps) || eps.length === 0) return;
-
-      const formattedEpisodes = eps.map((ep, idx) => {
-        const epNum = ep.episode_num ? parseInt(ep.episode_num, 10) : (idx + 1);
-        const ext = ep.container_extension || 'mkv';
-        const epId = ep.id;
-        const streamUrl = `/api/stream/xtream-series?episode_id=${epId}&ext=${ext}`;
-        return {
-          episode_number: epNum,
-          title: ep.title || `Épisode ${epNum}`,
-          overview: ep.info?.plot || ep.info?.overview || '',
-          duration: ep.info?.duration || '45m',
-          video_url: streamUrl,
-          still_url: ep.info?.movie_image || rawData.info?.cover || '',
-          video: ep.info?.video || {},
-          video_codec: ep.info?.video?.codec_name || null,
-          sources: {
-            direct: streamUrl,
-            fhd: streamUrl,
-            vf: streamUrl
-          }
-        };
-      });
-
-      seasonsList.push({
-        season_number: sNum,
-        name: `Saison ${sNum}`,
-        overview: `Saison ${sNum} (${formattedEpisodes.length} épisodes)`,
-        episode_count: formattedEpisodes.length,
-        episodes: formattedEpisodes
-      });
-    });
-
-    return seasonsList;
-  }
-
   if (pathname === '/api/movies' && req.method === 'GET') {
     res.writeHead(200, { 'Content-Type': 'application/json' });
     res.end(JSON.stringify({ success: true, data: catalog.movies }));
@@ -2978,8 +2995,8 @@ const server = http.createServer((req, res) => {
 
     if (movie) {
       let finalMovie = movie;
-      // Si la série n'a pas encore de saisons complètes, tenter de les charger depuis le cache disque
-      if ((!movie.seasons || movie.seasons.length === 0) && (movie.is_xtream_series || movie.series_id || id.startsWith('xtream_series_') || id === '68628')) {
+      // Pour toute série (notamment télé-réalité comme La Villa 68628), charger les saisons les plus fraîches depuis le cache disque
+      if (movie.media_type === 'series' || movie.is_xtream_series || movie.series_id || id.startsWith('xtream_series_') || id === '68628') {
         const sId = movie.series_id || ((id === '68628') ? 6715 : id.replace('xtream_series_', ''));
         const cacheFile = path.join(__dirname, 'data', 'cache', `series_${sId}.json`);
         if (fs.existsSync(cacheFile)) {
@@ -2988,6 +3005,7 @@ const server = http.createServer((req, res) => {
             const sList = formatXtreamSeasonsList(raw);
             if (sList && sList.length > 0) {
               finalMovie = Object.assign({}, movie, { seasons: sList });
+              movie.seasons = sList;
             }
           } catch (e) {}
         }
@@ -4278,6 +4296,22 @@ const server = http.createServer((req, res) => {
     syncTeleRealiteCatalogFromXtream();
   }, 6 * 3600 * 1000);
 
+  // Auto-sync périodique toutes les 5 minutes pour les séries actives en diffusion (ex: La Villa, etc.)
+  const ACTIVE_REALITY_SHOW_IDS = [6715];
+  function syncActiveRealityShows() {
+    ACTIVE_REALITY_SHOW_IDS.forEach((sId, i) => {
+      setTimeout(() => {
+        fetchFreshSeriesFromXtream(sId, (err, fresh) => {
+          if (!err && fresh) {
+            console.log(`[Auto-Sync] Série active ${sId} synchronisée avec succès.`);
+          }
+        });
+      }, i * 3000);
+    });
+  }
+  setInterval(syncActiveRealityShows, 5 * 60 * 1000);
+  setTimeout(syncActiveRealityShows, 5000);
+
   // ================= ROUTE CATALOGUE TÉLÉ-RÉALITÉ XTREAM (/api/xtream/telerealite) =================
   // Retourne les séries de télé-réalité authentiques avec auto-actualisation
   if (pathname === '/api/xtream/telerealite' && req.method === 'GET') {
@@ -4398,31 +4432,7 @@ const server = http.createServer((req, res) => {
       return res.end(JSON.stringify(seriesObj));
     };
 
-    function fetchFreshSeriesFromXtream(onDone) {
-      const apiUrl = `http://${XTREAM_CONFIG.host}:${XTREAM_CONFIG.port}/player_api.php?username=${XTREAM_CONFIG.username}&password=${XTREAM_CONFIG.password}&action=get_series_info&series_id=${seriesId}`;
-      http.get(apiUrl, { timeout: 12000 }, (apiRes) => {
-        let data = '';
-        apiRes.on('data', chunk => data += chunk);
-        apiRes.on('end', () => {
-          try {
-            const parsed = JSON.parse(data);
-            if (parsed && (parsed.info || parsed.episodes)) {
-              fs.writeFileSync(cacheFile, JSON.stringify(parsed, null, 2), 'utf8');
-              console.log(`[Xtream Auto-Sync] Série ${seriesId} mise à jour avec les derniers épisodes.`);
-              if (onDone) onDone(null, parsed);
-            } else if (onDone) {
-              onDone(new Error('Données Xtream incomplètes'));
-            }
-          } catch (e) {
-            if (onDone) onDone(e);
-          }
-        });
-      }).on('error', (err) => {
-        if (onDone) onDone(err);
-      });
-    }
-
-    // 1. Vérification du cache disque avec politique Stale-While-Revalidate (TTL 2h)
+    // 1. Vérification du cache disque (TTL: 3 minutes)
     let cached = null;
     let isStale = false;
     if (fs.existsSync(cacheFile)) {
@@ -4430,8 +4440,7 @@ const server = http.createServer((req, res) => {
         const stats = fs.statSync(cacheFile);
         cached = JSON.parse(fs.readFileSync(cacheFile, 'utf8'));
         const age = Date.now() - stats.mtimeMs;
-        // Si le cache a plus de 2 heures ou si refresh explicite demandé
-        if (age > 2 * 3600 * 1000 || forceRefresh) {
+        if (age > 180000 || forceRefresh) {
           isStale = true;
         }
       } catch (e) {
@@ -4439,20 +4448,31 @@ const server = http.createServer((req, res) => {
       }
     }
 
+    // Si refresh forcé : tenter d'obtenir les données toutes fraîches immédiatement
+    if (forceRefresh) {
+      fetchFreshSeriesFromXtream(seriesId, (err, fresh) => {
+        if (!err && fresh) {
+          return serveSeriesData(fresh);
+        }
+        if (cached) {
+          return serveSeriesData(cached);
+        }
+        res.writeHead(502, { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' });
+        return res.end(JSON.stringify({ success: false, message: 'Erreur connexion Xtream: ' + (err?.message || 'Inconnu') }));
+      });
+      return;
+    }
+
     if (cached) {
       if (isStale) {
-        // Rafraîchissement automatique en arrière-plan sans faire attendre l'utilisateur
-        fetchFreshSeriesFromXtream((err, fresh) => {
-          if (!err && fresh) {
-            console.log(`[Xtream Auto-Sync] Nouveaux épisodes récupérés pour série ${seriesId}`);
-          }
-        });
+        // Rafraîchissement automatique en arrière-plan sans bloquer
+        fetchFreshSeriesFromXtream(seriesId);
       }
       return serveSeriesData(cached);
     }
 
     // 2. Si aucun cache disque n'existe, récupération immédiate depuis Xtream
-    fetchFreshSeriesFromXtream((err, fresh) => {
+    fetchFreshSeriesFromXtream(seriesId, (err, fresh) => {
       if (err || !fresh) {
         res.writeHead(502, { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' });
         return res.end(JSON.stringify({ success: false, message: 'Erreur connexion Xtream series info: ' + (err?.message || 'Inconnu') }));
