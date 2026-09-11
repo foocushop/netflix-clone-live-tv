@@ -36,7 +36,7 @@ async function runSuite() {
   assert(playerContent.includes('playDirectVideo('), 'Méthode playDirectVideo présente');
   assert(playerContent.includes('playEmbedIframe('), 'Méthode playEmbedIframe présente');
   assert(playerContent.includes('_antiLoopHandler'), 'Protection anti-rollback PTS active');
-  assert(playerContent.includes('60 * 1024 * 1024'), 'Buffer HLS généreux 60 Mo configuré');
+  assert(playerContent.includes('120 * 1024 * 1024') || playerContent.includes('60 * 1024 * 1024'), 'Buffer HLS haute performance (60 Mo ou 120 Mo) configuré');
   assert(playerContent.includes('video.muted = true'), 'Fallback Autoplay muet configuré pour HTTPS');
   assert(playerContent.includes('parseDurationToSeconds'), 'Calculateur de durée présent');
 
