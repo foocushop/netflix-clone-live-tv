@@ -59,8 +59,21 @@
           </div>
         </div>
       </div>
-    </div>
   </header>
+
+  <!-- ================= BARRE DE SOUS-NAVIGATION MOBILE (CATÉGORIES DÉFILANTES) ================= -->
+  <nav class="mobile-sub-nav" id="mobileSubNav">
+    <div class="mobile-sub-nav-scroll">
+      <a href="#" class="mobile-sub-pill nav-link active" data-filter="all">🍿 Tout</a>
+      <a href="#" class="mobile-sub-pill nav-link" data-filter="series">📺 Séries</a>
+      <a href="#" class="mobile-sub-pill nav-link" data-filter="movie">🎬 Films</a>
+      <a href="#" class="mobile-sub-pill nav-link" data-filter="channels"><span class="live-dot-nav">●</span> TV Direct</a>
+      <a href="#" class="mobile-sub-pill nav-link" data-filter="xtream">💎 Xtream</a>
+      <a href="#" class="mobile-sub-pill nav-link" data-filter="telerealite">🌴 Télé-Réalité</a>
+      <a href="#" class="mobile-sub-pill nav-link" data-filter="nouveautes">✨ Nouveautés</a>
+      <a href="#" class="mobile-sub-pill nav-link" data-filter="my-list">❤️ Ma Liste</a>
+    </div>
+  </nav>
 
   <!-- ================= HERO BILLBOARD ================= -->
   <section class="hero-banner" id="heroBanner">
@@ -885,6 +898,51 @@
       Netflix Clone Portfolio Project. Les marques, logos et visuels restent la propriété de leurs détenteurs respectifs.
     </p>
   </footer>
+
+  <!-- ================= BARRE DE NAVIGATION INFÉRIEURE MOBILE (STYLE APP NETFLIX) ================= -->
+  <nav class="mobile-bottom-nav" id="mobileBottomNav">
+    <a href="#" class="mobile-nav-item nav-link active" data-filter="all">
+      <div class="mobile-nav-icon">
+        <svg viewBox="0 0 24 24" width="22" height="22" fill="currentColor">
+          <path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/>
+        </svg>
+      </div>
+      <span class="mobile-nav-label">Accueil</span>
+    </a>
+    <a href="#" class="mobile-nav-item nav-link" data-filter="series">
+      <div class="mobile-nav-icon">
+        <svg viewBox="0 0 24 24" width="22" height="22" fill="currentColor">
+          <path d="M21 3H3c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h5v2h8v-2h5c1.1 0 1.99-.9 1.99-2L23 5c0-1.1-.9-2-2-2zm0 14H3V5h18v12z"/>
+        </svg>
+      </div>
+      <span class="mobile-nav-label">Séries</span>
+    </a>
+    <a href="#" class="mobile-nav-item nav-link" data-filter="movie">
+      <div class="mobile-nav-icon">
+        <svg viewBox="0 0 24 24" width="22" height="22" fill="currentColor">
+          <path d="M18 4l2 4h-3l-2-4h-2l2 4h-3l-2-4H8l2 4H7L5 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V4h-4z"/>
+        </svg>
+      </div>
+      <span class="mobile-nav-label">Films</span>
+    </a>
+    <a href="#" class="mobile-nav-item nav-link" data-filter="channels">
+      <div class="mobile-nav-icon">
+        <svg viewBox="0 0 24 24" width="22" height="22" fill="currentColor">
+          <circle cx="12" cy="12" r="3"/>
+          <path d="M4.93 4.93A10 10 0 0 0 2 12c0 2.76 1.12 5.26 2.93 7.07l1.41-1.41A8 8 0 0 1 4 12c0-2.21.9-4.21 2.34-5.66L4.93 4.93zm14.14 0l-1.41 1.41A8 8 0 0 1 20 12c0 2.21-.9 4.21-2.34 5.66l1.41 1.41A10 10 0 0 0 22 12c0-2.76-1.12-5.26-2.93-7.07z"/>
+        </svg>
+      </div>
+      <span class="mobile-nav-label">TV Direct</span>
+    </a>
+    <a href="#" class="mobile-nav-item nav-link" data-filter="xtream">
+      <div class="mobile-nav-icon">
+        <svg viewBox="0 0 24 24" width="22" height="22" fill="currentColor">
+          <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+        </svg>
+      </div>
+      <span class="mobile-nav-label">Xtream</span>
+    </a>
+  </nav>
 
   <!-- Scripts -->
   <script src="js/hls.min.js"></script>

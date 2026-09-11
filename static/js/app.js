@@ -519,6 +519,7 @@ class NetflixApp {
     }
 
     this.modalBackdrop.classList.add('active');
+    document.body.classList.add('modal-open');
   }
 
   setupModalSeasons(movie) {
@@ -619,6 +620,7 @@ class NetflixApp {
 
   closeModal() {
     this.modalBackdrop.classList.remove('active');
+    document.body.classList.remove('modal-open');
   }
 
   updateModalListButton() {
@@ -694,7 +696,13 @@ class NetflixApp {
 
   setActiveNav(filter) {
     document.querySelectorAll('.nav-link').forEach(l => {
-      l.classList.toggle('active', l.dataset.filter === filter);
+      const isActive = l.dataset.filter === filter;
+      l.classList.toggle('active', isActive);
+      if (isActive && l.classList.contains('mobile-sub-pill')) {
+        try {
+          l.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+        } catch (e) {}
+      }
     });
   }
 
