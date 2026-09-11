@@ -2384,6 +2384,7 @@ async function handlePlayerApi(req, res, q) {
         server_protocol: proto,
         rtmp_port: "8880",
         timezone: "Europe/Paris",
+        timestamp_now: Math.floor(Date.now() / 1000),
         time_now: new Date().toISOString().replace('T', ' ').substring(0, 19),
         process: true
       }
