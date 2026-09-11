@@ -2360,6 +2360,53 @@ const server = http.createServer((req, res) => {
     return;
   }
 
+  // ── GITHUB DEPLOY WEBHOOK (DÉPLOIEMENT AUTOMATIQUE À CHAQUE GIT PUSH) ──
+  if (pathname === '/api/webhook/github' && (req.method === 'POST' || req.method === 'GET')) {
+    const WEBHOOK_SECRET = 'ZiablosurYoutubeDeployKey2026';
+    const providedSecret = req.headers['x-webhook-secret'] || parsedUrl.query.secret;
+    const githubSignature = req.headers['x-hub-signature-256'];
+
+    let bodyData = '';
+    req.on('data', chunk => { bodyData += chunk; });
+    req.on('end', () => {
+      let isAuthorized = false;
+      if (providedSecret === WEBHOOK_SECRET) {
+        isAuthorized = true;
+      } else if (githubSignature) {
+        try {
+          const crypto = require('crypto');
+          const hmac = crypto.createHmac('sha256', WEBHOOK_SECRET);
+          const expectedSig = 'sha256=' + hmac.update(bodyData).digest('hex');
+          if (crypto.timingSafeEqual(Buffer.from(githubSignature), Buffer.from(expectedSig))) {
+            isAuthorized = true;
+          }
+        } catch (e) {}
+      }
+
+      if (!isAuthorized) {
+        res.writeHead(401, { 'Content-Type': 'application/json' });
+        return res.end(JSON.stringify({ success: false, error: 'Unauthorized webhook request' }));
+      }
+
+      // Répondre immédiatement 200 OK à GitHub
+      res.writeHead(200, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ success: true, message: 'Deployment triggered successfully' }));
+
+      // Déclencher le déploiement en arrière-plan
+      const { exec } = require('child_process');
+      const deployCmd = 'cd /var/www/netflix-clone && git reset --hard HEAD && git pull origin main && npm install --omit=dev && (nginx -t && systemctl reload nginx) && (pm2 reload netflix-clone --update-env || pm2 restart netflix-clone)';
+      console.log('🚀 [WEBHOOK] Push GitHub reçu ! Déploiement automatique en cours...');
+      exec(deployCmd, (err, stdout, stderr) => {
+        if (err) {
+          console.error('❌ [WEBHOOK] Erreur lors du déploiement:', err.message, stderr);
+        } else {
+          console.log('✅ [WEBHOOK] Déploiement terminé avec succès !\n', stdout);
+        }
+      });
+    });
+    return;
+  }
+
   // ── HEALTHCHECK / PING KEEP-ALIVE RAPIDE (ANTI-VEILLE RENDER) ──
   if (pathname === '/api/ping' || pathname === '/api/health' || pathname === '/ping' || pathname === '/healthz') {
     res.writeHead(200, {
