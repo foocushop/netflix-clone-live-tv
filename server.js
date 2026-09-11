@@ -2813,16 +2813,8 @@ const server = http.createServer((req, res) => {
     return res.end(m3u);
   }
 
-  // ── ROUTE GUIDE TV EPG UNIVERSEL (/xmltv.php) ──
-  if (pathname === '/xmltv.php' && (req.method === 'GET' || req.method === 'HEAD')) {
-    const q = parsedUrl.query || {};
-    const username = q.username;
-    const password = q.password;
-    if (!username || !password || !authenticateXtreamClient(username, password)) {
-      res.writeHead(403, { 'Content-Type': 'text/plain; charset=utf-8', 'Access-Control-Allow-Origin': '*' });
-      return res.end('Accès refusé : Identifiants XMLTV incorrects');
-    }
-
+  // ── ROUTE GUIDE TV EPG UNIVERSEL (/xmltv.php & /epg.php) ──
+  if ((pathname === '/xmltv.php' || pathname === '/epg.php') && (req.method === 'GET' || req.method === 'HEAD')) {
     serveXmltvEpg(req, res);
     return;
   }
