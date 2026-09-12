@@ -10,6 +10,9 @@
 </head>
 <body>
 
+  <!-- ================= APPLICATION PRINCIPALE ZIFLIX (PAGE TAMPON SÉCURISÉE) ================= -->
+  <div id="ziflixApp" class="ziflix-app-root" style="display: none;">
+
   <!-- ================= HEADER / NAVBAR ================= -->
   <header class="netflix-header">
     <div class="header-left">
@@ -971,6 +974,7 @@
       <button class="modal-close-btn" id="closeAdminModalBtn" style="top: 15px; right: 15px;">✕</button>
     </div>
   </div>
+  </div><!-- /#ziflixApp -->
 
   <!-- Conteneur de notifications Toast -->
   <div class="toast-container" id="toastContainer"></div>
@@ -1021,7 +1025,7 @@
           <label for="regUsername">Pseudo choisi</label>
           <div class="auth-input-wrap">
             <span class="auth-input-icon">👤</span>
-            <input type="text" id="regUsername" class="auth-input" placeholder="Ex: Alex, Cinephile99..." maxlength="25" autocomplete="username" required>
+            <input type="text" id="regUsername" class="auth-input" placeholder="Ex: Alex, Cinephile99..." minlength="3" maxlength="30" autocomplete="username" required>
           </div>
         </div>
 
@@ -1029,13 +1033,13 @@
           <label for="regPassword">Mot de passe</label>
           <div class="auth-input-wrap">
             <span class="auth-input-icon">🔒</span>
-            <input type="password" id="regPassword" class="auth-input" placeholder="Créez un mot de passe" autocomplete="new-password" required>
+            <input type="password" id="regPassword" class="auth-input" placeholder="Créez un mot de passe (min. 3 car.)" minlength="3" autocomplete="new-password" required>
             <button type="button" class="auth-eye-btn" data-target="regPassword">👁️</button>
           </div>
         </div>
 
         <div class="auth-form-group">
-          <label style="display: block; margin-bottom: 8px;">Choisissez votre avatar ZIFLIX :</label>
+          <label style="display: block; margin-bottom: 6px; font-weight: 600;">Choisissez votre avatar ZIFLIX :</label>
           <div class="avatar-selection-grid" id="regAvatarGrid">
             <!-- 10 avatars injectés dynamiquement -->
           </div>

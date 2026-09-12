@@ -2635,6 +2635,10 @@ function getAuthUser(req) {
     const parsed = url.parse(req.url, true);
     token = parsed.query.auth_token || parsed.query.token || '';
   }
+  if (!token && req.headers.cookie) {
+    const match = req.headers.cookie.match(/(?:^|;\s*)ziflix_session=([^;]+)/);
+    if (match) token = decodeURIComponent(match[1]);
+  }
   if (!token) return null;
   const session = ZIFLIX_SESSIONS.get(token);
   if (!session) return null;
@@ -3098,6 +3102,12 @@ const server = http.createServer((req, res) => {
 
   // ================= API REST =================
   if (pathname === '/api/catalog' && req.method === 'GET') {
+    const authUser = getAuthUser(req);
+    if (!authUser || authUser.is_banned) {
+      res.writeHead(401, { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' });
+      return res.end(JSON.stringify({ success: false, error: 'Accès réservé aux membres ZIFLIX. Veuillez vous connecter.' }));
+    }
+
     if (!cachedCatalogBuffer) {
       const hero = catalog.movies.find(m => m.is_hero) || catalog.movies[0];
       const rows = catalog.categories.map(cat => {
@@ -3145,12 +3155,22 @@ const server = http.createServer((req, res) => {
   }
 
   if (pathname === '/api/movies' && req.method === 'GET') {
+    const authUser = getAuthUser(req);
+    if (!authUser || authUser.is_banned) {
+      res.writeHead(401, { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' });
+      return res.end(JSON.stringify({ success: false, error: 'Accès réservé aux membres ZIFLIX.' }));
+    }
     res.writeHead(200, { 'Content-Type': 'application/json' });
     res.end(JSON.stringify({ success: true, data: catalog.movies }));
     return;
   }
 
   if (pathname.startsWith('/api/movies/') && !pathname.endsWith('/hero') && req.method === 'GET') {
+    const authUser = getAuthUser(req);
+    if (!authUser || authUser.is_banned) {
+      res.writeHead(401, { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' });
+      return res.end(JSON.stringify({ success: false, error: 'Accès réservé aux membres ZIFLIX.' }));
+    }
     const id = pathname.replace('/api/movies/', '');
     let movie = catalog.movies.find(m => m.id === id);
     if (!movie && id.startsWith('xtream_series_')) {
@@ -3203,6 +3223,11 @@ const server = http.createServer((req, res) => {
   // ================= ROUTE RECHERCHE GLOBALE MULTI-CATALOGUES (/api/search) =================
   // Recherche instantanée sur les 1 702 médias de la plateforme (Films, Séries, Télé-Réalités, Chaînes Live)
   if (pathname === '/api/search' && req.method === 'GET') {
+    const authUser = getAuthUser(req);
+    if (!authUser || authUser.is_banned) {
+      res.writeHead(401, { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' });
+      return res.end(JSON.stringify({ success: false, error: 'Accès réservé aux membres ZIFLIX.' }));
+    }
     const rawQ = (parsedUrl.query.q || '').toString().toLowerCase().trim();
     if (!rawQ) {
       return sendResponse(req, res, 200, 'application/json', JSON.stringify({ success: true, data: [] }), {}, 60);
@@ -3389,7 +3414,12 @@ const server = http.createServer((req, res) => {
         ZIFLIX_SESSIONS.set(token, sessionData);
         saveZiflixSessions();
 
-        res.writeHead(200, { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' });
+        const cookieStr = `ziflix_session=${token}; Path=/; Max-Age=${30 * 24 * 3600}; SameSite=Lax`;
+        res.writeHead(200, {
+          'Content-Type': 'application/json',
+          'Set-Cookie': cookieStr,
+          'Access-Control-Allow-Origin': '*'
+        });
         return res.end(JSON.stringify({
           success: true,
           token,
@@ -3456,7 +3486,12 @@ const server = http.createServer((req, res) => {
         ZIFLIX_SESSIONS.set(token, sessionData);
         saveZiflixSessions();
 
-        res.writeHead(200, { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' });
+        const cookieStr = `ziflix_session=${token}; Path=/; Max-Age=${30 * 24 * 3600}; SameSite=Lax`;
+        res.writeHead(200, {
+          'Content-Type': 'application/json',
+          'Set-Cookie': cookieStr,
+          'Access-Control-Allow-Origin': '*'
+        });
         return res.end(JSON.stringify({
           success: true,
           token,
@@ -3568,15 +3603,23 @@ const server = http.createServer((req, res) => {
     return;
   }
 
-  if (pathname === '/api/auth/logout' && req.method === 'POST') {
+  if (pathname === '/api/auth/logout') {
     const authHeader = req.headers['authorization'] || '';
-    const token = authHeader.replace(/^Bearer\s+/i, '').trim();
+    let token = authHeader.replace(/^Bearer\s+/i, '').trim();
+    if (!token && req.headers.cookie) {
+      const match = req.headers.cookie.match(/(?:^|;\s*)ziflix_session=([^;]+)/);
+      if (match) token = decodeURIComponent(match[1]);
+    }
     if (token) {
       ZIFLIX_SESSIONS.delete(token);
       saveZiflixSessions();
     }
-    res.writeHead(200, { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' });
-    return res.end(JSON.stringify({ success: true }));
+    res.writeHead(200, {
+      'Content-Type': 'application/json',
+      'Set-Cookie': 'ziflix_session=; Path=/; Max-Age=0; SameSite=Lax',
+      'Access-Control-Allow-Origin': '*'
+    });
+    return res.end(JSON.stringify({ success: true, message: 'Déconnexion réussie' }));
   }
 
   // ================= SYSTÈME DE COMMENTAIRES ZIFLIX =================
@@ -4435,6 +4478,11 @@ const server = http.createServer((req, res) => {
 
   // ================= ROUTE EXTRACTION DIRECTE HLS (/api/extract) =================
   if (pathname === '/api/extract' && req.method === 'GET') {
+    const authUser = getAuthUser(req);
+    if (!authUser || authUser.is_banned) {
+      res.writeHead(401, { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' });
+      return res.end(JSON.stringify({ success: false, message: 'Accès réservé aux membres ZIFLIX.' }));
+    }
     let id = parsedUrl.query.id;
     let type = parsedUrl.query.type || 'movie';
     let season = parseInt(parsedUrl.query.season) || 1;
@@ -4698,6 +4746,11 @@ const server = http.createServer((req, res) => {
 
   // ================= ROUTE DIRECT LIVE STREAM HLS PROXY (/api/stream/live) =================
   if (pathname === '/api/stream/live' && req.method === 'GET') {
+    const authUser = getAuthUser(req);
+    if (!authUser || authUser.is_banned) {
+      res.writeHead(401, { 'Content-Type': 'text/plain; charset=utf-8', 'Access-Control-Allow-Origin': '*' });
+      return res.end('Accès refusé : Authentification ZIFLIX requise');
+    }
     const channelId = parsedUrl.query.channel;
     const track = parsedUrl.query.track;
     const mirror = parsedUrl.query.mirror || 'premium_vip';
@@ -4804,6 +4857,11 @@ const server = http.createServer((req, res) => {
   // ================= ROUTE RECHERCHE & CATALOGUE COMPLET XTREAM (/api/xtream/channels) =================
   // Retourne les 1 268 chaînes françaises avec recherche instantanée et filtres par catégories/qualités
   if (pathname === '/api/xtream/channels' && req.method === 'GET') {
+    const authUser = getAuthUser(req);
+    if (!authUser || authUser.is_banned) {
+      res.writeHead(401, { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' });
+      return res.end(JSON.stringify({ success: false, error: 'Accès réservé aux membres ZIFLIX.' }));
+    }
     const q = (parsedUrl.query.q || '').toString().toLowerCase().trim();
     const category = (parsedUrl.query.category || '').toString().toLowerCase().trim();
     const quality = (parsedUrl.query.quality || '').toString().toLowerCase().trim();
@@ -4942,6 +5000,11 @@ const server = http.createServer((req, res) => {
   // ================= ROUTE CATALOGUE TÉLÉ-RÉALITÉ XTREAM (/api/xtream/telerealite) =================
   // Retourne les séries de télé-réalité authentiques avec auto-actualisation
   if (pathname === '/api/xtream/telerealite' && req.method === 'GET') {
+    const authUser = getAuthUser(req);
+    if (!authUser || authUser.is_banned) {
+      res.writeHead(401, { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' });
+      return res.end(JSON.stringify({ success: false, error: 'Accès réservé aux membres ZIFLIX.' }));
+    }
     const q = (parsedUrl.query.q || '').toString().toLowerCase().trim();
     const limit = parseInt(parsedUrl.query.limit, 10) || 300;
     const forceRefresh = (parsedUrl.query.refresh === '1' || parsedUrl.query.refresh === 'true');
@@ -4979,6 +5042,11 @@ const server = http.createServer((req, res) => {
   // ================= ROUTE DÉTAILS SÉRIE XTREAM (/api/xtream/series-info) =================
   // Renvoie les vraies saisons et les vrais épisodes avec auto-actualisation Stale-While-Revalidate (TTL: 2h)
   if (pathname === '/api/xtream/series-info' && req.method === 'GET') {
+    const authUser = getAuthUser(req);
+    if (!authUser || authUser.is_banned) {
+      res.writeHead(401, { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' });
+      return res.end(JSON.stringify({ success: false, message: 'Accès réservé aux membres ZIFLIX.' }));
+    }
     const seriesId = parsedUrl.query.series_id || parsedUrl.query.id;
     const forceRefresh = (parsedUrl.query.refresh === '1' || parsedUrl.query.refresh === 'true');
 
@@ -5117,6 +5185,11 @@ const server = http.createServer((req, res) => {
   // 4. Réécriture dynamique des segments HLS (.ts) vers le proxy local /api/stream/xtream-chunk
   // 5. Élimination des erreurs Mixed-Content (HTTP -> HTTPS) et contournement CORS total
   if (pathname === '/api/stream/xtream' && req.method === 'GET') {
+    const authUser = getAuthUser(req);
+    if (!authUser || authUser.is_banned) {
+      res.writeHead(401, { 'Content-Type': 'text/plain; charset=utf-8', 'Access-Control-Allow-Origin': '*' });
+      return res.end('Accès refusé : Session ZIFLIX requise');
+    }
     const rawChannel = (parsedUrl.query.channel || '').toString().toLowerCase().trim();
     let streamId = parsedUrl.query.stream_id
       || XTREAM_CHANNELS[rawChannel] 
@@ -5499,6 +5572,11 @@ const server = http.createServer((req, res) => {
   // Support complet des requêtes HTTP Range (206 Partial Content), mise en cache Edge 0ms,
   // pool Keep-Alive persistant et débit maximal anti-buffering
   if (pathname === '/api/stream/xtream-series' && req.method === 'GET') {
+    const authUser = getAuthUser(req);
+    if (!authUser || authUser.is_banned) {
+      res.writeHead(401, { 'Content-Type': 'text/plain; charset=utf-8', 'Access-Control-Allow-Origin': '*' });
+      return res.end('Accès refusé : Session ZIFLIX requise');
+    }
     const episodeId = parsedUrl.query.episode_id;
     const ext = parsedUrl.query.ext || 'mkv';
 
@@ -5708,6 +5786,11 @@ const server = http.createServer((req, res) => {
   // ================= ROUTE DAILYMOTION STABLE (/api/stream/dm) =================
   // Génère des tokens frais à chaque requête → jamais d'expiration côté client
   if (pathname === '/api/stream/dm' && req.method === 'GET') {
+    const authUser = getAuthUser(req);
+    if (!authUser || authUser.is_banned) {
+      res.writeHead(401, { 'Content-Type': 'text/plain; charset=utf-8', 'Access-Control-Allow-Origin': '*' });
+      return res.end('Accès refusé : Session ZIFLIX requise');
+    }
     const videoId = parsedUrl.query.video;
     if (!videoId) {
       res.writeHead(400, { 'Content-Type': 'text/plain' });
@@ -5736,6 +5819,11 @@ const server = http.createServer((req, res) => {
 
   // ================= ROUTE PROXY STREAMING HLS (/api/stream/proxy) =================
   if (pathname === '/api/stream/proxy' && req.method === 'GET') {
+    const authUser = getAuthUser(req);
+    if (!authUser || authUser.is_banned) {
+      res.writeHead(401, { 'Content-Type': 'text/plain; charset=utf-8', 'Access-Control-Allow-Origin': '*' });
+      return res.end('Accès refusé : Session ZIFLIX requise');
+    }
     const targetUrl = parsedUrl.query.url;
     if (!targetUrl) {
       res.writeHead(400, { 'Content-Type': 'text/plain' });
@@ -5906,6 +5994,11 @@ const server = http.createServer((req, res) => {
 
   // ================= ROUTE STREAMING DÉDIÉE (/api/stream/:id) =================
   if (pathname.startsWith('/api/stream/') && req.method === 'GET') {
+    const authUser = getAuthUser(req);
+    if (!authUser || authUser.is_banned) {
+      res.writeHead(401, { 'Content-Type': 'text/plain; charset=utf-8', 'Access-Control-Allow-Origin': '*' });
+      return res.end('Accès refusé : Session ZIFLIX requise');
+    }
     const id = pathname.replace('/api/stream/', '');
     const movie = catalog.movies.find(m => m.id === id || m.tmdb_id === id);
     if (!movie) {

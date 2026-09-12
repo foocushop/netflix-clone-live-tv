@@ -4,7 +4,7 @@ const conn = new Client();
 
 const cmds = [
   'cd /var/www/netflix-clone',
-  'git status',
+  'git checkout -- package-lock.json',
   'git pull origin main',
   'node --check server.js',
   'node --check static/js/app.js',
@@ -15,8 +15,10 @@ const cmds = [
   'pm2 status',
   'echo "--- HEALTH CHECK ---"',
   'curl -s -o /dev/null -w "ROOT_HTTP: %{http_code}\n" http://127.0.0.1:8080/',
+  'curl -s -o /dev/null -w "PING_HTTP: %{http_code}\n" http://127.0.0.1:8080/api/ping',
   'curl -s -o /dev/null -w "LOGO_HTTP: %{http_code}\n" http://127.0.0.1:8080/assets/logos/ziflix-logo.svg',
-  'curl -s -o /dev/null -w "CATALOG_HTTP: %{http_code}\n" http://127.0.0.1:8080/api/catalog',
+  'curl -s -o /dev/null -w "UNAUTH_CATALOG_HTTP: %{http_code}\n" http://127.0.0.1:8080/api/catalog',
+  'curl -s -o /dev/null -w "UNAUTH_STREAM_HTTP: %{http_code}\n" http://127.0.0.1:8080/api/stream/xtream-series?episode_id=9999',
   'echo "--- PM2 LOGS (tail 25) ---"',
   'pm2 logs netflix-clone --lines 25 --nostream'
 ].join(' && ');

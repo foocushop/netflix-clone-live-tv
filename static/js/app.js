@@ -26,7 +26,16 @@ class NetflixApp {
     this.initEvents();
     this.initAuthEvents();
     this.checkAuth();
-    this.loadCatalog();
+  }
+
+  getAuthHeaders(extra = {}) {
+    const token = localStorage.getItem('ziflix_auth_token');
+    const headers = Object.assign({}, extra);
+    if (token) {
+      headers['Authorization'] = `Bearer ${token}`;
+      headers['x-auth-token'] = token;
+    }
+    return headers;
   }
 
   pauseBackgroundTasks() {
@@ -325,7 +334,14 @@ class NetflixApp {
   async loadCatalog() {
     try {
       const baseUrl = window.API_BASE || '';
-      const res = await fetch(`${baseUrl}/api/catalog?_t=${Date.now()}`);
+      const res = await fetch(`${baseUrl}/api/catalog?_t=${Date.now()}`, {
+        headers: this.getAuthHeaders(),
+        credentials: 'include'
+      });
+      if (res.status === 401) {
+        this.handleLogout();
+        return;
+      }
       const json = await res.json();
       if (json.success && json.data) {
         this.catalogData = json.data;
@@ -621,7 +637,7 @@ class NetflixApp {
       const baseUrl = window.API_BASE || '';
       const sId = movie.series_id || (String(movie.id).startsWith('xtream_series_') ? String(movie.id).replace('xtream_series_', '') : ((String(movie.id) === '68628' || String(movie.tmdb_id) === '68628') ? 6715 : null));
       const endpoint = sId ? `${baseUrl}/api/xtream/series-info?series_id=${sId}&refresh=1` : `${baseUrl}/api/movies/${encodeURIComponent(movie.id)}`;
-      fetch(endpoint)
+      fetch(endpoint, { headers: this.getAuthHeaders(), credentials: 'include' })
         .then(res => res.json())
         .then(res => {
           const freshSeasons = res.seasons || (res.data && res.data.seasons);
@@ -807,7 +823,10 @@ class NetflixApp {
   async performSearch(query) {
     try {
       const baseUrl = window.API_BASE || '';
-      const res = await fetch(`${baseUrl}/api/search?q=${encodeURIComponent(query)}`);
+      const res = await fetch(`${baseUrl}/api/search?q=${encodeURIComponent(query)}`, {
+        headers: this.getAuthHeaders(),
+        credentials: 'include'
+      });
       const json = await res.json();
       if (json.success && json.data) {
         this.catalogRowsContainer.innerHTML = '';
@@ -1134,7 +1153,10 @@ class NetflixApp {
     if (!this.xtreamChannels) {
       try {
         const baseUrl = window.API_BASE || '';
-        const res = await fetch(`${baseUrl}/api/xtream/channels?limit=1500`);
+        const res = await fetch(`${baseUrl}/api/xtream/channels?limit=1500`, {
+          headers: this.getAuthHeaders(),
+          credentials: 'include'
+        });
         const json = await res.json();
         if (json.success && json.data) {
           this.xtreamChannels = json.data;
@@ -1367,7 +1389,10 @@ class NetflixApp {
   prefetchTeleRealiteSeries(seriesId) {
     if (!seriesId || this.telerealiteSeriesCache.has(seriesId)) return;
     const baseUrl = window.API_BASE || '';
-    fetch(`${baseUrl}/api/xtream/series-info?series_id=${seriesId}`)
+    fetch(`${baseUrl}/api/xtream/series-info?series_id=${seriesId}`, {
+      headers: this.getAuthHeaders(),
+      credentials: 'include'
+    })
       .then(res => res.json())
       .then(seriesObj => {
         if (seriesObj.success && seriesObj.seasons) {
@@ -1465,7 +1490,10 @@ class NetflixApp {
 
     try {
       const baseUrl = window.API_BASE || '';
-      const res = await fetch(`${baseUrl}/api/xtream/series-info?series_id=${show.series_id}`);
+      const res = await fetch(`${baseUrl}/api/xtream/series-info?series_id=${show.series_id}`, {
+        headers: this.getAuthHeaders(),
+        credentials: 'include'
+      });
       const seriesObj = await res.json();
 
       if (!seriesObj.success || !seriesObj.seasons || seriesObj.seasons.length === 0) {
@@ -1522,7 +1550,10 @@ class NetflixApp {
       if (!this.telerealiteShows) {
         try {
           const baseUrl = window.API_BASE || '';
-          const res = await fetch(`${baseUrl}/api/xtream/telerealite?limit=300`);
+          const res = await fetch(`${baseUrl}/api/xtream/telerealite?limit=300`, {
+            headers: this.getAuthHeaders(),
+            credentials: 'include'
+          });
           const json = await res.json();
           if (json.success && json.data) {
             this.telerealiteShows = json.data;
@@ -1684,7 +1715,10 @@ class NetflixApp {
 
   // ================= 12. GESTION DU PROFIL & AUTHENTIFICATION OBLIGATOIRE ZIFLIX =================
   initAuthElements() {
+    this.ziflixApp = document.getElementById('ziflixApp');
     this.authGateModal = document.getElementById('authGateModal');
+    this.authGateTitle = document.getElementById('authGateTitle');
+    this.authGateSubtitle = document.getElementById('authGateSubtitle');
     this.tabLoginBtn = document.getElementById('tabLoginBtn');
     this.tabRegisterBtn = document.getElementById('tabRegisterBtn');
     this.loginForm = document.getElementById('loginForm');
@@ -1708,6 +1742,8 @@ class NetflixApp {
         if (this.loginForm) this.loginForm.classList.remove('hidden');
         if (this.registerForm) this.registerForm.classList.add('hidden');
         if (this.loginError) this.loginError.classList.add('hidden');
+        if (this.authGateTitle) this.authGateTitle.textContent = 'Bienvenue sur ZIFLIX';
+        if (this.authGateSubtitle) this.authGateSubtitle.textContent = 'Connectez-vous ou créez votre profil pour accéder aux films et séries';
       });
 
       this.tabRegisterBtn.addEventListener('click', () => {
@@ -1716,6 +1752,8 @@ class NetflixApp {
         if (this.registerForm) this.registerForm.classList.remove('hidden');
         if (this.loginForm) this.loginForm.classList.add('hidden');
         if (this.registerError) this.registerError.classList.add('hidden');
+        if (this.authGateTitle) this.authGateTitle.textContent = 'Créer mon profil ZIFLIX';
+        if (this.authGateSubtitle) this.authGateSubtitle.textContent = 'Choisissez votre pseudo et votre avatar exclusif';
       });
     }
 
@@ -1791,26 +1829,40 @@ class NetflixApp {
     this.renderAvatarSelectionGrids();
 
     if (!token) {
-      if (this.authGateModal) this.authGateModal.classList.remove('hidden');
+      this.showAuthGate();
       return;
     }
 
     try {
       const baseUrl = window.API_BASE || '';
       const res = await fetch(`${baseUrl}/api/auth/me`, {
-        headers: { 'Authorization': `Bearer ${token}` }
+        headers: this.getAuthHeaders(),
+        credentials: 'include'
       });
       const json = await res.json();
       if (json.success && json.user) {
         this.setCurrentUser(json.user);
-        if (this.authGateModal) this.authGateModal.classList.add('hidden');
+        this.unlockApp();
       } else {
         localStorage.removeItem('ziflix_auth_token');
-        if (this.authGateModal) this.authGateModal.classList.remove('hidden');
+        this.showAuthGate();
       }
     } catch (e) {
-      if (this.authGateModal) this.authGateModal.classList.remove('hidden');
+      this.showAuthGate();
     }
+  }
+
+  unlockApp() {
+    if (this.authGateModal) this.authGateModal.classList.add('hidden');
+    if (this.ziflixApp) this.ziflixApp.style.display = 'block';
+    if (!this.catalogData) {
+      this.loadCatalog();
+    }
+  }
+
+  showAuthGate() {
+    if (this.ziflixApp) this.ziflixApp.style.display = 'none';
+    if (this.authGateModal) this.authGateModal.classList.remove('hidden');
   }
 
   setCurrentUser(user) {
@@ -1858,7 +1910,7 @@ class NetflixApp {
       if (json.success && json.token && json.user) {
         localStorage.setItem('ziflix_auth_token', json.token);
         this.setCurrentUser(json.user);
-        if (this.authGateModal) this.authGateModal.classList.add('hidden');
+        this.unlockApp();
         this.showToast(`✨ Bienvenue ${json.user.username} sur ZIFLIX !`);
       } else {
         if (this.loginError) {
@@ -1912,7 +1964,7 @@ class NetflixApp {
       if (json.success && json.token && json.user) {
         localStorage.setItem('ziflix_auth_token', json.token);
         this.setCurrentUser(json.user);
-        if (this.authGateModal) this.authGateModal.classList.add('hidden');
+        this.unlockApp();
         this.showToast(`🎉 Profil ZIFLIX créé ! Bon visionnage ${json.user.username} !`);
       } else {
         if (this.registerError) {
@@ -1940,13 +1992,16 @@ class NetflixApp {
         const baseUrl = window.API_BASE || '';
         await fetch(`${baseUrl}/api/auth/logout`, {
           method: 'POST',
-          headers: { 'Authorization': `Bearer ${token}` }
+          headers: this.getAuthHeaders(),
+          credentials: 'include'
         });
       } catch (e) {}
     }
     localStorage.removeItem('ziflix_auth_token');
     this.currentUser = null;
-    if (this.authGateModal) this.authGateModal.classList.remove('hidden');
+    this.catalogData = null;
+    if (this.catalogRowsContainer) this.catalogRowsContainer.innerHTML = '';
+    this.showAuthGate();
     this.showToast('Vous avez été déconnecté.');
   }
 
@@ -2023,7 +2078,10 @@ class NetflixApp {
 
     try {
       const baseUrl = window.API_BASE || '';
-      const res = await fetch(`${baseUrl}/api/comments?mediaId=${encodeURIComponent(mediaId)}`);
+      const res = await fetch(`${baseUrl}/api/comments?mediaId=${encodeURIComponent(mediaId)}`, {
+        headers: this.getAuthHeaders(),
+        credentials: 'include'
+      });
       const json = await res.json();
       if (json.success && Array.isArray(json.comments)) {
         if (countEl) countEl.textContent = json.comments.length;

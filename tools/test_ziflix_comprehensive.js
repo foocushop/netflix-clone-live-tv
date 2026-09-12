@@ -51,7 +51,7 @@ async function runTests() {
     const interval = setInterval(async () => {
       attempts++;
       try {
-        const res = await request({ host: '127.0.0.1', port: TEST_PORT, path: '/api/catalog', method: 'GET' });
+        const res = await request({ host: '127.0.0.1', port: TEST_PORT, path: '/api/ping', method: 'GET' });
         if (res.status === 200) {
           clearInterval(interval);
           resolve();
@@ -247,10 +247,19 @@ async function runTests() {
     }, { userId: testUserId, role: 'admin' });
     assert(roleRes.status === 200 && roleRes.body.user.role === 'admin', 'User role promoted to admin');
 
-    // TEST 10: Catalog endpoint check & Top Regardés Row 1
-    console.log('\n[TEST 10] Testing Catalog API (/api/catalog)');
-    const catRes = await request({ host: '127.0.0.1', port: TEST_PORT, path: '/api/catalog', method: 'GET' });
-    assert(catRes.body && catRes.body.success && catRes.body.data && Array.isArray(catRes.body.data.rows), 'Catalog payload has valid success and rows');
+    // TEST 10: Catalog & Stream Auth Protection (Page Tampon Architecture)
+    console.log('\n[TEST 10] Testing Page Tampon Auth Protection & Catalog API');
+    const unauthCatRes = await request({ host: '127.0.0.1', port: TEST_PORT, path: '/api/catalog', method: 'GET' });
+    assert(unauthCatRes.status === 401, 'Unauthenticated /api/catalog is blocked with 401 Unauthorized');
+
+    const unauthStreamRes = await request({ host: '127.0.0.1', port: TEST_PORT, path: '/api/stream/xtream-series?episode_id=9999', method: 'GET' });
+    assert(unauthStreamRes.status === 401, 'Unauthenticated stream endpoint is blocked with 401 Unauthorized');
+
+    const catRes = await request({
+      host: '127.0.0.1', port: TEST_PORT, path: '/api/catalog', method: 'GET',
+      headers: { 'Authorization': `Bearer ${userToken}` }
+    });
+    assert(catRes.status === 200 && catRes.body && catRes.body.success && catRes.body.data && Array.isArray(catRes.body.data.rows), 'Authenticated /api/catalog returns 200 OK with valid data and rows');
     const firstRow = catRes.body.data.rows[0];
     assert(firstRow && firstRow.category.slug === 'top-regardes', 'Row 1 is "🔥 Nouveautés & Les Plus Regardés"');
     assert(firstRow.movies.length > 0, `Row 1 contains ${firstRow.movies.length} top movies`);

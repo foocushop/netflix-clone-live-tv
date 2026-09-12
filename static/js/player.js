@@ -249,6 +249,16 @@ class NetflixPlayer {
     }
   }
 
+  getAuthHeaders(extra = {}) {
+    const token = localStorage.getItem('ziflix_auth_token');
+    const headers = { ...extra };
+    if (token) {
+      headers['Authorization'] = `Bearer ${token}`;
+      headers['x-auth-token'] = token;
+    }
+    return headers;
+  }
+
   // ================= COMMENTAIRES EN DIRECT DANS LE LECTEUR =================
   initCommentsEvents() {
     if (this.commentsToggleBtn && this.commentsDrawer) {
@@ -286,7 +296,10 @@ class NetflixPlayer {
     const mediaId = this.currentMovie.id || this.currentMovie.series_id || 'stream';
     try {
       const baseUrl = window.API_BASE || '';
-      const res = await fetch(`${baseUrl}/api/comments?mediaId=${encodeURIComponent(mediaId)}`);
+      const res = await fetch(`${baseUrl}/api/comments?mediaId=${encodeURIComponent(mediaId)}`, {
+        headers: this.getAuthHeaders(),
+        credentials: 'include'
+      });
       const json = await res.json();
       if (json.success && Array.isArray(json.comments)) {
         if (json.comments.length === 0) {
@@ -328,10 +341,8 @@ class NetflixPlayer {
       const baseUrl = window.API_BASE || '';
       const res = await fetch(`${baseUrl}/api/comments`, {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
-        },
+        headers: this.getAuthHeaders({ 'Content-Type': 'application/json' }),
+        credentials: 'include',
         body: JSON.stringify({ mediaId, text })
       });
       const json = await res.json();
@@ -971,7 +982,10 @@ class NetflixPlayer {
       this.setStep(1, 'active', `1. Récupération des saisons et épisodes Xtream VIP (${movie.title})...`);
       try {
         const baseUrl = window.API_BASE || '';
-        const r = await fetch(`${baseUrl}/api/xtream/series-info?series_id=${sId}`);
+        const r = await fetch(`${baseUrl}/api/xtream/series-info?series_id=${sId}`, {
+          headers: this.getAuthHeaders(),
+          credentials: 'include'
+        });
         const fresh = await r.json();
         if (fresh?.seasons?.length > 0) {
           movie.seasons = fresh.seasons;
@@ -1248,11 +1262,19 @@ class NetflixPlayer {
       const seriesIdParam = this.currentMovie.series_id ? `&series_id=${encodeURIComponent(this.currentMovie.series_id)}` : '';
       const titleParam = this.currentMovie.title ? `&title=${encodeURIComponent(this.currentMovie.title)}` : '';
       const url = `${baseUrl}/api/extract?id=${encodeURIComponent(id)}&type=${mediaType}&season=${s}&episode=${e}&server=1&lang=vf&fallback=1${seriesIdParam}${titleParam}`;
-      const res = await fetch(url, { signal: abortController.signal });
+      const res = await fetch(url, {
+        signal: abortController.signal,
+        headers: this.getAuthHeaders(),
+        credentials: 'include'
+      });
       const data = await res.json();
 
       if (!data.success && data.needsSeriesInfo && data.series_id) {
-        const siRes = await fetch(`${baseUrl}/api/xtream/series-info?series_id=${data.series_id}`, { signal: abortController.signal });
+        const siRes = await fetch(`${baseUrl}/api/xtream/series-info?series_id=${data.series_id}`, {
+          signal: abortController.signal,
+          headers: this.getAuthHeaders(),
+          credentials: 'include'
+        });
         const siData = await siRes.json();
         if (siData?.seasons?.length > 0) {
           this.currentMovie.seasons = siData.seasons;
@@ -1302,6 +1324,12 @@ class NetflixPlayer {
   playDirectHls(streamUrl) {
     const baseUrl = window.API_BASE || '';
     if (streamUrl && streamUrl.startsWith('/')) streamUrl = baseUrl + streamUrl;
+
+    const authToken = localStorage.getItem('ziflix_auth_token');
+    if (authToken && streamUrl && (streamUrl.includes('/api/stream/') || streamUrl.startsWith(baseUrl)) && !streamUrl.includes('auth_token=')) {
+      const sep = streamUrl.includes('?') ? '&' : '?';
+      streamUrl = `${streamUrl}${sep}auth_token=${encodeURIComponent(authToken)}`;
+    }
 
     this.cleanupActivePlayback();
     this.streamAbortController = new AbortController();
@@ -1426,6 +1454,16 @@ class NetflixPlayer {
         fragLoadingMaxRetry: 4,
         fragLoadingRetryDelay: 500,
         abrEwmaDefaultEstimate: 6000000 // Estimation initiale 6 Mbps pour 1080p fluide sans sauts ABR au démarrage
+      };
+
+      hlsConfig.xhrSetup = (xhr, url) => {
+        xhr.withCredentials = true;
+        if (authToken) {
+          try {
+            xhr.setRequestHeader('Authorization', `Bearer ${authToken}`);
+            xhr.setRequestHeader('x-auth-token', authToken);
+          } catch (e) {}
+        }
       };
 
       const hls = new Hls(hlsConfig);
@@ -1553,6 +1591,12 @@ class NetflixPlayer {
   playDirectVideo(videoUrl) {
     const baseUrl = window.API_BASE || '';
     if (videoUrl && videoUrl.startsWith('/')) videoUrl = baseUrl + videoUrl;
+
+    const authToken = localStorage.getItem('ziflix_auth_token');
+    if (authToken && videoUrl && !videoUrl.includes('auth_token=')) {
+      const sep = videoUrl.includes('?') ? '&' : '?';
+      videoUrl = `${videoUrl}${sep}auth_token=${encodeURIComponent(authToken)}`;
+    }
 
     this.cleanupActivePlayback();
     this.streamAbortController = new AbortController();
