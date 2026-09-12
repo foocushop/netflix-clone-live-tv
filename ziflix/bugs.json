@@ -1,1 +1,40 @@
-[]
+[
+  {
+    "id": "bug_1789234177737_e2579e",
+    "user_id": "u_1789233751742_12454dfa",
+    "username": "oklex",
+    "avatar": "assets/avatars/avatar-10.svg",
+    "category": "audio",
+    "title": "Signalement : La Villa des cœurs brisés (2015) S11E17",
+    "description": "",
+    "media_id": "xtream_series_6715",
+    "media_title": "La Villa des cœurs brisés (2015)",
+    "season": 11,
+    "episode": 17,
+    "episode_id": null,
+    "device_info": "Android • Chrome",
+    "user_agent": "Mozilla/5.0 (Linux; Android 10; K) AppleWebKit/537.36 (KHTML, like Gecko) SamsungBrowser/30.0 Chrome/143.0.0.0 Mobile Safari/537.36",
+    "url": "https://ziablo.xyz/telerealite",
+    "status": "open",
+    "created_at": "2026-09-12T17:29:37.737Z"
+  },
+  {
+    "id": "bug_1789234165134_d2f5b2",
+    "user_id": "u_1789233751742_12454dfa",
+    "username": "oklex",
+    "avatar": "assets/avatars/avatar-10.svg",
+    "category": "audio",
+    "title": "Signalement : La Villa des cœurs brisés (2015) S11E17",
+    "description": "",
+    "media_id": "xtream_series_6715",
+    "media_title": "La Villa des cœurs brisés (2015)",
+    "season": 11,
+    "episode": 17,
+    "episode_id": null,
+    "device_info": "Android • Chrome",
+    "user_agent": "Mozilla/5.0 (Linux; Android 10; K) AppleWebKit/537.36 (KHTML, like Gecko) SamsungBrowser/30.0 Chrome/143.0.0.0 Mobile Safari/537.36",
+    "url": "https://ziablo.xyz/telerealite",
+    "status": "open",
+    "created_at": "2026-09-12T17:29:25.134Z"
+  }
+]
