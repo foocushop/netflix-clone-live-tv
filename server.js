@@ -5956,7 +5956,6 @@ const server = http.createServer((req, res) => {
     }
 
     // Attendre que la playlist et le premier segment soient prêts
-    const seg0 = path.join(hlsDir, 'seg_0000.ts');
     let waited = 0;
     const maxWait = 7000;
     const pollInterval = 150;
