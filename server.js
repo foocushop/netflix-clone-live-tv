@@ -750,16 +750,16 @@ const XTREAM_STREAM_FALLBACKS = {
 // Optimisé pour supporter plus de 200 utilisateurs simultanés sans latence de queue
 const xtreamHttpAgent = new http.Agent({
   keepAlive: true,
-  maxSockets: 250,
-  maxFreeSockets: 50,
+  maxSockets: 30,
+  maxFreeSockets: 10,
   keepAliveMsecs: 6000,
   timeout: 15000
 });
 
 const xtreamHttpsAgent = new https.Agent({
   keepAlive: true,
-  maxSockets: 250,
-  maxFreeSockets: 50,
+  maxSockets: 30,
+  maxFreeSockets: 10,
   keepAliveMsecs: 6000,
   timeout: 15000
 });
@@ -7072,11 +7072,6 @@ server.listen(PORT, HOST, () => {
 
   // Synchronisation initiale au démarrage (pull depuis GitHub si nécessaire)
   checkAndPullLatestCatalog();
-
-  // Préchauffage instantané des flux IPTV pour éliminer toute latence cold-start (< 1 min)
-  setTimeout(() => {
-    prewarmXtreamConnections();
-  }, 1200);
 
   // Maintien en éveil automatique anti-veille Render (Self-Ping 10 min)
   initRenderKeepAlive();
