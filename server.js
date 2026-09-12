@@ -5749,7 +5749,7 @@ const server = http.createServer((req, res) => {
   // ================= ROUTE PROXY STREAMING VOD SÉRIES XTREAM (/api/stream/xtream-series) =================
   // Support complet des requêtes HTTP Range (206 Partial Content), mise en cache Edge 0ms,
   // pool Keep-Alive persistant et débit maximal anti-buffering
-  if (pathname === '/api/stream/xtream-series' && req.method === 'GET') {
+  if (pathname === '/api/stream/xtream-series' && (req.method === 'GET' || req.method === 'HEAD')) {
     const authUser = getAuthUser(req);
     if (!authUser || authUser.is_banned) {
       res.writeHead(401, { 'Content-Type': 'text/plain; charset=utf-8', 'Access-Control-Allow-Origin': '*' });
@@ -5888,6 +5888,40 @@ const server = http.createServer((req, res) => {
         const isAppleDevice = /iphone|ipad|ipod/.test(ua) || (ua.includes('macintosh') && !ua.includes('chrome')) || (ua.includes('safari') && !ua.includes('chrome') && !ua.includes('android'));
         const forceMp4 = (parsedUrl.query.format === 'mp4' || parsedUrl.query.remux === '1');
         const needsMp4Remux = (isAppleDevice || forceMp4) && (ext === 'mkv' || ct.includes('matroska'));
+
+        if (req.method === 'HEAD') {
+          try { upstreamRes.destroy(); } catch (e) {}
+          if (needsMp4Remux) {
+            res.writeHead(200, {
+              'Access-Control-Allow-Origin': '*',
+              'Access-Control-Allow-Headers': '*',
+              'Content-Type': 'video/mp4',
+              'Accept-Ranges': 'bytes',
+              'Connection': 'keep-alive',
+              'X-Content-Type-Options': 'nosniff'
+            });
+          } else {
+            if (ext === 'mkv' || ct.includes('matroska')) {
+              outHeaders['Content-Type'] = 'video/x-matroska';
+            } else if (ext === 'mp4' || ct.includes('mp4')) {
+              outHeaders['Content-Type'] = 'video/mp4';
+            } else if (ext === 'ts' || ct.includes('mp2t')) {
+              outHeaders['Content-Type'] = 'video/mp2t';
+            } else if (ct && !ct.includes('octet-stream')) {
+              outHeaders['Content-Type'] = upstreamRes.headers['content-type'];
+            } else {
+              outHeaders['Content-Type'] = 'video/mp4';
+            }
+            if (upstreamRes.headers['content-length']) {
+              outHeaders['Content-Length'] = upstreamRes.headers['content-length'];
+            }
+            if (upstreamRes.headers['content-range']) {
+              outHeaders['Content-Range'] = upstreamRes.headers['content-range'];
+            }
+            res.writeHead(upstreamRes.statusCode || 200, outHeaders);
+          }
+          return res.end();
+        }
 
         if (needsMp4Remux) {
           const startTime = parseFloat(parsedUrl.query.start || parsedUrl.query.time || parsedUrl.query.t || 0) || 0;
