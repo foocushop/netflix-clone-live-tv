@@ -10,6 +10,6 @@
     </filter>
   </defs>
   <g filter="url(#zifGlow)">
-    <text x="10" y="85" font-family="-apple-system, BlinkMacSystemFont, Impact, Montserrat, Arial Black, sans-serif" font-size="88" font-weight="900" letter-spacing="4" fill="url(#zifGrad)">ZIFLIX</text>
+    <text x="50%" y="82" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, Impact, Montserrat, Arial Black, sans-serif" font-size="88" font-weight="900" letter-spacing="4" fill="url(#zifGrad)">ZIFLIX</text>
   </g>
 </svg>

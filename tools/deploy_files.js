@@ -5,7 +5,8 @@ const fs = require('fs');
 const filesToUpload = [
   { local: path.join(__dirname, '..', 'static', 'index.html'), remote: '/var/www/netflix-clone/static/index.html' },
   { local: path.join(__dirname, '..', 'static', 'css', 'netflix.css'), remote: '/var/www/netflix-clone/static/css/netflix.css' },
-  { local: path.join(__dirname, '..', 'static', 'js', 'app.js'), remote: '/var/www/netflix-clone/static/js/app.js' }
+  { local: path.join(__dirname, '..', 'static', 'js', 'app.js'), remote: '/var/www/netflix-clone/static/js/app.js' },
+  { local: path.join(__dirname, '..', 'static', 'assets', 'logos', 'ziflix-logo.svg'), remote: '/var/www/netflix-clone/static/assets/logos/ziflix-logo.svg' }
 ];
 
 const conn = new Client();

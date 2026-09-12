@@ -336,7 +336,7 @@ class NetflixApp {
     }
   }
 
-  async loadCatalog() {
+  async loadCatalog(isInitialSplashLoad = false) {
     try {
       const baseUrl = window.API_BASE || '';
       const res = await fetch(`${baseUrl}/api/catalog?_t=${Date.now()}`, {
@@ -372,17 +372,79 @@ class NetflixApp {
         if (initialFilter && initialFilter !== 'all') {
           this.applyFilter(initialFilter, false);
         }
+
+        // Si chargement initial avec splash, attendre le chargement de l'image de fond
+        // et des premières cartes pour éviter tout écran noir ou affichage incomplet
+        if (isInitialSplashLoad) {
+          await this.preloadHeroImage(json.data.hero);
+          this.dismissSplash();
+        }
+      } else if (isInitialSplashLoad) {
+        this.dismissSplash();
       }
     } catch (e) {
       console.error("Erreur lors du chargement du catalogue", e);
+      if (isInitialSplashLoad) {
+        this.dismissSplash();
+      }
     }
+  }
+
+  async preloadHeroImage(hero) {
+    const urls = [];
+    const heroImgUrl = hero ? (hero.backdrop_url || hero.poster_url) : null;
+    if (heroImgUrl) urls.push(this.normalizeImageUrl(heroImgUrl));
+
+    // Précharger aussi les 4 premières vignettes de la première rangée
+    if (this.catalogData && this.catalogData.rows && this.catalogData.rows[0]) {
+      const topMovies = (this.catalogData.rows[0].movies || []).slice(0, 4);
+      topMovies.forEach(m => {
+        const p = m.poster_url || m.backdrop_url;
+        if (p) urls.push(this.normalizeImageUrl(p));
+      });
+    }
+
+    if (urls.length === 0) return;
+
+    const promises = urls.map(url => {
+      return new Promise((resolve) => {
+        const img = new Image();
+        let done = false;
+        const finish = () => {
+          if (!done) {
+            done = true;
+            resolve();
+          }
+        };
+        img.onload = finish;
+        img.onerror = finish;
+        img.src = url;
+        if (img.decode) {
+          img.decode().then(finish).catch(finish);
+        }
+        setTimeout(finish, 1600); // Max 1.6s par image
+      });
+    });
+
+    await Promise.race([
+      Promise.all(promises),
+      new Promise(r => setTimeout(r, 2000)) // Sécurité globale max 2s
+    ]);
+
+    // Attendre deux ticks RAF pour que le moteur de rendu peigne la scène sur le GPU
+    await new Promise(resolve => {
+      requestAnimationFrame(() => {
+        requestAnimationFrame(resolve);
+      });
+    });
   }
 
   setupHero(movie) {
     if (!movie) return;
     this.currentHero = movie;
 
-    this.heroBanner.style.backgroundImage = `url(${movie.backdrop_url || movie.poster_url})`;
+    const bgUrl = this.normalizeImageUrl(movie.backdrop_url || movie.poster_url);
+    this.heroBanner.style.backgroundImage = bgUrl ? `url("${bgUrl}")` : 'none';
     this.heroTitle.textContent = movie.title;
     this.heroSynopsis.textContent = movie.overview;
 
@@ -1869,7 +1931,7 @@ class NetflixApp {
     const token = localStorage.getItem('ziflix_auth_token');
     this.renderAvatarSelectionGrids();
 
-    // Watchdog de sécurité (max 2.5s) : empêche tout blocage sur le splash si le réseau lag
+    // Watchdog de sécurité (max 3.8s) : empêche tout blocage sur le splash si le réseau lag
     this.splashWatchdog = setTimeout(() => {
       if (!this.splashDismissed) {
         console.warn('[ZIFLIX] Splash watchdog triggered');
@@ -1879,7 +1941,7 @@ class NetflixApp {
           this.dismissSplash();
         }
       }
-    }, 2500);
+    }, 3800);
 
     if (!token) {
       this.showAuthGate();
@@ -1918,8 +1980,8 @@ class NetflixApp {
 
     const startTime = this.splashStartTime || window.__ZIFLIX_SPLASH_START || Date.now();
     const elapsed = Date.now() - startTime;
-    // Durée minimale de 380ms pour une expérience fluide et cinématique (évite un flash cut)
-    const minDuration = 380;
+    // Durée minimale de 450ms pour une expérience fluide et cinématique (évite un flash cut)
+    const minDuration = 450;
     const delay = Math.max(0, minDuration - elapsed);
 
     setTimeout(() => {
@@ -1934,16 +1996,15 @@ class NetflixApp {
     }, delay);
   }
 
-  unlockApp() {
-    if (this.splashWatchdog) {
-      clearTimeout(this.splashWatchdog);
-      this.splashWatchdog = null;
-    }
+  async unlockApp() {
     if (this.authGateModal) this.authGateModal.classList.add('hidden');
     if (this.ziflixApp) this.ziflixApp.style.display = 'block';
-    this.dismissSplash();
+
     if (!this.catalogData) {
-      this.loadCatalog();
+      // Charger le catalogue et attendre le préchargement complet du Hero et des cartes
+      await this.loadCatalog(true);
+    } else {
+      this.dismissSplash();
     }
   }
 

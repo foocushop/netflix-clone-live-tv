@@ -4524,6 +4524,7 @@ button:focus-visible {
   flex-direction: column;
   align-items: center;
   justify-content: center;
+  text-align: center;
   padding: 24px;
   transform: translateZ(0);
   user-select: none;
@@ -4532,13 +4533,15 @@ button:focus-visible {
 /* Halos lumineux ZIFLIX (Compositor-only, zéro repaint layout) */
 .ziflix-splash-glow {
   position: absolute;
-  width: 340px;
+  top: 40%;
+  left: 50%;
+  width: 360px;
   height: 140px;
-  background: radial-gradient(ellipse at center, rgba(229, 9, 20, 0.32) 0%, rgba(229, 9, 20, 0.08) 50%, transparent 72%);
+  background: radial-gradient(ellipse at center, rgba(229, 9, 20, 0.38) 0%, rgba(229, 9, 20, 0.08) 50%, transparent 72%);
   border-radius: 50%;
   pointer-events: none;
+  transform: translate(-50%, -50%) translateZ(0);
   animation: splashGlowPulse 2.6s ease-in-out infinite alternate;
-  transform: translateZ(0);
   will-change: transform, opacity;
 }
 
@@ -4549,6 +4552,7 @@ button:focus-visible {
   height: auto;
   aspect-ratio: 420 / 110;
   display: block;
+  margin: 0 auto;
   user-select: none;
   -webkit-user-drag: none;
   animation: splashLogoEnter 0.45s cubic-bezier(0.16, 1, 0.3, 1) forwards,
@@ -4562,10 +4566,10 @@ button:focus-visible {
 .ziflix-splash-bar {
   position: relative;
   width: clamp(120px, 15vw, 170px);
-  height: 2px;
-  background: rgba(255, 255, 255, 0.08);
+  height: 2.5px;
+  background: rgba(255, 255, 255, 0.09);
   border-radius: 3px;
-  margin-top: 26px;
+  margin: 24px auto 0 auto;
   overflow: hidden;
   transform: translateZ(0);
 }
@@ -4576,7 +4580,7 @@ button:focus-visible {
   left: 0;
   height: 100%;
   width: 50%;
-  background: linear-gradient(90deg, transparent 0%, #e50914 50%, #ff4b55 80%, transparent 100%);
+  background: linear-gradient(90deg, transparent 0%, #e50914 45%, #ff4b55 80%, transparent 100%);
   border-radius: 3px;
   animation: splashShimmer 1.4s cubic-bezier(0.4, 0, 0.2, 1) infinite;
   transform: translateZ(0);
@@ -4609,11 +4613,11 @@ button:focus-visible {
 @keyframes splashGlowPulse {
   0% {
     opacity: 0.25;
-    transform: scale(0.94) translateZ(0);
+    transform: translate(-50%, -50%) scale(0.92) translateZ(0);
   }
   100% {
-    opacity: 0.65;
-    transform: scale(1.1) translateZ(0);
+    opacity: 0.70;
+    transform: translate(-50%, -50%) scale(1.12) translateZ(0);
   }
 }
 
