@@ -394,7 +394,16 @@ class NetflixPlayer {
       const clientX = e.clientX !== undefined ? e.clientX : (e.touches && e.touches[0] ? e.touches[0].clientX : rect.left);
       const pos = Math.max(0, Math.min(1, (clientX - rect.left) / rect.width));
       const targetTime = pos * duration;
-      if (this._isRemuxedMp4 && this._currentDirectVideoUrl) {
+      if (this._currentHlsUrl && this._currentHlsUrl.includes('/api/stream/xtream-series-hls')) {
+        const bufferedEnd = (this.video.buffered && this.video.buffered.length > 0) ? this.video.buffered.end(this.video.buffered.length - 1) : 0;
+        if (targetTime > bufferedEnd + 4) {
+          const cleanUrl = this._currentHlsUrl.replace(/[?&]start=\d+/g, '');
+          const sep = cleanUrl.includes('?') ? '&' : '?';
+          this.playDirectHls(`${cleanUrl}${sep}start=${Math.floor(targetTime)}`);
+        } else {
+          this.video.currentTime = targetTime;
+        }
+      } else if (this._isRemuxedMp4 && this._currentDirectVideoUrl) {
         const cleanUrl = this._currentDirectVideoUrl.replace(/&start=\d+/g, '').replace(/\?start=\d+/g, '?');
         const sep = cleanUrl.includes('?') ? '&' : '?';
         this.video.src = `${cleanUrl}${sep}start=${Math.floor(targetTime)}`;
@@ -1237,6 +1246,12 @@ class NetflixPlayer {
       const browserCanPlayHevc = (this.video.canPlayType('video/mp4; codecs="hvc1.1.6.L93.B0"') === 'probably' ||
                                   this.video.canPlayType('video/mp4; codecs="hev1.1.6.L93.B0"') === 'probably');
 
+      // Détection Safari / iOS : Matroska (.mkv) incompatible -> Moteur HLS natif
+      const isApple = /iPad|iPhone|iPod/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+      const isSafari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent) || isApple || (navigator.platform === 'MacIntel' && !/Chrome|CriOS/i.test(navigator.userAgent));
+      const canPlayMkv = (this.video.canPlayType('video/x-matroska') !== '' || this.video.canPlayType('video/mkv') !== '');
+      const needsHls = (!canPlayMkv || isSafari || isApple);
+
       if (epObj && epStreamUrl && (!isHevc || browserCanPlayHevc)) {
         this.currentSeason = parseInt(sObj.season_number, 10);
         this.currentEpisode = parseInt(epObj.episode_number, 10);
@@ -1248,6 +1263,22 @@ class NetflixPlayer {
         const baseUrl = window.API_BASE || '';
         let targetStreamUrl = epStreamUrl;
         if (targetStreamUrl.startsWith('/')) targetStreamUrl = baseUrl + targetStreamUrl;
+
+        // Safari / iOS : redirection instantanée vers HLS
+        if (needsHls && targetStreamUrl.includes('/api/stream/xtream-series')) {
+          const epId = epObj.id || epObj.episode_id || (targetStreamUrl.match(/episode_id=([^&]+)/)?.[1]);
+          if (epId) {
+            const hlsUrl = `${baseUrl}/api/stream/xtream-series-hls/${epId}/playlist.m3u8`;
+            this.showLoader(`⚡ Connexion au flux direct HLS ${this.currentMovie.title} S${this.currentSeason}:E${this.currentEpisode}...`);
+            this.resetSteps();
+            this.setStep(1, 'done', `1. Épisode validé (${this.currentMovie.title} S${this.currentSeason}:E${this.currentEpisode})`);
+            this.setStep(2, 'done', `2. Flux direct obtenu (1080p FHD • Apple HLS)`);
+            this.setStep(3, 'done', `3. Déchiffrement direct & Proxy local anti-pub`);
+            this.setStep(4, 'active', `4. Injection dans le lecteur ZIFLIX...`);
+            this.playDirectHls(hlsUrl);
+            return;
+          }
+        }
 
         this.showLoader(`⚡ Connexion au flux direct ${this.currentMovie.title} S${this.currentSeason}:E${this.currentEpisode}...`);
         this.resetSteps();
@@ -1327,8 +1358,22 @@ class NetflixPlayer {
         targetStreamUrl = baseUrl + targetStreamUrl;
       }
 
+      // Détection de compatibilité MKV (Safari / iOS / Mac)
+      const canPlayMkv = (this.video.canPlayType('video/x-matroska') !== '' || this.video.canPlayType('video/mkv') !== '');
+      const isApple = /iPad|iPhone|iPod/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+      const isSafari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent) || isApple || (navigator.platform === 'MacIntel' && !/Chrome|CriOS/i.test(navigator.userAgent));
+      const needsHls = (!canPlayMkv || isSafari || isApple);
+
       if (isChannel || data.player_type === 'direct_hls' || (targetStreamUrl && targetStreamUrl.includes('.m3u8'))) {
         this.playDirectHls(targetStreamUrl);
+      } else if (needsHls && targetStreamUrl && targetStreamUrl.includes('/api/stream/xtream-series')) {
+        const epIdMatch = targetStreamUrl.match(/episode_id=([^&]+)/);
+        if (epIdMatch) {
+          const hlsUrl = `${baseUrl}/api/stream/xtream-series-hls/${epIdMatch[1]}/playlist.m3u8`;
+          this.playDirectHls(hlsUrl);
+        } else {
+          this.playDirectVideo(targetStreamUrl);
+        }
       } else if (data.player_type === 'direct_video' || targetStreamUrl.includes('/api/stream/xtream-series')) {
         this.playDirectVideo(targetStreamUrl);
       } else if (data.player_type === 'iframe' || data.is_embed) {
@@ -1360,6 +1405,7 @@ class NetflixPlayer {
       const sep = streamUrl.includes('?') ? '&' : '?';
       streamUrl = `${streamUrl}${sep}auth_token=${encodeURIComponent(authToken)}`;
     }
+    this._currentHlsUrl = streamUrl;
 
     this.cleanupActivePlayback();
     this.streamAbortController = new AbortController();
@@ -1604,14 +1650,21 @@ class NetflixPlayer {
       });
     } else if (this.video.canPlayType('application/vnd.apple.mpegurl')) {
       this.video.src = streamUrl;
-      this.video.onloadedmetadata = () => {
+      const startPlay = () => {
         onReady();
-        this.video.play().catch(() => {
-          this.video.muted = true;
-          this.syncVolumeUI();
-          this.video.play().catch(() => {});
-        });
+        const playPromise = this.video.play();
+        if (playPromise !== undefined) {
+          playPromise.catch(err => {
+            console.warn('[Player] Autoplay avec son restreint sur Safari, démarrage muet :', err.message);
+            this.video.muted = true;
+            this.syncVolumeUI();
+            this.video.play().catch(() => {});
+          });
+        }
       };
+      this.video.addEventListener('loadedmetadata', startPlay, { signal, once: true });
+      this.video.addEventListener('canplay', startPlay, { signal, once: true });
+      this.video.addEventListener('loadeddata', startPlay, { signal, once: true });
     } else {
       this.showStatusBanner("Votre navigateur ne supporte pas la lecture HLS directe.");
     }
@@ -1628,15 +1681,21 @@ class NetflixPlayer {
       videoUrl = `${videoUrl}${sep}auth_token=${encodeURIComponent(authToken)}`;
     }
 
-    // Détection de compatibilité MKV (Safari / iOS)
+    // Détection de compatibilité MKV (Safari / iOS / Mac)
     const canPlayMkv = (this.video.canPlayType('video/x-matroska') !== '' || this.video.canPlayType('video/mkv') !== '');
     const isApple = /iPad|iPhone|iPod/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
-    this._isRemuxedMp4 = false;
-    if ((!canPlayMkv || isApple) && videoUrl.includes('/api/stream/xtream-series') && !videoUrl.includes('format=mp4')) {
-      const sep = videoUrl.includes('?') ? '&' : '?';
-      videoUrl = `${videoUrl}${sep}format=mp4`;
-      this._isRemuxedMp4 = true;
+    const isSafari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent) || isApple || (navigator.platform === 'MacIntel' && !/Chrome|CriOS/i.test(navigator.userAgent));
+    const needsHls = (!canPlayMkv || isSafari || isApple);
+
+    if (needsHls && videoUrl.includes('/api/stream/xtream-series')) {
+      const epIdMatch = videoUrl.match(/episode_id=([^&]+)/);
+      if (epIdMatch) {
+        const hlsUrl = `${baseUrl}/api/stream/xtream-series-hls/${epIdMatch[1]}/playlist.m3u8`;
+        this.playDirectHls(hlsUrl);
+        return;
+      }
     }
+    this._isRemuxedMp4 = false;
     this._currentDirectVideoUrl = videoUrl;
 
     this.cleanupActivePlayback();

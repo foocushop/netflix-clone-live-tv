@@ -786,6 +786,8 @@ const xtreamEdgeCache = new Map();
 const xtreamManifestCache = new Map();
 // Cache d'adresses Edge directes pour les épisodes séries Xtream VOD (TTL 10 min pour éviter les re-redirections après pause)
 const xtreamSeriesEdgeCache = new Map();
+// Sessions actives de remuxage HLS pour séries Xtream (Apple Safari & Web HLS)
+const xtreamHlsSessions = new Map();
 
 // Cache des images pour contourner le Mixed-Content (HTTP sur HTTPS Render) et port 443 manquant
 const imageProxyCache = new Map();
@@ -803,11 +805,40 @@ setInterval(() => {
   for (const [k, v] of xtreamSeriesEdgeCache.entries()) {
     if (v.expiresAt <= now) xtreamSeriesEdgeCache.delete(k);
   }
+  // Nettoyage automatique des sessions HLS séries inactives depuis plus de 3 minutes
+  for (const [epId, session] of xtreamHlsSessions.entries()) {
+    if (now - session.lastAccess > 3 * 60 * 1000) {
+      if (session.proc) {
+        try { session.proc.kill('SIGTERM'); } catch (e) {}
+        try { session.proc.kill('SIGKILL'); } catch (e) {}
+      }
+      try {
+        if (session.hlsDir && fs.existsSync(session.hlsDir)) {
+          fs.rmSync(session.hlsDir, { recursive: true, force: true });
+        }
+      } catch (e) {}
+      xtreamHlsSessions.delete(epId);
+    }
+  }
   if (imageProxyCache.size > MAX_IMAGE_CACHE_ITEMS) {
     const keys = Array.from(imageProxyCache.keys());
     for (let i = 0; i < 100; i++) imageProxyCache.delete(keys[i]);
   }
 }, 60000);
+
+// Nettoyage à l'arrêt du processus
+process.on('exit', () => {
+  for (const session of xtreamHlsSessions.values()) {
+    if (session.proc) {
+      try { session.proc.kill('SIGKILL'); } catch (e) {}
+    }
+    try {
+      if (session.hlsDir && fs.existsSync(session.hlsDir)) {
+        fs.rmSync(session.hlsDir, { recursive: true, force: true });
+      }
+    } catch (e) {}
+  }
+});
 
 // Préchauffage automatique des flux et connexions Keep-Alive au démarrage (supprime la lenteur du cold-start <1min)
 async function prewarmXtreamConnections() {
@@ -4797,16 +4828,29 @@ const server = http.createServer((req, res) => {
             }
           }
 
+          const userAgent = (req.headers['user-agent'] || '').toLowerCase();
+          const isAppleClient = /iphone|ipad|ipod/.test(userAgent) || (userAgent.includes('macintosh') && !userAgent.includes('chrome')) || (userAgent.includes('safari') && !userAgent.includes('chrome') && !userAgent.includes('android'));
+          let finalStreamUrl = streamUrlToUse;
+          let finalPlayerType = 'direct_video';
+
+          if (isAppleClient || parsedUrl.query.format === 'hls') {
+            const epId = episodeObj.id || (streamUrlToUse.match(/episode_id=([^&]+)/)?.[1]);
+            if (epId) {
+              finalStreamUrl = `/api/stream/xtream-series-hls/${epId}/playlist.m3u8`;
+              finalPlayerType = 'direct_hls';
+            }
+          }
+
           return {
             success: true,
             server: serverNum,
-            server_name: `Serveur ${serverNum} (Xtream 1080p FHD Direct)`,
+            server_name: isAppleClient ? `Serveur ${serverNum} (Xtream 1080p FHD • Apple HLS Natif)` : `Serveur ${serverNum} (Xtream 1080p FHD Direct)`,
             hoster: 'Xtream Codes VIP Full HD',
             quality: '1080p FHD',
             title: `${showTitle} - S${sNum}:E${episodeObj.episode_number || eNum}`,
-            stream_url: streamUrlToUse,
-            raw_stream_url: streamUrlToUse,
-            player_type: 'direct_video',
+            stream_url: finalStreamUrl,
+            raw_stream_url: finalStreamUrl,
+            player_type: finalPlayerType,
             is_embed: false,
             codec: epCodec,
             sources_count: 5,
@@ -5746,6 +5790,205 @@ const server = http.createServer((req, res) => {
     return;
   }
 
+  // ================= ROUTE PROXY STREAMING VOD SÉRIES XTREAM HLS (Safari / Apple / Web HLS) =================
+  // Remuxage ultra-performant à la volée MKV -> HLS (.m3u8 + segments MPEG-TS)
+  // Résout définitivement l'incompatibilité Safari / iOS (black screen sur MKV ou MP4 chunked)
+  if (pathname.startsWith('/api/stream/xtream-series-hls') && (req.method === 'GET' || req.method === 'HEAD')) {
+    const authUser = getAuthUser(req);
+    if (!authUser || authUser.is_banned) {
+      res.writeHead(401, { 'Content-Type': 'text/plain; charset=utf-8', 'Access-Control-Allow-Origin': '*' });
+      return res.end('Accès refusé : Session ZIFLIX requise');
+    }
+
+    const subPath = pathname.replace(/^\/api\/stream\/xtream-series-hls\/?/, '');
+    const pathParts = subPath.split('/').filter(Boolean);
+    let episodeId = pathParts[0] || parsedUrl.query.episode_id;
+    let resource = pathParts[1] || (pathParts[0] && pathParts[0].includes('.') ? pathParts[0] : 'playlist.m3u8');
+    if (pathParts[0] && pathParts[0].includes('.')) {
+      episodeId = parsedUrl.query.episode_id || pathParts[0].split('.')[0];
+    }
+
+    if (!episodeId) {
+      res.writeHead(400, { 'Content-Type': 'text/plain', 'Access-Control-Allow-Origin': '*' });
+      return res.end('Paramètre episode_id manquant pour HLS');
+    }
+
+    trackStreamingSession(req, res, episodeId, 'series_hls');
+
+    const ext = parsedUrl.query.ext || 'mkv';
+    const cacheKey = `${episodeId}_${ext}`;
+    const originUrl = `http://${XTREAM_CONFIG.host}:${XTREAM_CONFIG.port}/series/${XTREAM_CONFIG.username}/${XTREAM_CONFIG.password}/${episodeId}.${ext}`;
+    const cachedEdge = xtreamSeriesEdgeCache.get(cacheKey);
+    const initialUrl = (cachedEdge && cachedEdge.expiresAt > Date.now()) ? cachedEdge.url : originUrl;
+
+    const hlsDir = path.join('/tmp', 'ziflix_hls', String(episodeId));
+    const playlistPath = path.join(hlsDir, 'playlist.m3u8');
+
+    // 1. Requête pour un segment .ts
+    if (resource.endsWith('.ts')) {
+      const segFile = path.join(hlsDir, resource);
+      const session = xtreamHlsSessions.get(String(episodeId));
+      if (session) session.lastAccess = Date.now();
+
+      const serveSegment = () => {
+        if (fs.existsSync(segFile)) {
+          try {
+            const stat = fs.statSync(segFile);
+            if (stat.size > 0) {
+              res.writeHead(200, {
+                'Content-Type': 'video/mp2t',
+                'Content-Length': stat.size,
+                'Access-Control-Allow-Origin': '*',
+                'Access-Control-Allow-Headers': '*',
+                'Cache-Control': 'public, max-age=86400',
+                'Accept-Ranges': 'bytes'
+              });
+              fs.createReadStream(segFile).pipe(res);
+              return true;
+            }
+          } catch (e) {}
+        }
+        return false;
+      };
+
+      if (serveSegment()) return;
+
+      // Attendre jusqu'à 5s que FFmpeg écrive le segment
+      let waitedMs = 0;
+      const interval = 200;
+      const checkTimer = setInterval(() => {
+        waitedMs += interval;
+        if (serveSegment()) {
+          clearInterval(checkTimer);
+        } else if (waitedMs >= 5000) {
+          clearInterval(checkTimer);
+          if (!res.headersSent) {
+            res.writeHead(404, { 'Content-Type': 'text/plain', 'Access-Control-Allow-Origin': '*' });
+            res.end('Segment non disponible');
+          }
+        }
+      }, interval);
+
+      req.on('close', () => clearInterval(checkTimer));
+      return;
+    }
+
+    // 2. Requête pour la playlist M3U8
+    let session = xtreamHlsSessions.get(String(episodeId));
+    if (!session) {
+      if (!fs.existsSync(hlsDir)) fs.mkdirSync(hlsDir, { recursive: true });
+
+      const startTime = parseFloat(parsedUrl.query.start || parsedUrl.query.time || 0) || 0;
+      const ffmpegArgs = [
+        '-v', 'warning',
+        '-user_agent', 'IPTVSmartersPro/1.0'
+      ];
+      if (startTime > 0) {
+        ffmpegArgs.push('-ss', startTime.toString());
+      }
+      ffmpegArgs.push(
+        '-i', initialUrl,
+        '-c', 'copy',
+        '-sn',
+        '-f', 'hls',
+        '-hls_time', '4',
+        '-hls_list_size', '0',
+        '-hls_segment_filename', path.join(hlsDir, 'seg_%04d.ts'),
+        playlistPath
+      );
+
+      const proc = spawn('ffmpeg', ffmpegArgs, { stdio: ['ignore', 'pipe', 'pipe'] });
+      session = {
+        proc,
+        hlsDir,
+        playlistPath,
+        startTime,
+        lastAccess: Date.now(),
+        createdAt: Date.now(),
+        isDone: false
+      };
+      xtreamHlsSessions.set(String(episodeId), session);
+
+      proc.on('close', () => {
+        session.isDone = true;
+        session.proc = null;
+      });
+      proc.on('error', (err) => {
+        console.warn(`[Xtream HLS FFmpeg Error]: ${err.message}`);
+        session.isDone = true;
+        session.proc = null;
+      });
+    } else {
+      session.lastAccess = Date.now();
+    }
+
+    // Attendre que la playlist et le premier segment soient prêts
+    const seg0 = path.join(hlsDir, 'seg_0000.ts');
+    let waited = 0;
+    const maxWait = 7000;
+    const pollInterval = 150;
+
+    const checkReady = () => {
+      if (fs.existsSync(playlistPath) && fs.existsSync(seg0)) {
+        try {
+          const s = fs.statSync(seg0);
+          if (s.size > 20000) return true;
+        } catch (e) {}
+      }
+      return false;
+    };
+
+    if (checkReady()) {
+      return sendPlaylist();
+    }
+
+    const waitTimer = setInterval(() => {
+      waited += pollInterval;
+      if (checkReady()) {
+        clearInterval(waitTimer);
+        sendPlaylist();
+      } else if (waited >= maxWait) {
+        clearInterval(waitTimer);
+        if (!res.headersSent) {
+          if (fs.existsSync(playlistPath)) {
+            sendPlaylist();
+          } else {
+            res.writeHead(504, { 'Content-Type': 'text/plain', 'Access-Control-Allow-Origin': '*' });
+            res.end('Délai d\'attente dépassé pour la génération du flux HLS');
+          }
+        }
+      }
+    }, pollInterval);
+
+    req.on('close', () => clearInterval(waitTimer));
+
+    function sendPlaylist() {
+      if (res.headersSent || res.writableEnded) return;
+      try {
+        let content = fs.readFileSync(playlistPath, 'utf8');
+        const authToken = parsedUrl.query.auth_token || parsedUrl.query.token || req.headers['x-auth-token'];
+        if (authToken) {
+          content = content.replace(/^(seg_\d+\.ts)$/gm, `$1?auth_token=${encodeURIComponent(authToken)}`);
+        }
+        res.writeHead(200, {
+          'Content-Type': 'application/vnd.apple.mpegurl',
+          'Access-Control-Allow-Origin': '*',
+          'Access-Control-Allow-Headers': '*',
+          'Cache-Control': 'no-cache, no-store, must-revalidate',
+          'Pragma': 'no-cache',
+          'Expires': '0'
+        });
+        res.end(content);
+      } catch (err) {
+        if (!res.headersSent) {
+          res.writeHead(500, { 'Content-Type': 'text/plain', 'Access-Control-Allow-Origin': '*' });
+          res.end('Erreur lecture playlist HLS: ' + err.message);
+        }
+      }
+    }
+    return;
+  }
+
   // ================= ROUTE PROXY STREAMING VOD SÉRIES XTREAM (/api/stream/xtream-series) =================
   // Support complet des requêtes HTTP Range (206 Partial Content), mise en cache Edge 0ms,
   // pool Keep-Alive persistant et débit maximal anti-buffering
@@ -5886,103 +6129,44 @@ const server = http.createServer((req, res) => {
         const ct = (upstreamRes.headers['content-type'] || '').toLowerCase();
         const ua = (req.headers['user-agent'] || '').toLowerCase();
         const isAppleDevice = /iphone|ipad|ipod/.test(ua) || (ua.includes('macintosh') && !ua.includes('chrome')) || (ua.includes('safari') && !ua.includes('chrome') && !ua.includes('android'));
-        const forceMp4 = (parsedUrl.query.format === 'mp4' || parsedUrl.query.remux === '1');
-        const needsMp4Remux = (isAppleDevice || forceMp4) && (ext === 'mkv' || ct.includes('matroska'));
+        const forceHls = (parsedUrl.query.format === 'hls' || parsedUrl.query.format === 'mp4' || parsedUrl.query.remux === '1');
+        const needsHlsRedirect = (isAppleDevice || forceHls) && (ext === 'mkv' || ct.includes('matroska') || !ct);
 
-        if (req.method === 'HEAD') {
+        if (needsHlsRedirect) {
           try { upstreamRes.destroy(); } catch (e) {}
-          if (needsMp4Remux) {
-            res.writeHead(200, {
-              'Access-Control-Allow-Origin': '*',
-              'Access-Control-Allow-Headers': '*',
-              'Content-Type': 'video/mp4',
-              'Accept-Ranges': 'bytes',
-              'Connection': 'keep-alive',
-              'X-Content-Type-Options': 'nosniff'
-            });
-          } else {
-            if (ext === 'mkv' || ct.includes('matroska')) {
-              outHeaders['Content-Type'] = 'video/x-matroska';
-            } else if (ext === 'mp4' || ct.includes('mp4')) {
-              outHeaders['Content-Type'] = 'video/mp4';
-            } else if (ext === 'ts' || ct.includes('mp2t')) {
-              outHeaders['Content-Type'] = 'video/mp2t';
-            } else if (ct && !ct.includes('octet-stream')) {
-              outHeaders['Content-Type'] = upstreamRes.headers['content-type'];
-            } else {
-              outHeaders['Content-Type'] = 'video/mp4';
-            }
-            if (upstreamRes.headers['content-length']) {
-              outHeaders['Content-Length'] = upstreamRes.headers['content-length'];
-            }
-            if (upstreamRes.headers['content-range']) {
-              outHeaders['Content-Range'] = upstreamRes.headers['content-range'];
-            }
-            res.writeHead(upstreamRes.statusCode || 200, outHeaders);
-          }
+          const authToken = parsedUrl.query.auth_token || parsedUrl.query.token || req.headers['x-auth-token'];
+          const tokenParam = authToken ? `?auth_token=${encodeURIComponent(authToken)}` : '';
+          const startTime = parseFloat(parsedUrl.query.start || parsedUrl.query.time || parsedUrl.query.t || 0) || 0;
+          const startParam = startTime > 0 ? (tokenParam ? `&start=${startTime}` : `?start=${startTime}`) : '';
+          res.writeHead(307, {
+            'Location': `/api/stream/xtream-series-hls/${episodeId}/playlist.m3u8${tokenParam}${startParam}`,
+            'Access-Control-Allow-Origin': '*',
+            'Access-Control-Allow-Headers': '*'
+          });
           return res.end();
         }
 
-        if (needsMp4Remux) {
-          const startTime = parseFloat(parsedUrl.query.start || parsedUrl.query.time || parsedUrl.query.t || 0) || 0;
-          let ffmpegProc = null;
-
-          const outHeaders = {
-            'Access-Control-Allow-Origin': '*',
-            'Access-Control-Allow-Headers': '*',
-            'Content-Type': 'video/mp4',
-            'Cache-Control': 'no-cache, no-store',
-            'Connection': 'keep-alive',
-            'X-Content-Type-Options': 'nosniff'
-          };
-          res.writeHead(200, outHeaders);
-
-          if (startTime > 0) {
-            // Seek précis sur la source avec -ss
-            try { upstreamRes.destroy(); } catch (e) {}
-            ffmpegProc = spawn('ffmpeg', [
-              '-v', 'error',
-              '-user_agent', 'IPTVSmartersPro/1.0',
-              '-ss', startTime.toString(),
-              '-i', targetUrl,
-              '-c', 'copy',
-              '-f', 'mp4',
-              '-movflags', 'frag_keyframe+empty_moov+default_base_moof',
-              'pipe:1'
-            ], { stdio: ['ignore', 'pipe', 'ignore'] });
+        if (req.method === 'HEAD') {
+          try { upstreamRes.destroy(); } catch (e) {}
+          if (ext === 'mkv' || ct.includes('matroska')) {
+            outHeaders['Content-Type'] = 'video/x-matroska';
+          } else if (ext === 'mp4' || ct.includes('mp4')) {
+            outHeaders['Content-Type'] = 'video/mp4';
+          } else if (ext === 'ts' || ct.includes('mp2t')) {
+            outHeaders['Content-Type'] = 'video/mp2t';
+          } else if (ct && !ct.includes('octet-stream')) {
+            outHeaders['Content-Type'] = upstreamRes.headers['content-type'];
           } else {
-            // Remuxage ultra-rapide par pipe direct depuis upstreamRes
-            ffmpegProc = spawn('ffmpeg', [
-              '-v', 'error',
-              '-i', 'pipe:0',
-              '-c', 'copy',
-              '-f', 'mp4',
-              '-movflags', 'frag_keyframe+empty_moov+default_base_moof',
-              'pipe:1'
-            ], { stdio: ['pipe', 'pipe', 'ignore'] });
-
-            upstreamRes.pipe(ffmpegProc.stdin);
-            ffmpegProc.stdin.on('error', () => {});
+            outHeaders['Content-Type'] = 'video/mp4';
           }
-
-          ffmpegProc.stdout.pipe(res);
-
-          const killFfmpeg = () => {
-            if (ffmpegProc) {
-              try { ffmpegProc.stdout.destroy(); } catch (e) {}
-              try { ffmpegProc.kill('SIGKILL'); } catch (e) {}
-              ffmpegProc = null;
-            }
-            try { upstreamRes.destroy(); } catch (e) {}
-          };
-
-          req.once('close', killFfmpeg);
-          res.once('close', killFfmpeg);
-          ffmpegProc.once('close', () => {
-            req.removeListener('close', killFfmpeg);
-            res.removeListener('close', killFfmpeg);
-          });
-          return;
+          if (upstreamRes.headers['content-length']) {
+            outHeaders['Content-Length'] = upstreamRes.headers['content-length'];
+          }
+          if (upstreamRes.headers['content-range']) {
+            outHeaders['Content-Range'] = upstreamRes.headers['content-range'];
+          }
+          res.writeHead(upstreamRes.statusCode || 200, outHeaders);
+          return res.end();
         }
 
         if (ext === 'mkv' || ct.includes('matroska')) {
