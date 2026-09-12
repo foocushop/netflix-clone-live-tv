@@ -793,13 +793,23 @@ try {
 
 const xtreamSocksAgent = SocksProxyAgent ? new SocksProxyAgent('socks5h://127.0.0.1:40000', {
   keepAlive: true,
-  maxSockets: 250,
-  maxFreeSockets: 50,
-  timeout: 15000
+  maxSockets: 300,
+  maxFreeSockets: 20,
+  timeout: 10000
 }) : null;
 
-function getXtreamAgent(urlStr, isSeries = false) {
+function getFreshXtreamSocksAgent() {
+  return SocksProxyAgent ? new SocksProxyAgent('socks5h://127.0.0.1:40000', {
+    keepAlive: false,
+    timeout: 8000
+  }) : null;
+}
+
+function getXtreamAgent(urlStr, isSeries = false, useFresh = false) {
   if (xtreamSocksAgent && (urlStr.includes(XTREAM_CONFIG.host) || urlStr.includes('foxbleu.org'))) {
+    if (useFresh) {
+      return getFreshXtreamSocksAgent() || xtreamSocksAgent;
+    }
     return xtreamSocksAgent;
   }
   const isHttps = urlStr.startsWith('https:');
@@ -897,8 +907,9 @@ function fetchXtreamPlaylist(targetUrl, headers = {}, hops = 0, retry = 0) {
     } catch (e) {
       return reject(new Error('URL Xtream invalide: ' + targetUrl));
     }
-    const client = parsed.protocol === 'https:' ? https : http;
-    const agent = getXtreamAgent(targetUrl, false);
+    const isFoxBleu = targetUrl.includes(XTREAM_CONFIG.host) || targetUrl.includes('foxbleu.org');
+    const client = isFoxBleu && xtreamSocksAgent ? http : (parsed.protocol === 'https:' ? https : http);
+    const agent = getXtreamAgent(targetUrl, false, retry > 0);
     let settled = false;
 
     const req = client.get(targetUrl, {
@@ -907,14 +918,14 @@ function fetchXtreamPlaylist(targetUrl, headers = {}, hops = 0, retry = 0) {
         'User-Agent': 'IPTVSmartersPro/1.0',
         'Accept': '*/*'
       }, headers),
-      timeout: 3500
+      timeout: 4500
     }, (res) => {
       res.on('error', (err) => {
         if (settled) return;
         settled = true;
         try { req.destroy(); } catch (e) {}
-        if (retry < 1 && (err.code === 'ECONNRESET' || err.message?.includes('socket hang up') || err.code === 'ETIMEDOUT')) {
-          return resolve(fetchXtreamPlaylist(targetUrl, headers, hops, retry + 1));
+        if (retry < 3 && (err.code === 'ECONNRESET' || err.message?.includes('socket hang up') || err.code === 'ETIMEDOUT' || err.message?.includes('HostUnreachable') || err.message?.includes('Socks') || err.code === 'ECONNREFUSED')) {
+          return setTimeout(() => resolve(fetchXtreamPlaylist(targetUrl, headers, hops, retry + 1)), 200 * (retry + 1));
         }
         reject(err);
       });
@@ -930,6 +941,16 @@ function fetchXtreamPlaylist(targetUrl, headers = {}, hops = 0, retry = 0) {
         if (!settled) {
           settled = true;
           return resolve(fetchXtreamPlaylist(nextUrl, headers, hops + 1, retry));
+        }
+        return;
+      }
+
+      // Si le serveur amont renvoie une erreur 502/503/504 temporaire : auto-retry avec backoff
+      if ((res.statusCode === 502 || res.statusCode === 503 || res.statusCode === 504) && retry < 3) {
+        try { res.destroy(); } catch (e) {}
+        if (!settled) {
+          settled = true;
+          return setTimeout(() => resolve(fetchXtreamPlaylist(targetUrl, headers, hops, retry + 1)), 250 * (retry + 1));
         }
         return;
       }
@@ -968,8 +989,8 @@ function fetchXtreamPlaylist(targetUrl, headers = {}, hops = 0, retry = 0) {
     req.on('error', (err) => {
       if (settled) return;
       settled = true;
-      if (retry < 1 && (err.message.includes('socket hang up') || err.code === 'ECONNRESET' || err.code === 'ETIMEDOUT')) {
-        return resolve(fetchXtreamPlaylist(targetUrl, headers, hops, retry + 1));
+      if (retry < 3 && (err.message?.includes('socket hang up') || err.code === 'ECONNRESET' || err.code === 'ETIMEDOUT' || err.message?.includes('HostUnreachable') || err.message?.includes('Socks') || err.code === 'ECONNREFUSED')) {
+        return setTimeout(() => resolve(fetchXtreamPlaylist(targetUrl, headers, hops, retry + 1)), 200 * (retry + 1));
       }
       reject(err);
     });
@@ -978,8 +999,8 @@ function fetchXtreamPlaylist(targetUrl, headers = {}, hops = 0, retry = 0) {
       try { req.destroy(); } catch (e) {}
       if (settled) return;
       settled = true;
-      if (retry < 1) {
-        return resolve(fetchXtreamPlaylist(targetUrl, headers, hops, retry + 1));
+      if (retry < 3) {
+        return setTimeout(() => resolve(fetchXtreamPlaylist(targetUrl, headers, hops, retry + 1)), 200 * (retry + 1));
       }
       reject(new Error('Timeout de connexion Xtream'));
     });
@@ -5763,7 +5784,7 @@ const server = http.createServer((req, res) => {
 
       const isFoxBleu = urlToFetch.includes(XTREAM_CONFIG.host) || urlToFetch.includes('foxbleu.org');
       const client = isFoxBleu && xtreamSocksAgent ? http : (parsed.protocol === 'https:' ? https : http);
-      const agent = getXtreamAgent(urlToFetch);
+      const agent = getXtreamAgent(urlToFetch, false, retry > 0);
       let isAborted = false;
       let activeChunkRes = null;
 
@@ -5836,10 +5857,10 @@ const server = http.createServer((req, res) => {
           return;
         }
 
-        // Auto-retry si socket fermée prématurément par le serveur distant
-        if (retry < 2 && !res.headersSent && (err.message.includes('socket hang up') || err.code === 'ECONNRESET' || err.code === 'ETIMEDOUT')) {
+        // Auto-retry si socket fermée prématurément par le serveur distant ou proxy SOCKS
+        if (retry < 3 && !res.headersSent && (err.message?.includes('socket hang up') || err.code === 'ECONNRESET' || err.code === 'ETIMEDOUT' || err.message?.includes('HostUnreachable') || err.message?.includes('Socks') || err.code === 'ECONNREFUSED')) {
           cleanupListeners();
-          return pipeChunk(urlToFetch, hops, retry + 1);
+          return setTimeout(() => pipeChunk(urlToFetch, hops, retry + 1), 150 * (retry + 1));
         }
 
         console.warn('[Xtream Chunk Request Error]:', err.message);
@@ -5854,9 +5875,9 @@ const server = http.createServer((req, res) => {
       clientReq.on('timeout', () => {
         try { clientReq.destroy(); } catch (e) {}
         if (isAborted || req.destroyed || res.destroyed || res.writableEnded) return;
-        if (retry < 2 && !res.headersSent) {
+        if (retry < 3 && !res.headersSent) {
           cleanupListeners();
-          return pipeChunk(urlToFetch, hops, retry + 1);
+          return setTimeout(() => pipeChunk(urlToFetch, hops, retry + 1), 150 * (retry + 1));
         }
         if (!res.headersSent) {
           try {
@@ -6149,7 +6170,7 @@ const server = http.createServer((req, res) => {
     const hasCachedEdge = !!(cachedEdge && cachedEdge.expiresAt > Date.now());
     const initialUrl = hasCachedEdge ? cachedEdge.url : originUrl;
 
-    function pipeSeriesStream(targetUrl, hops = 0, isEdgeAttempt = hasCachedEdge) {
+    function pipeSeriesStream(targetUrl, hops = 0, isEdgeAttempt = hasCachedEdge, retry = 0) {
       if (hops > 4) {
         if (!res.headersSent) {
           res.writeHead(502, { 'Content-Type': 'text/plain', 'Access-Control-Allow-Origin': '*' });
@@ -6175,7 +6196,7 @@ const server = http.createServer((req, res) => {
 
       const isFoxBleu = targetUrl.includes(XTREAM_CONFIG.host) || targetUrl.includes('foxbleu.org');
       const client = isFoxBleu && xtreamSocksAgent ? http : (parsed.protocol === 'https:' ? https : http);
-      const agent = isFoxBleu && xtreamSocksAgent ? xtreamSocksAgent : (parsed.protocol === 'https:' ? xtreamSeriesHttpsAgent : xtreamSeriesHttpAgent);
+      const agent = isFoxBleu && xtreamSocksAgent ? getXtreamAgent(targetUrl, true, retry > 0) : (parsed.protocol === 'https:' ? xtreamSeriesHttpsAgent : xtreamSeriesHttpAgent);
       const headersToForward = {
         'User-Agent': 'IPTVSmartersPro/1.0',
         'Accept': '*/*'
@@ -6191,7 +6212,7 @@ const server = http.createServer((req, res) => {
       const clientReq = client.get(targetUrl, {
         headers: headersToForward,
         agent: agent,
-        timeout: 6000
+        timeout: 8000
       }, (upstreamRes) => {
         activeUpstreamRes = upstreamRes;
 
@@ -6203,7 +6224,7 @@ const server = http.createServer((req, res) => {
             cleanupListeners();
             const nextUrl = loc.startsWith('http') ? loc : new URL(loc, targetUrl).href;
             xtreamSeriesEdgeCache.set(cacheKey, { url: nextUrl, expiresAt: Date.now() + 60 * 60 * 1000 });
-            return pipeSeriesStream(nextUrl, hops + 1, true);
+            return pipeSeriesStream(nextUrl, hops + 1, true, 0);
           }
         }
 
@@ -6214,7 +6235,15 @@ const server = http.createServer((req, res) => {
           cleanupListeners();
           xtreamSeriesEdgeCache.delete(cacheKey);
           console.log(`[Xtream Series Edge Fallback] Edge CDN a renvoyé HTTP ${upstreamRes.statusCode}. Récupération d'un nouveau jeton depuis foxbleu.org...`);
-          return pipeSeriesStream(originUrl, hops, false);
+          return pipeSeriesStream(originUrl, hops, false, 0);
+        }
+
+        // Si le serveur amont renvoie une erreur 502/503/504 temporaire : auto-retry avec backoff
+        if ((upstreamRes.statusCode === 502 || upstreamRes.statusCode === 503 || upstreamRes.statusCode === 504) && !isEdgeAttempt && retry < 3) {
+          try { upstreamRes.destroy(); } catch (e) {}
+          cleanupListeners();
+          console.log(`[Xtream Series 502 Upstream Retry]: tentative ${retry + 1}/3...`);
+          return setTimeout(() => pipeSeriesStream(originUrl, hops, false, retry + 1), 250 * (retry + 1));
         }
 
         if (upstreamRes.statusCode >= 400) {
@@ -6395,7 +6424,12 @@ const server = http.createServer((req, res) => {
           cleanupListeners();
           xtreamSeriesEdgeCache.delete(cacheKey);
           console.log(`[Xtream Series Edge Network Error]: ${err.message}. Récupération via serveur maître...`);
-          return pipeSeriesStream(originUrl, hops, false);
+          return pipeSeriesStream(originUrl, hops, false, 0);
+        }
+        if (!isEdgeAttempt && retry < 3 && !res.headersSent && (err.message?.includes('socket hang up') || err.code === 'ECONNRESET' || err.code === 'ETIMEDOUT' || err.message?.includes('HostUnreachable') || err.message?.includes('Socks') || err.code === 'ECONNREFUSED')) {
+          cleanupListeners();
+          console.log(`[Xtream Series Origin Retry]: ${err.message}, tentative ${retry + 1}/3...`);
+          return setTimeout(() => pipeSeriesStream(originUrl, hops, false, retry + 1), 200 * (retry + 1));
         }
         console.warn('[Xtream Series Request Error]:', err.message);
         if (!res.headersSent) {
@@ -6412,7 +6446,11 @@ const server = http.createServer((req, res) => {
         if (isEdgeAttempt && !res.headersSent) {
           cleanupListeners();
           xtreamSeriesEdgeCache.delete(cacheKey);
-          return pipeSeriesStream(originUrl, hops, false);
+          return pipeSeriesStream(originUrl, hops, false, 0);
+        }
+        if (!isEdgeAttempt && retry < 3 && !res.headersSent) {
+          cleanupListeners();
+          return setTimeout(() => pipeSeriesStream(originUrl, hops, false, retry + 1), 200 * (retry + 1));
         }
         if (!res.headersSent) {
           try {
