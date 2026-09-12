@@ -6001,6 +6001,7 @@ const server = http.createServer((req, res) => {
     let isTruncatedPlaylist = false;
     let isFullCompletePlaylist = false;
     let existingPlaylistDuration = 0;
+    let existingFirstSegNum = 0;
     if (fs.existsSync(playlistPath)) {
       try {
         const existingContent = fs.readFileSync(playlistPath, 'utf8');
@@ -6009,6 +6010,10 @@ const server = http.createServer((req, res) => {
         let m;
         while ((m = re.exec(existingContent)) !== null) dur += parseFloat(m[1]);
         existingPlaylistDuration = dur;
+        const firstSegMatch = existingContent.match(/seg_(\d+)\.ts/);
+        if (firstSegMatch && firstSegMatch[1]) {
+          existingFirstSegNum = parseInt(firstSegMatch[1], 10);
+        }
         if (existingContent.includes('#EXT-X-ENDLIST')) {
           if (dur < 600) {
             isTruncatedPlaylist = true;
@@ -6019,11 +6024,13 @@ const server = http.createServer((req, res) => {
       } catch (e) {}
     }
 
-    // Une session doit être redémarrée UNIQUEMENT si :
+    // Une session doit être redémarrée si :
     // 1. La playlist est corrompue/tronquée (< 600s avec ENDLIST)
-    // 2. OU si le point de départ demandé dépasse largement ce qui a été généré (> 60s au-delà) et que l'épisode n'est pas encore complet
-    const isSeekingBeyondBuffer = startTime > 0 && !isFullCompletePlaylist && (startTime > existingPlaylistDuration + 60);
-    const isDifferentStart = session && isSeekingBeyondBuffer && Math.abs((session.startTime || 0) - startTime) > 5;
+    // 2. Le point demandé précède le premier segment présent sur disque
+    // 3. OU si le point demandé dépasse largement ce qui a été généré (> 60s au-delà) et que l'épisode n'est pas encore complet
+    const isSeekingBeforeFirstSeg = existingFirstSegNum > 0 && (startTime < existingFirstSegNum * 3);
+    const isSeekingBeyondBuffer = startTime > 0 && !isFullCompletePlaylist && (startTime > existingPlaylistDuration + (existingFirstSegNum * 4) + 60);
+    const isDifferentStart = (isSeekingBeforeFirstSeg || (session && isSeekingBeyondBuffer && Math.abs((session.startTime || 0) - startTime) > 5));
     const isBrokenSession = (session && session.isDone && (!fs.existsSync(playlistPath) || isTruncatedPlaylist)) || (!session && isTruncatedPlaylist);
 
     if ((isDifferentStart || isBrokenSession) && !isFullCompletePlaylist) {
