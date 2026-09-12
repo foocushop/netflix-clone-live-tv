@@ -5501,6 +5501,14 @@ const server = http.createServer((req, res) => {
     return;
   }
 
+// Chaînes avec codec audio Dolby Digital Plus (E-AC-3) nécessitant un transcodage audio AAC pour navigateurs web
+const EC3_AUDIO_CHANNELS = new Set([
+  '14156', '14161', '13936', '39437', '47509', // Canal+ Sport (FHD, HD, SD, Bas Débit, HEVC)
+  '14151', '28345', // Canal+ France (FHD, SD)
+  'tv_canal_sport', 'canal+ sport', 'canal sport',
+  'tv_canal_france', 'canal+', 'canal+ france'
+]);
+
   // ================= ROUTE DIRECT XTREAM VIP PROXY (/api/stream/xtream) =================
   // Infrastructure Haute Résilience pour Xtream Codes :
   // 1. Détection dynamique de la chaîne exacte (zéro duplication sur Canal+ Foot)
@@ -5530,9 +5538,16 @@ const server = http.createServer((req, res) => {
       trackStreamingSession(req, res, streamId, 'live', rawChannel);
     }
 
+    const shouldTranscodeAudio = (
+      parsedUrl.query.transcode_audio === '1' ||
+      EC3_AUDIO_CHANNELS.has(String(rawChannel)) ||
+      EC3_AUDIO_CHANNELS.has(String(streamId))
+    );
+    const manifestCacheKey = String(streamId) + (shouldTranscodeAudio ? '_aac' : '');
+
     // Accélération 1 : Cache mémoire RAM instantané (1500ms) pour rafraîchissement à 0 ms
     if (!parsedUrl.query.target && streamId) {
-      const cachedManifest = xtreamManifestCache.get(streamId);
+      const cachedManifest = xtreamManifestCache.get(manifestCacheKey);
       if (cachedManifest && cachedManifest.expiresAt > Date.now()) {
         res.writeHead(200, {
           'Content-Type': 'application/vnd.apple.mpegurl',
@@ -5541,7 +5556,8 @@ const server = http.createServer((req, res) => {
           'Cache-Control': 'no-cache, no-store, must-revalidate',
           'X-Xtream-Cache': 'HIT-RAM',
           'Pragma': 'no-cache',
-          'Expires': '0'
+          'Expires': '0',
+          'Connection': 'keep-alive'
         });
         return res.end(cachedManifest.manifest);
       }
@@ -5700,18 +5716,18 @@ const server = http.createServer((req, res) => {
 
             // Si c'est une sous-playlist (variant stream)
             if (trimmed.includes('.m3u8')) {
-              return `/api/stream/xtream?target=${encodeURIComponent(absUrl)}`;
+              return `/api/stream/xtream?target=${encodeURIComponent(absUrl)}${shouldTranscodeAudio ? '&transcode_audio=1' : ''}`;
             }
 
             // Segment média (.ts)
-            return `/api/stream/xtream-chunk?url=${encodeURIComponent(absUrl)}`;
+            return `/api/stream/xtream-chunk?url=${encodeURIComponent(absUrl)}${shouldTranscodeAudio ? '&transcode_audio=1' : ''}`;
           });
 
           const rewrittenManifest = rewrittenLines.join('\n');
 
           // Sauvegarde dans le cache RAM éphémère (1500ms)
           if (!parsedUrl.query.target && streamId) {
-            xtreamManifestCache.set(streamId, { manifest: rewrittenManifest, expiresAt: Date.now() + 1500 });
+            xtreamManifestCache.set(manifestCacheKey, { manifest: rewrittenManifest, expiresAt: Date.now() + 1500 });
           }
 
           res.writeHead(200, {
@@ -5787,6 +5803,7 @@ const server = http.createServer((req, res) => {
       const agent = getXtreamAgent(urlToFetch, false, isFoxBleu && USE_SOCKS_PROXY);
       let isAborted = false;
       let activeChunkRes = null;
+      let activeFfmpeg = null;
 
       const clientReq = client.get(urlToFetch, {
         agent,
@@ -5803,6 +5820,10 @@ const server = http.createServer((req, res) => {
           if (isAborted || req.destroyed || res.destroyed || res.writableEnded) return;
           console.warn('[Xtream Chunk Stream Error]:', err.message);
           try { chunkRes.destroy(); } catch (e) {}
+          if (activeFfmpeg) {
+            try { activeFfmpeg.kill('SIGKILL'); } catch (e) {}
+            activeFfmpeg = null;
+          }
           if (!res.headersSent) {
             try {
               res.writeHead(502, { 'Content-Type': 'text/plain', 'Access-Control-Allow-Origin': '*' });
@@ -5840,16 +5861,53 @@ const server = http.createServer((req, res) => {
           try { res.socket.setNoDelay(true); } catch (e) {}
         }
 
-        res.writeHead(chunkRes.statusCode, {
-          'Content-Type': chunkRes.headers['content-type'] || 'video/mp2t',
-          'Content-Length': chunkRes.headers['content-length'],
-          'Access-Control-Allow-Origin': '*',
-          'Access-Control-Allow-Headers': '*',
-          'Cache-Control': 'public, max-age=3600',
-          'Connection': 'keep-alive'
-        });
+        const needAudioTranscode = parsedUrl.query.transcode_audio === '1';
 
-        chunkRes.pipe(res);
+        if (needAudioTranscode) {
+          res.writeHead(chunkRes.statusCode, {
+            'Content-Type': 'video/mp2t',
+            'Access-Control-Allow-Origin': '*',
+            'Access-Control-Allow-Headers': '*',
+            'Cache-Control': 'public, max-age=3600',
+            'Connection': 'keep-alive'
+          });
+
+          const ffmpeg = spawn('ffmpeg', [
+            '-v', 'error',
+            '-i', 'pipe:0',
+            '-c:v', 'copy',
+            '-c:a', 'aac',
+            '-b:a', '192k',
+            '-muxdelay', '0',
+            '-f', 'mpegts',
+            'pipe:1'
+          ], { stdio: ['pipe', 'pipe', 'ignore'] });
+
+          activeFfmpeg = ffmpeg;
+
+          ffmpeg.on('error', (err) => {
+            console.warn('[Xtream Chunk Audio Transcode Error]:', err.message);
+            try { res.end(); } catch (e) {}
+          });
+
+          ffmpeg.on('close', () => {
+            if (activeFfmpeg === ffmpeg) activeFfmpeg = null;
+          });
+
+          chunkRes.pipe(ffmpeg.stdin);
+          ffmpeg.stdout.pipe(res);
+        } else {
+          res.writeHead(chunkRes.statusCode, {
+            'Content-Type': chunkRes.headers['content-type'] || 'video/mp2t',
+            'Content-Length': chunkRes.headers['content-length'],
+            'Access-Control-Allow-Origin': '*',
+            'Access-Control-Allow-Headers': '*',
+            'Cache-Control': 'public, max-age=3600',
+            'Connection': 'keep-alive'
+          });
+
+          chunkRes.pipe(res);
+        }
       });
 
       clientReq.on('error', (err) => {
@@ -5892,6 +5950,12 @@ const server = http.createServer((req, res) => {
         try { clientReq.destroy(); } catch (e) {}
         if (activeChunkRes) {
           try { activeChunkRes.destroy(); } catch (e) {}
+        }
+        if (activeFfmpeg) {
+          try { activeFfmpeg.stdin.destroy(); } catch (e) {}
+          try { activeFfmpeg.stdout.destroy(); } catch (e) {}
+          try { activeFfmpeg.kill('SIGKILL'); } catch (e) {}
+          activeFfmpeg = null;
         }
       };
 

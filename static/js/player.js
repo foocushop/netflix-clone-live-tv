@@ -1564,6 +1564,9 @@ class NetflixPlayer {
       streamUrl = `${streamUrl}${sep}auth_token=${encodeURIComponent(authToken)}`;
     }
     this._currentHlsUrl = streamUrl;
+    if (!streamUrl.includes('transcode_audio=1')) {
+      this._audioTranscodeRecovery = false;
+    }
     const startMatch = streamUrl.match(/[?&]start=(\d+)/);
     this._hlsStreamOffset = startMatch ? parseInt(startMatch[1], 10) : 0;
 
@@ -1745,10 +1748,26 @@ class NetflixPlayer {
       });
 
       hls.on(Hls.Events.ERROR, (event, data) => {
-        // Détection d'incompatibilité audio matérielle (ex: EC-3 Dolby)
-        if (data.reason && (data.reason.includes('EC-3') || data.reason.includes('Unsupported audio'))) {
-          console.warn('[HLS] Incompatibilité audio directe (EC-3).');
-          this.showStatusBanner("Incompatibilité audio avec votre navigateur. Essai de récupération...");
+        // Détection d'incompatibilité audio matérielle (ex: EC-3 Dolby / code non supporté)
+        const isAudioIncompatibility = (
+          (data.reason && (data.reason.includes('EC-3') || data.reason.includes('Unsupported audio'))) ||
+          data.details === 'bufferAddCodecError' ||
+          (data.details === Hls.ErrorDetails.BUFFER_APPENDING_ERROR && data.mimeType && data.mimeType.includes('ec-3'))
+        );
+        if (isAudioIncompatibility) {
+          console.warn('[HLS] Incompatibilité audio détectée (EC-3).');
+          if (!this._audioTranscodeRecovery && this._currentHlsUrl && !this._currentHlsUrl.includes('transcode_audio=1')) {
+            this._audioTranscodeRecovery = true;
+            this.showStatusBanner("Incompatibilité audio avec votre navigateur. Optimisation audio en cours...");
+            const sep = this._currentHlsUrl.includes('?') ? '&' : '?';
+            const recoveredUrl = `${this._currentHlsUrl}${sep}transcode_audio=1`;
+            console.log('[HLS Audio Recovery] Bascule automatique vers transcodage AAC serveur :', recoveredUrl);
+            setTimeout(() => {
+              this.playDirectHls(recoveredUrl);
+            }, 300);
+            return;
+          }
+          this.showStatusBanner("Incompatibilité audio avec votre navigateur.");
         }
 
         if (!data.fatal) {
