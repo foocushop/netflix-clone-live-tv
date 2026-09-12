@@ -458,22 +458,37 @@ class NetflixPlayer {
     const applySeek = (targetTime) => {
       const isChannel = (this.currentMovie?.media_type === 'channel' || this.currentMovie?.is_live);
       if (isChannel) return;
+      if (!this.video || !isFinite(targetTime) || targetTime < 0) return;
+
       if (this._currentHlsUrl && this._currentHlsUrl.includes('/api/stream/xtream-series-hls')) {
-        const bufferedEnd = (this.video.buffered && this.video.buffered.length > 0) ? this.video.buffered.end(this.video.buffered.length - 1) : 0;
-        if (targetTime > bufferedEnd + 4 || targetTime < this.video.currentTime - 30) {
+        const maxSeekable = (this.video.seekable && this.video.seekable.length > 0)
+          ? this.video.seekable.end(this.video.seekable.length - 1)
+          : 0;
+
+        // Si la durée demandée dépasse très largement ce qui a été généré sur le serveur (> 90s au-delà)
+        // et que la playlist n'est pas encore complète, on demande au serveur de démarrer FFmpeg à ce point
+        if (maxSeekable > 0 && targetTime > maxSeekable + 90) {
           const cleanUrl = this._currentHlsUrl.replace(/[?&]start=\d+/g, '');
           const sep = cleanUrl.includes('?') ? '&' : '?';
           this.playDirectHls(`${cleanUrl}${sep}start=${Math.floor(targetTime)}`);
-        } else {
-          this.video.currentTime = targetTime;
+          return;
+        }
+
+        // Sinon, seek natif instantané ultra-fluide dans la playlist existante
+        this.video.currentTime = targetTime;
+        if (this.video.paused) {
+          this.video.play().catch(() => {});
         }
       } else if (this._isRemuxedMp4 && this._currentDirectVideoUrl) {
-        const cleanUrl = this._currentDirectVideoUrl.replace(/&start=\d+/g, '').replace(/\?start=\d+/g, '?');
-        const sep = cleanUrl.includes('?') ? '&' : '?';
-        this.video.src = `${cleanUrl}${sep}start=${Math.floor(targetTime)}`;
-        this.video.play().catch(() => {});
+        this.video.currentTime = targetTime;
+        if (this.video.paused) {
+          this.video.play().catch(() => {});
+        }
       } else {
         this.video.currentTime = targetTime;
+        if (this.video.paused) {
+          this.video.play().catch(() => {});
+        }
       }
     };
 
@@ -1966,23 +1981,12 @@ class NetflixPlayer {
       total = this.currentEpisodeDuration || 0;
     }
     if (!total || !isFinite(total)) return;
-    const newTime = Math.max(0, Math.min(total, this.video.currentTime + seconds));
-    if (this._currentHlsUrl && this._currentHlsUrl.includes('/api/stream/xtream-series-hls')) {
-      const bufferedEnd = (this.video.buffered && this.video.buffered.length > 0) ? this.video.buffered.end(this.video.buffered.length - 1) : 0;
-      if (newTime > bufferedEnd + 4 || newTime < this.video.currentTime - 30) {
-        const cleanUrl = this._currentHlsUrl.replace(/[?&]start=\d+/g, '');
-        const sep = cleanUrl.includes('?') ? '&' : '?';
-        this.playDirectHls(`${cleanUrl}${sep}start=${Math.floor(newTime)}`);
-      } else {
-        this.video.currentTime = newTime;
-      }
-    } else if (this._isRemuxedMp4 && this._currentDirectVideoUrl) {
-      const cleanUrl = this._currentDirectVideoUrl.replace(/&start=\d+/g, '').replace(/\?start=\d+/g, '?');
-      const sep = cleanUrl.includes('?') ? '&' : '?';
-      this.video.src = `${cleanUrl}${sep}start=${Math.floor(newTime)}`;
-      this.video.play().catch(() => {});
-    } else {
+    const newTime = Math.max(0, Math.min(total - 1, (this.video.currentTime || 0) + seconds));
+    if (this.video) {
       this.video.currentTime = newTime;
+      if (this.video.paused) {
+        this.video.play().catch(() => {});
+      }
     }
     this.triggerCenterRipple(seconds > 0 ? `+${seconds}s` : `${seconds}s`);
   }

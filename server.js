@@ -5997,30 +5997,36 @@ const server = http.createServer((req, res) => {
     const seg0 = path.join(hlsDir, 'seg_0000.ts');
     let session = xtreamHlsSessions.get(String(episodeId));
 
-    // Détection de playlist tronquée résiduelle sur disque (< 600 secondes)
+    // Détection de playlist sur disque
     let isTruncatedPlaylist = false;
+    let isFullCompletePlaylist = false;
+    let existingPlaylistDuration = 0;
     if (fs.existsSync(playlistPath)) {
       try {
         const existingContent = fs.readFileSync(playlistPath, 'utf8');
+        let dur = 0;
+        const re = /#EXTINF:([0-9.]+)/g;
+        let m;
+        while ((m = re.exec(existingContent)) !== null) dur += parseFloat(m[1]);
+        existingPlaylistDuration = dur;
         if (existingContent.includes('#EXT-X-ENDLIST')) {
-          let dur = 0;
-          const re = /#EXTINF:([0-9.]+)/g;
-          let m;
-          while ((m = re.exec(existingContent)) !== null) {
-            dur += parseFloat(m[1]);
-          }
           if (dur < 600) {
             isTruncatedPlaylist = true;
+          } else {
+            isFullCompletePlaylist = true;
           }
         }
       } catch (e) {}
     }
 
-    // Si le temps de départ a changé (seek au-delà du buffer) ou si la session précédente a crashé sans générer de flux ou est tronquée
-    const isDifferentStart = session && Math.abs((session.startTime || 0) - startTime) > 2;
-    const isBrokenSession = (session && session.isDone && (!fs.existsSync(playlistPath) || !fs.existsSync(seg0) || isTruncatedPlaylist)) || (!session && isTruncatedPlaylist);
+    // Une session doit être redémarrée UNIQUEMENT si :
+    // 1. La playlist est corrompue/tronquée (< 600s avec ENDLIST)
+    // 2. OU si le point de départ demandé dépasse largement ce qui a été généré (> 60s au-delà) et que l'épisode n'est pas encore complet
+    const isSeekingBeyondBuffer = startTime > 0 && !isFullCompletePlaylist && (startTime > existingPlaylistDuration + 60);
+    const isDifferentStart = session && isSeekingBeyondBuffer && Math.abs((session.startTime || 0) - startTime) > 5;
+    const isBrokenSession = (session && session.isDone && (!fs.existsSync(playlistPath) || isTruncatedPlaylist)) || (!session && isTruncatedPlaylist);
 
-    if (isDifferentStart || isBrokenSession) {
+    if ((isDifferentStart || isBrokenSession) && !isFullCompletePlaylist) {
       if (session && session.proc) {
         try { session.proc.kill('SIGTERM'); } catch (e) {}
         try { session.proc.kill('SIGKILL'); } catch (e) {}
@@ -6047,17 +6053,29 @@ const server = http.createServer((req, res) => {
         '-user_agent', 'IPTVSmartersPro/1.0'
       ];
       if (startTime > 0) {
-        ffmpegArgs.push('-ss', startTime.toString());
+        const startSec = Math.floor(startTime);
+        ffmpegArgs.push(
+          '-ss', startSec.toString(),
+          '-output_ts_offset', startSec.toString()
+        );
       }
       ffmpegArgs.push(
         '-i', streamSourceUrl,
         '-c', 'copy',
         '-sn',
-        '-avoid_negative_ts', 'make_zero',
         '-f', 'hls',
         '-hls_time', '4',
         '-hls_list_size', '0',
-        '-hls_playlist_type', 'event',
+        '-hls_playlist_type', 'event'
+      );
+      if (startTime > 0) {
+        const startNum = Math.floor(startTime / 4);
+        ffmpegArgs.push(
+          '-hls_start_number_source', 'generic',
+          '-start_number', startNum.toString()
+        );
+      }
+      ffmpegArgs.push(
         '-hls_segment_filename', path.join(hlsDir, 'seg_%04d.ts'),
         playlistPath
       );
@@ -6106,9 +6124,9 @@ const server = http.createServer((req, res) => {
       });
     }
 
-    if (!session) {
+    if (!session && !isFullCompletePlaylist) {
       spawnHlsProc(originUrl);
-    } else {
+    } else if (session) {
       session.lastAccess = Date.now();
     }
 
@@ -6118,10 +6136,17 @@ const server = http.createServer((req, res) => {
     const pollInterval = 150;
 
     const checkReady = () => {
-      if (fs.existsSync(playlistPath) && fs.existsSync(seg0)) {
+      if (fs.existsSync(playlistPath)) {
         try {
-          const s = fs.statSync(seg0);
-          if (s.size > 20000) return true;
+          const content = fs.readFileSync(playlistPath, 'utf8');
+          const firstSegMatch = content.match(/(seg_\d+\.ts)/);
+          if (firstSegMatch && firstSegMatch[1]) {
+            const firstSegPath = path.join(hlsDir, firstSegMatch[1]);
+            if (fs.existsSync(firstSegPath)) {
+              const s = fs.statSync(firstSegPath);
+              if (s.size > 20000) return true;
+            }
+          }
         } catch (e) {}
       }
       return false;
