@@ -1,0 +1,12 @@
+[
+  {
+    "id": "series_6715_s11",
+    "series_id": 6715,
+    "season": 11,
+    "name": "La Villa des cœurs brisés",
+    "emoji": "💔",
+    "template": "<b>{titre}</b> {emoji} Saison {saison}\n\nÉpisode {episode}",
+    "channel_id": "-1002615244456",
+    "enabled": true
+  }
+]
