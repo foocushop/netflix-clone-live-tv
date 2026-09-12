@@ -351,7 +351,8 @@ function fetchFreshXmltv() {
     const upstreamUrl = `http://${XTREAM_CONFIG.host}:${XTREAM_CONFIG.port}/xmltv.php?username=${XTREAM_CONFIG.username}&password=${XTREAM_CONFIG.password}`;
     console.log('[XMLTV] 📥 Téléchargement du guide EPG complet depuis le serveur source...');
 
-    http.get(upstreamUrl, { timeout: 90000 }, (upRes) => {
+    const xmltvAgent = getXtreamAgent(upstreamUrl);
+    http.get(upstreamUrl, { agent: xmltvAgent, timeout: 90000 }, (upRes) => {
       if (upRes.statusCode !== 200) {
         xmltvEpgPromise = null;
         return reject(new Error(`Serveur XMLTV amont code HTTP ${upRes.statusCode}`));
@@ -780,6 +781,34 @@ const xtreamSeriesHttpsAgent = new https.Agent({
   timeout: 30000
 });
 
+// Agent SOCKS5 via WARP local (127.0.0.1:40000) pour contourner le blocage datacenter sur foxbleu.org
+let SocksProxyAgent = null;
+try {
+  SocksProxyAgent = require('socks-proxy-agent').SocksProxyAgent;
+} catch (e) {
+  try {
+    SocksProxyAgent = require('/var/www/netflix-clone/node_modules/socks-proxy-agent').SocksProxyAgent;
+  } catch (e2) {}
+}
+
+const xtreamSocksAgent = SocksProxyAgent ? new SocksProxyAgent('socks5h://127.0.0.1:40000', {
+  keepAlive: true,
+  maxSockets: 50,
+  maxFreeSockets: 10,
+  timeout: 10000
+}) : null;
+
+function getXtreamAgent(urlStr, isSeries = false) {
+  if (xtreamSocksAgent && (urlStr.includes(XTREAM_CONFIG.host) || urlStr.includes('foxbleu.org'))) {
+    return xtreamSocksAgent;
+  }
+  const isHttps = urlStr.startsWith('https:');
+  if (isSeries) {
+    return isHttps ? xtreamSeriesHttpsAgent : xtreamSeriesHttpAgent;
+  }
+  return isHttps ? xtreamHttpsAgent : xtreamHttpAgent;
+}
+
 // Cache d'adresses Edge directes (TTL 60s) pour contourner les redirections 302 à répétition
 const xtreamEdgeCache = new Map();
 // Cache ultra-rapide des manifests réécrits (TTL 1500ms) pour démarrage immédiat (0ms)
@@ -867,7 +896,7 @@ function fetchXtreamPlaylist(targetUrl, headers = {}, hops = 0, retry = 0) {
       return reject(new Error('URL Xtream invalide: ' + targetUrl));
     }
     const client = parsed.protocol === 'https:' ? https : http;
-    const agent = parsed.protocol === 'https:' ? xtreamHttpsAgent : xtreamHttpAgent;
+    const agent = getXtreamAgent(targetUrl, false);
     let settled = false;
 
     const req = client.get(targetUrl, {
@@ -2400,7 +2429,8 @@ function updateCatalogSeriesSeasons(seriesId, rawXtreamData) {
 
 function fetchFreshSeriesFromXtream(seriesId, onDone) {
   const apiUrl = `http://${XTREAM_CONFIG.host}:${XTREAM_CONFIG.port}/player_api.php?username=${XTREAM_CONFIG.username}&password=${XTREAM_CONFIG.password}&action=get_series_info&series_id=${seriesId}`;
-  http.get(apiUrl, { timeout: 12000 }, (apiRes) => {
+  const apiAgent = getXtreamAgent(apiUrl);
+  http.get(apiUrl, { agent: apiAgent, timeout: 12000 }, (apiRes) => {
     let data = '';
     apiRes.on('data', chunk => data += chunk);
     apiRes.on('end', () => {
@@ -2948,7 +2978,8 @@ async function handlePlayerApi(req, res, q) {
       return res.end(cached.body);
     }
     const upstreamUrl = `http://${XTREAM_CONFIG.host}:${XTREAM_CONFIG.port}/player_api.php?username=${XTREAM_CONFIG.username}&password=${XTREAM_CONFIG.password}&action=${action}&stream_id=${streamId}${limit}`;
-    http.get(upstreamUrl, { timeout: 8000 }, (upRes) => {
+    const epgAgent = getXtreamAgent(upstreamUrl);
+    http.get(upstreamUrl, { agent: epgAgent, timeout: 8000 }, (upRes) => {
       let data = '';
       upRes.on('data', c => data += c);
       upRes.on('end', () => {
@@ -5160,7 +5191,8 @@ const server = http.createServer((req, res) => {
 
   function syncTeleRealiteCatalogFromXtream(onDone) {
     const apiUrl = `http://${XTREAM_CONFIG.host}:${XTREAM_CONFIG.port}/player_api.php?username=${XTREAM_CONFIG.username}&password=${XTREAM_CONFIG.password}&action=get_series&category_id=947`;
-    http.get(apiUrl, { timeout: 15000 }, (apiRes) => {
+    const syncAgent = getXtreamAgent(apiUrl);
+    http.get(apiUrl, { agent: syncAgent, timeout: 15000 }, (apiRes) => {
       let data = '';
       apiRes.on('data', chunk => data += chunk);
       apiRes.on('end', () => {
@@ -5907,7 +5939,7 @@ const server = http.createServer((req, res) => {
       session = null;
     }
 
-    if (!session) {
+    function spawnHlsProc(streamSourceUrl) {
       if (!fs.existsSync(hlsDir)) fs.mkdirSync(hlsDir, { recursive: true });
 
       const ffmpegArgs = [
@@ -5918,7 +5950,7 @@ const server = http.createServer((req, res) => {
         ffmpegArgs.push('-ss', startTime.toString());
       }
       ffmpegArgs.push(
-        '-i', initialUrl,
+        '-i', streamSourceUrl,
         '-c', 'copy',
         '-sn',
         '-avoid_negative_ts', 'make_zero',
@@ -5951,6 +5983,30 @@ const server = http.createServer((req, res) => {
         session.isDone = true;
         session.proc = null;
       });
+    }
+
+    if (!session) {
+      if (hasCachedEdge && cachedEdge.url) {
+        spawnHlsProc(cachedEdge.url);
+      } else {
+        const edgeAgent = getXtreamAgent(originUrl, true);
+        const reqResolve = http.get(originUrl, {
+          agent: edgeAgent,
+          headers: { 'User-Agent': 'IPTVSmartersPro/1.0', 'Accept': '*/*' },
+          timeout: 5000
+        }, (resResolve) => {
+          const loc = resResolve.headers.location;
+          resResolve.destroy();
+          const edgeUrl = (loc && loc.startsWith('http')) ? loc : (loc ? new URL(loc, originUrl).href : originUrl);
+          if (loc) {
+            xtreamSeriesEdgeCache.set(cacheKey, { url: edgeUrl, expiresAt: Date.now() + 60 * 60 * 1000 });
+          }
+          spawnHlsProc(edgeUrl);
+        });
+        reqResolve.on('error', () => {
+          spawnHlsProc(originUrl);
+        });
+      }
     } else {
       session.lastAccess = Date.now();
     }
@@ -6076,8 +6132,9 @@ const server = http.createServer((req, res) => {
         return;
       }
 
-      const client = parsed.protocol === 'https:' ? https : http;
-      const agent = parsed.protocol === 'https:' ? xtreamSeriesHttpsAgent : xtreamSeriesHttpAgent;
+      const isFoxBleu = targetUrl.includes(XTREAM_CONFIG.host) || targetUrl.includes('foxbleu.org');
+      const client = isFoxBleu && xtreamSocksAgent ? http : (parsed.protocol === 'https:' ? https : http);
+      const agent = isFoxBleu && xtreamSocksAgent ? xtreamSocksAgent : (parsed.protocol === 'https:' ? xtreamSeriesHttpsAgent : xtreamSeriesHttpAgent);
       const headersToForward = {
         'User-Agent': 'IPTVSmartersPro/1.0',
         'Accept': '*/*'
@@ -6167,10 +6224,11 @@ const server = http.createServer((req, res) => {
         const ct = (upstreamRes.headers['content-type'] || '').toLowerCase();
         const ua = (req.headers['user-agent'] || '').toLowerCase();
         const isAppleDevice = /iphone|ipad|ipod/.test(ua) || (ua.includes('macintosh') && !ua.includes('chrome')) || (ua.includes('safari') && !ua.includes('chrome') && !ua.includes('android'));
-        const forceHls = (parsedUrl.query.format === 'hls' || parsedUrl.query.format === 'mp4' || parsedUrl.query.remux === '1');
-        const needsHlsRedirect = (isAppleDevice || forceHls) && (ext === 'mkv' || ct.includes('matroska') || !ct);
+        const forceHls = (parsedUrl.query.format === 'hls');
+        const forceMp4 = (parsedUrl.query.format === 'mp4' || parsedUrl.query.remux === '1');
+        const needsMp4Remux = (isAppleDevice || forceMp4) && (ext === 'mkv' || ct.includes('matroska') || !ct);
 
-        if (needsHlsRedirect) {
+        if (forceHls) {
           try { upstreamRes.destroy(); } catch (e) {}
           const authToken = parsedUrl.query.auth_token || parsedUrl.query.token || req.headers['x-auth-token'];
           const tokenParam = authToken ? `?auth_token=${encodeURIComponent(authToken)}` : '';
@@ -6182,6 +6240,66 @@ const server = http.createServer((req, res) => {
             'Access-Control-Allow-Headers': '*'
           });
           return res.end();
+        }
+
+        if (needsMp4Remux) {
+          const startTime = parseFloat(parsedUrl.query.start || parsedUrl.query.time || parsedUrl.query.t || 0) || 0;
+          let ffmpegProc = null;
+
+          const remuxHeaders = {
+            'Access-Control-Allow-Origin': '*',
+            'Access-Control-Allow-Headers': '*',
+            'Content-Type': 'video/mp4',
+            'Cache-Control': 'no-cache, no-store',
+            'Connection': 'keep-alive',
+            'X-Content-Type-Options': 'nosniff'
+          };
+          res.writeHead(200, remuxHeaders);
+
+          if (startTime > 0) {
+            try { upstreamRes.destroy(); } catch (e) {}
+            ffmpegProc = spawn('ffmpeg', [
+              '-v', 'error',
+              '-user_agent', 'IPTVSmartersPro/1.0',
+              '-ss', startTime.toString(),
+              '-i', targetUrl,
+              '-c', 'copy',
+              '-f', 'mp4',
+              '-movflags', 'frag_keyframe+empty_moov+default_base_moof',
+              'pipe:1'
+            ], { stdio: ['ignore', 'pipe', 'ignore'] });
+          } else {
+            ffmpegProc = spawn('ffmpeg', [
+              '-v', 'error',
+              '-i', 'pipe:0',
+              '-c', 'copy',
+              '-f', 'mp4',
+              '-movflags', 'frag_keyframe+empty_moov+default_base_moof',
+              'pipe:1'
+            ], { stdio: ['pipe', 'pipe', 'ignore'] });
+
+            upstreamRes.pipe(ffmpegProc.stdin);
+            ffmpegProc.stdin.on('error', () => {});
+          }
+
+          ffmpegProc.stdout.pipe(res);
+
+          const killFfmpeg = () => {
+            if (ffmpegProc) {
+              try { ffmpegProc.stdout.destroy(); } catch (e) {}
+              try { ffmpegProc.kill('SIGKILL'); } catch (e) {}
+              ffmpegProc = null;
+            }
+            try { upstreamRes.destroy(); } catch (e) {}
+          };
+
+          req.once('close', killFfmpeg);
+          res.once('close', killFfmpeg);
+          ffmpegProc.once('close', () => {
+            req.removeListener('close', killFfmpeg);
+            res.removeListener('close', killFfmpeg);
+          });
+          return;
         }
 
         if (req.method === 'HEAD') {

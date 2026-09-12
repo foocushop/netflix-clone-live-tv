@@ -1353,22 +1353,8 @@ class NetflixPlayer {
         targetStreamUrl = baseUrl + targetStreamUrl;
       }
 
-      // Détection de compatibilité MKV (Safari / iOS / Mac)
-      const canPlayMkv = (this.video.canPlayType('video/x-matroska') !== '' || this.video.canPlayType('video/mkv') !== '');
-      const isApple = /iPad|iPhone|iPod/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
-      const isSafari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent) || isApple || (navigator.platform === 'MacIntel' && !/Chrome|CriOS/i.test(navigator.userAgent));
-      const needsHls = (!canPlayMkv || isSafari || isApple);
-
       if (isChannel || data.player_type === 'direct_hls' || (targetStreamUrl && targetStreamUrl.includes('.m3u8'))) {
         this.playDirectHls(targetStreamUrl);
-      } else if (needsHls && targetStreamUrl && targetStreamUrl.includes('/api/stream/xtream-series')) {
-        const epIdMatch = targetStreamUrl.match(/episode_id=([^&]+)/);
-        if (epIdMatch) {
-          const hlsUrl = `${baseUrl}/api/stream/xtream-series-hls/${epIdMatch[1]}/playlist.m3u8`;
-          this.playDirectHls(hlsUrl);
-        } else {
-          this.playDirectVideo(targetStreamUrl);
-        }
       } else if (data.player_type === 'direct_video' || targetStreamUrl.includes('/api/stream/xtream-series')) {
         this.playDirectVideo(targetStreamUrl);
       } else if (data.player_type === 'iframe' || data.is_embed) {
@@ -1680,21 +1666,16 @@ class NetflixPlayer {
       videoUrl = `${videoUrl}${sep}auth_token=${encodeURIComponent(authToken)}`;
     }
 
-    // Détection de compatibilité MKV (Safari / iOS / Mac)
-    const canPlayMkv = (this.video.canPlayType('video/x-matroska') !== '' || this.video.canPlayType('video/mkv') !== '');
+    // Détection Apple (iOS / Safari WebKit) qui nécessite le conteneur MP4 fragmenté
     const isApple = /iPad|iPhone|iPod/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
     const isSafari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent) || isApple || (navigator.platform === 'MacIntel' && !/Chrome|CriOS/i.test(navigator.userAgent));
-    const needsHls = (!canPlayMkv || isSafari || isApple);
 
-    if (needsHls && videoUrl.includes('/api/stream/xtream-series')) {
-      const epIdMatch = videoUrl.match(/episode_id=([^&]+)/);
-      if (epIdMatch) {
-        const hlsUrl = `${baseUrl}/api/stream/xtream-series-hls/${epIdMatch[1]}/playlist.m3u8`;
-        this.playDirectHls(hlsUrl);
-        return;
-      }
-    }
     this._isRemuxedMp4 = false;
+    if ((isSafari || isApple) && videoUrl.includes('/api/stream/xtream-series') && !videoUrl.includes('format=mp4') && !videoUrl.includes('format=hls')) {
+      const sep = videoUrl.includes('?') ? '&' : '?';
+      videoUrl = `${videoUrl}${sep}format=mp4`;
+      this._isRemuxedMp4 = true;
+    }
     this._currentDirectVideoUrl = videoUrl;
 
     this.cleanupActivePlayback();
@@ -1713,6 +1694,7 @@ class NetflixPlayer {
       hasReadied = true;
       this.setStep(4, 'done', `4. Épisode connecté • Lecture active 1080p FHD`);
       this.hideLoader();
+      this.hideStatusBanner();
       if (this.backdrop) {
         this.backdrop.classList.add('fade-out');
         setTimeout(() => {
@@ -1728,9 +1710,9 @@ class NetflixPlayer {
       if (this.video.currentTime > 0) onReady();
     }, { signal });
 
-    // Sécurité absolue : masquer le loader après 3.5s quoi qu'il arrive
+    // Sécurité : masquer le loader après démarrage ou après 5s
     setTimeout(() => {
-      if (!hasReadied) {
+      if (!hasReadied && this.video.readyState >= 1) {
         hasReadied = true;
         this.hideLoader();
         if (this.backdrop) {
@@ -1740,16 +1722,26 @@ class NetflixPlayer {
           }, 200);
         }
       }
-    }, 3500);
+    }, 5000);
 
     this.video.addEventListener('error', () => {
       onReady();
       const err = this.video.error;
       console.warn('[Direct Video Error]:', err?.message || err?.code);
 
-      // Notification si format non supporté
-      if (this.currentMovie && (err?.code === 4 || !this.video.readyState)) {
-        this.showStatusBanner("Format vidéo non supporté par ce navigateur.");
+      // Notification intelligente et non trompeuse
+      if (this.currentMovie) {
+        fetch(videoUrl, { method: 'GET', headers: Object.assign({}, this.getAuthHeaders(), { 'Range': 'bytes=0-10' }) }).then(res => {
+          if (res.status >= 500) {
+            this.showStatusBanner("Le serveur de diffusion est momentanément indisponible (Erreur " + res.status + "). Veuillez patienter un instant.");
+          } else if (res.status === 404) {
+            this.showStatusBanner("Cet épisode n'est plus disponible sur le serveur source.");
+          } else {
+            this.showStatusBanner("Erreur de lecture du flux. Cliquez sur Réessayer.");
+          }
+        }).catch(() => {
+          this.showStatusBanner("Erreur de connexion au flux vidéo. Veuillez réessayer.");
+        });
       }
     }, { signal, once: true });
 
