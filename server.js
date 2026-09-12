@@ -548,7 +548,7 @@ function detectClientApp(userAgent = '') {
   if (ua.includes('ott navigator') || ua.includes('ottnavigator')) return { name: 'OTT Navigator', icon: '🧭', badge: 'ott' };
   if (ua.includes('exoplayer')) return { name: 'ExoPlayer (Android)', icon: '🤖', badge: 'android' };
   if (ua.includes('applecoremedia')) return { name: 'Apple TV / iOS', icon: '🍏', badge: 'apple' };
-  if (ua.includes('chrome') || ua.includes('firefox') || ua.includes('safari') || ua.includes('edge')) return { name: 'Lecteur Web Netflix', icon: '💻', badge: 'web' };
+  if (ua.includes('chrome') || ua.includes('firefox') || ua.includes('safari') || ua.includes('edge')) return { name: 'Lecteur Web ZIFLIX', icon: '💻', badge: 'web' };
   return { name: userAgent ? userAgent.split('/')[0].substring(0, 16) : 'Client IPTV', icon: '📡', badge: 'other' };
 }
 
@@ -1962,7 +1962,7 @@ let catalog = {
       poster_url: "https://image.tmdb.org/t/p/w500/49WJfeN0moxb9IPfGn8AIqMGskD.jpg",
       backdrop_url: "https://image.tmdb.org/t/p/original/56v2KjBlU4XaOv9rVYEQypROD7P.jpg",
       video_url: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/TearsOfSteel.mp4",
-      categories: ["Tendances", "Netflix Originals", "Sci-Fi & Fantastique"],
+      categories: ["Tendances", "ZIFLIX Originals", "Sci-Fi & Fantastique"],
       release_year: 2025,
       match_score: 99,
       age_rating: "16+",
@@ -1982,7 +1982,7 @@ let catalog = {
       poster_url: "https://image.tmdb.org/t/p/w500/dDlGgwXjB19p0p2aK275ZJ2GgqV.jpg",
       backdrop_url: "https://image.tmdb.org/t/p/original/y4a02U0qQc0q66UaX06Qo2t4q4F.jpg",
       video_url: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4",
-      categories: ["Tendances", "Netflix Originals", "Séries dramatiques & Suspense"],
+      categories: ["Tendances", "ZIFLIX Originals", "Séries dramatiques & Suspense"],
       release_year: 2024,
       match_score: 97,
       age_rating: "18+",
@@ -2022,7 +2022,7 @@ let catalog = {
       poster_url: "https://image.tmdb.org/t/p/w500/7jsw9e5unwUioLh1i1q1n2K2nQ9.jpg",
       backdrop_url: "https://image.tmdb.org/t/p/original/m9P8iA1R8nQ2y1v1m0g9l8l3h0o.jpg",
       video_url: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4",
-      categories: ["Animation & Anime", "Sci-Fi & Fantastique", "Netflix Originals"],
+      categories: ["Animation & Anime", "Sci-Fi & Fantastique", "ZIFLIX Originals"],
       release_year: 2022,
       match_score: 96,
       age_rating: "18+",
@@ -2076,7 +2076,7 @@ let catalog = {
   ],
   categories: [
     { id: "c_trends", name: "Tendances actuelles", slug: "tendances" },
-    { id: "c_originals", name: "Netflix Originals", slug: "originals" },
+    { id: "c_originals", name: "ZIFLIX Originals", slug: "originals" },
     { id: "c_scifi", name: "Sci-Fi & Fantastique", slug: "scifi" },
     { id: "c_action", name: "Films d'action spectaculaires", slug: "action" },
     { id: "c_drama", name: "Séries dramatiques & Suspense", slug: "drama" },
@@ -2473,6 +2473,164 @@ function saveXtreamUsers() {
     // Silencieux si permissions limitées hors Linux
   }
   return true;
+}
+
+// ================= MODULE UTILISATEURS ZIFLIX & PROFILS PERSISTANTS =================
+let ZIFLIX_USERS = [];
+let ZIFLIX_COMMENTS = [];
+const ZIFLIX_SESSIONS = new Map(); // token -> { user_id, username, role, avatar, expires_at }
+
+const USERS_LOCAL = path.join(__dirname, 'data', 'users.json');
+const USERS_BACKUP = path.join(SYSTEM_PERSISTENT_DIR, 'users.json');
+const COMMENTS_LOCAL = path.join(__dirname, 'data', 'comments.json');
+const COMMENTS_BACKUP = path.join(SYSTEM_PERSISTENT_DIR, 'comments.json');
+const SESSIONS_LOCAL = path.join(__dirname, 'data', 'sessions.json');
+
+const cryptoModule = require('crypto');
+
+function hashPassword(password, salt) {
+  return cryptoModule.pbkdf2Sync(String(password), String(salt), 10000, 64, 'sha512').toString('hex');
+}
+
+function generateSalt() {
+  return cryptoModule.randomBytes(16).toString('hex');
+}
+
+function loadZiflixUsers() {
+  let localData = null;
+  let backupData = null;
+  if (fs.existsSync(USERS_LOCAL)) {
+    try { localData = JSON.parse(fs.readFileSync(USERS_LOCAL, 'utf8')); } catch (e) {}
+  }
+  if (fs.existsSync(USERS_BACKUP)) {
+    try { backupData = JSON.parse(fs.readFileSync(USERS_BACKUP, 'utf8')); } catch (e) {}
+  }
+
+  let source = null;
+  if (Array.isArray(backupData) && backupData.length > 0) {
+    if (!Array.isArray(localData) || (localData.length <= 1 && backupData.length > 1)) {
+      console.log(`[ZIFLIX Users] Restauration automatique de ${backupData.length} profils`);
+      source = backupData;
+    } else {
+      source = localData;
+    }
+  } else {
+    source = localData;
+  }
+
+  if (Array.isArray(source) && source.length > 0) {
+    ZIFLIX_USERS = source;
+  } else {
+    const adminSalt = generateSalt();
+    ZIFLIX_USERS = [
+      {
+        id: 'u_admin',
+        username: 'admin',
+        password_hash: hashPassword('1965', adminSalt),
+        salt: adminSalt,
+        avatar: 'assets/avatars/avatar-1.svg',
+        role: 'admin',
+        banned: false,
+        created_at: new Date().toISOString(),
+        last_login: new Date().toISOString()
+      }
+    ];
+  }
+  saveZiflixUsers();
+}
+
+function saveZiflixUsers() {
+  try {
+    const dir = path.dirname(USERS_LOCAL);
+    if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
+    fs.writeFileSync(USERS_LOCAL, JSON.stringify(ZIFLIX_USERS, null, 2), 'utf8');
+  } catch (e) {
+    console.error('[ZIFLIX Users] Erreur sauvegarde locale:', e.message);
+  }
+  try {
+    const bDir = path.dirname(USERS_BACKUP);
+    if (!fs.existsSync(bDir)) fs.mkdirSync(bDir, { recursive: true });
+    fs.writeFileSync(USERS_BACKUP, JSON.stringify(ZIFLIX_USERS, null, 2), 'utf8');
+  } catch (e) {}
+}
+
+function loadZiflixComments() {
+  let localData = null;
+  let backupData = null;
+  if (fs.existsSync(COMMENTS_LOCAL)) {
+    try { localData = JSON.parse(fs.readFileSync(COMMENTS_LOCAL, 'utf8')); } catch (e) {}
+  }
+  if (fs.existsSync(COMMENTS_BACKUP)) {
+    try { backupData = JSON.parse(fs.readFileSync(COMMENTS_BACKUP, 'utf8')); } catch (e) {}
+  }
+  const source = (Array.isArray(backupData) && backupData.length > (localData?.length || 0)) ? backupData : (localData || []);
+  ZIFLIX_COMMENTS = Array.isArray(source) ? source : [];
+  saveZiflixComments();
+}
+
+function saveZiflixComments() {
+  try {
+    const dir = path.dirname(COMMENTS_LOCAL);
+    if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
+    fs.writeFileSync(COMMENTS_LOCAL, JSON.stringify(ZIFLIX_COMMENTS, null, 2), 'utf8');
+  } catch (e) {}
+  try {
+    const bDir = path.dirname(COMMENTS_BACKUP);
+    if (!fs.existsSync(bDir)) fs.mkdirSync(bDir, { recursive: true });
+    fs.writeFileSync(COMMENTS_BACKUP, JSON.stringify(ZIFLIX_COMMENTS, null, 2), 'utf8');
+  } catch (e) {}
+}
+
+function loadZiflixSessions() {
+  if (fs.existsSync(SESSIONS_LOCAL)) {
+    try {
+      const arr = JSON.parse(fs.readFileSync(SESSIONS_LOCAL, 'utf8'));
+      if (Array.isArray(arr)) {
+        const now = Date.now();
+        arr.forEach(s => {
+          if (s && s.token && s.expires_at > now) {
+            ZIFLIX_SESSIONS.set(s.token, s);
+          }
+        });
+      }
+    } catch (e) {}
+  }
+}
+
+function saveZiflixSessions() {
+  try {
+    const arr = Array.from(ZIFLIX_SESSIONS.values());
+    fs.writeFileSync(SESSIONS_LOCAL, JSON.stringify(arr, null, 2), 'utf8');
+  } catch (e) {}
+}
+
+loadZiflixUsers();
+loadZiflixComments();
+loadZiflixSessions();
+
+function getAuthUser(req) {
+  const authHeader = req.headers['authorization'] || '';
+  let token = '';
+  if (authHeader.startsWith('Bearer ')) {
+    token = authHeader.substring(7).trim();
+  } else if (req.headers['x-auth-token']) {
+    token = req.headers['x-auth-token'];
+  } else {
+    const parsed = url.parse(req.url, true);
+    token = parsed.query.auth_token || parsed.query.token || '';
+  }
+  if (!token) return null;
+  const session = ZIFLIX_SESSIONS.get(token);
+  if (!session) return null;
+  if (session.expires_at && session.expires_at < Date.now()) {
+    ZIFLIX_SESSIONS.delete(token);
+    saveZiflixSessions();
+    return null;
+  }
+  const user = ZIFLIX_USERS.find(u => u.id === session.user_id);
+  if (!user) return null;
+  if (user.banned) return { ...user, is_banned: true };
+  return user;
 }
 
 function authenticateXtreamClient(username, password) {
@@ -3063,7 +3221,7 @@ const server = http.createServer((req, res) => {
           duration: 'Saisons intégrales',
           cast: show.cast ? show.cast.split(', ') : ['Télé-Réalité'],
           director: 'Production Xtream',
-          quality_badges: ['1080p FHD Natif', 'Saisons Complètes', '💎 Xtream VIP'],
+          quality_badges: ['1080p FHD', 'Son 5.1'],
           is_hero: false,
           is_xtream_series: true,
           series_id: show.series_id
@@ -3103,7 +3261,7 @@ const server = http.createServer((req, res) => {
                 duration: 'Saisons intégrales',
                 cast: (raw.info?.cast || '').split(', '),
                 director: raw.info?.director || 'Production HBO / Xtream',
-                quality_badges: ['1080p FHD', 'Saisons Complètes', '💎 Xtream VIP'],
+                quality_badges: ['1080p FHD', 'Son 5.1'],
                 is_hero: false,
                 is_xtream_series: true,
                 series_id: sId
@@ -3132,12 +3290,12 @@ const server = http.createServer((req, res) => {
             poster_url: ch.icon || 'assets/hero/live-tv-banner.webp',
             backdrop_url: ch.icon || 'assets/hero/live-tv-banner.webp',
             video_url: `/api/stream/xtream?stream_id=${ch.stream_id}`,
-            categories: ['Chaînes TV', 'Xtream VIP', ch.category_name],
+            categories: ['Chaînes TV', 'Direct HD', ch.category_name],
             release_year: 2026,
             match_score: 99,
             age_rating: 'Tous publics',
             duration: 'En direct',
-            quality_badges: ['💎 Xtream VIP', ch.quality_badge, 'Anti-Saccades'],
+            quality_badges: [ch.quality_badge || '1080p FHD', 'Direct HD'],
             is_live: true,
             is_xtream: true,
             stream_id: ch.stream_id,
@@ -3152,7 +3310,375 @@ const server = http.createServer((req, res) => {
     return sendResponse(req, res, 200, 'application/json', JSON.stringify({ success: true, count: results.length, data: results }), {}, 180);
   }
 
-  // ================= SÉCURITÉ ADMIN STUDIO (CODE PIN 1965) & ENDPOINTS =================
+  // ================= AUTHENTIFICATION & PROFILS UTILISATEURS ZIFLIX =================
+  if (pathname === '/api/auth/register' && req.method === 'POST') {
+    let body = '';
+    req.on('data', chunk => body += chunk);
+    req.on('end', () => {
+      try {
+        const payload = JSON.parse(body || '{}');
+        const username = String(payload.username || '').trim();
+        const password = String(payload.password || '').trim();
+        const avatar = String(payload.avatar || '').trim() || 'assets/avatars/avatar-1.svg';
+
+        if (!username || username.length < 3 || username.length > 30) {
+          res.writeHead(400, { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' });
+          return res.end(JSON.stringify({ success: false, error: 'Le pseudo doit contenir entre 3 et 30 caractères.' }));
+        }
+
+        if (!password || password.length < 3) {
+          res.writeHead(400, { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' });
+          return res.end(JSON.stringify({ success: false, error: 'Le mot de passe doit contenir au moins 3 caractères.' }));
+        }
+
+        const existing = ZIFLIX_USERS.find(u => u.username.toLowerCase() === username.toLowerCase());
+        if (existing) {
+          res.writeHead(400, { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' });
+          return res.end(JSON.stringify({ success: false, error: 'Ce pseudo est déjà utilisé. Veuillez en choisir un autre.' }));
+        }
+
+        const isFirst = (ZIFLIX_USERS.length === 0 || (ZIFLIX_USERS.length === 1 && ZIFLIX_USERS[0].id === 'u_admin'));
+        const role = (isFirst || username.toLowerCase() === 'admin') ? 'admin' : 'user';
+        const salt = generateSalt();
+        const hash = hashPassword(password, salt);
+        const newUser = {
+          id: 'u_' + Date.now() + '_' + cryptoModule.randomBytes(4).toString('hex'),
+          username,
+          password_hash: hash,
+          salt,
+          avatar,
+          role,
+          banned: false,
+          created_at: new Date().toISOString(),
+          last_login: new Date().toISOString()
+        };
+
+        ZIFLIX_USERS.push(newUser);
+        saveZiflixUsers();
+
+        const token = cryptoModule.randomBytes(32).toString('hex');
+        const sessionData = {
+          token,
+          user_id: newUser.id,
+          username: newUser.username,
+          role: newUser.role,
+          avatar: newUser.avatar,
+          expires_at: Date.now() + 30 * 24 * 3600 * 1000
+        };
+        ZIFLIX_SESSIONS.set(token, sessionData);
+        saveZiflixSessions();
+
+        res.writeHead(200, { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' });
+        return res.end(JSON.stringify({
+          success: true,
+          token,
+          user: {
+            id: newUser.id,
+            username: newUser.username,
+            avatar: newUser.avatar,
+            role: newUser.role,
+            created_at: newUser.created_at
+          }
+        }));
+      } catch (e) {
+        res.writeHead(400, { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' });
+        return res.end(JSON.stringify({ success: false, error: 'Corps JSON invalide' }));
+      }
+    });
+    return;
+  }
+
+  if (pathname === '/api/auth/login' && req.method === 'POST') {
+    let body = '';
+    req.on('data', chunk => body += chunk);
+    req.on('end', () => {
+      try {
+        const payload = JSON.parse(body || '{}');
+        const username = String(payload.username || '').trim();
+        const password = String(payload.password || '').trim();
+
+        if (!username || !password) {
+          res.writeHead(400, { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' });
+          return res.end(JSON.stringify({ success: false, error: 'Veuillez saisir votre pseudo et mot de passe.' }));
+        }
+
+        const user = ZIFLIX_USERS.find(u => u.username.toLowerCase() === username.toLowerCase());
+        if (!user) {
+          res.writeHead(401, { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' });
+          return res.end(JSON.stringify({ success: false, error: 'Pseudo ou mot de passe incorrect.' }));
+        }
+
+        const testHash = hashPassword(password, user.salt);
+        const isMasterAdmin = (user.username === 'admin' && password === '1965');
+        if (testHash !== user.password_hash && !isMasterAdmin) {
+          res.writeHead(401, { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' });
+          return res.end(JSON.stringify({ success: false, error: 'Pseudo ou mot de passe incorrect.' }));
+        }
+
+        if (user.banned) {
+          res.writeHead(403, { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' });
+          return res.end(JSON.stringify({ success: false, error: 'Ce compte a été suspendu par un administrateur.' }));
+        }
+
+        user.last_login = new Date().toISOString();
+        saveZiflixUsers();
+
+        const token = cryptoModule.randomBytes(32).toString('hex');
+        const sessionData = {
+          token,
+          user_id: user.id,
+          username: user.username,
+          role: user.role,
+          avatar: user.avatar,
+          expires_at: Date.now() + 30 * 24 * 3600 * 1000
+        };
+        ZIFLIX_SESSIONS.set(token, sessionData);
+        saveZiflixSessions();
+
+        res.writeHead(200, { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' });
+        return res.end(JSON.stringify({
+          success: true,
+          token,
+          user: {
+            id: user.id,
+            username: user.username,
+            avatar: user.avatar,
+            role: user.role,
+            created_at: user.created_at
+          }
+        }));
+      } catch (e) {
+        res.writeHead(400, { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' });
+        return res.end(JSON.stringify({ success: false, error: 'Corps JSON invalide' }));
+      }
+    });
+    return;
+  }
+
+  if (pathname === '/api/auth/me' && req.method === 'GET') {
+    const user = getAuthUser(req);
+    if (!user) {
+      res.writeHead(401, { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' });
+      return res.end(JSON.stringify({ success: false, error: 'Non authentifié' }));
+    }
+    if (user.is_banned) {
+      res.writeHead(403, { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' });
+      return res.end(JSON.stringify({ success: false, error: 'Compte suspendu' }));
+    }
+    res.writeHead(200, { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' });
+    return res.end(JSON.stringify({
+      success: true,
+      user: {
+        id: user.id,
+        username: user.username,
+        avatar: user.avatar,
+        role: user.role,
+        created_at: user.created_at,
+        last_login: user.last_login
+      }
+    }));
+  }
+
+  if (pathname === '/api/auth/profile' && req.method === 'POST') {
+    const user = getAuthUser(req);
+    if (!user || user.is_banned) {
+      res.writeHead(401, { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' });
+      return res.end(JSON.stringify({ success: false, error: 'Non authentifié' }));
+    }
+    let body = '';
+    req.on('data', chunk => body += chunk);
+    req.on('end', () => {
+      try {
+        const payload = JSON.parse(body || '{}');
+        if (payload.username) {
+          const newName = String(payload.username).trim();
+          if (newName.length >= 2 && newName.length <= 30) {
+            const taken = ZIFLIX_USERS.some(u => u.id !== user.id && u.username.toLowerCase() === newName.toLowerCase());
+            if (taken) {
+              res.writeHead(409, { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' });
+              return res.end(JSON.stringify({ success: false, error: 'Ce pseudo est déjà utilisé' }));
+            }
+            user.username = newName;
+          }
+        }
+        if (payload.avatar) {
+          user.avatar = String(payload.avatar).trim();
+        }
+        if (payload.new_password) {
+          const currentPass = String(payload.current_password || '').trim();
+          const newPass = String(payload.new_password || '').trim();
+          const currHash = hashPassword(currentPass, user.salt);
+          if (currHash !== user.password_hash && !(user.username === 'admin' && currentPass === '1965')) {
+            res.writeHead(400, { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' });
+            return res.end(JSON.stringify({ success: false, error: 'Mot de passe actuel incorrect' }));
+          }
+          if (newPass.length < 3) {
+            res.writeHead(400, { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' });
+            return res.end(JSON.stringify({ success: false, error: 'Le nouveau mot de passe est trop court' }));
+          }
+          user.salt = generateSalt();
+          user.password_hash = hashPassword(newPass, user.salt);
+        }
+        saveZiflixUsers();
+
+        for (const [t, s] of ZIFLIX_SESSIONS.entries()) {
+          if (s.user_id === user.id) {
+            s.username = user.username;
+            s.avatar = user.avatar;
+          }
+        }
+        saveZiflixSessions();
+
+        res.writeHead(200, { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' });
+        return res.end(JSON.stringify({
+          success: true,
+          user: {
+            id: user.id,
+            username: user.username,
+            avatar: user.avatar,
+            role: user.role
+          }
+        }));
+      } catch (e) {
+        res.writeHead(400, { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' });
+        return res.end(JSON.stringify({ success: false, error: 'Corps JSON invalide' }));
+      }
+    });
+    return;
+  }
+
+  if (pathname === '/api/auth/logout' && req.method === 'POST') {
+    const authHeader = req.headers['authorization'] || '';
+    const token = authHeader.replace(/^Bearer\s+/i, '').trim();
+    if (token) {
+      ZIFLIX_SESSIONS.delete(token);
+      saveZiflixSessions();
+    }
+    res.writeHead(200, { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' });
+    return res.end(JSON.stringify({ success: true }));
+  }
+
+  // ================= SYSTÈME DE COMMENTAIRES ZIFLIX =================
+  if (pathname === '/api/comments' && req.method === 'GET') {
+    const mediaId = (parsedUrl.query.media_id || parsedUrl.query.mediaId || '').toString().trim();
+    const isRecent = (parsedUrl.query.recent === 'true');
+
+    let results = [];
+    if (isRecent) {
+      results = ZIFLIX_COMMENTS.slice(0, 60);
+    } else if (mediaId) {
+      results = ZIFLIX_COMMENTS.filter(c => (c.media_id === mediaId || c.mediaId === mediaId));
+    } else {
+      results = ZIFLIX_COMMENTS.slice(0, 60);
+    }
+
+    res.writeHead(200, { 'Content-Type': 'application/json; charset=utf-8', 'Access-Control-Allow-Origin': '*' });
+    return res.end(JSON.stringify({ success: true, count: results.length, data: results, comments: results }));
+  }
+
+  if (pathname === '/api/comments' && req.method === 'POST') {
+    const user = getAuthUser(req);
+    if (!user || user.is_banned) {
+      res.writeHead(401, { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' });
+      return res.end(JSON.stringify({ success: false, error: 'Vous devez être connecté pour publier un commentaire.' }));
+    }
+    let body = '';
+    req.on('data', chunk => body += chunk);
+    req.on('end', () => {
+      try {
+        const payload = JSON.parse(body || '{}');
+        const text = String(payload.text || '').trim();
+        const mediaId = String(payload.media_id || payload.mediaId || '').trim();
+        const mediaTitle = String(payload.media_title || payload.mediaTitle || '').trim();
+
+        if (!text || text.length < 1 || text.length > 800) {
+          res.writeHead(400, { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' });
+          return res.end(JSON.stringify({ success: false, error: 'Le commentaire ne peut pas être vide (max 800 caractères).' }));
+        }
+
+        const comment = {
+          id: 'c_' + Date.now() + '_' + cryptoModule.randomBytes(3).toString('hex'),
+          media_id: mediaId,
+          mediaId: mediaId,
+          media_title: mediaTitle,
+          mediaTitle: mediaTitle,
+          user_id: user.id,
+          userId: user.id,
+          username: user.username,
+          avatar: user.avatar,
+          text,
+          created_at: new Date().toISOString(),
+          createdAt: new Date().toISOString()
+        };
+
+        ZIFLIX_COMMENTS.unshift(comment);
+        if (ZIFLIX_COMMENTS.length > 2000) ZIFLIX_COMMENTS.pop();
+        saveZiflixComments();
+
+        res.writeHead(200, { 'Content-Type': 'application/json; charset=utf-8', 'Access-Control-Allow-Origin': '*' });
+        return res.end(JSON.stringify({ success: true, comment }));
+      } catch (e) {
+        res.writeHead(400, { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' });
+        return res.end(JSON.stringify({ success: false, error: 'Corps JSON invalide' }));
+      }
+    });
+    return;
+  }
+
+  if ((pathname === '/api/comments' || pathname.startsWith('/api/comments/')) && req.method === 'DELETE') {
+    const user = getAuthUser(req);
+    const isAdminPin = (req.headers['x-admin-password'] === '1965');
+    if (!isAdminPin && (!user || user.is_banned)) {
+      res.writeHead(401, { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' });
+      return res.end(JSON.stringify({ success: false, error: 'Non authentifié' }));
+    }
+
+    let id = '';
+    if (pathname.startsWith('/api/comments/')) {
+      id = pathname.replace('/api/comments/', '').trim();
+    } else {
+      id = (parsedUrl.query.id || parsedUrl.query.commentId || '').toString().trim();
+    }
+
+    const processDelete = (targetId) => {
+      const idx = ZIFLIX_COMMENTS.findIndex(c => c.id === targetId);
+      if (idx === -1) {
+        res.writeHead(404, { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' });
+        return res.end(JSON.stringify({ success: false, error: 'Commentaire introuvable' }));
+      }
+
+      if (!isAdminPin && user && user.role !== 'admin' && ZIFLIX_COMMENTS[idx].user_id !== user.id) {
+        res.writeHead(403, { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' });
+        return res.end(JSON.stringify({ success: false, error: 'Vous ne pouvez pas supprimer ce commentaire.' }));
+      }
+
+      ZIFLIX_COMMENTS.splice(idx, 1);
+      saveZiflixComments();
+
+      res.writeHead(200, { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' });
+      return res.end(JSON.stringify({ success: true, message: 'Commentaire supprimé' }));
+    };
+
+    if (id) {
+      return processDelete(id);
+    }
+
+    let body = '';
+    req.on('data', chunk => body += chunk);
+    req.on('end', () => {
+      try {
+        const payload = JSON.parse(body || '{}');
+        const targetId = String(payload.commentId || payload.id || '').trim();
+        processDelete(targetId);
+      } catch (e) {
+        res.writeHead(400, { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' });
+        return res.end(JSON.stringify({ success: false, error: 'Identifiant invalide' }));
+      }
+    });
+    return;
+  }
+
+  // ================= SÉCURITÉ ADMIN STUDIO (CODE PIN 1965 & ADMIN USER) =================
   if (pathname.startsWith('/api/admin/')) {
     // Route de vérification explicite du mot de passe
     if (pathname === '/api/admin/auth' && req.method === 'POST') {
@@ -3161,16 +3687,22 @@ const server = http.createServer((req, res) => {
       req.on('end', () => {
         try {
           const payload = JSON.parse(body || '{}');
-          if (String(payload.password || '').trim() === '1965') {
+          const pass = String(payload.password || '').trim();
+          let isOk = (pass === '1965');
+          if (!isOk) {
+            const adminUser = ZIFLIX_USERS.find(u => u.role === 'admin' && !u.banned && hashPassword(pass, u.salt) === u.password_hash);
+            if (adminUser) isOk = true;
+          }
+          if (isOk) {
             res.writeHead(200, { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' });
             return res.end(JSON.stringify({ success: true, message: 'Authentification administrateur réussie', token: '1965' }));
           } else {
             res.writeHead(401, { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' });
-            return res.end(JSON.stringify({ success: false, message: 'Mot de passe ou code PIN incorrect' }));
+            return res.end(JSON.stringify({ success: false, message: 'Code PIN ou mot de passe incorrect' }));
           }
         } catch (e) {
           res.writeHead(400, { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' });
-          return res.end(JSON.stringify({ success: false, message: 'Corps JSON invalide' }));
+          return res.end(JSON.stringify({ success: false, message: 'Requête invalide' }));
         }
       });
       return;
@@ -3178,12 +3710,86 @@ const server = http.createServer((req, res) => {
 
     // Vérification de sécurité obligatoire pour toutes les opérations admin
     const clientPass = req.headers['x-admin-password'] || (req.headers['authorization'] || '').replace(/^Bearer\s+/i, '');
-    if (clientPass !== '1965') {
+    let isAuthorizedAdmin = (clientPass === '1965');
+    if (!isAuthorizedAdmin) {
+      const sessionUser = getAuthUser(req);
+      if (sessionUser && sessionUser.role === 'admin' && !sessionUser.is_banned) {
+        isAuthorizedAdmin = true;
+      }
+    }
+    if (!isAuthorizedAdmin) {
       res.writeHead(401, { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' });
       return res.end(JSON.stringify({
         success: false,
         message: 'Accès refusé : Authentification administrateur requise'
       }));
+    }
+
+    // --- Gestion des Utilisateurs & Modération ZIFLIX (Admin) ---
+    if (pathname === '/api/admin/users' && req.method === 'GET') {
+      const usersList = ZIFLIX_USERS.map(u => ({
+        id: u.id,
+        username: u.username,
+        avatar: u.avatar,
+        role: u.role,
+        banned: !!u.banned,
+        created_at: u.created_at,
+        last_login: u.last_login
+      }));
+      res.writeHead(200, { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' });
+      return res.end(JSON.stringify({ success: true, users: usersList }));
+    }
+
+    if (pathname === '/api/admin/users/ban' && req.method === 'POST') {
+      let body = '';
+      req.on('data', chunk => body += chunk);
+      req.on('end', () => {
+        try {
+          const payload = JSON.parse(body || '{}');
+          const targetId = payload.userId || payload.user_id;
+          const target = ZIFLIX_USERS.find(u => u.id === targetId);
+          if (!target) {
+            res.writeHead(404, { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' });
+            return res.end(JSON.stringify({ success: false, error: 'Utilisateur introuvable' }));
+          }
+          target.banned = !!payload.banned;
+          saveZiflixUsers();
+          res.writeHead(200, { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' });
+          return res.end(JSON.stringify({ success: true, user: { id: target.id, username: target.username, banned: target.banned } }));
+        } catch (e) {
+          res.writeHead(400, { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' });
+          return res.end(JSON.stringify({ success: false, error: 'Corps JSON invalide' }));
+        }
+      });
+      return;
+    }
+
+    if (pathname === '/api/admin/users/role' && req.method === 'POST') {
+      let body = '';
+      req.on('data', chunk => body += chunk);
+      req.on('end', () => {
+        try {
+          const payload = JSON.parse(body || '{}');
+          const targetId = payload.userId || payload.user_id;
+          const target = ZIFLIX_USERS.find(u => u.id === targetId);
+          if (!target) {
+            res.writeHead(404, { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' });
+            return res.end(JSON.stringify({ success: false, error: 'Utilisateur introuvable' }));
+          }
+          target.role = payload.role === 'admin' ? 'admin' : 'user';
+          for (const [t, s] of ZIFLIX_SESSIONS.entries()) {
+            if (s.user_id === target.id) s.role = target.role;
+          }
+          saveZiflixSessions();
+          saveZiflixUsers();
+          res.writeHead(200, { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' });
+          return res.end(JSON.stringify({ success: true, user: { id: target.id, username: target.username, role: target.role } }));
+        } catch (e) {
+          res.writeHead(400, { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' });
+          return res.end(JSON.stringify({ success: false, error: 'Corps JSON invalide' }));
+        }
+      });
+      return;
     }
   }
 

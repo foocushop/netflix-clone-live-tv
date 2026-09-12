@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="100" height="100">
+  <defs>
+    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#1F1F24"/>
+      <stop offset="100%" stop-color="#0E0E12"/>
+    </linearGradient>
+    <linearGradient id="zGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FF3B30"/>
+      <stop offset="70%" stop-color="#E50914"/>
+      <stop offset="100%" stop-color="#B20710"/>
+    </linearGradient>
+    <filter id="shadowZ" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="4" stdDeviation="4" flood-color="#E50914" flood-opacity="0.5"/>
+    </filter>
+  </defs>
+  <rect width="100" height="100" rx="22" fill="url(#bgGrad)" stroke="#2D2D38" stroke-width="2"/>
+  <g filter="url(#shadowZ)">
+    <path d="M26 26 H74 V37 L41 69 H74 V80 H26 V69 L59 37 H26 Z" fill="url(#zGrad)"/>
+  </g>
+</svg>

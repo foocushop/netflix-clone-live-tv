@@ -106,13 +106,21 @@ class NetflixPlayer {
     this.statusSwitchBtn = document.getElementById('statusSwitchBtn');
     this.statusRetryBtn = document.getElementById('statusRetryBtn');
 
+    // 10. Tiroir des Commentaires en direct ZIFLIX
+    this.commentsToggleBtn = document.getElementById('playerCommentsToggleBtn');
+    this.commentsDrawer = document.getElementById('playerCommentsDrawer');
+    this.commentsCloseBtn = document.getElementById('playerCommentsCloseBtn');
+    this.commentsList = document.getElementById('playerDrawerCommentsList');
+    this.commentInput = document.getElementById('playerCommentInput');
+    this.commentSubmitBtn = document.getElementById('playerCommentSubmitBtn');
+
     // État Interne
     this.currentMovie = null;
     this.currentServer = 1;
     this.currentSeason = 1;
     this.currentEpisode = 1;
     this.currentEpisodeDuration = 0;
-    this.currentLang = localStorage.getItem('netflix_lang') || 'vo';
+    this.currentLang = 'vf';
     this.currentQuality = -1; // -1 = Auto ABR
     this.hls = null;
     this.savedPlaybackTime = 0;
@@ -123,6 +131,7 @@ class NetflixPlayer {
 
     // Initialisation
     this.initEvents();
+    this.initCommentsEvents();
     this.initScrubberEvents();
     this.initVolumeEvents();
     this.initSpeedEvents();
@@ -230,32 +239,106 @@ class NetflixPlayer {
           }
           break;
         default:
-          if (e.key >= '1' && e.key <= '8') {
-            this.switchServer(parseInt(e.key, 10));
-          }
           break;
       }
     });
 
-    // Bascule Audio VO / VF
-    if (this.langVoBtn) {
-      this.langVoBtn.addEventListener('click', () => this.setLanguage('vo'));
-    }
-    if (this.langVfBtn) {
-      this.langVfBtn.addEventListener('click', () => this.setLanguage('vf'));
-    }
-
     // Actions Bannière de Statut
-    if (this.statusSwitchBtn) {
-      this.statusSwitchBtn.addEventListener('click', () => {
-        const isChannel = (this.currentMovie?.media_type === 'channel' || this.currentMovie?.is_live);
-        const maxSrv = isChannel ? 8 : 5;
-        this.switchServer((this.currentServer % maxSrv) + 1);
-      });
-    }
     if (this.statusRetryBtn) {
       this.statusRetryBtn.addEventListener('click', () => this.loadStream());
     }
+  }
+
+  // ================= COMMENTAIRES EN DIRECT DANS LE LECTEUR =================
+  initCommentsEvents() {
+    if (this.commentsToggleBtn && this.commentsDrawer) {
+      this.commentsToggleBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        this.commentsDrawer.classList.toggle('hidden');
+        if (!this.commentsDrawer.classList.contains('hidden')) {
+          this.loadLiveComments();
+        }
+      });
+    }
+
+    if (this.commentsCloseBtn && this.commentsDrawer) {
+      this.commentsCloseBtn.addEventListener('click', () => {
+        this.commentsDrawer.classList.add('hidden');
+      });
+    }
+
+    if (this.commentSubmitBtn) {
+      this.commentSubmitBtn.addEventListener('click', () => this.submitLiveComment());
+    }
+
+    if (this.commentInput) {
+      this.commentInput.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') {
+          e.preventDefault();
+          this.submitLiveComment();
+        }
+      });
+    }
+  }
+
+  async loadLiveComments() {
+    if (!this.currentMovie || !this.commentsList) return;
+    const mediaId = this.currentMovie.id || this.currentMovie.series_id || 'stream';
+    try {
+      const baseUrl = window.API_BASE || '';
+      const res = await fetch(`${baseUrl}/api/comments?mediaId=${encodeURIComponent(mediaId)}`);
+      const json = await res.json();
+      if (json.success && Array.isArray(json.comments)) {
+        if (json.comments.length === 0) {
+          this.commentsList.innerHTML = '<div style="color: #888; font-size: 0.75rem; text-align: center; padding: 12px;">Aucun avis pour le moment. Soyez le premier !</div>';
+          return;
+        }
+        this.commentsList.innerHTML = '';
+        json.comments.forEach(c => {
+          const div = document.createElement('div');
+          div.className = 'player-drawer-item';
+          div.innerHTML = `
+            <div class="player-drawer-meta">
+              <span class="player-drawer-author">${c.username}</span>
+              <span>${new Date(c.createdAt).toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })}</span>
+            </div>
+            <div class="player-drawer-text">${c.text.replace(/</g, '&lt;').replace(/>/g, '&gt;')}</div>
+          `;
+          this.commentsList.appendChild(div);
+        });
+        this.commentsList.scrollTop = this.commentsList.scrollHeight;
+      }
+    } catch (e) {}
+  }
+
+  async submitLiveComment() {
+    if (!this.currentMovie || !this.commentInput) return;
+    const text = this.commentInput.value.trim();
+    if (!text) return;
+
+    const token = localStorage.getItem('ziflix_auth_token');
+    if (!token) {
+      alert('Veuillez vous connecter à ZIFLIX pour commenter.');
+      return;
+    }
+
+    const mediaId = this.currentMovie.id || this.currentMovie.series_id || 'stream';
+    try {
+      const baseUrl = window.API_BASE || '';
+      const res = await fetch(`${baseUrl}/api/comments`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({ mediaId, text })
+      });
+      const json = await res.json();
+      if (json.success) {
+        this.commentInput.value = '';
+        this.loadLiveComments();
+      }
+    } catch (e) {}
   }
 
   // ================= 2. SCRUBBER & TIMELINE PROGRESSIVE =================
@@ -1092,6 +1175,9 @@ class NetflixPlayer {
 
     this.hideLoader();
     this.hideStatusBanner();
+    if (this.commentsDrawer) {
+      this.commentsDrawer.classList.add('hidden');
+    }
     this.overlay.classList.remove('active', 'user-idle');
     clearTimeout(this.inactivityTimer);
 

@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="100" height="100">
+  <defs>
+    <radialGradient id="bgGrad8" cx="50%" cy="40%" r="60%">
+      <stop offset="0%" stop-color="#262636"/>
+      <stop offset="100%" stop-color="#0E0E14"/>
+    </radialGradient>
+    <filter id="glow8" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="0" stdDeviation="3" flood-color="#EF4444" flood-opacity="0.6"/>
+    </filter>
+  </defs>
+  <circle cx="50" cy="50" r="46" fill="url(#bgGrad8)" stroke="#EF4444" stroke-width="2.5" filter="url(#glow8)"/>
+  <g><path d="M32 30 Q30 16 40 22 Q44 26 42 34" fill="#EF4444"/><path d="M68 30 Q70 16 60 22 Q56 26 58 34" fill="#EF4444"/><circle cx="50" cy="46" r="18" fill="#241A1C" stroke="#EF4444" stroke-width="2"/><polygon points="42,42 46,45 42,48" fill="#FFAA00"/><polygon points="58,42 54,45 58,48" fill="#FFAA00"/><polygon points="50,48 53,56 47,56" fill="#EF4444"/><path d="M26 80 Q50 68 74 80 L76 96 H24 Z" fill="#1A1416" stroke="#EF4444" stroke-width="2"/></g>
+</svg>

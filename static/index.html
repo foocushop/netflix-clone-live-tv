@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Netflix - Clone Fonctionnel Propulsé par Rust</title>
-  <link rel="icon" type="image/svg+xml" href="assets/logos/netflix-n.svg">
+  <title>ZIFLIX - Streaming & Télévision en Direct</title>
+  <link rel="icon" type="image/svg+xml" href="assets/logos/ziflix-icon.svg">
   <link rel="stylesheet" href="css/netflix.css">
   <link rel="stylesheet" href="css/admin.css">
 </head>
@@ -13,7 +13,7 @@
   <!-- ================= HEADER / NAVBAR ================= -->
   <header class="netflix-header">
     <div class="header-left">
-      <img src="assets/logos/netflix-logo.svg" alt="Netflix" class="netflix-logo" onclick="window.location.reload()">
+      <img src="assets/logos/ziflix-logo.svg" alt="ZIFLIX" class="netflix-logo" onclick="window.location.reload()">
       <ul class="nav-links">
         <li><a href="#" class="nav-link active" data-filter="all">Accueil</a></li>
         <li><a href="#" class="nav-link" data-filter="series">Séries</a></li>
@@ -26,39 +26,38 @@
       </ul>
     </div>
     <div class="header-right">
-      <!-- Sélecteur Audio VO / VF -->
-      <div class="lang-switch-capsule" id="headerLangSwitch" title="Basculer la version audio (VO / VF)" data-active-lang="vo">
-        <div class="lang-switch-thumb"></div>
-        <button class="lang-btn active" data-lang="vo" type="button">🇬🇧 VO</button>
-        <button class="lang-btn" data-lang="vf" type="button">🇫🇷 VF</button>
-      </div>
       <div class="search-box">
         <span class="search-icon">🔍</span>
         <input type="text" id="searchInput" class="search-input" placeholder="Titres, personnes, genres...">
       </div>
-      <div class="profile-container">
-        <div class="profile-avatar" title="Mon Profil Netflix">
-          <img src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='14' fill='%23E50914'/><text x='50' y='68' font-size='50' font-family='Arial,sans-serif' font-weight='bold' text-anchor='middle' fill='white'>N</text></svg>" alt="Profil" style="width: 100%; height: 100%; border-radius: 4px;">
+      <div class="profile-container" id="profileContainer" tabindex="0" aria-label="Menu Profil">
+        <div class="profile-avatar" id="profileAvatarBtn" title="Mon Profil ZIFLIX">
+          <img id="headerProfileImg" src="assets/avatars/avatar-1.svg" alt="Profil" style="width: 100%; height: 100%; border-radius: 50%; object-fit: cover;">
         </div>
-        <div class="profile-dropdown">
-          <div class="dropdown-item">
-            <span style="font-size: 1.2rem;">👤</span> Profil Standard
+        <div class="profile-dropdown" id="profileDropdown">
+          <div class="dropdown-item" id="openProfileModalBtn">
+            <span style="font-size: 1.2rem;">👤</span>
+            <div>
+              <div style="font-weight: 700; color: #fff;" id="headerUsernameDisplay">Mon Profil</div>
+              <div style="font-size: 0.72rem; color: #aaa;">Personnaliser l'avatar</div>
+            </div>
           </div>
           <div class="dropdown-item" id="openAdminBtn">
             <span style="font-size: 1.2rem;">⚙️</span> 
             <div>
               <div style="font-weight: 700; color: #ff5555;">Mode Administrateur</div>
-              <div style="font-size: 0.72rem; color: #888;">Gérer catalogue & vidéos</div>
+              <div style="font-size: 0.72rem; color: #888;">Gérer catalogue, utilisateurs & vidéos</div>
             </div>
           </div>
-          <div class="dropdown-item">
+          <div class="dropdown-item" id="helpCenterBtn">
             <span style="font-size: 1.2rem;">❓</span> Centre d'aide
           </div>
-          <div class="dropdown-item">
-            <span style="font-size: 1.2rem;">🚪</span> Se déconnecter de Netflix
+          <div class="dropdown-item" id="logoutBtn" style="color: #ff6b6b;">
+            <span style="font-size: 1.2rem;">🚪</span> Se déconnecter de ZIFLIX
           </div>
         </div>
       </div>
+    </div>
   </header>
 
   <!-- ================= BARRE DE SOUS-NAVIGATION MOBILE (CATÉGORIES DÉFILANTES) ================= -->
@@ -79,7 +78,7 @@
   <section class="hero-banner" id="heroBanner">
     <div class="hero-vignette"></div>
     <div class="hero-content">
-      <div class="hero-badge">N SÉRIE ORIGINALE</div>
+      <div class="hero-badge">ZIFLIX SÉRIE ORIGINALE</div>
       <h1 class="hero-title" id="heroTitle">Chargement...</h1>
       <div class="hero-meta">
         <span class="match-score" id="heroMatch">Recommandé à 99%</span>
@@ -175,11 +174,6 @@
             <button class="btn-netflix btn-netflix-primary" id="modalPlayBtn">
               <span>▶</span> Regarder maintenant
             </button>
-            <div class="lang-switch-capsule" id="modalLangSwitch" title="Basculer la version audio (VO / VF)" data-active-lang="vo">
-              <div class="lang-switch-thumb"></div>
-              <button class="lang-btn active" data-lang="vo" type="button">🇬🇧 VO</button>
-              <button class="lang-btn" data-lang="vf" type="button">🇫🇷 VF</button>
-            </div>
             <button class="btn-netflix btn-netflix-secondary" id="modalListBtn">
               + Ajouter à ma liste
             </button>
@@ -222,52 +216,45 @@
           <!-- Liste des épisodes injectés dynamiquement -->
         </div>
       </div>
+
+      <!-- ================= SECTION COMMENTAIRES ZIFLIX ================= -->
+      <div class="modal-comments-section" id="modalCommentsSection">
+        <div class="modal-episodes-divider"></div>
+        <div class="modal-comments-header">
+          <h3 class="modal-comments-heading">💬 Avis & Commentaires (<span id="modalCommentsCount">0</span>)</h3>
+        </div>
+        <div class="comment-compose-box">
+          <img class="comment-author-avatar" id="commentCurrentUserAvatar" src="assets/avatars/avatar-1.svg" alt="Avatar">
+          <div class="comment-compose-content">
+            <textarea id="commentTextInput" class="comment-textarea" placeholder="Partagez votre avis sur ce programme..." rows="2"></textarea>
+            <div class="comment-compose-actions">
+              <button type="button" class="btn-netflix btn-netflix-primary btn-sm" id="submitCommentBtn">Publier l'avis</button>
+            </div>
+          </div>
+        </div>
+        <div class="modal-comments-list" id="modalCommentsList">
+          <!-- Liste des commentaires injectée dynamiquement -->
+        </div>
+      </div>
     </div>
   </div>
 
-  <!-- ================= LECTEUR VIDÉO NETFLIX MULTI-SERVEURS ================= -->
+  <!-- ================= LECTEUR VIDÉO ZIFLIX ÉPURÉ ================= -->
   <div class="netflix-player-overlay" id="netflixPlayer">
-    <!-- Barre Supérieure Flottante Netflix (Toujours accessible, ne se bloque jamais) -->
+    <!-- Barre Supérieure Flottante ZIFLIX (Épurée & Haute Performance) -->
     <div class="player-top-bar" id="playerTopBar">
       <button class="player-back-btn" id="playerBackBtn" title="Retour au catalogue (Échap)">
         <span>←</span>
       </button>
       <div class="player-header-info">
         <span id="playerTitle" class="player-title-display">Lecture en cours</span>
-        <span id="playerMeta" class="player-meta-display">Protection Anti-Pubs Active 🛡️</span>
+        <span id="playerMeta" class="player-meta-display">Direct HD • Protection Anti-Pubs 🛡️</span>
       </div>
 
-      <!-- Slider Langue VO / VF -->
-      <div class="player-lang-box">
-        <div class="lang-switch-capsule player-lang-capsule" id="playerLangSwitch" title="Basculer la version audio (VO / VF)" data-active-lang="vo">
-          <div class="lang-switch-thumb"></div>
-          <button class="lang-btn active" data-lang="vo" id="playerLangVo" type="button">🇬🇧 VO</button>
-          <button class="lang-btn" data-lang="vf" id="playerLangVf" type="button">🇫🇷 VF</button>
-        </div>
-      </div>
-
-      <!-- Sélecteur de Serveurs avec Boutons de Navigation / Défilement Horizontal -->
-      <div class="player-server-wrapper" id="playerServerWrapper">
-        <button class="server-nav-btn prev is-disabled" id="serverNavPrev" type="button" aria-label="Serveurs précédents" title="Faire défiler vers la gauche">‹</button>
-        <div class="player-server-selector" id="playerServerSelector">
-          <button class="server-pill active" data-server="1" title="Serveur 1 : Direct HLS (Cluster Alpha)">
-            <span class="pill-dot">●</span> ⚡ Serveur 1 (Direct HLS)
-          </button>
-          <button class="server-pill" data-server="2" title="Serveur 2 : Direct HLS (Cluster Bêta)">
-            🎬 Serveur 2 (Direct HD)
-          </button>
-          <button class="server-pill" data-server="3" title="Serveur 3 : Direct HLS Multi-Flux (Cluster Gamma)">
-            🌐 Serveur 3 (Direct Multi)
-          </button>
-          <button class="server-pill" data-server="4" title="Serveur 4 : Direct HLS CDN VIP (Cluster Delta)">
-            📡 Serveur 4 (Direct VIP)
-          </button>
-          <button class="server-pill" data-server="5" title="Serveur 5 : Direct HLS Secours (Cluster Epsilon)">
-            🚀 Serveur 5 (Direct Secours)
-          </button>
-        </div>
-        <button class="server-nav-btn next" id="serverNavNext" type="button" aria-label="Serveurs suivants" title="Faire défiler vers la droite">›</button>
-      </div>
+      <!-- Bouton d'ouverture des commentaires en direct -->
+      <button class="player-comments-toggle-btn" id="playerCommentsToggleBtn" type="button" title="Afficher les commentaires en direct">
+        💬 <span class="comments-toggle-label">Commentaires</span>
+      </button>
 
       <!-- Sélecteur d'Épisodes (pour Séries) -->
       <div class="player-episode-box hidden" id="playerEpisodeBox">
@@ -454,10 +441,24 @@
 
       <!-- Bannière de statut / résilience -->
       <div class="player-status-banner hidden" id="playerStatusBanner">
-        <span id="statusBannerText">Ce serveur met un peu de temps à répondre...</span>
+        <span id="statusBannerText">Tentative de reconnexion au flux direct...</span>
         <div class="status-banner-actions">
-          <button class="btn-status-action" id="statusSwitchBtn">Basculer de serveur</button>
-          <button class="btn-status-action secondary" id="statusRetryBtn">Réessayer</button>
+          <button class="btn-status-action" id="statusRetryBtn">Réessayer</button>
+        </div>
+      </div>
+
+      <!-- Tiroir Latéral des Commentaires en Direct dans le Player ZIFLIX -->
+      <div class="player-comments-drawer hidden" id="playerCommentsDrawer">
+        <div class="player-drawer-header">
+          <div class="player-drawer-title">💬 Commentaires en direct</div>
+          <button class="player-drawer-close" id="playerCommentsCloseBtn" type="button" title="Fermer">✕</button>
+        </div>
+        <div class="player-drawer-list" id="playerDrawerCommentsList">
+          <!-- Injecté dynamiquement -->
+        </div>
+        <div class="player-drawer-compose">
+          <input type="text" id="playerCommentInput" class="player-drawer-input" placeholder="Votre commentaire..." maxlength="400" autocomplete="off">
+          <button type="button" id="playerCommentSubmitBtn" class="player-drawer-send-btn">Envoyer</button>
         </div>
       </div>
     </div>
@@ -770,6 +771,58 @@
         </div>
       </div>
 
+      <!-- ================= SECTION UTILISATEURS & MODÉRATION ZIFLIX ================= -->
+      <div class="admin-users-mod-container" id="adminUsersModSection" style="margin-bottom: 28px;">
+        <div class="xtream-monitor-header" style="margin-bottom: 16px;">
+          <div class="monitor-title-wrap">
+            <span class="monitor-icon">👥</span>
+            <div class="monitor-title-group">
+              <h2 class="monitor-title">PROFILS & MODÉRATION DE LA COMMUNAUTÉ ZIFLIX</h2>
+              <p class="monitor-subtitle">Gérez les comptes enregistrés, promouvez les modérateurs, bannissez les contrevenants et modérez les avis</p>
+            </div>
+          </div>
+          <div class="monitor-header-badges" style="gap: 10px;">
+            <button type="button" class="btn-admin btn-admin-secondary btn-sm" id="adminUsersRefreshBtn" title="Actualiser la liste">
+              🔄 Actualiser
+            </button>
+          </div>
+        </div>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 20px;" class="admin-mod-dual-grid">
+          <!-- Utilisateurs ZIFLIX -->
+          <div style="background: var(--admin-surface-card); border: 1px solid var(--admin-border); border-radius: 12px; padding: 16px; overflow: hidden;">
+            <h3 style="margin-top: 0; margin-bottom: 12px; font-size: 1rem; color: #fff; display: flex; align-items: center; justify-content: space-between;">
+              <span style="display: flex; align-items: center; gap: 8px;"><span>👤</span> Comptes Utilisateurs (<span id="adminUsersCount">0</span>)</span>
+            </h3>
+            <div style="max-height: 320px; overflow-y: auto;">
+              <table class="admin-table" style="width: 100%; border-collapse: collapse;">
+                <thead>
+                  <tr style="background: rgba(255,255,255,0.03); border-bottom: 1px solid var(--admin-border);">
+                    <th style="padding: 8px; text-align: left; font-size: 0.75rem;">Utilisateur</th>
+                    <th style="padding: 8px; text-align: center; font-size: 0.75rem;">Rôle</th>
+                    <th style="padding: 8px; text-align: center; font-size: 0.75rem;">Statut</th>
+                    <th style="padding: 8px; text-align: right; font-size: 0.75rem;">Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="adminUsersTableBody">
+                  <!-- Rempli par admin.js -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- Modération des commentaires -->
+          <div style="background: var(--admin-surface-card); border: 1px solid var(--admin-border); border-radius: 12px; padding: 16px; overflow: hidden;">
+            <h3 style="margin-top: 0; margin-bottom: 12px; font-size: 1rem; color: #fff; display: flex; align-items: center; justify-content: space-between;">
+              <span style="display: flex; align-items: center; gap: 8px;"><span>💬</span> Derniers Avis & Commentaires (<span id="adminCommentsCount">0</span>)</span>
+            </h3>
+            <div style="max-height: 320px; overflow-y: auto;" id="adminCommentsList">
+              <!-- Rempli par admin.js -->
+            </div>
+          </div>
+        </div>
+      </div>
+
       <!-- Barre d'outils pratique : Recherche instantanée & Filtres de type -->
       <div class="admin-toolbar">
         <div class="admin-search-wrapper">
@@ -922,9 +975,137 @@
   <!-- Conteneur de notifications Toast -->
   <div class="toast-container" id="toastContainer"></div>
 
+  <!-- ================= MODAL AUTH GATE ZIFLIX (OBLIGATOIRE) ================= -->
+  <div class="auth-gate-backdrop" id="authGateModal">
+    <div class="auth-gate-card">
+      <div class="auth-gate-header">
+        <img src="assets/logos/ziflix-logo.svg" alt="ZIFLIX" class="auth-gate-logo">
+        <h2 class="auth-gate-title" id="authGateTitle">Bienvenue sur ZIFLIX</h2>
+        <p class="auth-gate-subtitle" id="authGateSubtitle">Connectez-vous ou créez votre profil pour accéder aux films et séries</p>
+      </div>
+
+      <div class="auth-gate-tabs">
+        <button type="button" class="auth-tab-btn active" id="tabLoginBtn">Connexion</button>
+        <button type="button" class="auth-tab-btn" id="tabRegisterBtn">Créer un profil</button>
+      </div>
+
+      <!-- Formulaire Connexion -->
+      <form id="loginForm" class="auth-gate-form">
+        <div class="auth-form-group">
+          <label for="loginUsername">Pseudo</label>
+          <div class="auth-input-wrap">
+            <span class="auth-input-icon">👤</span>
+            <input type="text" id="loginUsername" class="auth-input" placeholder="Votre pseudo" autocomplete="username" required>
+          </div>
+        </div>
+
+        <div class="auth-form-group">
+          <label for="loginPassword">Mot de passe</label>
+          <div class="auth-input-wrap">
+            <span class="auth-input-icon">🔒</span>
+            <input type="password" id="loginPassword" class="auth-input" placeholder="Votre mot de passe" autocomplete="current-password" required>
+            <button type="button" class="auth-eye-btn" data-target="loginPassword">👁️</button>
+          </div>
+        </div>
+
+        <div class="auth-error-msg hidden" id="loginError"></div>
+
+        <button type="submit" class="btn-ziflix-primary auth-submit-btn" id="loginSubmitBtn">
+          Entrer sur ZIFLIX ▶
+        </button>
+      </form>
+
+      <!-- Formulaire Création de Profil -->
+      <form id="registerForm" class="auth-gate-form hidden">
+        <div class="auth-form-group">
+          <label for="regUsername">Pseudo choisi</label>
+          <div class="auth-input-wrap">
+            <span class="auth-input-icon">👤</span>
+            <input type="text" id="regUsername" class="auth-input" placeholder="Ex: Alex, Cinephile99..." maxlength="25" autocomplete="username" required>
+          </div>
+        </div>
+
+        <div class="auth-form-group">
+          <label for="regPassword">Mot de passe</label>
+          <div class="auth-input-wrap">
+            <span class="auth-input-icon">🔒</span>
+            <input type="password" id="regPassword" class="auth-input" placeholder="Créez un mot de passe" autocomplete="new-password" required>
+            <button type="button" class="auth-eye-btn" data-target="regPassword">👁️</button>
+          </div>
+        </div>
+
+        <div class="auth-form-group">
+          <label style="display: block; margin-bottom: 8px;">Choisissez votre avatar ZIFLIX :</label>
+          <div class="avatar-selection-grid" id="regAvatarGrid">
+            <!-- 10 avatars injectés dynamiquement -->
+          </div>
+        </div>
+
+        <div class="auth-form-group">
+          <label for="regCustomAvatarUrl">Ou URL d'image personnalisée (optionnel) :</label>
+          <div class="auth-input-wrap">
+            <span class="auth-input-icon">🖼️</span>
+            <input type="url" id="regCustomAvatarUrl" class="auth-input" placeholder="https://exemple.com/photo.png">
+          </div>
+        </div>
+
+        <div class="auth-error-msg hidden" id="registerError"></div>
+
+        <button type="submit" class="btn-ziflix-primary auth-submit-btn" id="registerSubmitBtn">
+          Créer mon profil ZIFLIX ✨
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- ================= MODAL PERSONNALISATION PROFIL ZIFLIX ================= -->
+  <div class="modal-backdrop" id="profileCustomModal">
+    <div class="modal-content profile-custom-card">
+      <button class="modal-close-btn" id="closeProfileModalBtn">✕</button>
+      <div class="profile-custom-header">
+        <h2 style="font-size: 1.3rem; margin: 0 0 6px 0;">Personnaliser mon profil</h2>
+        <p style="font-size: 0.82rem; color: #aaa; margin: 0;">Modifiez votre pseudo ou sélectionnez un nouvel avatar</p>
+      </div>
+
+      <div class="profile-current-preview">
+        <img id="profileModalCurrentAvatar" src="assets/avatars/avatar-1.svg" alt="Avatar Actuel" class="profile-preview-img">
+        <div class="profile-preview-info">
+          <span class="profile-preview-name" id="profileModalUsername">Utilisateur</span>
+          <span class="profile-preview-badge" id="profileModalRole">Membre ZIFLIX</span>
+        </div>
+      </div>
+
+      <form id="profileUpdateForm">
+        <div class="auth-form-group">
+          <label for="profileInputUsername">Nouveau Pseudo</label>
+          <input type="text" id="profileInputUsername" class="admin-form-input" placeholder="Votre pseudo" required>
+        </div>
+
+        <div class="auth-form-group">
+          <label style="display: block; margin-bottom: 8px;">Sélectionnez un avatar parmi la collection ZIFLIX :</label>
+          <div class="avatar-selection-grid" id="profileAvatarGrid">
+            <!-- 10 avatars injectés dynamiquement -->
+          </div>
+        </div>
+
+        <div class="auth-form-group">
+          <label for="profileInputCustomUrl">Ou entrez l'URL d'une image personnalisée :</label>
+          <input type="url" id="profileInputCustomUrl" class="admin-form-input" placeholder="https://exemple.com/ma-photo.jpg">
+        </div>
+
+        <div class="auth-error-msg hidden" id="profileUpdateError"></div>
+
+        <div style="display: flex; justify-content: flex-end; gap: 10px; margin-top: 20px;">
+          <button type="button" class="btn-netflix btn-netflix-secondary" id="cancelProfileBtn">Annuler</button>
+          <button type="submit" class="btn-netflix btn-netflix-primary" id="saveProfileBtn">Enregistrer</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
   <!-- ================= FOOTER ================= -->
   <footer class="netflix-footer">
-    <p>Des questions ? Contactez le support Netflix Clone</p>
+    <p>Des questions ? Contactez le support ZIFLIX</p>
     <ul class="footer-links">
       <li><a href="#">FAQ</a></li>
       <li><a href="#">Centre d'aide</a></li>
@@ -940,10 +1121,10 @@
       <li><a href="#">Nous contacter</a></li>
     </ul>
     <div class="rust-badge">
-      <span>🦀</span> Architecture 100% Soutenue par Rust (Axum & Tokio) • Streaming HTTP Range 206
+      <span>🦀</span> Architecture Haute Performance ZIFLIX • Streaming Range 206 Ultra-Fluide
     </div>
     <p style="margin-top: 15px; font-size: 0.75rem; color: #555;">
-      Netflix Clone Portfolio Project. Les marques, logos et visuels restent la propriété de leurs détenteurs respectifs.
+      ZIFLIX Streaming & Live TV. Les marques, logos et visuels restent la propriété de leurs détenteurs respectifs.
     </p>
   </footer>
 

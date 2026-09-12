@@ -1,0 +1,16 @@
+[
+  {
+    "id": "c_init_1",
+    "media_id": "stranger-things",
+    "mediaId": "stranger-things",
+    "media_title": "Stranger Things",
+    "mediaTitle": "Stranger Things",
+    "user_id": "u_admin",
+    "userId": "u_admin",
+    "username": "admin",
+    "avatar": "assets/avatars/avatar-1.svg",
+    "text": "Bienvenue sur ZIFLIX ! Bon visionnage à tous.",
+    "created_at": "2026-09-12T00:00:00.000Z",
+    "createdAt": "2026-09-12T00:00:00.000Z"
+  }
+]

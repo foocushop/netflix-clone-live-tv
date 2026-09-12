@@ -40,6 +40,13 @@ class NetflixAdmin {
     this.closeAddXtreamUserBtn = document.getElementById('closeAddXtreamUserBtn');
     this.xtreamUsersRefreshBtn = document.getElementById('xtreamUsersRefreshBtn');
 
+    // Communauté & Modération ZIFLIX
+    this.adminUsersTableBody = document.getElementById('adminUsersTableBody');
+    this.adminUsersCount = document.getElementById('adminUsersCount');
+    this.adminCommentsList = document.getElementById('adminCommentsList');
+    this.adminCommentsCount = document.getElementById('adminCommentsCount');
+    this.adminUsersRefreshBtn = document.getElementById('adminUsersRefreshBtn');
+
     window.netflixAdmin = this;
 
     this.initEvents();
@@ -230,13 +237,26 @@ class NetflixAdmin {
     if (this.xtreamUsersRefreshBtn) {
       this.xtreamUsersRefreshBtn.addEventListener('click', () => this.loadXtreamUsers(true));
     }
+
+    if (this.adminUsersRefreshBtn) {
+      this.adminUsersRefreshBtn.addEventListener('click', () => {
+        this.loadCommunityUsers();
+        this.loadCommunityComments();
+        this.showToast('👥 Modération actualisée');
+      });
+    }
   }
 
   // ================= FLUX DE SÉCURITÉ & CONNEXION =================
   open() {
     if (!this.isAuthenticated()) {
-      this.openAuthModal();
-      return;
+      const user = window.netflixApp?.currentUser;
+      if (user && user.role === 'admin') {
+        sessionStorage.setItem('netflix_admin_authenticated', '1965');
+      } else {
+        this.openAuthModal();
+        return;
+      }
     }
     this.overlay.classList.add('active');
     this.loadStats();
@@ -244,6 +264,8 @@ class NetflixAdmin {
     this.loadClusterStatus();
     this.loadXtreamSessions();
     this.loadXtreamUsers();
+    this.loadCommunityUsers();
+    this.loadCommunityComments();
     this.startClusterPolling();
   }
 
@@ -290,6 +312,8 @@ class NetflixAdmin {
         this.loadClusterStatus();
         this.loadXtreamSessions();
         this.loadXtreamUsers();
+        this.loadCommunityUsers();
+        this.loadCommunityComments();
       } else {
         this.showAuthError(data.message || "Code PIN ou mot de passe incorrect");
       }
@@ -305,6 +329,8 @@ class NetflixAdmin {
         this.loadClusterStatus();
         this.loadXtreamSessions();
         this.loadXtreamUsers();
+        this.loadCommunityUsers();
+        this.loadCommunityComments();
       } else {
         this.showAuthError("Code PIN incorrect. Veuillez réessayer.");
       }
@@ -1357,6 +1383,169 @@ class NetflixAdmin {
     } catch (err) {
       console.error('Erreur suppression compte Xtream:', err);
       this.showToast("Erreur de communication avec le serveur", true);
+    }
+  }
+
+  // ================= MODÉRATION COMMUNAUTÉ & UTILISATEURS ZIFLIX =================
+  async loadCommunityUsers() {
+    if (!this.adminUsersTableBody) return;
+    const token = localStorage.getItem('ziflix_auth_token');
+    try {
+      const headers = { 'Content-Type': 'application/json' };
+      if (token) headers['Authorization'] = `Bearer ${token}`;
+      const res = await fetch('/api/admin/users', { headers });
+      const json = await res.json();
+      if (json.success && Array.isArray(json.users)) {
+        if (this.adminUsersCount) this.adminUsersCount.textContent = json.users.length;
+        if (json.users.length === 0) {
+          this.adminUsersTableBody.innerHTML = '<tr><td colspan="4" style="text-align: center; color: #888; padding: 16px;">Aucun utilisateur enregistré.</td></tr>';
+          return;
+        }
+        this.adminUsersTableBody.innerHTML = '';
+        json.users.forEach(u => {
+          const tr = document.createElement('tr');
+          tr.style.borderBottom = '1px solid var(--admin-border)';
+          const isBanned = !!u.banned;
+          const isAdmin = (u.role === 'admin');
+
+          tr.innerHTML = `
+            <td style="padding: 10px 8px; display: flex; align-items: center; gap: 8px;">
+              <img src="${u.avatar || 'assets/avatars/avatar-1.svg'}" alt="${u.username}" style="width: 28px; height: 28px; border-radius: 50%; object-fit: cover;">
+              <strong style="color: #fff; font-size: 0.82rem;">${u.username}</strong>
+            </td>
+            <td style="padding: 10px 8px; text-align: center;">
+              <span style="font-size: 0.72rem; padding: 2px 6px; border-radius: 4px; font-weight: 700; ${isAdmin ? 'background: rgba(229, 9, 20, 0.25); color: #ff6b6b;' : 'background: rgba(255,255,255,0.08); color: #aaa;'}">
+                ${isAdmin ? '👑 Admin' : 'Membre'}
+              </span>
+            </td>
+            <td style="padding: 10px 8px; text-align: center;">
+              <span style="font-size: 0.72rem; font-weight: 700; color: ${isBanned ? '#ff4d4d' : '#46d369'};">
+                ${isBanned ? '🚫 Banni' : '✅ Actif'}
+              </span>
+            </td>
+            <td style="padding: 10px 8px; text-align: right; white-space: nowrap;">
+              <button type="button" class="btn-admin btn-admin-secondary btn-sm toggle-role-btn" style="font-size: 0.7rem; padding: 3px 6px;">
+                ${isAdmin ? 'Rétrograder' : 'Promouvoir'}
+              </button>
+              <button type="button" class="btn-admin ${isBanned ? 'btn-admin-green' : 'btn-admin-red'} btn-sm toggle-ban-btn" style="font-size: 0.7rem; padding: 3px 6px; margin-left: 4px;">
+                ${isBanned ? 'Débannir' : 'Bannir'}
+              </button>
+            </td>
+          `;
+
+          tr.querySelector('.toggle-role-btn')?.addEventListener('click', async () => {
+            const newRole = isAdmin ? 'user' : 'admin';
+            await this.changeUserRole(u.id, newRole);
+          });
+
+          tr.querySelector('.toggle-ban-btn')?.addEventListener('click', async () => {
+            await this.toggleUserBan(u.id, !isBanned);
+          });
+
+          this.adminUsersTableBody.appendChild(tr);
+        });
+      }
+    } catch (e) {}
+  }
+
+  async toggleUserBan(userId, ban) {
+    const token = localStorage.getItem('ziflix_auth_token');
+    try {
+      const headers = { 'Content-Type': 'application/json' };
+      if (token) headers['Authorization'] = `Bearer ${token}`;
+      const res = await fetch('/api/admin/users/ban', {
+        method: 'POST',
+        headers,
+        body: JSON.stringify({ userId, banned: ban })
+      });
+      const json = await res.json();
+      if (json.success) {
+        this.showToast(ban ? '🚫 Utilisateur banni' : '✅ Utilisateur débanni');
+        this.loadCommunityUsers();
+      } else {
+        this.showToast(json.error || "Erreur lors de l'opération", true);
+      }
+    } catch (e) {
+      this.showToast('Erreur réseau', true);
+    }
+  }
+
+  async changeUserRole(userId, role) {
+    const token = localStorage.getItem('ziflix_auth_token');
+    try {
+      const headers = { 'Content-Type': 'application/json' };
+      if (token) headers['Authorization'] = `Bearer ${token}`;
+      const res = await fetch('/api/admin/users/role', {
+        method: 'POST',
+        headers,
+        body: JSON.stringify({ userId, role })
+      });
+      const json = await res.json();
+      if (json.success) {
+        this.showToast(`Rôle mis à jour : ${role}`);
+        this.loadCommunityUsers();
+      } else {
+        this.showToast(json.error || 'Erreur lors de la mise à jour du rôle', true);
+      }
+    } catch (e) {
+      this.showToast('Erreur réseau', true);
+    }
+  }
+
+  async loadCommunityComments() {
+    if (!this.adminCommentsList) return;
+    const token = localStorage.getItem('ziflix_auth_token');
+    try {
+      const headers = { 'Content-Type': 'application/json' };
+      if (token) headers['Authorization'] = `Bearer ${token}`;
+      const res = await fetch('/api/comments?recent=true', { headers });
+      const json = await res.json();
+      if (json.success && Array.isArray(json.comments)) {
+        if (this.adminCommentsCount) this.adminCommentsCount.textContent = json.comments.length;
+        if (json.comments.length === 0) {
+          this.adminCommentsList.innerHTML = '<div style="color: #888; font-size: 0.8rem; text-align: center; padding: 20px;">Aucun avis posté.</div>';
+          return;
+        }
+        this.adminCommentsList.innerHTML = '';
+        json.comments.forEach(c => {
+          const item = document.createElement('div');
+          item.style.cssText = 'background: rgba(255,255,255,0.03); border: 1px solid var(--admin-border); border-radius: 8px; padding: 10px; margin-bottom: 8px; font-size: 0.8rem;';
+          item.innerHTML = `
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
+              <strong style="color: #fff;">${c.username} <span style="font-size: 0.72rem; color: #888; font-weight: 400;">(${c.mediaId})</span></strong>
+              <button type="button" class="btn-admin btn-admin-red btn-sm delete-comment-btn" style="padding: 2px 6px; font-size: 0.68rem;">Supprimer</button>
+            </div>
+            <div style="color: #ccc; margin-bottom: 4px;">${c.text.replace(/</g, '&lt;').replace(/>/g, '&gt;')}</div>
+            <div style="font-size: 0.68rem; color: #666;">${new Date(c.createdAt).toLocaleString('fr-FR')}</div>
+          `;
+          item.querySelector('.delete-comment-btn')?.addEventListener('click', async () => {
+            await this.deleteCommentAdmin(c.id);
+          });
+          this.adminCommentsList.appendChild(item);
+        });
+      }
+    } catch (e) {}
+  }
+
+  async deleteCommentAdmin(commentId) {
+    const token = localStorage.getItem('ziflix_auth_token');
+    try {
+      const headers = { 'Content-Type': 'application/json' };
+      if (token) headers['Authorization'] = `Bearer ${token}`;
+      const res = await fetch('/api/comments', {
+        method: 'DELETE',
+        headers,
+        body: JSON.stringify({ commentId })
+      });
+      const json = await res.json();
+      if (json.success) {
+        this.showToast('🗑️ Avis supprimé par la modération');
+        this.loadCommunityComments();
+      } else {
+        this.showToast(json.error || 'Erreur lors de la suppression', true);
+      }
+    } catch (e) {
+      this.showToast('Erreur réseau', true);
     }
   }
 }

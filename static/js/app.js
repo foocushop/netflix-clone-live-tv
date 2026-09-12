@@ -16,10 +16,17 @@ class NetflixApp {
     window.app = this;
     this.bgAbortController = new AbortController();
 
+    this.currentUser = null;
+    this.avatarsList = Array.from({ length: 10 }, (_, i) => `assets/avatars/avatar-${i + 1}.svg`);
+    this.selectedRegAvatar = this.avatarsList[0];
+    this.selectedProfileAvatar = this.avatarsList[0];
+
     this.initElements();
+    this.initAuthElements();
     this.initEvents();
+    this.initAuthEvents();
+    this.checkAuth();
     this.loadCatalog();
-    this.player.setLanguage(localStorage.getItem('netflix_lang') || 'vo', false);
   }
 
   pauseBackgroundTasks() {
@@ -225,21 +232,78 @@ class NetflixApp {
     });
 
     // Ouverture Mode Admin
-    document.getElementById('openAdminBtn').addEventListener('click', (e) => {
-      e.preventDefault();
-      this.admin.open();
-    });
-
-    // Sélecteurs de langue (Header, Modal)
-    document.querySelectorAll('.lang-switch-capsule').forEach(capsule => {
-      capsule.querySelectorAll('.lang-btn').forEach(btn => {
-        btn.addEventListener('click', (e) => {
-          e.stopPropagation();
-          const lang = btn.dataset.lang || 'vo';
-          this.player.setLanguage(lang);
-        });
+    const openAdminBtn = document.getElementById('openAdminBtn');
+    if (openAdminBtn) {
+      openAdminBtn.addEventListener('click', (e) => {
+        e.preventDefault();
+        const profileContainer = document.getElementById('profileContainer');
+        if (profileContainer) profileContainer.classList.remove('open');
+        this.admin.open();
       });
-    });
+    }
+
+    // Toggle Dropdown Profil au clic & fermeture automatique si clic extérieur
+    const profileAvatarBtn = document.getElementById('profileAvatarBtn');
+    const profileContainer = document.getElementById('profileContainer');
+    if (profileAvatarBtn && profileContainer) {
+      profileAvatarBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        profileContainer.classList.toggle('open');
+      });
+      document.addEventListener('click', (e) => {
+        if (!profileContainer.contains(e.target)) {
+          profileContainer.classList.remove('open');
+        }
+      });
+    }
+
+    // Modal de Personnalisation Profil
+    const openProfileModalBtn = document.getElementById('openProfileModalBtn');
+    if (openProfileModalBtn) {
+      openProfileModalBtn.addEventListener('click', (e) => {
+        e.preventDefault();
+        if (profileContainer) profileContainer.classList.remove('open');
+        this.openProfileModal();
+      });
+    }
+    const closeProfileModalBtn = document.getElementById('closeProfileModalBtn');
+    const cancelProfileBtn = document.getElementById('cancelProfileBtn');
+    if (closeProfileModalBtn) closeProfileModalBtn.addEventListener('click', () => this.closeProfileModal());
+    if (cancelProfileBtn) cancelProfileBtn.addEventListener('click', () => this.closeProfileModal());
+
+    // Déconnexion
+    const logoutBtn = document.getElementById('logoutBtn');
+    if (logoutBtn) {
+      logoutBtn.addEventListener('click', (e) => {
+        e.preventDefault();
+        if (profileContainer) profileContainer.classList.remove('open');
+        this.handleLogout();
+      });
+    }
+
+    // Centre d'aide
+    const helpCenterBtn = document.getElementById('helpCenterBtn');
+    if (helpCenterBtn) {
+      helpCenterBtn.addEventListener('click', () => {
+        if (profileContainer) profileContainer.classList.remove('open');
+        this.showToast("ℹ️ Centre d'aide ZIFLIX : Support technique 24/7 actif.");
+      });
+    }
+
+    // Publication de commentaire dans la fiche média
+    const submitCommentBtn = document.getElementById('submitCommentBtn');
+    if (submitCommentBtn) {
+      submitCommentBtn.addEventListener('click', () => this.submitComment());
+    }
+    const commentTextInput = document.getElementById('commentTextInput');
+    if (commentTextInput) {
+      commentTextInput.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) {
+          e.preventDefault();
+          this.submitComment();
+        }
+      });
+    }
   }
 
   async loadCatalog() {
@@ -493,6 +557,7 @@ class NetflixApp {
     this.modalDirector.textContent = movie.director || 'Non communiqué';
 
     this.updateModalListButton();
+    this.loadModalComments(movie.id);
 
     // Gestion des saisons & épisodes pour les séries
     if (movie.media_type === 'series' || movie.is_xtream_series) {
@@ -802,15 +867,47 @@ class NetflixApp {
     if (filter === 'nouveautes') {
       if (this.originalHero) this.setupHero(this.originalHero);
       this.catalogRowsContainer.innerHTML = '';
-      const recentMovies = (this.catalogData?.movies || []).filter(m =>
-        (m.release_year && m.release_year >= 2025) ||
-        (m.created_at && m.created_at.startsWith('2026')) ||
-        (m.year && m.year >= 2025)
-      );
+      const all = this.catalogData?.movies || [];
+
+      // 1. Les plus regardés (Triés par score de match & popularité)
+      const topWatched = [...all]
+        .filter(m => m.media_type !== 'channel')
+        .sort((a, b) => (b.match_score || 0) - (a.match_score || 0))
+        .slice(0, 18);
+
+      // 2. Nouveautés 2025 - 2026
+      const recentMovies = [...all]
+        .filter(m =>
+          (m.release_year && m.release_year >= 2025) ||
+          (m.created_at && m.created_at.startsWith('2026')) ||
+          (m.year && m.year >= 2025)
+        )
+        .sort((a, b) => (b.release_year || b.year || 0) - (a.release_year || a.year || 0));
+
+      // 3. Séries en cours les plus suivies
+      const popularSeries = [...all]
+        .filter(m => m.media_type === 'series')
+        .sort((a, b) => (b.match_score || 0) - (a.match_score || 0))
+        .slice(0, 18);
+
       this.renderRow({
-        category: { name: "✨ Nouveautés 2025 - 2026", slug: "nouveautes" },
-        movies: recentMovies
+        category: { name: "🔥 Les Plus Regardés sur ZIFLIX (Top Tendances)", slug: "top-regardes" },
+        movies: topWatched
       });
+
+      if (recentMovies.length > 0) {
+        this.renderRow({
+          category: { name: "✨ Nouveautés & Sorties Récentes (2025 - 2026)", slug: "nouveautes" },
+          movies: recentMovies
+        });
+      }
+
+      if (popularSeries.length > 0) {
+        this.renderRow({
+          category: { name: "📺 Séries en Cours les Plus Suivies", slug: "series-populaires" },
+          movies: popularSeries
+        });
+      }
       return;
     }
 
@@ -1556,6 +1653,456 @@ class NetflixApp {
     });
     slider.appendChild(fragment);
     this.catalogRowsContainer.appendChild(rowEl);
+  }
+
+  // ================= 12. GESTION DU PROFIL & AUTHENTIFICATION OBLIGATOIRE ZIFLIX =================
+  initAuthElements() {
+    this.authGateModal = document.getElementById('authGateModal');
+    this.tabLoginBtn = document.getElementById('tabLoginBtn');
+    this.tabRegisterBtn = document.getElementById('tabRegisterBtn');
+    this.loginForm = document.getElementById('loginForm');
+    this.registerForm = document.getElementById('registerForm');
+    this.loginError = document.getElementById('loginError');
+    this.registerError = document.getElementById('registerError');
+
+    this.profileCustomModal = document.getElementById('profileCustomModal');
+    this.profileUpdateForm = document.getElementById('profileUpdateForm');
+    this.profileInputUsername = document.getElementById('profileInputUsername');
+    this.profileInputCustomUrl = document.getElementById('profileInputCustomUrl');
+    this.profileUpdateError = document.getElementById('profileUpdateError');
+  }
+
+  initAuthEvents() {
+    // Onglets Connexion / Inscription
+    if (this.tabLoginBtn && this.tabRegisterBtn) {
+      this.tabLoginBtn.addEventListener('click', () => {
+        this.tabLoginBtn.classList.add('active');
+        this.tabRegisterBtn.classList.remove('active');
+        if (this.loginForm) this.loginForm.classList.remove('hidden');
+        if (this.registerForm) this.registerForm.classList.add('hidden');
+        if (this.loginError) this.loginError.classList.add('hidden');
+      });
+
+      this.tabRegisterBtn.addEventListener('click', () => {
+        this.tabRegisterBtn.classList.add('active');
+        this.tabLoginBtn.classList.remove('active');
+        if (this.registerForm) this.registerForm.classList.remove('hidden');
+        if (this.loginForm) this.loginForm.classList.add('hidden');
+        if (this.registerError) this.registerError.classList.add('hidden');
+      });
+    }
+
+    // Boutons pour afficher/masquer le mot de passe
+    document.querySelectorAll('.auth-eye-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const targetId = btn.dataset.target;
+        const input = document.getElementById(targetId);
+        if (input) {
+          const isPass = input.type === 'password';
+          input.type = isPass ? 'text' : 'password';
+          btn.textContent = isPass ? '🙈' : '👁️';
+        }
+      });
+    });
+
+    // Soumission Connexion
+    if (this.loginForm) {
+      this.loginForm.addEventListener('submit', (e) => this.handleLogin(e));
+    }
+
+    // Soumission Inscription
+    if (this.registerForm) {
+      this.registerForm.addEventListener('submit', (e) => this.handleRegister(e));
+    }
+
+    // Soumission Mise à jour Profil
+    if (this.profileUpdateForm) {
+      this.profileUpdateForm.addEventListener('submit', (e) => this.handleProfileUpdate(e));
+    }
+  }
+
+  renderAvatarSelectionGrids() {
+    const regGrid = document.getElementById('regAvatarGrid');
+    const profileGrid = document.getElementById('profileAvatarGrid');
+
+    const populateGrid = (gridEl, isProfileModal = false) => {
+      if (!gridEl) return;
+      gridEl.innerHTML = '';
+      this.avatarsList.forEach(avatarPath => {
+        const item = document.createElement('div');
+        item.className = 'avatar-choice-item';
+        const isSelected = isProfileModal
+          ? (this.selectedProfileAvatar === avatarPath)
+          : (this.selectedRegAvatar === avatarPath);
+        if (isSelected) item.classList.add('active');
+
+        item.innerHTML = `<img src="${avatarPath}" alt="Avatar ZIFLIX" class="avatar-choice-img">`;
+        item.addEventListener('click', () => {
+          gridEl.querySelectorAll('.avatar-choice-item').forEach(el => el.classList.remove('active'));
+          item.classList.add('active');
+          if (isProfileModal) {
+            this.selectedProfileAvatar = avatarPath;
+            const previewImg = document.getElementById('profileModalCurrentAvatar');
+            if (previewImg) previewImg.src = avatarPath;
+            if (this.profileInputCustomUrl) this.profileInputCustomUrl.value = '';
+          } else {
+            this.selectedRegAvatar = avatarPath;
+            const regCustomUrl = document.getElementById('regCustomAvatarUrl');
+            if (regCustomUrl) regCustomUrl.value = '';
+          }
+        });
+        gridEl.appendChild(item);
+      });
+    };
+
+    populateGrid(regGrid, false);
+    populateGrid(profileGrid, true);
+  }
+
+  async checkAuth() {
+    const token = localStorage.getItem('ziflix_auth_token');
+    this.renderAvatarSelectionGrids();
+
+    if (!token) {
+      if (this.authGateModal) this.authGateModal.classList.remove('hidden');
+      return;
+    }
+
+    try {
+      const baseUrl = window.API_BASE || '';
+      const res = await fetch(`${baseUrl}/api/auth/me`, {
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      const json = await res.json();
+      if (json.success && json.user) {
+        this.setCurrentUser(json.user);
+        if (this.authGateModal) this.authGateModal.classList.add('hidden');
+      } else {
+        localStorage.removeItem('ziflix_auth_token');
+        if (this.authGateModal) this.authGateModal.classList.remove('hidden');
+      }
+    } catch (e) {
+      if (this.authGateModal) this.authGateModal.classList.remove('hidden');
+    }
+  }
+
+  setCurrentUser(user) {
+    this.currentUser = user;
+    const headerProfileImg = document.getElementById('headerProfileImg');
+    const headerUsernameDisplay = document.getElementById('headerUsernameDisplay');
+    const commentCurrentUserAvatar = document.getElementById('commentCurrentUserAvatar');
+
+    if (headerProfileImg && user.avatar) headerProfileImg.src = user.avatar;
+    if (headerUsernameDisplay && user.username) headerUsernameDisplay.textContent = user.username;
+    if (commentCurrentUserAvatar && user.avatar) commentCurrentUserAvatar.src = user.avatar;
+
+    const openAdminBtn = document.getElementById('openAdminBtn');
+    if (openAdminBtn) {
+      openAdminBtn.style.display = (user.role === 'admin') ? 'flex' : 'none';
+    }
+  }
+
+  async handleLogin(e) {
+    e.preventDefault();
+    const usernameInput = document.getElementById('loginUsername');
+    const passwordInput = document.getElementById('loginPassword');
+    const submitBtn = document.getElementById('loginSubmitBtn');
+    if (!usernameInput || !passwordInput) return;
+
+    const username = usernameInput.value.trim();
+    const password = passwordInput.value;
+    if (!username || !password) return;
+
+    if (this.loginError) this.loginError.classList.add('hidden');
+    if (submitBtn) {
+      submitBtn.disabled = true;
+      submitBtn.textContent = 'Connexion en cours...';
+    }
+
+    try {
+      const baseUrl = window.API_BASE || '';
+      const res = await fetch(`${baseUrl}/api/auth/login`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ username, password })
+      });
+      const json = await res.json();
+
+      if (json.success && json.token && json.user) {
+        localStorage.setItem('ziflix_auth_token', json.token);
+        this.setCurrentUser(json.user);
+        if (this.authGateModal) this.authGateModal.classList.add('hidden');
+        this.showToast(`✨ Bienvenue ${json.user.username} sur ZIFLIX !`);
+      } else {
+        if (this.loginError) {
+          this.loginError.textContent = json.error || 'Identifiant ou mot de passe incorrect.';
+          this.loginError.classList.remove('hidden');
+        }
+      }
+    } catch (err) {
+      if (this.loginError) {
+        this.loginError.textContent = 'Erreur réseau. Veuillez réessayer.';
+        this.loginError.classList.remove('hidden');
+      }
+    } finally {
+      if (submitBtn) {
+        submitBtn.disabled = false;
+        submitBtn.textContent = 'Entrer sur ZIFLIX ▶';
+      }
+    }
+  }
+
+  async handleRegister(e) {
+    e.preventDefault();
+    const usernameInput = document.getElementById('regUsername');
+    const passwordInput = document.getElementById('regPassword');
+    const customUrlInput = document.getElementById('regCustomAvatarUrl');
+    const submitBtn = document.getElementById('registerSubmitBtn');
+    if (!usernameInput || !passwordInput) return;
+
+    const username = usernameInput.value.trim();
+    const password = passwordInput.value;
+    const customUrl = customUrlInput ? customUrlInput.value.trim() : '';
+    const avatar = customUrl || this.selectedRegAvatar || 'assets/avatars/avatar-1.svg';
+
+    if (!username || !password) return;
+
+    if (this.registerError) this.registerError.classList.add('hidden');
+    if (submitBtn) {
+      submitBtn.disabled = true;
+      submitBtn.textContent = 'Création du profil...';
+    }
+
+    try {
+      const baseUrl = window.API_BASE || '';
+      const res = await fetch(`${baseUrl}/api/auth/register`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ username, password, avatar })
+      });
+      const json = await res.json();
+
+      if (json.success && json.token && json.user) {
+        localStorage.setItem('ziflix_auth_token', json.token);
+        this.setCurrentUser(json.user);
+        if (this.authGateModal) this.authGateModal.classList.add('hidden');
+        this.showToast(`🎉 Profil ZIFLIX créé ! Bon visionnage ${json.user.username} !`);
+      } else {
+        if (this.registerError) {
+          this.registerError.textContent = json.error || 'Erreur lors de la création du profil.';
+          this.registerError.classList.remove('hidden');
+        }
+      }
+    } catch (err) {
+      if (this.registerError) {
+        this.registerError.textContent = 'Erreur réseau. Veuillez réessayer.';
+        this.registerError.classList.remove('hidden');
+      }
+    } finally {
+      if (submitBtn) {
+        submitBtn.disabled = false;
+        submitBtn.textContent = 'Créer mon profil ZIFLIX ✨';
+      }
+    }
+  }
+
+  async handleLogout() {
+    const token = localStorage.getItem('ziflix_auth_token');
+    if (token) {
+      try {
+        const baseUrl = window.API_BASE || '';
+        await fetch(`${baseUrl}/api/auth/logout`, {
+          method: 'POST',
+          headers: { 'Authorization': `Bearer ${token}` }
+        });
+      } catch (e) {}
+    }
+    localStorage.removeItem('ziflix_auth_token');
+    this.currentUser = null;
+    if (this.authGateModal) this.authGateModal.classList.remove('hidden');
+    this.showToast('Vous avez été déconnecté.');
+  }
+
+  openProfileModal() {
+    if (!this.profileCustomModal) return;
+    if (this.currentUser) {
+      if (this.profileInputUsername) this.profileInputUsername.value = this.currentUser.username || '';
+      const modalAvatar = document.getElementById('profileModalCurrentAvatar');
+      const modalUsername = document.getElementById('profileModalUsername');
+      const modalRole = document.getElementById('profileModalRole');
+      if (modalAvatar) modalAvatar.src = this.currentUser.avatar || 'assets/avatars/avatar-1.svg';
+      if (modalUsername) modalUsername.textContent = this.currentUser.username || 'Membre';
+      if (modalRole) modalRole.textContent = (this.currentUser.role === 'admin') ? '👑 Administrateur' : 'Membre ZIFLIX';
+      this.selectedProfileAvatar = this.currentUser.avatar || this.avatarsList[0];
+      this.renderAvatarSelectionGrids();
+    }
+    if (this.profileUpdateError) this.profileUpdateError.classList.add('hidden');
+    this.profileCustomModal.classList.add('active');
+  }
+
+  closeProfileModal() {
+    if (this.profileCustomModal) {
+      this.profileCustomModal.classList.remove('active');
+    }
+  }
+
+  async handleProfileUpdate(e) {
+    e.preventDefault();
+    const token = localStorage.getItem('ziflix_auth_token');
+    if (!token) return;
+
+    const newUsername = this.profileInputUsername ? this.profileInputUsername.value.trim() : '';
+    const customUrl = this.profileInputCustomUrl ? this.profileInputCustomUrl.value.trim() : '';
+    const avatar = customUrl || this.selectedProfileAvatar;
+
+    if (!newUsername) return;
+
+    try {
+      const baseUrl = window.API_BASE || '';
+      const res = await fetch(`${baseUrl}/api/auth/profile`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({ username: newUsername, avatar })
+      });
+      const json = await res.json();
+
+      if (json.success && json.user) {
+        this.setCurrentUser(json.user);
+        this.closeProfileModal();
+        this.showToast('✅ Profil mis à jour avec succès !');
+      } else {
+        if (this.profileUpdateError) {
+          this.profileUpdateError.textContent = json.error || 'Erreur lors de la modification.';
+          this.profileUpdateError.classList.remove('hidden');
+        }
+      }
+    } catch (err) {
+      if (this.profileUpdateError) {
+        this.profileUpdateError.textContent = 'Erreur de communication.';
+        this.profileUpdateError.classList.remove('hidden');
+      }
+    }
+  }
+
+  // ================= 13. COMMENTAIRES FICHE MÉDIA =================
+  async loadModalComments(mediaId) {
+    const listEl = document.getElementById('modalCommentsList');
+    const countEl = document.getElementById('modalCommentsCount');
+    if (!listEl) return;
+    listEl.innerHTML = '<div style="color: #888; font-size: 0.85rem; padding: 10px 0;">Chargement des avis...</div>';
+
+    try {
+      const baseUrl = window.API_BASE || '';
+      const res = await fetch(`${baseUrl}/api/comments?mediaId=${encodeURIComponent(mediaId)}`);
+      const json = await res.json();
+      if (json.success && Array.isArray(json.comments)) {
+        if (countEl) countEl.textContent = json.comments.length;
+        if (json.comments.length === 0) {
+          listEl.innerHTML = '<div style="color: #777; font-size: 0.85rem; font-style: italic; padding: 12px 0;">Soyez le premier à partager votre avis sur ce programme !</div>';
+          return;
+        }
+        listEl.innerHTML = '';
+        json.comments.forEach(c => {
+          const item = document.createElement('div');
+          item.className = 'comment-card';
+          const isAuthorOrAdmin = this.currentUser && (this.currentUser.id === c.userId || this.currentUser.role === 'admin');
+          item.innerHTML = `
+            <img src="${c.avatar || 'assets/avatars/avatar-1.svg'}" alt="${c.username}" class="comment-author-avatar">
+            <div class="comment-card-body">
+              <div class="comment-card-header">
+                <span class="comment-author-name">${c.username}</span>
+                <div style="display: flex; align-items: center; gap: 8px;">
+                  <span class="comment-date">${new Date(c.createdAt).toLocaleDateString('fr-FR', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })}</span>
+                  ${isAuthorOrAdmin ? `<button type="button" class="comment-delete-btn" data-id="${c.id}" title="Supprimer">🗑️</button>` : ''}
+                </div>
+              </div>
+              <p class="comment-text">${c.text.replace(/</g, '&lt;').replace(/>/g, '&gt;')}</p>
+            </div>
+          `;
+          if (isAuthorOrAdmin) {
+            item.querySelector('.comment-delete-btn')?.addEventListener('click', () => this.deleteComment(c.id, mediaId));
+          }
+          listEl.appendChild(item);
+        });
+      }
+    } catch (err) {
+      if (listEl) listEl.innerHTML = '<div style="color: #e50914; font-size: 0.82rem;">Erreur de chargement des avis.</div>';
+    }
+  }
+
+  async submitComment() {
+    const input = document.getElementById('commentTextInput');
+    if (!input || !this.currentModalMovie) return;
+    const text = input.value.trim();
+    if (!text) return;
+
+    const token = localStorage.getItem('ziflix_auth_token');
+    if (!token) {
+      this.showToast('Veuillez vous connecter pour publier un avis.', true);
+      return;
+    }
+
+    try {
+      const baseUrl = window.API_BASE || '';
+      const res = await fetch(`${baseUrl}/api/comments`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({
+          mediaId: this.currentModalMovie.id,
+          text
+        })
+      });
+      const json = await res.json();
+      if (json.success) {
+        input.value = '';
+        this.loadModalComments(this.currentModalMovie.id);
+        this.showToast('Votre avis a été publié !');
+      } else {
+        this.showToast(json.error || 'Erreur lors de la publication', true);
+      }
+    } catch (e) {
+      this.showToast('Erreur réseau lors de la publication', true);
+    }
+  }
+
+  async deleteComment(commentId, mediaId) {
+    const token = localStorage.getItem('ziflix_auth_token');
+    if (!token) return;
+    try {
+      const baseUrl = window.API_BASE || '';
+      const res = await fetch(`${baseUrl}/api/comments`, {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({ commentId })
+      });
+      const json = await res.json();
+      if (json.success) {
+        this.loadModalComments(mediaId);
+        this.showToast('Commentaire supprimé.');
+      }
+    } catch (e) {}
+  }
+
+  showToast(message, isError = false) {
+    const container = document.getElementById('toastContainer');
+    if (!container) return;
+    const toast = document.createElement('div');
+    toast.className = `toast ${isError ? 'toast-error' : 'toast-success'}`;
+    toast.textContent = message;
+    container.appendChild(toast);
+    setTimeout(() => {
+      toast.classList.add('fade-out');
+      setTimeout(() => toast.remove(), 300);
+    }, 3500);
   }
 }
 

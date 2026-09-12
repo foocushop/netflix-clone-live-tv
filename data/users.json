@@ -1,0 +1,13 @@
+[
+  {
+    "id": "u_admin",
+    "username": "admin",
+    "password_hash": "27405b5e261f1b61df62ad61fba5afc2f937dc86f55fb5d7248c9801d9e9dea8874518884810b64e9e987c7671ff096e1eed1eaaaf2b4a1e07318825d83b4878",
+    "salt": "abbdfcd936d3692e637bb460f445a2f5",
+    "avatar": "assets/avatars/avatar-1.svg",
+    "role": "admin",
+    "banned": false,
+    "created_at": "2026-09-12T00:00:00.000Z",
+    "last_login": "2026-09-12T00:00:00.000Z"
+  }
+]

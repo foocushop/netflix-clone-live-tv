@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 420 110" width="420" height="110">
+  <defs>
+    <linearGradient id="zifGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FF2424"/>
+      <stop offset="60%" stop-color="#E50914"/>
+      <stop offset="100%" stop-color="#9E0008"/>
+    </linearGradient>
+    <filter id="zifGlow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="2" stdDeviation="3" flood-color="#E50914" flood-opacity="0.45"/>
+    </filter>
+  </defs>
+  <g filter="url(#zifGlow)">
+    <text x="10" y="85" font-family="-apple-system, BlinkMacSystemFont, Impact, Montserrat, Arial Black, sans-serif" font-size="88" font-weight="900" letter-spacing="4" fill="url(#zifGrad)">ZIFLIX</text>
+  </g>
+</svg>
