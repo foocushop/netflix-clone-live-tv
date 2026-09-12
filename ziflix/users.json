@@ -8,7 +8,7 @@
     "role": "admin",
     "banned": false,
     "created_at": "2026-09-12T00:18:32.081Z",
-    "last_login": "2026-09-12T22:24:55.589Z"
+    "last_login": "2026-09-12T23:12:46.420Z"
   },
   {
     "id": "u_1789172323622_733799e0",
@@ -129,7 +129,7 @@
     "role": "user",
     "banned": false,
     "created_at": "2026-09-12T17:18:03.304Z",
-    "last_login": "2026-09-12T19:45:02.699Z"
+    "last_login": "2026-09-12T22:48:45.508Z"
   },
   {
     "id": "u_1789233514993_98347a56",
@@ -217,7 +217,7 @@
     "role": "user",
     "banned": false,
     "created_at": "2026-09-12T18:09:19.169Z",
-    "last_login": "2026-09-12T22:01:42.417Z"
+    "last_login": "2026-09-12T23:00:40.741Z"
   },
   {
     "id": "u_1789236840043_9b729b7d",
@@ -294,7 +294,7 @@
     "role": "user",
     "banned": false,
     "created_at": "2026-09-12T19:00:15.427Z",
-    "last_login": "2026-09-12T21:31:00.762Z"
+    "last_login": "2026-09-12T23:11:34.132Z"
   },
   {
     "id": "u_1789241017938_da7363ba",
@@ -327,7 +327,7 @@
     "role": "user",
     "banned": false,
     "created_at": "2026-09-12T19:45:38.422Z",
-    "last_login": "2026-09-12T19:45:38.422Z"
+    "last_login": "2026-09-12T22:50:53.815Z"
   },
   {
     "id": "u_1789242653538_01715b7b",
@@ -558,7 +558,7 @@
     "role": "user",
     "banned": false,
     "created_at": "2026-09-12T21:36:08.705Z",
-    "last_login": "2026-09-12T21:36:08.705Z"
+    "last_login": "2026-09-12T22:55:29.754Z"
   },
   {
     "id": "u_1789249046091_74bb4b75",
@@ -636,5 +636,49 @@
     "banned": false,
     "created_at": "2026-09-12T22:16:00.024Z",
     "last_login": "2026-09-12T22:16:00.024Z"
+  },
+  {
+    "id": "u_1789252446909_2a52f01f",
+    "username": "Ruth",
+    "password_hash": "584b53da0b4360a57bba843f2583e47ace039a7fe10236f48540993906855efaf837886c918861651f0f0135ab094366b029c92e83942c09b13627c2f3c97b90",
+    "salt": "8c690b92a9dfc34324ec4aaf01694ce5",
+    "avatar": "assets/avatars/avatar-5.svg",
+    "role": "user",
+    "banned": false,
+    "created_at": "2026-09-12T22:34:06.909Z",
+    "last_login": "2026-09-12T22:34:06.909Z"
+  },
+  {
+    "id": "u_1789252792634_8d57baba",
+    "username": "Dvy",
+    "password_hash": "5b528c483215ebf834b5cfa44622990553af50b4dbaadddf5e3a3de50972e17a5656e90d66929401bdc56c1e44b988718449548bfea4ab902274fc3ba65b1d65",
+    "salt": "07ed7a4c6d97b340034affa6e85c56c0",
+    "avatar": "assets/avatars/avatar-1.svg",
+    "role": "user",
+    "banned": false,
+    "created_at": "2026-09-12T22:39:52.634Z",
+    "last_login": "2026-09-12T22:39:52.634Z"
+  },
+  {
+    "id": "u_1789254943636_e8d76557",
+    "username": "Violetta",
+    "password_hash": "e80219e147125495c9cf7e5000e5693158669e42a15b11d444d0c7ebf5bd5465de77ec281ee6506a9ab8ffea20c976903fa2f88177b0031fe12acb5efacdadc5",
+    "salt": "68f1f14e2ffdac31818e0f6e9555847d",
+    "avatar": "assets/avatars/avatar-1.svg",
+    "role": "user",
+    "banned": false,
+    "created_at": "2026-09-12T23:15:43.636Z",
+    "last_login": "2026-09-12T23:15:43.636Z"
+  },
+  {
+    "id": "u_1789255156693_955b4987",
+    "username": "Mariame.ha",
+    "password_hash": "1b77d9c65046418ff5e55a5b0723d1b454d7c2d2f582cda933aa30248b7ac6b2d5f9cff3053fcedf6afabfd971bb76d6a4b0eb7ef8a7e0173e5b98cd14a8dcad",
+    "salt": "4b207b5e541a18547035be3dc0f23707",
+    "avatar": "assets/avatars/avatar-1.svg",
+    "role": "user",
+    "banned": false,
+    "created_at": "2026-09-12T23:19:16.693Z",
+    "last_login": "2026-09-12T23:19:16.693Z"
   }
 ]
