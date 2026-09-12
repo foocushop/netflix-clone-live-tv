@@ -4548,9 +4548,9 @@ button:focus-visible {
 /* Logo ZIFLIX avec entrée douce et respiration subtile */
 .ziflix-splash-logo {
   position: relative;
-  width: clamp(210px, 26vw, 320px);
+  width: clamp(200px, 24vw, 290px);
   height: auto;
-  aspect-ratio: 420 / 110;
+  aspect-ratio: 220 / 70;
   display: block;
   margin: 0 auto;
   user-select: none;
