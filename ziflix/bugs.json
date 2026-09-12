@@ -1,5 +1,24 @@
 [
   {
+    "id": "bug_1789248608852_72bbf9",
+    "user_id": "u_1789231871823_60fd0679",
+    "username": "Emm19",
+    "avatar": "assets/avatars/avatar-7.svg",
+    "category": "audio",
+    "title": "Signalement : Les Apprentis Aventuriers S9E1",
+    "description": "",
+    "media_id": "xtream_series_9066",
+    "media_title": "Les Apprentis Aventuriers",
+    "season": 9,
+    "episode": 1,
+    "episode_id": null,
+    "device_info": "Android • Chrome",
+    "user_agent": "Mozilla/5.0 (Linux; Android 10; K) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Mobile Safari/537.36",
+    "url": "https://ziablo.xyz/",
+    "status": "open",
+    "created_at": "2026-09-12T21:30:08.853Z"
+  },
+  {
     "id": "bug_1789243089105_bda05a",
     "user_id": "u_1789239615427_7fe79462",
     "username": "asoumare2003@gmail.com",
