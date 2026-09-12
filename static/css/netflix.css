@@ -4488,5 +4488,157 @@ button:focus-visible {
   }
 }
 
+/* =========================================================
+   ZIFLIX CINEMATIC SPLASH SCREEN (ULTRA-LIGHTWEIGHT 60 FPS)
+   ========================================================= */
+.ziflix-splash-screen {
+  position: fixed;
+  inset: 0;
+  width: 100vw;
+  height: 100vh;
+  height: 100dvh;
+  background-color: #0b0b10;
+  background: radial-gradient(circle at 50% 45%, #181826 0%, #0c0c14 60%, #06060a 100%);
+  z-index: 999999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  pointer-events: auto;
+  opacity: 1;
+  transform: scale(1) translateZ(0);
+  transition: opacity 0.4s cubic-bezier(0.4, 0, 0.2, 1), transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  will-change: opacity, transform;
+  backface-visibility: hidden;
+}
+
+.ziflix-splash-screen.splash-dismiss {
+  opacity: 0;
+  transform: scale(1.04) translateZ(0);
+  pointer-events: none;
+}
+
+.ziflix-splash-content {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  transform: translateZ(0);
+  user-select: none;
+}
+
+/* Halos lumineux ZIFLIX (Compositor-only, zéro repaint layout) */
+.ziflix-splash-glow {
+  position: absolute;
+  width: 340px;
+  height: 140px;
+  background: radial-gradient(ellipse at center, rgba(229, 9, 20, 0.32) 0%, rgba(229, 9, 20, 0.08) 50%, transparent 72%);
+  border-radius: 50%;
+  pointer-events: none;
+  animation: splashGlowPulse 2.6s ease-in-out infinite alternate;
+  transform: translateZ(0);
+  will-change: transform, opacity;
+}
+
+/* Logo ZIFLIX avec entrée douce et respiration subtile */
+.ziflix-splash-logo {
+  position: relative;
+  width: clamp(210px, 26vw, 320px);
+  height: auto;
+  aspect-ratio: 420 / 110;
+  display: block;
+  user-select: none;
+  -webkit-user-drag: none;
+  animation: splashLogoEnter 0.45s cubic-bezier(0.16, 1, 0.3, 1) forwards,
+             splashLogoBreathing 3.2s ease-in-out 0.45s infinite alternate;
+  transform: translateZ(0);
+  will-change: transform, opacity;
+  backface-visibility: hidden;
+}
+
+/* Ligne de progression cinématique ZIFLIX */
+.ziflix-splash-bar {
+  position: relative;
+  width: clamp(120px, 15vw, 170px);
+  height: 2px;
+  background: rgba(255, 255, 255, 0.08);
+  border-radius: 3px;
+  margin-top: 26px;
+  overflow: hidden;
+  transform: translateZ(0);
+}
+
+.ziflix-splash-shimmer {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 100%;
+  width: 50%;
+  background: linear-gradient(90deg, transparent 0%, #e50914 50%, #ff4b55 80%, transparent 100%);
+  border-radius: 3px;
+  animation: splashShimmer 1.4s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+  transform: translateZ(0);
+  will-change: transform;
+}
+
+/* Keyframes optimisés GPU (seulement transform & opacity) */
+@keyframes splashLogoEnter {
+  0% {
+    opacity: 0;
+    transform: scale(0.92) translateZ(0);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1) translateZ(0);
+  }
+}
+
+@keyframes splashLogoBreathing {
+  0% {
+    transform: scale(1) translateZ(0);
+    opacity: 0.95;
+  }
+  100% {
+    transform: scale(1.025) translateZ(0);
+    opacity: 1;
+  }
+}
+
+@keyframes splashGlowPulse {
+  0% {
+    opacity: 0.25;
+    transform: scale(0.94) translateZ(0);
+  }
+  100% {
+    opacity: 0.65;
+    transform: scale(1.1) translateZ(0);
+  }
+}
+
+@keyframes splashShimmer {
+  0% {
+    transform: translateX(-120%) translateZ(0);
+  }
+  100% {
+    transform: translateX(220%) translateZ(0);
+  }
+}
+
+/* Accessibilité et performance Smart TV réduite */
+@media (prefers-reduced-motion: reduce) {
+  .ziflix-splash-screen {
+    transition: opacity 0.2s linear !important;
+    transform: none !important;
+  }
+  .ziflix-splash-logo,
+  .ziflix-splash-glow,
+  .ziflix-splash-shimmer {
+    animation: none !important;
+    transform: none !important;
+  }
+}
+
 
 

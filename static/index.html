@@ -5,10 +5,33 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
   <title>ZIFLIX - Streaming & Télévision en Direct</title>
   <link rel="icon" type="image/svg+xml" href="assets/logos/ziflix-icon.svg">
+  <link rel="preload" href="assets/logos/ziflix-logo.svg" as="image" type="image/svg+xml">
   <link rel="stylesheet" href="css/netflix.css">
   <link rel="stylesheet" href="css/admin.css">
+  <!-- Critical Zero-FOUC & Splash early styles -->
+  <style>
+    .auth-gate-backdrop.hidden { display: none !important; }
+    #authGateModal.hidden { display: none !important; }
+    .ziflix-splash-screen {
+      position: fixed; inset: 0; width: 100vw; height: 100vh; height: 100dvh;
+      background: radial-gradient(circle at 50% 45%, #161622 0%, #0a0a0f 65%, #050508 100%);
+      z-index: 999999; display: flex; align-items: center; justify-content: center;
+    }
+  </style>
+  <script>window.__ZIFLIX_SPLASH_START = Date.now();</script>
 </head>
 <body>
+
+  <!-- ================= SPLASH SCREEN CINÉMATIQUE ZIFLIX (ZÉRO FOUC & 60FPS SMART TV) ================= -->
+  <div id="ziflixSplash" class="ziflix-splash-screen" aria-hidden="false">
+    <div class="ziflix-splash-content">
+      <div class="ziflix-splash-glow"></div>
+      <img src="assets/logos/ziflix-logo.svg" alt="ZIFLIX" class="ziflix-splash-logo" width="300" height="79" decoding="async">
+      <div class="ziflix-splash-bar">
+        <div class="ziflix-splash-shimmer"></div>
+      </div>
+    </div>
+  </div>
 
   <!-- ================= APPLICATION PRINCIPALE ZIFLIX (PAGE TAMPON SÉCURISÉE) ================= -->
   <div id="ziflixApp" class="ziflix-app-root" style="display: none;">
@@ -1023,7 +1046,7 @@
   <div class="toast-container" id="toastContainer"></div>
 
   <!-- ================= MODAL AUTH GATE ZIFLIX (OBLIGATOIRE) ================= -->
-  <div class="auth-gate-backdrop" id="authGateModal">
+  <div class="auth-gate-backdrop hidden" id="authGateModal">
     <div class="auth-gate-card">
       <div class="auth-gate-header">
         <img src="assets/logos/ziflix-logo.svg" alt="ZIFLIX" class="auth-gate-logo">

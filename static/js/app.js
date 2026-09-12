@@ -21,6 +21,10 @@ class NetflixApp {
     this.selectedRegAvatar = this.avatarsList[0];
     this.selectedProfileAvatar = this.avatarsList[0];
 
+    this.splashStartTime = window.__ZIFLIX_SPLASH_START || Date.now();
+    this.splashDismissed = false;
+    this.splashWatchdog = null;
+
     this.initElements();
     this.initAuthElements();
     this.initEvents();
@@ -1718,6 +1722,7 @@ class NetflixApp {
   initAuthElements() {
     this.ziflixApp = document.getElementById('ziflixApp');
     this.authGateModal = document.getElementById('authGateModal');
+    this.splashElement = document.getElementById('ziflixSplash');
     this.authGateTitle = document.getElementById('authGateTitle');
     this.authGateSubtitle = document.getElementById('authGateSubtitle');
     this.tabLoginBtn = document.getElementById('tabLoginBtn');
@@ -1864,6 +1869,18 @@ class NetflixApp {
     const token = localStorage.getItem('ziflix_auth_token');
     this.renderAvatarSelectionGrids();
 
+    // Watchdog de sécurité (max 2.5s) : empêche tout blocage sur le splash si le réseau lag
+    this.splashWatchdog = setTimeout(() => {
+      if (!this.splashDismissed) {
+        console.warn('[ZIFLIX] Splash watchdog triggered');
+        if (!this.currentUser) {
+          this.showAuthGate();
+        } else {
+          this.dismissSplash();
+        }
+      }
+    }, 2500);
+
     if (!token) {
       this.showAuthGate();
       return;
@@ -1888,17 +1905,56 @@ class NetflixApp {
     }
   }
 
+  dismissSplash() {
+    if (this.splashDismissed) return;
+    this.splashDismissed = true;
+    if (this.splashWatchdog) {
+      clearTimeout(this.splashWatchdog);
+      this.splashWatchdog = null;
+    }
+
+    const splash = this.splashElement || document.getElementById('ziflixSplash');
+    if (!splash) return;
+
+    const startTime = this.splashStartTime || window.__ZIFLIX_SPLASH_START || Date.now();
+    const elapsed = Date.now() - startTime;
+    // Durée minimale de 380ms pour une expérience fluide et cinématique (évite un flash cut)
+    const minDuration = 380;
+    const delay = Math.max(0, minDuration - elapsed);
+
+    setTimeout(() => {
+      splash.classList.add('splash-dismiss');
+      const cleanup = () => {
+        splash.setAttribute('aria-hidden', 'true');
+        splash.style.display = 'none';
+        splash.removeEventListener('transitionend', cleanup);
+      };
+      splash.addEventListener('transitionend', cleanup, { once: true });
+      setTimeout(cleanup, 550); // Watchdog Smart TV si transitionend n'est pas émis
+    }, delay);
+  }
+
   unlockApp() {
+    if (this.splashWatchdog) {
+      clearTimeout(this.splashWatchdog);
+      this.splashWatchdog = null;
+    }
     if (this.authGateModal) this.authGateModal.classList.add('hidden');
     if (this.ziflixApp) this.ziflixApp.style.display = 'block';
+    this.dismissSplash();
     if (!this.catalogData) {
       this.loadCatalog();
     }
   }
 
   showAuthGate() {
+    if (this.splashWatchdog) {
+      clearTimeout(this.splashWatchdog);
+      this.splashWatchdog = null;
+    }
     if (this.ziflixApp) this.ziflixApp.style.display = 'none';
     if (this.authGateModal) this.authGateModal.classList.remove('hidden');
+    this.dismissSplash();
   }
 
   setCurrentUser(user) {
