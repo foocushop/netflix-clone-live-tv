@@ -515,7 +515,7 @@ class NetflixAdmin {
 
       tr.innerHTML = `
         <td>
-          <img src="${m.poster_url || ''}" alt="${this.escapeHtml(m.title)}" class="table-poster" loading="lazy" onerror="this.onerror=null; this.src='data:image/svg+xml;charset=UTF-8,<svg xmlns=\\'http://www.w3.org/2000/svg\\' width=\\'100\\' height=\\'150\\' viewBox=\\'0 0 100 150\\'><rect fill=\\'%23222\\' width=\\'100\\' height=\\'150\\'/><text fill=\\'%23E50914\\' font-family=\\'sans-serif\\' font-size=\\'16\\' font-weight=\\'bold\\' x=\\'50%25\\' y=\\'50%25\\' text-anchor=\\'middle\\'>NETFLIX</text></svg>'">
+          <img src="${m.poster_url || ''}" alt="${this.escapeHtml(m.title)}" class="table-poster" loading="lazy" onerror="this.onerror=null; this.src='data:image/svg+xml;charset=UTF-8,<svg xmlns=\\'http://www.w3.org/2000/svg\\' width=\\'100\\' height=\\'150\\' viewBox=\\'0 0 100 150\\'><rect fill=\\'%23222\\' width=\\'100\\' height=\\'150\\'/><text fill=\\'%23E50914\\' font-family=\\'sans-serif\\' font-size=\\'16\\' font-weight=\\'bold\\' x=\\'50%25\\' y=\\'50%25\\' text-anchor=\\'middle\\'>ZIFLIX</text></svg>'">
         </td>
         <td>
           <div class="table-title-wrap">
@@ -532,7 +532,7 @@ class NetflixAdmin {
         </td>
         <td>
           <div class="table-actions">
-            <button class="btn-action-sm btn-play-test" onclick="window.netflixAdmin.testPlayback(decodeURIComponent('${safeId}'))" title="Tester le flux dans le lecteur Netflix">▶ Tester</button>
+            <button class="btn-action-sm btn-play-test" onclick="window.netflixAdmin.testPlayback(decodeURIComponent('${safeId}'))" title="Tester le flux dans le lecteur ZIFLIX">▶ Tester</button>
             ${!isHero ? `<button class="btn-action-sm btn-star" onclick="window.netflixAdmin.setHero(decodeURIComponent('${safeId}'))" title="Mettre en tête d'affiche (Hero Billboard)">⭐ Vedette</button>` : ''}
             <button class="btn-action-sm" onclick="window.netflixAdmin.openEditModal(decodeURIComponent('${safeId}'))" title="Modifier les métadonnées">✏️ Modifier</button>
             <button class="btn-action-sm btn-clone" onclick="window.netflixAdmin.cloneMovie(decodeURIComponent('${safeId}'))" title="Dupliquer pour créer une variante">📋 Cloner</button>
@@ -563,7 +563,7 @@ class NetflixAdmin {
       window.netflixPlayer.open(movie);
       this.showToast(`▶ Lecture test lancée : ${movie.title}`);
     } else {
-      this.showToast("Lecteur Netflix non initialisé", true);
+      this.showToast("Lecteur ZIFLIX non initialisé", true);
     }
   }
 
@@ -1387,12 +1387,19 @@ class NetflixAdmin {
   }
 
   // ================= MODÉRATION COMMUNAUTÉ & UTILISATEURS ZIFLIX =================
+  getAdminHeaders() {
+    const headers = { 'Content-Type': 'application/json' };
+    const token = localStorage.getItem('ziflix_auth_token');
+    if (token) headers['Authorization'] = `Bearer ${token}`;
+    const pass = this.getAuthPassword() || '1965';
+    if (pass) headers['x-admin-password'] = pass;
+    return headers;
+  }
+
   async loadCommunityUsers() {
     if (!this.adminUsersTableBody) return;
-    const token = localStorage.getItem('ziflix_auth_token');
     try {
-      const headers = { 'Content-Type': 'application/json' };
-      if (token) headers['Authorization'] = `Bearer ${token}`;
+      const headers = this.getAdminHeaders();
       const res = await fetch('/api/admin/users', { headers });
       const json = await res.json();
       if (json.success && Array.isArray(json.users)) {
@@ -1449,10 +1456,8 @@ class NetflixAdmin {
   }
 
   async toggleUserBan(userId, ban) {
-    const token = localStorage.getItem('ziflix_auth_token');
     try {
-      const headers = { 'Content-Type': 'application/json' };
-      if (token) headers['Authorization'] = `Bearer ${token}`;
+      const headers = this.getAdminHeaders();
       const res = await fetch('/api/admin/users/ban', {
         method: 'POST',
         headers,
@@ -1471,10 +1476,8 @@ class NetflixAdmin {
   }
 
   async changeUserRole(userId, role) {
-    const token = localStorage.getItem('ziflix_auth_token');
     try {
-      const headers = { 'Content-Type': 'application/json' };
-      if (token) headers['Authorization'] = `Bearer ${token}`;
+      const headers = this.getAdminHeaders();
       const res = await fetch('/api/admin/users/role', {
         method: 'POST',
         headers,
@@ -1494,10 +1497,8 @@ class NetflixAdmin {
 
   async loadCommunityComments() {
     if (!this.adminCommentsList) return;
-    const token = localStorage.getItem('ziflix_auth_token');
     try {
-      const headers = { 'Content-Type': 'application/json' };
-      if (token) headers['Authorization'] = `Bearer ${token}`;
+      const headers = this.getAdminHeaders();
       const res = await fetch('/api/comments?recent=true', { headers });
       const json = await res.json();
       if (json.success && Array.isArray(json.comments)) {
@@ -1528,14 +1529,12 @@ class NetflixAdmin {
   }
 
   async deleteCommentAdmin(commentId) {
-    const token = localStorage.getItem('ziflix_auth_token');
     try {
-      const headers = { 'Content-Type': 'application/json' };
-      if (token) headers['Authorization'] = `Bearer ${token}`;
-      const res = await fetch('/api/comments', {
+      const headers = this.getAdminHeaders();
+      const res = await fetch(`/api/comments?id=${encodeURIComponent(commentId)}`, {
         method: 'DELETE',
         headers,
-        body: JSON.stringify({ commentId })
+        body: JSON.stringify({ commentId, id: commentId })
       });
       const json = await res.json();
       if (json.success) {

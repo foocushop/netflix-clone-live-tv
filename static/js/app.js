@@ -52,8 +52,8 @@ class NetflixApp {
   }
 
   getMovieFallbackSvg(title) {
-    const clean = (title || 'Titre Netflix').replace(/["'<>\\]/g, '').trim().substring(0, 24);
-    const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="300" height="450" viewBox="0 0 300 450"><rect fill="#1f1f1f" width="300" height="450"/><text fill="#E50914" font-family="sans-serif" font-size="32" font-weight="800" x="50%" y="45%" text-anchor="middle">NETFLIX</text><text fill="#888" font-family="sans-serif" font-size="13" x="50%" y="55%" text-anchor="middle">${clean}</text></svg>`;
+    const clean = (title || 'Titre ZIFLIX').replace(/["'<>\\]/g, '').trim().substring(0, 24);
+    const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="300" height="450" viewBox="0 0 300 450"><rect fill="#1f1f1f" width="300" height="450"/><text fill="#E50914" font-family="sans-serif" font-size="32" font-weight="800" x="50%" y="45%" text-anchor="middle">ZIFLIX</text><text fill="#888" font-family="sans-serif" font-size="13" x="50%" y="55%" text-anchor="middle">${clean}</text></svg>`;
     return 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(svg);
   }
 
@@ -242,16 +242,32 @@ class NetflixApp {
       });
     }
 
-    // Toggle Dropdown Profil au clic & fermeture automatique si clic extérieur
+    // Toggle Dropdown Profil au survol (avec marge de tolérance) & au clic
     const profileAvatarBtn = document.getElementById('profileAvatarBtn');
     const profileContainer = document.getElementById('profileContainer');
     if (profileAvatarBtn && profileContainer) {
+      let closeTimeout = null;
+
+      profileContainer.addEventListener('mouseenter', () => {
+        if (closeTimeout) clearTimeout(closeTimeout);
+        profileContainer.classList.add('open');
+      });
+
+      profileContainer.addEventListener('mouseleave', () => {
+        closeTimeout = setTimeout(() => {
+          profileContainer.classList.remove('open');
+        }, 350);
+      });
+
       profileAvatarBtn.addEventListener('click', (e) => {
         e.stopPropagation();
+        if (closeTimeout) clearTimeout(closeTimeout);
         profileContainer.classList.toggle('open');
       });
+
       document.addEventListener('click', (e) => {
         if (!profileContainer.contains(e.target)) {
+          if (closeTimeout) clearTimeout(closeTimeout);
           profileContainer.classList.remove('open');
         }
       });
@@ -546,7 +562,18 @@ class NetflixApp {
     this.modalSynopsis.textContent = movie.overview || 'Aucune description disponible pour ce programme.';
 
     this.modalBadges.innerHTML = '';
-    (movie.quality_badges || ['1080p FHD', 'Son 5.1']).forEach(b => {
+    const rawBadges = (movie.quality_badges && movie.quality_badges.length > 0) ? movie.quality_badges : ['1080p FHD', 'Son 5.1'];
+    const cleanBadges = [];
+    rawBadges.forEach(b => {
+      let cleaned = String(b)
+        .replace(/1080p FHD Natif/gi, '1080p FHD')
+        .replace(/1080p FHD Direct/gi, '1080p FHD')
+        .replace(/💎 Xtream VIP/gi, '1080p FHD')
+        .replace(/Saisons Complètes/gi, 'Saisons Intégrales')
+        .trim();
+      if (cleaned && !cleanBadges.includes(cleaned)) cleanBadges.push(cleaned);
+    });
+    (cleanBadges.length > 0 ? cleanBadges : ['1080p FHD', 'Son 5.1']).forEach(b => {
       const span = document.createElement('span');
       span.className = 'quality-badge';
       span.textContent = b;
@@ -2076,13 +2103,13 @@ class NetflixApp {
     if (!token) return;
     try {
       const baseUrl = window.API_BASE || '';
-      const res = await fetch(`${baseUrl}/api/comments`, {
+      const res = await fetch(`${baseUrl}/api/comments?id=${encodeURIComponent(commentId)}`, {
         method: 'DELETE',
         headers: {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${token}`
         },
-        body: JSON.stringify({ commentId })
+        body: JSON.stringify({ commentId, id: commentId })
       });
       const json = await res.json();
       if (json.success) {

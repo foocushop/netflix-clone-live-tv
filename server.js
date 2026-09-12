@@ -2207,24 +2207,27 @@ function scheduleCatalogSync(delayMs = 3000) {
 
 async function checkAndPullLatestCatalog() {
   if (!GITHUB_CONFIG.token) return;
+  if (process.env.NODE_ENV === 'test' || process.env.SKIP_GITHUB_PULL) return;
   try {
     const rawUrl = `https://raw.githubusercontent.com/${GITHUB_CONFIG.owner}/${GITHUB_CONFIG.repo}/${GITHUB_CONFIG.branch}/data/catalog.json`;
     const res = await fetch(rawUrl, {
       headers: {
         'Authorization': `token ${GITHUB_CONFIG.token}`,
-        'User-Agent': 'Netflix-Clone-StartupSync'
+        'User-Agent': 'ZIFLIX-StartupSync'
       }
     });
     if (res.ok) {
       const text = await res.text();
       const parsed = JSON.parse(text);
       if (parsed && Array.isArray(parsed.movies) && parsed.movies.length > 0) {
-        catalog = parsed;
-        fs.writeFileSync(DATA_FILE, JSON.stringify(catalog, null, 2));
-        invalidateCatalogCache();
-        lastGitHubSyncTime = Date.now();
-        gitHubSyncStatus = 'synced';
-        console.log(`[GitHub Sync] 🚀 Catalogue initial synchronisé depuis GitHub au démarrage (${catalog.movies.length} médias)`);
+        if (!catalog || !Array.isArray(catalog.movies) || catalog.movies.length === 0) {
+          catalog = parsed;
+          fs.writeFileSync(DATA_FILE, JSON.stringify(catalog, null, 2));
+          invalidateCatalogCache();
+          lastGitHubSyncTime = Date.now();
+          gitHubSyncStatus = 'synced';
+          console.log(`[GitHub Sync] 🚀 Catalogue initial synchronisé depuis GitHub au démarrage (${catalog.movies.length} médias)`);
+        }
       }
     }
   } catch (err) {
@@ -2497,45 +2500,45 @@ function generateSalt() {
 }
 
 function loadZiflixUsers() {
-  let localData = null;
-  let backupData = null;
+  let localData = [];
+  let backupData = [];
   if (fs.existsSync(USERS_LOCAL)) {
-    try { localData = JSON.parse(fs.readFileSync(USERS_LOCAL, 'utf8')); } catch (e) {}
+    try { localData = JSON.parse(fs.readFileSync(USERS_LOCAL, 'utf8')) || []; } catch (e) {}
   }
   if (fs.existsSync(USERS_BACKUP)) {
-    try { backupData = JSON.parse(fs.readFileSync(USERS_BACKUP, 'utf8')); } catch (e) {}
+    try { backupData = JSON.parse(fs.readFileSync(USERS_BACKUP, 'utf8')) || []; } catch (e) {}
   }
 
-  let source = null;
-  if (Array.isArray(backupData) && backupData.length > 0) {
-    if (!Array.isArray(localData) || (localData.length <= 1 && backupData.length > 1)) {
-      console.log(`[ZIFLIX Users] Restauration automatique de ${backupData.length} profils`);
-      source = backupData;
-    } else {
-      source = localData;
-    }
-  } else {
-    source = localData;
+  const usersMap = new Map();
+  if (Array.isArray(localData)) {
+    localData.forEach(u => {
+      if (u && u.username) usersMap.set(u.username.toLowerCase(), u);
+    });
   }
-
-  if (Array.isArray(source) && source.length > 0) {
-    ZIFLIX_USERS = source;
-  } else {
-    const adminSalt = generateSalt();
-    ZIFLIX_USERS = [
-      {
-        id: 'u_admin',
-        username: 'admin',
-        password_hash: hashPassword('1965', adminSalt),
-        salt: adminSalt,
-        avatar: 'assets/avatars/avatar-1.svg',
-        role: 'admin',
-        banned: false,
-        created_at: new Date().toISOString(),
-        last_login: new Date().toISOString()
+  if (Array.isArray(backupData)) {
+    backupData.forEach(u => {
+      if (u && u.username) {
+        usersMap.set(u.username.toLowerCase(), u);
       }
-    ];
+    });
   }
+
+  if (!usersMap.has('admin')) {
+    const adminSalt = generateSalt();
+    usersMap.set('admin', {
+      id: 'u_admin',
+      username: 'admin',
+      password_hash: hashPassword('1965', adminSalt),
+      salt: adminSalt,
+      avatar: 'assets/avatars/avatar-1.svg',
+      role: 'admin',
+      banned: false,
+      created_at: new Date().toISOString(),
+      last_login: new Date().toISOString()
+    });
+  }
+
+  ZIFLIX_USERS = Array.from(usersMap.values());
   saveZiflixUsers();
 }
 
@@ -2555,16 +2558,29 @@ function saveZiflixUsers() {
 }
 
 function loadZiflixComments() {
-  let localData = null;
-  let backupData = null;
+  let localData = [];
+  let backupData = [];
   if (fs.existsSync(COMMENTS_LOCAL)) {
-    try { localData = JSON.parse(fs.readFileSync(COMMENTS_LOCAL, 'utf8')); } catch (e) {}
+    try { localData = JSON.parse(fs.readFileSync(COMMENTS_LOCAL, 'utf8')) || []; } catch (e) {}
   }
   if (fs.existsSync(COMMENTS_BACKUP)) {
-    try { backupData = JSON.parse(fs.readFileSync(COMMENTS_BACKUP, 'utf8')); } catch (e) {}
+    try { backupData = JSON.parse(fs.readFileSync(COMMENTS_BACKUP, 'utf8')) || []; } catch (e) {}
   }
-  const source = (Array.isArray(backupData) && backupData.length > (localData?.length || 0)) ? backupData : (localData || []);
-  ZIFLIX_COMMENTS = Array.isArray(source) ? source : [];
+
+  const commentsMap = new Map();
+  if (Array.isArray(localData)) {
+    localData.forEach(c => {
+      if (c && c.id) commentsMap.set(c.id, c);
+    });
+  }
+  if (Array.isArray(backupData)) {
+    backupData.forEach(c => {
+      if (c && c.id) commentsMap.set(c.id, c);
+    });
+  }
+
+  ZIFLIX_COMMENTS = Array.from(commentsMap.values());
+  ZIFLIX_COMMENTS.sort((a, b) => new Date(b.created_at || b.createdAt || 0) - new Date(a.created_at || a.createdAt || 0));
   saveZiflixComments();
 }
 
@@ -3085,13 +3101,19 @@ const server = http.createServer((req, res) => {
     if (!cachedCatalogBuffer) {
       const hero = catalog.movies.find(m => m.is_hero) || catalog.movies[0];
       const rows = catalog.categories.map(cat => {
-        const catMovies = catalog.movies.filter(m =>
+        let catMovies = catalog.movies.filter(m =>
           m.categories.some(c =>
             c.toLowerCase().includes(cat.name.toLowerCase()) ||
             cat.name.toLowerCase().includes(c.toLowerCase()) ||
             c.toLowerCase().includes(cat.slug.toLowerCase())
           )
         );
+        if (catMovies.length === 0 && (cat.slug === 'top-regardes' || cat.id === 'c_top_regardes')) {
+          catMovies = [...catalog.movies]
+            .filter(m => m.media_type !== 'channel')
+            .sort((a, b) => (b.match_score || 0) - (a.match_score || 0))
+            .slice(0, 24);
+        }
         return { category: cat, movies: catMovies };
       }).filter(r => r.movies.length > 0);
 
@@ -3337,8 +3359,7 @@ const server = http.createServer((req, res) => {
           return res.end(JSON.stringify({ success: false, error: 'Ce pseudo est déjà utilisé. Veuillez en choisir un autre.' }));
         }
 
-        const isFirst = (ZIFLIX_USERS.length === 0 || (ZIFLIX_USERS.length === 1 && ZIFLIX_USERS[0].id === 'u_admin'));
-        const role = (isFirst || username.toLowerCase() === 'admin') ? 'admin' : 'user';
+        const role = (username.toLowerCase() === 'admin') ? 'admin' : 'user';
         const salt = generateSalt();
         const hash = hashPassword(password, salt);
         const newUser = {
@@ -4418,7 +4439,7 @@ const server = http.createServer((req, res) => {
     let type = parsedUrl.query.type || 'movie';
     let season = parseInt(parsedUrl.query.season) || 1;
     let episode = parseInt(parsedUrl.query.episode) || 1;
-    let lang = (parsedUrl.query.lang || 'vo').toLowerCase();
+    let lang = (parsedUrl.query.lang || 'vf').toLowerCase();
 
     if (!id) {
       res.writeHead(400, { 'Content-Type': 'application/json' });
@@ -6111,7 +6132,7 @@ const server = http.createServer((req, res) => {
 
 server.listen(PORT, '0.0.0.0', () => {
   console.log("\n=======================================================");
-  console.log("  🍿 NETFLIX CLONE - PRÉVISUALISATION & API REST ACTIVES");
+  console.log("  🍿 ZIFLIX - PRÉVISUALISATION & API REST ACTIVES");
   console.log("=======================================================");
   console.log(`  🚀 Serveur démarré avec succès !`);
   console.log(`  🌐 Accès Web : http://127.0.0.1:${PORT}`);

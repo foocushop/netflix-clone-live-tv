@@ -123,6 +123,8 @@ body {
   cursor: pointer;
   display: flex;
   align-items: center;
+  padding: 6px 0 16px 0;
+  margin-bottom: -16px;
 }
 
 .profile-avatar {
@@ -147,11 +149,11 @@ body {
 
 .profile-dropdown {
   position: absolute;
-  top: 46px;
+  top: 48px;
   right: 0;
   background: rgba(18, 18, 22, 0.98);
   border: 1px solid rgba(255, 255, 255, 0.12);
-  border-radius: 8px;
+  border-radius: 10px;
   width: 240px;
   display: none;
   flex-direction: column;
@@ -167,10 +169,10 @@ body {
 .profile-dropdown::before {
   content: '';
   position: absolute;
-  top: -16px;
-  left: 0;
-  right: 0;
-  height: 16px;
+  top: -26px;
+  left: -100px;
+  right: -20px;
+  height: 30px;
   background: transparent;
 }
 
@@ -267,15 +269,16 @@ body {
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  background: rgba(229, 9, 20, 0.85);
+  background: rgba(229, 9, 20, 0.9);
   color: #fff;
-  font-size: 0.75rem;
+  font-size: 0.72rem;
   font-weight: 700;
-  padding: 4px 10px;
-  border-radius: 3px;
-  letter-spacing: 1px;
+  padding: 4px 12px;
+  border-radius: 999px;
+  letter-spacing: 0.8px;
   text-transform: uppercase;
   margin-bottom: 12px;
+  box-shadow: 0 2px 8px rgba(229, 9, 20, 0.4);
 }
 
 .hero-title {
@@ -300,19 +303,25 @@ body {
 }
 
 .age-badge {
-  border: 1px solid #777;
-  padding: 1px 6px;
-  border-radius: 2px;
-  font-size: 0.75rem;
-  color: #ccc;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  background: rgba(255, 255, 255, 0.08);
+  padding: 2px 8px;
+  border-radius: 999px;
+  font-size: 0.72rem;
+  color: #ddd;
+  font-weight: 600;
 }
 
 .quality-badge {
-  border: 1px solid #777;
-  padding: 1px 6px;
-  border-radius: 2px;
-  font-size: 0.72rem;
-  color: #eee;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  background: rgba(255, 255, 255, 0.08);
+  padding: 2px 8px;
+  border-radius: 999px;
+  font-size: 0.7rem;
+  color: #fff;
+  font-weight: 700;
+  letter-spacing: 0.3px;
+  backdrop-filter: blur(4px);
 }
 
 .hero-synopsis {
@@ -2636,7 +2645,7 @@ body {
   .profile-avatar {
     width: 30px !important;
     height: 30px !important;
-    border-radius: 4px !important;
+    border-radius: 50% !important;
   }
 
   .profile-dropdown {

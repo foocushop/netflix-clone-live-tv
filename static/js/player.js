@@ -196,7 +196,7 @@ class NetflixPlayer {
     // Raccourcis Clavier
     document.addEventListener('keydown', (e) => {
       if (!this.overlay.classList.contains('active')) return;
-      if (['input', 'select', 'textarea'].includes(document.activeElement?.tagName?.toLowerCase())) return;
+      if (e.target.matches?.('input, select, textarea') || ['input', 'select', 'textarea'].includes(document.activeElement?.tagName?.toLowerCase())) return;
 
       switch (e.key) {
         case ' ':
@@ -318,7 +318,8 @@ class NetflixPlayer {
 
     const token = localStorage.getItem('ziflix_auth_token');
     if (!token) {
-      alert('Veuillez vous connecter à ZIFLIX pour commenter.');
+      this.showStatusBanner('Veuillez vous connecter à ZIFLIX pour commenter.');
+      setTimeout(() => this.hideStatusBanner(), 3500);
       return;
     }
 
@@ -711,77 +712,16 @@ class NetflixPlayer {
 
   updateServerPills() {
     if (!this.serverSelector) return;
-    const isChannel = (this.currentMovie?.media_type === 'channel' || this.currentMovie?.is_live);
-
-    let serverList = [];
-    if (isChannel) {
-      serverList = [
-        { num: 1, label: '💎 S1: Xtream VIP (1080p)', title: 'Serveur 1 : Direct Xtream VIP 1080p (Recommandé)', badge: '💎 Xtream VIP', isVip: true },
-        { num: 2, label: '⭐ S2: Dark VIP 1080p', title: 'Serveur 2 : Flux VIP Ultra HD 1080p/60fps', badge: '⭐ Dark VIP', isVip: true },
-        { num: 3, label: '⚡ S3: Direct 1080p (DLHD)', title: 'Serveur 3 : Direct HLS DLHD FHD', badge: '1080p Natif' },
-        { num: 4, label: '🎬 S4: Direct 1080p (Apex)', title: 'Serveur 4 : Direct HLS Apex Streams FHD', badge: '1080p Natif' },
-        { num: 5, label: '📡 S5: Direct 1080p (Alpha)', title: 'Serveur 5 : Direct HLS Alpha FHD', badge: '1080p Natif' },
-        { num: 6, label: '🌐 S6: Direct 1080p (Cricsfree)', title: 'Serveur 6 : Direct HLS Cricsfree FHD', badge: '1080p Natif' },
-        { num: 7, label: '🚀 S7: Direct 1080p (WideIPTV)', title: 'Serveur 7 : Direct HLS WideIPTV Bluetier CDN', badge: '1080p Natif' },
-        { num: 8, label: '🛡️ S8: Direct 1080p (Secours)', title: 'Serveur 8 : Miroir de Secours FHD', badge: 'Secours' }
-      ];
-    } else {
-      const isVf = (this.currentLang === 'vf');
-      serverList = [
-        { num: 1, label: isVf ? 'Serveur 1 (Direct HLS • VF)' : 'Serveur 1 (Direct HLS • VO)', title: 'Serveur 1 : Direct HLS' },
-        { num: 2, label: 'Serveur 2 (Direct HD)', title: 'Serveur 2 : Direct HD' },
-        { num: 3, label: 'Serveur 3 (Direct 720p)', title: 'Serveur 3 : Direct 720p' },
-        { num: 4, label: 'Serveur 4 (Miroir CDN)', title: 'Serveur 4 : Miroir CDN' },
-        { num: 5, label: 'Serveur 5 (Secours)', title: 'Serveur 5 : Miroir de Secours' }
-      ];
-    }
-
     this.serverSelector.innerHTML = '';
-    serverList.forEach(s => {
-      const btn = document.createElement('button');
-      btn.type = 'button';
-      const active = (s.num === this.currentServer);
-      btn.className = `server-pill${active ? ' active' : ''}${s.isVip ? ' vip-pill' : ''}`;
-      btn.dataset.server = String(s.num);
-      btn.title = s.title;
-      if (active) {
-        const dot = document.createElement('span');
-        dot.className = 'pill-dot';
-        dot.textContent = '● ';
-        btn.appendChild(dot);
-      }
-      btn.appendChild(document.createTextNode(s.label + ' '));
-      if (s.badge) {
-        const badge = document.createElement('span');
-        badge.className = 'pill-badge' + (s.isVip ? ' vip' : '');
-        badge.textContent = s.badge;
-        btn.appendChild(badge);
-      }
-      btn.addEventListener('click', () => this.switchServer(s.num));
-      this.serverSelector.appendChild(btn);
-    });
-
-    setTimeout(() => {
-      const activePill = this.serverSelector.querySelector('.server-pill.active');
-      if (activePill) {
-        activePill.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
-      }
-      this.updateServerNavState();
-    }, 50);
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'server-pill active vip-pill';
+    btn.innerHTML = '<span class="pill-dot">● </span>Serveur ZIFLIX (Direct FHD)';
+    this.serverSelector.appendChild(btn);
   }
 
-  switchServer(serverNum, preserveTime = true) {
-    const num = parseInt(serverNum, 10) || 1;
-    if (preserveTime && this.video && this.video.currentTime > 0) {
-      this.savedPlaybackTime = this.video.currentTime;
-    } else if (!preserveTime) {
-      this.savedPlaybackTime = 0;
-      if (this.video) {
-        try { this.video.currentTime = 0; } catch (e) {}
-      }
-    }
-
-    this.currentServer = num;
+  switchServer(serverNum = 1, preserveTime = true) {
+    this.currentServer = 1;
     this.hideStatusBanner();
     this.updateServerPills();
     this.updateMetaDisplay();
@@ -1112,19 +1052,18 @@ class NetflixPlayer {
       else this.video.removeAttribute('poster');
     }
 
-    const isLive = (movie.media_type === 'channel' || movie.is_live);
     if (this.langSwitch) {
-      this.langSwitch.style.display = isLive ? 'none' : 'flex';
+      this.langSwitch.style.display = 'none';
     }
 
-    const isSingleXtreamLive = (movie.media_type === 'channel' || movie.is_live) && movie.is_xtream;
-    const hasMultipleServers = !isSingleXtreamLive;
     if (this.serverWrapper) {
-      this.serverWrapper.style.display = hasMultipleServers ? 'flex' : 'none';
+      this.serverWrapper.style.display = 'none';
     }
 
-    this.setLanguage(this.currentLang, false);
-    this.switchServer(initialServer, false);
+    this.currentLang = 'vf';
+    this.currentServer = 1;
+    this.updateMetaDisplay();
+    this.loadStream();
   }
 
   // Nettoyage complet et étanche de la session de streaming en cours
@@ -1266,18 +1205,18 @@ class NetflixPlayer {
         let targetStreamUrl = epStreamUrl;
         if (targetStreamUrl.startsWith('/')) targetStreamUrl = baseUrl + targetStreamUrl;
 
-        this.showLoader(`⚡ Connexion au flux direct ${this.currentMovie.title} S${this.currentSeason}:E${this.currentEpisode} (💎 Xtream 1080p)...`);
+        this.showLoader(`⚡ Connexion au flux direct ${this.currentMovie.title} S${this.currentSeason}:E${this.currentEpisode}...`);
         this.resetSteps();
         this.setStep(1, 'done', `1. Épisode validé (${this.currentMovie.title} S${this.currentSeason}:E${this.currentEpisode})`);
-        this.setStep(2, 'done', `2. Flux direct obtenu (💎 Xtream VIP 1080p FHD)`);
+        this.setStep(2, 'done', `2. Flux direct obtenu (1080p FHD)`);
         this.setStep(3, 'done', `3. Déchiffrement direct & Proxy local anti-pub`);
-        this.setStep(4, 'active', `4. Injection dans le lecteur Netflix...`);
+        this.setStep(4, 'active', `4. Injection dans le lecteur ZIFLIX...`);
         this.playDirectVideo(targetStreamUrl);
         return;
       }
 
       if (!epObj || !epStreamUrl) {
-        this.showStatusBanner(`Épisode S${this.currentSeason}:E${this.currentEpisode} indisponible sur le serveur Xtream.`);
+        this.showStatusBanner(`Épisode S${this.currentSeason}:E${this.currentEpisode} indisponible sur le serveur.`);
         return;
       }
 
@@ -1297,8 +1236,7 @@ class NetflixPlayer {
     const s = this.currentSeason;
     const e = this.currentEpisode;
 
-    const langLabel = isChannel ? 'DIRECT 🔴' : ((this.currentLang === 'vf') ? 'VF 🇫🇷' : 'VO 🇬🇧');
-    this.showLoader(isChannel ? `⚡ Connexion au direct ${this.currentMovie.title}...` : `⚡ Extraction Serveur ${this.currentServer} (${langLabel})...`);
+    this.showLoader(isChannel ? `⚡ Connexion au direct ${this.currentMovie.title}...` : `⚡ Connexion au flux direct...`);
     this.resetSteps();
     this.setStep(1, 'active', `1. Résolution de la source (${this.currentMovie.title})...`);
 
@@ -1309,7 +1247,7 @@ class NetflixPlayer {
       const baseUrl = window.API_BASE || '';
       const seriesIdParam = this.currentMovie.series_id ? `&series_id=${encodeURIComponent(this.currentMovie.series_id)}` : '';
       const titleParam = this.currentMovie.title ? `&title=${encodeURIComponent(this.currentMovie.title)}` : '';
-      const url = `${baseUrl}/api/extract?id=${encodeURIComponent(id)}&type=${mediaType}&season=${s}&episode=${e}&server=${this.currentServer}&lang=${this.currentLang}&fallback=1${seriesIdParam}${titleParam}`;
+      const url = `${baseUrl}/api/extract?id=${encodeURIComponent(id)}&type=${mediaType}&season=${s}&episode=${e}&server=1&lang=vf&fallback=1${seriesIdParam}${titleParam}`;
       const res = await fetch(url, { signal: abortController.signal });
       const data = await res.json();
 
@@ -1330,7 +1268,7 @@ class NetflixPlayer {
       this.setStep(1, 'done', `1. Source validée (${this.currentMovie.title})`);
       this.setStep(2, 'done', `2. Flux direct obtenu (${data.quality || '1080p FHD'})`);
       this.setStep(3, 'done', `3. Déchiffrement direct validé`);
-      this.setStep(4, 'active', `4. Injection dans le lecteur Netflix...`);
+      this.setStep(4, 'active', `4. Injection dans le lecteur ZIFLIX...`);
 
       let targetStreamUrl = data.stream_url || data.embed_url;
       if (targetStreamUrl && targetStreamUrl.startsWith('/')) {
@@ -1348,19 +1286,15 @@ class NetflixPlayer {
       }
     } catch (err) {
       if (err.name === 'AbortError') return;
-      console.warn(`[Serveur ${this.currentServer}] Erreur extraction :`, err.message);
+      console.warn('[ZIFLIX Player] Erreur extraction :', err.message);
 
       const isXtreamSeries = (this.currentMovie && (this.currentMovie.is_xtream_series || this.currentMovie.id === '68628' || String(this.currentMovie.id).startsWith('xtream_series_')));
       if (isXtreamSeries) {
-        this.showStatusBanner(`Épisode S${this.currentSeason}:E${this.currentEpisode} indisponible sur le serveur Xtream (${err.message})`);
+        this.showStatusBanner(`Épisode S${this.currentSeason}:E${this.currentEpisode} indisponible (${err.message}). Cliquez sur Réessayer.`);
         return;
       }
 
-      this.showStatusBanner(`Serveur ${this.currentServer} indisponible (${err.message}). Basculement automatique...`);
-      setTimeout(() => {
-        const maxSrv = isChannel ? 8 : 5;
-        this.switchServer((this.currentServer % maxSrv) + 1);
-      }, 1500);
+      this.showStatusBanner(`Flux temporairement indisponible (${err.message || 'Erreur'}). Cliquez sur Réessayer.`);
     }
   }
 
@@ -1545,19 +1479,10 @@ class NetflixPlayer {
       });
 
       hls.on(Hls.Events.ERROR, (event, data) => {
-        // Détection immédiate d'incompatibilité audio matérielle (ex: EC-3 Dolby dans M2TS non supporté par le décodeur du navigateur)
+        // Détection d'incompatibilité audio matérielle (ex: EC-3 Dolby)
         if (data.reason && (data.reason.includes('EC-3') || data.reason.includes('Unsupported audio'))) {
-          console.warn('[HLS] Incompatibilité audio directe (EC-3). Basculement immédiat vers le serveur optimisé...');
-          const isChannel = (this.currentMovie?.media_type === 'channel' || this.currentMovie?.is_live);
-          if (isChannel && this.currentServer < 8) {
-            const nextSrv = (this.currentServer % 8) + 1;
-            this.showStatusBanner(`Flux direct en cours d'optimisation (Basculement Serveur ${nextSrv})...`);
-            setTimeout(() => {
-              this.hideStatusBanner();
-              this.switchServer(nextSrv, true);
-            }, 100);
-            return;
-          }
+          console.warn('[HLS] Incompatibilité audio directe (EC-3).');
+          this.showStatusBanner("Incompatibilité audio avec votre navigateur. Essai de récupération...");
         }
 
         if (!data.fatal) {
@@ -1584,37 +1509,20 @@ class NetflixPlayer {
         switch (data.type) {
           case Hls.ErrorTypes.NETWORK_ERROR:
             this._networkErrorCount = (this._networkErrorCount || 0) + 1;
-            if (this._networkErrorCount >= 2 || data.details === 'manifestLoadError' || data.details === 'manifestLoadTimeOut') {
+            if (this._networkErrorCount >= 3 || data.details === 'manifestLoadError' || data.details === 'manifestLoadTimeOut') {
               this._networkErrorCount = 0;
-              const isChannel = (this.currentMovie?.media_type === 'channel' || this.currentMovie?.is_live);
-              if (isChannel && (this.currentServer < 8)) {
-                const nextSrv = (this.currentServer % 8) + 1;
-                this.showStatusBanner(`Flux principal indisponible (Basculement automatique Serveur ${nextSrv})...`);
-                setTimeout(() => {
-                  this.hideStatusBanner();
-                  this.switchServer(nextSrv, true);
-                }, 600);
-                return;
-              }
+              this.showStatusBanner("Erreur de connexion au flux. Cliquez sur Réessayer.");
+              return;
             }
             console.log('[HLS] Récupération réseau automatique...');
             hls.startLoad();
             break;
           case Hls.ErrorTypes.MEDIA_ERROR:
             this._mediaErrorCount = (this._mediaErrorCount || 0) + 1;
-            if (this._mediaErrorCount >= 2 || data.details === 'mediaSourceRequiresReset') {
-              console.warn('[HLS] Codec incompatible ou erreur média persistante. Basculement automatique...');
+            if (this._mediaErrorCount >= 3 || data.details === 'mediaSourceRequiresReset') {
               this._mediaErrorCount = 0;
-              const isChannel = (this.currentMovie?.media_type === 'channel' || this.currentMovie?.is_live);
-              if (isChannel) {
-                const nextSrv = (this.currentServer % 8) + 1;
-                this.showStatusBanner(`Flux direct en cours d'optimisation (Basculement Serveur ${nextSrv})...`);
-                setTimeout(() => {
-                  this.hideStatusBanner();
-                  this.switchServer(nextSrv, true);
-                }, 800);
-                return;
-              }
+              this.showStatusBanner("Erreur de décodage média. Cliquez sur Réessayer.");
+              return;
             }
             console.log('[HLS] Récupération média automatique...');
             hls.recoverMediaError();
@@ -1696,12 +1604,9 @@ class NetflixPlayer {
       const err = this.video.error;
       console.warn('[Direct Video Error]:', err?.message || err?.code);
 
-      // Récupération automatique si le format n'est pas supporté (ex: HEVC/MKV dans Chrome)
+      // Notification si format non supporté
       if (this.currentMovie && (err?.code === 4 || !this.video.readyState)) {
-        this.showStatusBanner("Format vidéo non supporté par ce navigateur (HEVC). Basculement automatique vers le flux HLS compatible...");
-        setTimeout(() => {
-          this.switchServer(2, true);
-        }, 700);
+        this.showStatusBanner("Format vidéo non supporté par ce navigateur.");
       }
     }, { signal, once: true });
 
@@ -1850,49 +1755,22 @@ class NetflixPlayer {
     if (this.statusBanner) this.statusBanner.classList.add('hidden');
   }
 
-  setLanguage(lang, reloadStream = true) {
-    if (lang !== 'vo' && lang !== 'vf') lang = 'vo';
-    this.currentLang = lang;
+  setLanguage(lang = 'vf', reloadStream = true) {
+    this.currentLang = 'vf';
     try {
-      localStorage.setItem('netflix_lang', lang);
+      localStorage.setItem('netflix_lang', 'vf');
     } catch (e) {}
-
-    document.querySelectorAll('.lang-switch-capsule').forEach(capsule => {
-      capsule.setAttribute('data-active-lang', lang);
-      const voBtn = capsule.querySelector('[data-lang="vo"]');
-      const vfBtn = capsule.querySelector('[data-lang="vf"]');
-      if (voBtn) voBtn.classList.toggle('active', lang === 'vo');
-      if (vfBtn) vfBtn.classList.toggle('active', lang === 'vf');
-    });
 
     this.updateServerPills();
     this.updateMetaDisplay();
-
-    if (this.overlay.classList.contains('active') && reloadStream) {
-      if (this.video && this.video.currentTime > 0) {
-        this.savedPlaybackTime = this.video.currentTime;
-      }
-      this.loadStream();
-    }
   }
 
   updateMetaDisplay() {
     if (!this.currentMovie) return;
     const isChannel = (this.currentMovie?.media_type === 'channel' || this.currentMovie?.is_live);
     if (isChannel) {
-      const serverNames = {
-        1: 'Serveur 1 (💎 Direct Xtream VIP 1080p)',
-        2: 'Serveur 2 (⭐ Dark VIP Ultra HD 1080p/60fps)',
-        3: 'Serveur 3 (⚡ Direct HLS DLHD Cluster 2 1080p)',
-        4: 'Serveur 4 (🎬 Direct HLS Apex Streams 1080p)',
-        5: 'Serveur 5 (📡 Direct HLS DLHD Alpha 1080p)',
-        6: 'Serveur 6 (🌐 Direct HLS Cricsfree 1080p)',
-        7: 'Serveur 7 (🚀 Direct HLS WideIPTV Bluetier 1080p)',
-        8: 'Serveur 8 (🛡️ Direct HLS Secours 1080p)'
-      };
-      const sName = serverNames[this.currentServer] || `Serveur ${this.currentServer}`;
       const chNum = this.currentMovie.channel_number ? `Canal ${this.currentMovie.channel_number} • ` : '';
-      this.metaDisplay.innerHTML = `<span style="color: #e50914; font-weight: 800;"><span class="live-pulse">●</span> EN DIRECT</span> • ${chNum}1080p FHD • ${sName} • Anti-Pubs Actif 🛡️`;
+      this.metaDisplay.innerHTML = `<span style="color: #e50914; font-weight: 800;"><span class="live-pulse">●</span> EN DIRECT</span> • ${chNum}1080p FHD • Serveur ZIFLIX • Anti-Pubs Actif 🛡️`;
       this.ctrlMediaTitle.textContent = `${this.currentMovie.title} (🔴 DIRECT)`;
       if (this.ctrlTotalDuration) this.ctrlTotalDuration.textContent = 'DIRECT';
       return;
@@ -1901,14 +1779,12 @@ class NetflixPlayer {
     const isSeries = (this.currentMovie.media_type === 'series' || this.currentMovie.is_xtream_series);
     const year = this.currentMovie.release_year || '2025';
     const dur = this.currentMovie.duration || '45 min';
-    const langBadge = (this.currentLang === 'vf') ? 'VF 🇫🇷' : 'VO 🇬🇧';
-    const sName = `Serveur ${this.currentServer}`;
 
     if (isSeries) {
-      this.metaDisplay.textContent = `Saison ${this.currentSeason} • Épisode ${this.currentEpisode} • ${langBadge} • ${sName} • Anti-Pubs Actif 🛡️`;
+      this.metaDisplay.textContent = `Saison ${this.currentSeason} • Épisode ${this.currentEpisode} • 1080p FHD • Serveur ZIFLIX • Anti-Pubs Actif 🛡️`;
       this.ctrlMediaTitle.textContent = `${this.currentMovie.title} (S${this.currentSeason}:E${this.currentEpisode})`;
     } else {
-      this.metaDisplay.textContent = `${year} • ${dur} • ${langBadge} • ${sName} • Anti-Pubs Actif 🛡️`;
+      this.metaDisplay.textContent = `${year} • ${dur} • 1080p FHD • Serveur ZIFLIX • Anti-Pubs Actif 🛡️`;
       this.ctrlMediaTitle.textContent = this.currentMovie.title;
     }
   }

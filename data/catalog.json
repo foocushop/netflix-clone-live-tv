@@ -1,6 +1,12 @@
 {
   "categories": [
     {
+      "id": "c_top_regardes",
+      "name": "🔥 Nouveautés & Les Plus Regardés",
+      "slug": "top-regardes",
+      "description": "Les plus grands succès et nouveautés en exclusivité sur ZIFLIX"
+    },
+    {
       "id": "c_trends",
       "name": "Tendances actuelles",
       "slug": "tendances",
@@ -8,9 +14,9 @@
     },
     {
       "id": "c_originals",
-      "name": "Netflix Originals",
+      "name": "ZIFLIX Originals",
       "slug": "originals",
-      "description": "Sélection officielle : Netflix Originals"
+      "description": "Sélection officielle : ZIFLIX Originals"
     },
     {
       "id": "c_top_rated",
@@ -128,6 +134,7 @@
         "Divertissement"
       ],
       "categories": [
+        "🔥 Nouveautés & Les Plus Regardés",
         "Series Tendances",
         "Télé-Réalité"
       ],
@@ -1189,7 +1196,7 @@
         "Acteurs Principaux",
         "Distribution Officielle"
       ],
-      "director": "Production Réalisée pour Netflix",
+      "director": "Production Réalisée pour ZIFLIX",
       "quality_badges": [
         "4K Ultra HD",
         "Spatial Audio",
@@ -1228,7 +1235,7 @@
         "Acteurs Principaux",
         "Distribution Officielle"
       ],
-      "director": "Production Réalisée pour Netflix",
+      "director": "Production Réalisée pour ZIFLIX",
       "quality_badges": [
         "4K Ultra HD",
         "Spatial Audio",
@@ -1267,7 +1274,7 @@
         "Acteurs Principaux",
         "Distribution Officielle"
       ],
-      "director": "Production Réalisée pour Netflix",
+      "director": "Production Réalisée pour ZIFLIX",
       "quality_badges": [
         "4K Ultra HD",
         "Spatial Audio",
@@ -1306,7 +1313,7 @@
         "Acteurs Principaux",
         "Distribution Officielle"
       ],
-      "director": "Production Réalisée pour Netflix",
+      "director": "Production Réalisée pour ZIFLIX",
       "quality_badges": [
         "4K Ultra HD",
         "Spatial Audio",
@@ -1346,7 +1353,7 @@
         "Acteurs Principaux",
         "Distribution Officielle"
       ],
-      "director": "Production Réalisée pour Netflix",
+      "director": "Production Réalisée pour ZIFLIX",
       "quality_badges": [
         "4K Ultra HD",
         "Spatial Audio",
@@ -1385,7 +1392,7 @@
         "Acteurs Principaux",
         "Distribution Officielle"
       ],
-      "director": "Production Réalisée pour Netflix",
+      "director": "Production Réalisée pour ZIFLIX",
       "quality_badges": [
         "4K Ultra HD",
         "Spatial Audio",
@@ -1424,7 +1431,7 @@
         "Acteurs Principaux",
         "Distribution Officielle"
       ],
-      "director": "Production Réalisée pour Netflix",
+      "director": "Production Réalisée pour ZIFLIX",
       "quality_badges": [
         "4K Ultra HD",
         "Spatial Audio",
@@ -1453,7 +1460,7 @@
       },
       "categories": [
         "Tendances actuelles",
-        "Netflix Originals",
+        "ZIFLIX Originals",
         "Séries dramatiques & Thrillers"
       ],
       "release_year": 2024,
@@ -1464,7 +1471,7 @@
         "Acteurs Principaux",
         "Distribution Officielle"
       ],
-      "director": "Production Réalisée pour Netflix",
+      "director": "Production Réalisée pour ZIFLIX",
       "quality_badges": [
         "4K Ultra HD",
         "Spatial Audio",
@@ -1503,7 +1510,7 @@
         "Acteurs Principaux",
         "Distribution Officielle"
       ],
-      "director": "Production Réalisée pour Netflix",
+      "director": "Production Réalisée pour ZIFLIX",
       "quality_badges": [
         "4K Ultra HD",
         "Spatial Audio",
@@ -1543,7 +1550,7 @@
         "Acteurs Principaux",
         "Distribution Officielle"
       ],
-      "director": "Production Réalisée pour Netflix",
+      "director": "Production Réalisée pour ZIFLIX",
       "quality_badges": [
         "4K Ultra HD",
         "Spatial Audio",
@@ -1581,7 +1588,7 @@
         "Acteurs Principaux",
         "Distribution Officielle"
       ],
-      "director": "Production Réalisée pour Netflix",
+      "director": "Production Réalisée pour ZIFLIX",
       "quality_badges": [
         "4K Ultra HD",
         "Spatial Audio",
@@ -1619,7 +1626,7 @@
         "Acteurs Principaux",
         "Distribution Officielle"
       ],
-      "director": "Production Réalisée pour Netflix",
+      "director": "Production Réalisée pour ZIFLIX",
       "quality_badges": [
         "4K Ultra HD",
         "Spatial Audio",
@@ -1658,7 +1665,7 @@
         "Acteurs Principaux",
         "Distribution Officielle"
       ],
-      "director": "Production Réalisée pour Netflix",
+      "director": "Production Réalisée pour ZIFLIX",
       "quality_badges": [
         "4K Ultra HD",
         "Spatial Audio",
@@ -1686,6 +1693,7 @@
         "server": "/api/stream/37854"
       },
       "categories": [
+        "🔥 Nouveautés & Les Plus Regardés",
         "Tendances actuelles"
       ],
       "release_year": 1999,
@@ -1696,7 +1704,7 @@
         "Acteurs Principaux",
         "Distribution Officielle"
       ],
-      "director": "Production Réalisée pour Netflix",
+      "director": "Production Réalisée pour ZIFLIX",
       "quality_badges": [
         "4K Ultra HD",
         "Spatial Audio",
@@ -1735,7 +1743,7 @@
         "Acteurs Principaux",
         "Distribution Officielle"
       ],
-      "director": "Production Réalisée pour Netflix",
+      "director": "Production Réalisée pour ZIFLIX",
       "quality_badges": [
         "4K Ultra HD",
         "Spatial Audio",
@@ -1774,7 +1782,7 @@
         "Acteurs Principaux",
         "Distribution Officielle"
       ],
-      "director": "Production Réalisée pour Netflix",
+      "director": "Production Réalisée pour ZIFLIX",
       "quality_badges": [
         "4K Ultra HD",
         "Spatial Audio",
@@ -1812,7 +1820,7 @@
         "Acteurs Principaux",
         "Distribution Officielle"
       ],
-      "director": "Production Réalisée pour Netflix",
+      "director": "Production Réalisée pour ZIFLIX",
       "quality_badges": [
         "4K Ultra HD",
         "Spatial Audio",
@@ -1840,6 +1848,7 @@
         "server": "/api/stream/329471"
       },
       "categories": [
+        "🔥 Nouveautés & Les Plus Regardés",
         "Tendances actuelles"
       ],
       "release_year": 2026,
@@ -1850,7 +1859,7 @@
         "Acteurs Principaux",
         "Distribution Officielle"
       ],
-      "director": "Production Réalisée pour Netflix",
+      "director": "Production Réalisée pour ZIFLIX",
       "quality_badges": [
         "4K Ultra HD",
         "Spatial Audio",
@@ -1890,7 +1899,7 @@
         "Acteurs Principaux",
         "Distribution Officielle"
       ],
-      "director": "Production Réalisée pour Netflix",
+      "director": "Production Réalisée pour ZIFLIX",
       "quality_badges": [
         "4K Ultra HD",
         "Spatial Audio",
@@ -1929,7 +1938,7 @@
         "Acteurs Principaux",
         "Distribution Officielle"
       ],
-      "director": "Production Réalisée pour Netflix",
+      "director": "Production Réalisée pour ZIFLIX",
       "quality_badges": [
         "4K Ultra HD",
         "Spatial Audio",
@@ -1957,7 +1966,7 @@
         "server": "/api/stream/502"
       },
       "categories": [
-        "Netflix Originals"
+        "ZIFLIX Originals"
       ],
       "release_year": 1969,
       "match_score": 85,
@@ -1967,7 +1976,7 @@
         "Acteurs Principaux",
         "Distribution Officielle"
       ],
-      "director": "Production Réalisée pour Netflix",
+      "director": "Production Réalisée pour ZIFLIX",
       "quality_badges": [
         "4K Ultra HD",
         "Spatial Audio",
@@ -1995,7 +2004,7 @@
         "server": "/api/stream/65701"
       },
       "categories": [
-        "Netflix Originals"
+        "ZIFLIX Originals"
       ],
       "release_year": 2012,
       "match_score": 85,
@@ -2005,7 +2014,7 @@
         "Acteurs Principaux",
         "Distribution Officielle"
       ],
-      "director": "Production Réalisée pour Netflix",
+      "director": "Production Réalisée pour ZIFLIX",
       "quality_badges": [
         "4K Ultra HD",
         "Spatial Audio",
@@ -2033,7 +2042,7 @@
         "server": "/api/stream/246246"
       },
       "categories": [
-        "Netflix Originals"
+        "ZIFLIX Originals"
       ],
       "release_year": 2024,
       "match_score": 89,
@@ -2043,7 +2052,7 @@
         "Acteurs Principaux",
         "Distribution Officielle"
       ],
-      "director": "Production Réalisée pour Netflix",
+      "director": "Production Réalisée pour ZIFLIX",
       "quality_badges": [
         "4K Ultra HD",
         "Spatial Audio",
@@ -2071,7 +2080,7 @@
         "server": "/api/stream/4656"
       },
       "categories": [
-        "Netflix Originals"
+        "ZIFLIX Originals"
       ],
       "release_year": 1993,
       "match_score": 85,
@@ -2081,7 +2090,7 @@
         "Acteurs Principaux",
         "Distribution Officielle"
       ],
-      "director": "Production Réalisée pour Netflix",
+      "director": "Production Réalisée pour ZIFLIX",
       "quality_badges": [
         "4K Ultra HD",
         "Spatial Audio",
@@ -2109,7 +2118,8 @@
         "server": "/api/stream/66732"
       },
       "categories": [
-        "Netflix Originals"
+        "🔥 Nouveautés & Les Plus Regardés",
+        "ZIFLIX Originals"
       ],
       "release_year": 2016,
       "match_score": 91,
@@ -2119,7 +2129,7 @@
         "Acteurs Principaux",
         "Distribution Officielle"
       ],
-      "director": "Production Réalisée pour Netflix",
+      "director": "Production Réalisée pour ZIFLIX",
       "quality_badges": [
         "4K Ultra HD",
         "Spatial Audio",
@@ -2242,7 +2252,7 @@
         "server": "/api/stream/100757"
       },
       "categories": [
-        "Netflix Originals"
+        "ZIFLIX Originals"
       ],
       "release_year": 2020,
       "match_score": 87,
@@ -2252,7 +2262,7 @@
         "Acteurs Principaux",
         "Distribution Officielle"
       ],
-      "director": "Production Réalisée pour Netflix",
+      "director": "Production Réalisée pour ZIFLIX",
       "quality_badges": [
         "4K Ultra HD",
         "Spatial Audio",
@@ -2280,7 +2290,7 @@
         "server": "/api/stream/90802"
       },
       "categories": [
-        "Netflix Originals"
+        "ZIFLIX Originals"
       ],
       "release_year": 2022,
       "match_score": 85,
@@ -2290,7 +2300,7 @@
         "Acteurs Principaux",
         "Distribution Officielle"
       ],
-      "director": "Production Réalisée pour Netflix",
+      "director": "Production Réalisée pour ZIFLIX",
       "quality_badges": [
         "4K Ultra HD",
         "Spatial Audio",
@@ -2318,7 +2328,7 @@
         "server": "/api/stream/4194"
       },
       "categories": [
-        "Netflix Originals"
+        "ZIFLIX Originals"
       ],
       "release_year": 2008,
       "match_score": 90,
@@ -2328,7 +2338,7 @@
         "Acteurs Principaux",
         "Distribution Officielle"
       ],
-      "director": "Production Réalisée pour Netflix",
+      "director": "Production Réalisée pour ZIFLIX",
       "quality_badges": [
         "4K Ultra HD",
         "Spatial Audio",
@@ -2356,7 +2366,7 @@
         "server": "/api/stream/63174"
       },
       "categories": [
-        "Netflix Originals"
+        "ZIFLIX Originals"
       ],
       "release_year": 2016,
       "match_score": 89,
@@ -2366,7 +2376,7 @@
         "Acteurs Principaux",
         "Distribution Officielle"
       ],
-      "director": "Production Réalisée pour Netflix",
+      "director": "Production Réalisée pour ZIFLIX",
       "quality_badges": [
         "4K Ultra HD",
         "Spatial Audio",
@@ -2394,7 +2404,7 @@
         "server": "/api/stream/78191"
       },
       "categories": [
-        "Netflix Originals"
+        "ZIFLIX Originals"
       ],
       "release_year": 2018,
       "match_score": 85,
@@ -2404,7 +2414,7 @@
         "Acteurs Principaux",
         "Distribution Officielle"
       ],
-      "director": "Production Réalisée pour Netflix",
+      "director": "Production Réalisée pour ZIFLIX",
       "quality_badges": [
         "4K Ultra HD",
         "Spatial Audio",
@@ -2432,7 +2442,8 @@
         "server": "/api/stream/45790"
       },
       "categories": [
-        "Netflix Originals"
+        "🔥 Nouveautés & Les Plus Regardés",
+        "ZIFLIX Originals"
       ],
       "release_year": 2012,
       "match_score": 91,
@@ -2442,7 +2453,7 @@
         "Acteurs Principaux",
         "Distribution Officielle"
       ],
-      "director": "Production Réalisée pour Netflix",
+      "director": "Production Réalisée pour ZIFLIX",
       "quality_badges": [
         "4K Ultra HD",
         "Spatial Audio",
@@ -2470,7 +2481,7 @@
         "server": "/api/stream/119051"
       },
       "categories": [
-        "Netflix Originals"
+        "ZIFLIX Originals"
       ],
       "release_year": 2022,
       "match_score": 88,
@@ -2480,7 +2491,7 @@
         "Acteurs Principaux",
         "Distribution Officielle"
       ],
-      "director": "Production Réalisée pour Netflix",
+      "director": "Production Réalisée pour ZIFLIX",
       "quality_badges": [
         "4K Ultra HD",
         "Spatial Audio",
@@ -2546,7 +2557,7 @@
         "server": "/api/stream/1424"
       },
       "categories": [
-        "Netflix Originals"
+        "ZIFLIX Originals"
       ],
       "release_year": 2013,
       "match_score": 85,
@@ -2556,7 +2567,7 @@
         "Acteurs Principaux",
         "Distribution Officielle"
       ],
-      "director": "Production Réalisée pour Netflix",
+      "director": "Production Réalisée pour ZIFLIX",
       "quality_badges": [
         "4K Ultra HD",
         "Spatial Audio",
@@ -2584,7 +2595,7 @@
         "server": "/api/stream/67178"
       },
       "categories": [
-        "Netflix Originals"
+        "ZIFLIX Originals"
       ],
       "release_year": 2017,
       "match_score": 87,
@@ -2594,7 +2605,7 @@
         "Acteurs Principaux",
         "Distribution Officielle"
       ],
-      "director": "Production Réalisée pour Netflix",
+      "director": "Production Réalisée pour ZIFLIX",
       "quality_badges": [
         "4K Ultra HD",
         "Spatial Audio",
@@ -2622,7 +2633,7 @@
         "server": "/api/stream/212989"
       },
       "categories": [
-        "Netflix Originals"
+        "ZIFLIX Originals"
       ],
       "release_year": 2023,
       "match_score": 85,
@@ -2632,7 +2643,7 @@
         "Acteurs Principaux",
         "Distribution Officielle"
       ],
-      "director": "Production Réalisée pour Netflix",
+      "director": "Production Réalisée pour ZIFLIX",
       "quality_badges": [
         "4K Ultra HD",
         "Spatial Audio",
@@ -2660,7 +2671,7 @@
         "server": "/api/stream/82596"
       },
       "categories": [
-        "Netflix Originals"
+        "ZIFLIX Originals"
       ],
       "release_year": 2020,
       "match_score": 85,
@@ -2670,7 +2681,7 @@
         "Acteurs Principaux",
         "Distribution Officielle"
       ],
-      "director": "Production Réalisée pour Netflix",
+      "director": "Production Réalisée pour ZIFLIX",
       "quality_badges": [
         "4K Ultra HD",
         "Spatial Audio",
@@ -2698,7 +2709,7 @@
         "server": "/api/stream/15226"
       },
       "categories": [
-        "Netflix Originals"
+        "ZIFLIX Originals"
       ],
       "release_year": 1998,
       "match_score": 85,
@@ -2708,7 +2719,7 @@
         "Acteurs Principaux",
         "Distribution Officielle"
       ],
-      "director": "Production Réalisée pour Netflix",
+      "director": "Production Réalisée pour ZIFLIX",
       "quality_badges": [
         "4K Ultra HD",
         "Spatial Audio",
@@ -2736,7 +2747,7 @@
         "server": "/api/stream/42009"
       },
       "categories": [
-        "Netflix Originals"
+        "ZIFLIX Originals"
       ],
       "release_year": 2011,
       "match_score": 88,
@@ -2746,7 +2757,7 @@
         "Acteurs Principaux",
         "Distribution Officielle"
       ],
-      "director": "Production Réalisée pour Netflix",
+      "director": "Production Réalisée pour ZIFLIX",
       "quality_badges": [
         "4K Ultra HD",
         "Spatial Audio",
@@ -2774,7 +2785,7 @@
         "server": "/api/stream/82452"
       },
       "categories": [
-        "Netflix Originals"
+        "ZIFLIX Originals"
       ],
       "release_year": 2024,
       "match_score": 85,
@@ -2784,7 +2795,7 @@
         "Acteurs Principaux",
         "Distribution Officielle"
       ],
-      "director": "Production Réalisée pour Netflix",
+      "director": "Production Réalisée pour ZIFLIX",
       "quality_badges": [
         "4K Ultra HD",
         "Spatial Audio",
@@ -2812,6 +2823,7 @@
         "server": "/api/stream/980431"
       },
       "categories": [
+        "🔥 Nouveautés & Les Plus Regardés",
         "Les plus gros succès critiques"
       ],
       "release_year": 2026,
@@ -2822,7 +2834,7 @@
         "Acteurs Principaux",
         "Distribution Officielle"
       ],
-      "director": "Production Réalisée pour Netflix",
+      "director": "Production Réalisée pour ZIFLIX",
       "quality_badges": [
         "4K Ultra HD",
         "Spatial Audio",
@@ -2835,7 +2847,7 @@
       "id": "1632181",
       "title": "Socias por accidente",
       "original_title": "Socias por accidente",
-      "overview": "Une production immersive acclamée par la critique, disponible dès maintenant en haute définition sur Netflix.",
+      "overview": "Une production immersive acclamée par la critique, disponible dès maintenant en haute définition sur ZIFLIX.",
       "media_type": "movie",
       "tmdb_id": "1632181",
       "poster_url": "https://image.tmdb.org/t/p/w500/j0CIVzeR7hRAPBPGR54qDZoOQpp.jpg",
@@ -2850,6 +2862,7 @@
         "server": "/api/stream/1632181"
       },
       "categories": [
+        "🔥 Nouveautés & Les Plus Regardés",
         "Les plus gros succès critiques"
       ],
       "release_year": 2026,
@@ -2860,7 +2873,7 @@
         "Acteurs Principaux",
         "Distribution Officielle"
       ],
-      "director": "Production Réalisée pour Netflix",
+      "director": "Production Réalisée pour ZIFLIX",
       "quality_badges": [
         "4K Ultra HD",
         "Spatial Audio",
@@ -2888,6 +2901,7 @@
         "server": "/api/stream/1007757"
       },
       "categories": [
+        "🔥 Nouveautés & Les Plus Regardés",
         "Les plus gros succès critiques"
       ],
       "release_year": 2026,
@@ -2898,7 +2912,7 @@
         "Acteurs Principaux",
         "Distribution Officielle"
       ],
-      "director": "Production Réalisée pour Netflix",
+      "director": "Production Réalisée pour ZIFLIX",
       "quality_badges": [
         "4K Ultra HD",
         "Spatial Audio",
@@ -2926,6 +2940,7 @@
         "server": "/api/stream/1621552"
       },
       "categories": [
+        "🔥 Nouveautés & Les Plus Regardés",
         "Les plus gros succès critiques",
         "Films d'action & Blockbusters"
       ],
@@ -2937,7 +2952,7 @@
         "Acteurs Principaux",
         "Distribution Officielle"
       ],
-      "director": "Production Réalisée pour Netflix",
+      "director": "Production Réalisée pour ZIFLIX",
       "quality_badges": [
         "4K Ultra HD",
         "Spatial Audio",
@@ -2965,6 +2980,7 @@
         "server": "/api/stream/1311031"
       },
       "categories": [
+        "🔥 Nouveautés & Les Plus Regardés",
         "Les plus gros succès critiques",
         "Films d'action & Blockbusters"
       ],
@@ -2976,7 +2992,7 @@
         "Acteurs Principaux",
         "Distribution Officielle"
       ],
-      "director": "Production Réalisée pour Netflix",
+      "director": "Production Réalisée pour ZIFLIX",
       "quality_badges": [
         "4K Ultra HD",
         "Spatial Audio",
@@ -3004,6 +3020,7 @@
         "server": "/api/stream/278"
       },
       "categories": [
+        "🔥 Nouveautés & Les Plus Regardés",
         "Les plus gros succès critiques"
       ],
       "release_year": 1994,
@@ -3014,7 +3031,7 @@
         "Acteurs Principaux",
         "Distribution Officielle"
       ],
-      "director": "Production Réalisée pour Netflix",
+      "director": "Production Réalisée pour ZIFLIX",
       "quality_badges": [
         "4K Ultra HD",
         "Spatial Audio",
@@ -3042,6 +3059,7 @@
         "server": "/api/stream/238"
       },
       "categories": [
+        "🔥 Nouveautés & Les Plus Regardés",
         "Les plus gros succès critiques"
       ],
       "release_year": 1972,
@@ -3052,7 +3070,7 @@
         "Acteurs Principaux",
         "Distribution Officielle"
       ],
-      "director": "Production Réalisée pour Netflix",
+      "director": "Production Réalisée pour ZIFLIX",
       "quality_badges": [
         "4K Ultra HD",
         "Spatial Audio",
@@ -3080,6 +3098,7 @@
         "server": "/api/stream/936075"
       },
       "categories": [
+        "🔥 Nouveautés & Les Plus Regardés",
         "Les plus gros succès critiques"
       ],
       "release_year": 2026,
@@ -3090,7 +3109,7 @@
         "Acteurs Principaux",
         "Distribution Officielle"
       ],
-      "director": "Production Réalisée pour Netflix",
+      "director": "Production Réalisée pour ZIFLIX",
       "quality_badges": [
         "4K Ultra HD",
         "Spatial Audio",
@@ -3118,6 +3137,7 @@
         "server": "/api/stream/687163"
       },
       "categories": [
+        "🔥 Nouveautés & Les Plus Regardés",
         "Les plus gros succès critiques",
         "Sci-Fi & Mondes fantastiques"
       ],
@@ -3129,7 +3149,7 @@
         "Acteurs Principaux",
         "Distribution Officielle"
       ],
-      "director": "Production Réalisée pour Netflix",
+      "director": "Production Réalisée pour ZIFLIX",
       "quality_badges": [
         "4K Ultra HD",
         "Spatial Audio",
@@ -3157,6 +3177,7 @@
         "server": "/api/stream/240"
       },
       "categories": [
+        "🔥 Nouveautés & Les Plus Regardés",
         "Les plus gros succès critiques"
       ],
       "release_year": 1974,
@@ -3167,7 +3188,7 @@
         "Acteurs Principaux",
         "Distribution Officielle"
       ],
-      "director": "Production Réalisée pour Netflix",
+      "director": "Production Réalisée pour ZIFLIX",
       "quality_badges": [
         "4K Ultra HD",
         "Spatial Audio",
@@ -3195,6 +3216,7 @@
         "server": "/api/stream/389"
       },
       "categories": [
+        "🔥 Nouveautés & Les Plus Regardés",
         "Les plus gros succès critiques"
       ],
       "release_year": 1957,
@@ -3205,7 +3227,7 @@
         "Acteurs Principaux",
         "Distribution Officielle"
       ],
-      "director": "Production Réalisée pour Netflix",
+      "director": "Production Réalisée pour ZIFLIX",
       "quality_badges": [
         "4K Ultra HD",
         "Spatial Audio",
@@ -3233,6 +3255,7 @@
         "server": "/api/stream/424"
       },
       "categories": [
+        "🔥 Nouveautés & Les Plus Regardés",
         "Les plus gros succès critiques"
       ],
       "release_year": 1993,
@@ -3243,7 +3266,7 @@
         "Acteurs Principaux",
         "Distribution Officielle"
       ],
-      "director": "Production Réalisée pour Netflix",
+      "director": "Production Réalisée pour ZIFLIX",
       "quality_badges": [
         "4K Ultra HD",
         "Spatial Audio",
@@ -3271,6 +3294,7 @@
         "server": "/api/stream/1232449"
       },
       "categories": [
+        "🔥 Nouveautés & Les Plus Regardés",
         "Les plus gros succès critiques"
       ],
       "release_year": 2024,
@@ -3281,7 +3305,7 @@
         "Acteurs Principaux",
         "Distribution Officielle"
       ],
-      "director": "Production Réalisée pour Netflix",
+      "director": "Production Réalisée pour ZIFLIX",
       "quality_badges": [
         "4K Ultra HD",
         "Spatial Audio",
@@ -3319,7 +3343,7 @@
         "Acteurs Principaux",
         "Distribution Officielle"
       ],
-      "director": "Production Réalisée pour Netflix",
+      "director": "Production Réalisée pour ZIFLIX",
       "quality_badges": [
         "4K Ultra HD",
         "Spatial Audio",
@@ -3357,7 +3381,7 @@
         "Acteurs Principaux",
         "Distribution Officielle"
       ],
-      "director": "Production Réalisée pour Netflix",
+      "director": "Production Réalisée pour ZIFLIX",
       "quality_badges": [
         "4K Ultra HD",
         "Spatial Audio",
@@ -3395,7 +3419,7 @@
         "Acteurs Principaux",
         "Distribution Officielle"
       ],
-      "director": "Production Réalisée pour Netflix",
+      "director": "Production Réalisée pour ZIFLIX",
       "quality_badges": [
         "4K Ultra HD",
         "Spatial Audio",
@@ -3433,7 +3457,7 @@
         "Acteurs Principaux",
         "Distribution Officielle"
       ],
-      "director": "Production Réalisée pour Netflix",
+      "director": "Production Réalisée pour ZIFLIX",
       "quality_badges": [
         "4K Ultra HD",
         "Spatial Audio",
@@ -3471,7 +3495,7 @@
         "Acteurs Principaux",
         "Distribution Officielle"
       ],
-      "director": "Production Réalisée pour Netflix",
+      "director": "Production Réalisée pour ZIFLIX",
       "quality_badges": [
         "4K Ultra HD",
         "Spatial Audio",
@@ -3509,7 +3533,7 @@
         "Acteurs Principaux",
         "Distribution Officielle"
       ],
-      "director": "Production Réalisée pour Netflix",
+      "director": "Production Réalisée pour ZIFLIX",
       "quality_badges": [
         "4K Ultra HD",
         "Spatial Audio",
@@ -3547,7 +3571,7 @@
         "Acteurs Principaux",
         "Distribution Officielle"
       ],
-      "director": "Production Réalisée pour Netflix",
+      "director": "Production Réalisée pour ZIFLIX",
       "quality_badges": [
         "4K Ultra HD",
         "Spatial Audio",
@@ -3587,7 +3611,7 @@
         "Acteurs Principaux",
         "Distribution Officielle"
       ],
-      "director": "Production Réalisée pour Netflix",
+      "director": "Production Réalisée pour ZIFLIX",
       "quality_badges": [
         "4K Ultra HD",
         "Spatial Audio",
@@ -3627,7 +3651,7 @@
         "Acteurs Principaux",
         "Distribution Officielle"
       ],
-      "director": "Production Réalisée pour Netflix",
+      "director": "Production Réalisée pour ZIFLIX",
       "quality_badges": [
         "4K Ultra HD",
         "Spatial Audio",
@@ -3665,7 +3689,7 @@
         "Acteurs Principaux",
         "Distribution Officielle"
       ],
-      "director": "Production Réalisée pour Netflix",
+      "director": "Production Réalisée pour ZIFLIX",
       "quality_badges": [
         "4K Ultra HD",
         "Spatial Audio",
@@ -3704,7 +3728,7 @@
         "Acteurs Principaux",
         "Distribution Officielle"
       ],
-      "director": "Production Réalisée pour Netflix",
+      "director": "Production Réalisée pour ZIFLIX",
       "quality_badges": [
         "4K Ultra HD",
         "Spatial Audio",
@@ -3743,7 +3767,7 @@
         "Acteurs Principaux",
         "Distribution Officielle"
       ],
-      "director": "Production Réalisée pour Netflix",
+      "director": "Production Réalisée pour ZIFLIX",
       "quality_badges": [
         "4K Ultra HD",
         "Spatial Audio",
@@ -3771,6 +3795,7 @@
         "server": "/api/stream/1560520"
       },
       "categories": [
+        "🔥 Nouveautés & Les Plus Regardés",
         "Films d'action & Blockbusters",
         "Sci-Fi & Mondes fantastiques"
       ],
@@ -3782,7 +3807,7 @@
         "Acteurs Principaux",
         "Distribution Officielle"
       ],
-      "director": "Production Réalisée pour Netflix",
+      "director": "Production Réalisée pour ZIFLIX",
       "quality_badges": [
         "4K Ultra HD",
         "Spatial Audio",
@@ -3820,7 +3845,7 @@
         "Acteurs Principaux",
         "Distribution Officielle"
       ],
-      "director": "Production Réalisée pour Netflix",
+      "director": "Production Réalisée pour ZIFLIX",
       "quality_badges": [
         "4K Ultra HD",
         "Spatial Audio",
@@ -3859,7 +3884,7 @@
         "Acteurs Principaux",
         "Distribution Officielle"
       ],
-      "director": "Production Réalisée pour Netflix",
+      "director": "Production Réalisée pour ZIFLIX",
       "quality_badges": [
         "4K Ultra HD",
         "Spatial Audio",
@@ -3898,7 +3923,7 @@
         "Acteurs Principaux",
         "Distribution Officielle"
       ],
-      "director": "Production Réalisée pour Netflix",
+      "director": "Production Réalisée pour ZIFLIX",
       "quality_badges": [
         "4K Ultra HD",
         "Spatial Audio",
@@ -3937,7 +3962,7 @@
         "Acteurs Principaux",
         "Distribution Officielle"
       ],
-      "director": "Production Réalisée pour Netflix",
+      "director": "Production Réalisée pour ZIFLIX",
       "quality_badges": [
         "4K Ultra HD",
         "Spatial Audio",
@@ -3976,7 +4001,7 @@
         "Acteurs Principaux",
         "Distribution Officielle"
       ],
-      "director": "Production Réalisée pour Netflix",
+      "director": "Production Réalisée pour ZIFLIX",
       "quality_badges": [
         "4K Ultra HD",
         "Spatial Audio",
@@ -4015,7 +4040,7 @@
         "Acteurs Principaux",
         "Distribution Officielle"
       ],
-      "director": "Production Réalisée pour Netflix",
+      "director": "Production Réalisée pour ZIFLIX",
       "quality_badges": [
         "4K Ultra HD",
         "Spatial Audio",
@@ -4053,7 +4078,7 @@
         "Acteurs Principaux",
         "Distribution Officielle"
       ],
-      "director": "Production Réalisée pour Netflix",
+      "director": "Production Réalisée pour ZIFLIX",
       "quality_badges": [
         "4K Ultra HD",
         "Spatial Audio",
@@ -4091,7 +4116,7 @@
         "Acteurs Principaux",
         "Distribution Officielle"
       ],
-      "director": "Production Réalisée pour Netflix",
+      "director": "Production Réalisée pour ZIFLIX",
       "quality_badges": [
         "4K Ultra HD",
         "Spatial Audio",
@@ -4129,7 +4154,7 @@
         "Acteurs Principaux",
         "Distribution Officielle"
       ],
-      "director": "Production Réalisée pour Netflix",
+      "director": "Production Réalisée pour ZIFLIX",
       "quality_badges": [
         "4K Ultra HD",
         "Spatial Audio",
@@ -4167,7 +4192,7 @@
         "Acteurs Principaux",
         "Distribution Officielle"
       ],
-      "director": "Production Réalisée pour Netflix",
+      "director": "Production Réalisée pour ZIFLIX",
       "quality_badges": [
         "4K Ultra HD",
         "Spatial Audio",
@@ -4205,7 +4230,7 @@
         "Acteurs Principaux",
         "Distribution Officielle"
       ],
-      "director": "Production Réalisée pour Netflix",
+      "director": "Production Réalisée pour ZIFLIX",
       "quality_badges": [
         "4K Ultra HD",
         "Spatial Audio",
@@ -4243,7 +4268,7 @@
         "Acteurs Principaux",
         "Distribution Officielle"
       ],
-      "director": "Production Réalisée pour Netflix",
+      "director": "Production Réalisée pour ZIFLIX",
       "quality_badges": [
         "4K Ultra HD",
         "Spatial Audio",
@@ -4281,7 +4306,7 @@
         "Acteurs Principaux",
         "Distribution Officielle"
       ],
-      "director": "Production Réalisée pour Netflix",
+      "director": "Production Réalisée pour ZIFLIX",
       "quality_badges": [
         "4K Ultra HD",
         "Spatial Audio",
@@ -4319,7 +4344,7 @@
         "Acteurs Principaux",
         "Distribution Officielle"
       ],
-      "director": "Production Réalisée pour Netflix",
+      "director": "Production Réalisée pour ZIFLIX",
       "quality_badges": [
         "4K Ultra HD",
         "Spatial Audio",
@@ -4357,7 +4382,7 @@
         "Acteurs Principaux",
         "Distribution Officielle"
       ],
-      "director": "Production Réalisée pour Netflix",
+      "director": "Production Réalisée pour ZIFLIX",
       "quality_badges": [
         "4K Ultra HD",
         "Spatial Audio",
@@ -4395,7 +4420,7 @@
         "Acteurs Principaux",
         "Distribution Officielle"
       ],
-      "director": "Production Réalisée pour Netflix",
+      "director": "Production Réalisée pour ZIFLIX",
       "quality_badges": [
         "4K Ultra HD",
         "Spatial Audio",
@@ -4433,7 +4458,7 @@
         "Acteurs Principaux",
         "Distribution Officielle"
       ],
-      "director": "Production Réalisée pour Netflix",
+      "director": "Production Réalisée pour ZIFLIX",
       "quality_badges": [
         "4K Ultra HD",
         "Spatial Audio",
@@ -4471,7 +4496,7 @@
         "Acteurs Principaux",
         "Distribution Officielle"
       ],
-      "director": "Production Réalisée pour Netflix",
+      "director": "Production Réalisée pour ZIFLIX",
       "quality_badges": [
         "4K Ultra HD",
         "Spatial Audio",
@@ -4509,7 +4534,7 @@
         "Acteurs Principaux",
         "Distribution Officielle"
       ],
-      "director": "Production Réalisée pour Netflix",
+      "director": "Production Réalisée pour ZIFLIX",
       "quality_badges": [
         "4K Ultra HD",
         "Spatial Audio",
@@ -4537,6 +4562,7 @@
         "server": "/api/stream/1408"
       },
       "categories": [
+        "🔥 Nouveautés & Les Plus Regardés",
         "Séries dramatiques & Thrillers"
       ],
       "release_year": 2004,
@@ -4547,7 +4573,7 @@
         "Acteurs Principaux",
         "Distribution Officielle"
       ],
-      "director": "Production Réalisée pour Netflix",
+      "director": "Production Réalisée pour ZIFLIX",
       "quality_badges": [
         "4K Ultra HD",
         "Spatial Audio",
@@ -4585,7 +4611,7 @@
         "Acteurs Principaux",
         "Distribution Officielle"
       ],
-      "director": "Production Réalisée pour Netflix",
+      "director": "Production Réalisée pour ZIFLIX",
       "quality_badges": [
         "4K Ultra HD",
         "Spatial Audio",
@@ -4623,7 +4649,7 @@
         "Acteurs Principaux",
         "Distribution Officielle"
       ],
-      "director": "Production Réalisée pour Netflix",
+      "director": "Production Réalisée pour ZIFLIX",
       "quality_badges": [
         "4K Ultra HD",
         "Spatial Audio",
@@ -4636,7 +4662,7 @@
       "id": "13945",
       "title": "Gute Zeiten, schlechte Zeiten",
       "original_title": "Gute Zeiten, schlechte Zeiten",
-      "overview": "Une production immersive acclamée par la critique, disponible dès maintenant en haute définition sur Netflix.",
+      "overview": "Une production immersive acclamée par la critique, disponible dès maintenant en haute définition sur ZIFLIX.",
       "media_type": "series",
       "tmdb_id": "13945",
       "poster_url": "https://image.tmdb.org/t/p/w500/qujVFLAlBnPU9mZElV4NZgL8iXT.jpg",
@@ -4661,7 +4687,7 @@
         "Acteurs Principaux",
         "Distribution Officielle"
       ],
-      "director": "Production Réalisée pour Netflix",
+      "director": "Production Réalisée pour ZIFLIX",
       "quality_badges": [
         "4K Ultra HD",
         "Spatial Audio",
@@ -4699,7 +4725,7 @@
         "Acteurs Principaux",
         "Distribution Officielle"
       ],
-      "director": "Production Réalisée pour Netflix",
+      "director": "Production Réalisée pour ZIFLIX",
       "quality_badges": [
         "4K Ultra HD",
         "Spatial Audio",
@@ -4737,7 +4763,7 @@
         "Acteurs Principaux",
         "Distribution Officielle"
       ],
-      "director": "Production Réalisée pour Netflix",
+      "director": "Production Réalisée pour ZIFLIX",
       "quality_badges": [
         "4K Ultra HD",
         "Spatial Audio",
@@ -4775,7 +4801,7 @@
         "Acteurs Principaux",
         "Distribution Officielle"
       ],
-      "director": "Production Réalisée pour Netflix",
+      "director": "Production Réalisée pour ZIFLIX",
       "quality_badges": [
         "4K Ultra HD",
         "Spatial Audio",
@@ -4813,7 +4839,7 @@
         "Acteurs Principaux",
         "Distribution Officielle"
       ],
-      "director": "Production Réalisée pour Netflix",
+      "director": "Production Réalisée pour ZIFLIX",
       "quality_badges": [
         "4K Ultra HD",
         "Spatial Audio",
@@ -4851,7 +4877,7 @@
         "Acteurs Principaux",
         "Distribution Officielle"
       ],
-      "director": "Production Réalisée pour Netflix",
+      "director": "Production Réalisée pour ZIFLIX",
       "quality_badges": [
         "4K Ultra HD",
         "Spatial Audio",
@@ -4889,7 +4915,7 @@
         "Acteurs Principaux",
         "Distribution Officielle"
       ],
-      "director": "Production Réalisée pour Netflix",
+      "director": "Production Réalisée pour ZIFLIX",
       "quality_badges": [
         "4K Ultra HD",
         "Spatial Audio",
@@ -4927,7 +4953,7 @@
         "Acteurs Principaux",
         "Distribution Officielle"
       ],
-      "director": "Production Réalisée pour Netflix",
+      "director": "Production Réalisée pour ZIFLIX",
       "quality_badges": [
         "4K Ultra HD",
         "Spatial Audio",
@@ -4965,7 +4991,7 @@
         "Acteurs Principaux",
         "Distribution Officielle"
       ],
-      "director": "Production Réalisée pour Netflix",
+      "director": "Production Réalisée pour ZIFLIX",
       "quality_badges": [
         "4K Ultra HD",
         "Spatial Audio",
@@ -5003,7 +5029,7 @@
         "Acteurs Principaux",
         "Distribution Officielle"
       ],
-      "director": "Production Réalisée pour Netflix",
+      "director": "Production Réalisée pour ZIFLIX",
       "quality_badges": [
         "4K Ultra HD",
         "Spatial Audio",
@@ -5041,7 +5067,7 @@
         "Acteurs Principaux",
         "Distribution Officielle"
       ],
-      "director": "Production Réalisée pour Netflix",
+      "director": "Production Réalisée pour ZIFLIX",
       "quality_badges": [
         "4K Ultra HD",
         "Spatial Audio",
@@ -5079,7 +5105,7 @@
         "Acteurs Principaux",
         "Distribution Officielle"
       ],
-      "director": "Production Réalisée pour Netflix",
+      "director": "Production Réalisée pour ZIFLIX",
       "quality_badges": [
         "4K Ultra HD",
         "Spatial Audio",
@@ -5117,7 +5143,7 @@
         "Acteurs Principaux",
         "Distribution Officielle"
       ],
-      "director": "Production Réalisée pour Netflix",
+      "director": "Production Réalisée pour ZIFLIX",
       "quality_badges": [
         "4K Ultra HD",
         "Spatial Audio",
@@ -5155,7 +5181,7 @@
         "Acteurs Principaux",
         "Distribution Officielle"
       ],
-      "director": "Production Réalisée pour Netflix",
+      "director": "Production Réalisée pour ZIFLIX",
       "quality_badges": [
         "4K Ultra HD",
         "Spatial Audio",
@@ -5193,7 +5219,7 @@
         "Acteurs Principaux",
         "Distribution Officielle"
       ],
-      "director": "Production Réalisée pour Netflix",
+      "director": "Production Réalisée pour ZIFLIX",
       "quality_badges": [
         "4K Ultra HD",
         "Spatial Audio",
@@ -5221,6 +5247,7 @@
         "server": "/api/stream/60625"
       },
       "categories": [
+        "🔥 Nouveautés & Les Plus Regardés",
         "Animation & Anime"
       ],
       "release_year": 2013,
@@ -5231,7 +5258,7 @@
         "Acteurs Principaux",
         "Distribution Officielle"
       ],
-      "director": "Production Réalisée pour Netflix",
+      "director": "Production Réalisée pour ZIFLIX",
       "quality_badges": [
         "4K Ultra HD",
         "Spatial Audio",
@@ -5269,7 +5296,7 @@
         "Acteurs Principaux",
         "Distribution Officielle"
       ],
-      "director": "Production Réalisée pour Netflix",
+      "director": "Production Réalisée pour ZIFLIX",
       "quality_badges": [
         "4K Ultra HD",
         "Spatial Audio",
@@ -5297,6 +5324,7 @@
         "server": "/api/stream/31132"
       },
       "categories": [
+        "🔥 Nouveautés & Les Plus Regardés",
         "Animation & Anime"
       ],
       "release_year": 2010,
@@ -5307,7 +5335,7 @@
         "Acteurs Principaux",
         "Distribution Officielle"
       ],
-      "director": "Production Réalisée pour Netflix",
+      "director": "Production Réalisée pour ZIFLIX",
       "quality_badges": [
         "4K Ultra HD",
         "Spatial Audio",
@@ -5345,7 +5373,7 @@
         "Acteurs Principaux",
         "Distribution Officielle"
       ],
-      "director": "Production Réalisée pour Netflix",
+      "director": "Production Réalisée pour ZIFLIX",
       "quality_badges": [
         "4K Ultra HD",
         "Spatial Audio",
@@ -5383,7 +5411,7 @@
         "Acteurs Principaux",
         "Distribution Officielle"
       ],
-      "director": "Production Réalisée pour Netflix",
+      "director": "Production Réalisée pour ZIFLIX",
       "quality_badges": [
         "4K Ultra HD",
         "Spatial Audio",
@@ -5421,7 +5449,7 @@
         "Acteurs Principaux",
         "Distribution Officielle"
       ],
-      "director": "Production Réalisée pour Netflix",
+      "director": "Production Réalisée pour ZIFLIX",
       "quality_badges": [
         "4K Ultra HD",
         "Spatial Audio",
@@ -5434,7 +5462,7 @@
       "id": "310751",
       "title": "哆啦A梦TV版",
       "original_title": "哆啦A梦TV版",
-      "overview": "Une production immersive acclamée par la critique, disponible dès maintenant en haute définition sur Netflix.",
+      "overview": "Une production immersive acclamée par la critique, disponible dès maintenant en haute définition sur ZIFLIX.",
       "media_type": "series",
       "tmdb_id": "310751",
       "poster_url": "https://image.tmdb.org/t/p/w500/wmydskWjF621H31lF8RVQeRZavf.jpg",
@@ -5459,7 +5487,7 @@
         "Acteurs Principaux",
         "Distribution Officielle"
       ],
-      "director": "Production Réalisée pour Netflix",
+      "director": "Production Réalisée pour ZIFLIX",
       "quality_badges": [
         "4K Ultra HD",
         "Spatial Audio",
@@ -5497,7 +5525,7 @@
         "Acteurs Principaux",
         "Distribution Officielle"
       ],
-      "director": "Production Réalisée pour Netflix",
+      "director": "Production Réalisée pour ZIFLIX",
       "quality_badges": [
         "4K Ultra HD",
         "Spatial Audio",
@@ -5535,7 +5563,7 @@
         "Acteurs Principaux",
         "Distribution Officielle"
       ],
-      "director": "Production Réalisée pour Netflix",
+      "director": "Production Réalisée pour ZIFLIX",
       "quality_badges": [
         "4K Ultra HD",
         "Spatial Audio",
@@ -5573,7 +5601,7 @@
         "Acteurs Principaux",
         "Distribution Officielle"
       ],
-      "director": "Production Réalisée pour Netflix",
+      "director": "Production Réalisée pour ZIFLIX",
       "quality_badges": [
         "4K Ultra HD",
         "Spatial Audio",
@@ -5611,7 +5639,7 @@
         "Acteurs Principaux",
         "Distribution Officielle"
       ],
-      "director": "Production Réalisée pour Netflix",
+      "director": "Production Réalisée pour ZIFLIX",
       "quality_badges": [
         "4K Ultra HD",
         "Spatial Audio",
@@ -5649,7 +5677,7 @@
         "Acteurs Principaux",
         "Distribution Officielle"
       ],
-      "director": "Production Réalisée pour Netflix",
+      "director": "Production Réalisée pour ZIFLIX",
       "quality_badges": [
         "4K Ultra HD",
         "Spatial Audio",
@@ -5688,7 +5716,7 @@
         "Acteurs Principaux",
         "Distribution Officielle"
       ],
-      "director": "Production Réalisée pour Netflix",
+      "director": "Production Réalisée pour ZIFLIX",
       "quality_badges": [
         "4K Ultra HD",
         "Spatial Audio",
@@ -5726,7 +5754,7 @@
         "Acteurs Principaux",
         "Distribution Officielle"
       ],
-      "director": "Production Réalisée pour Netflix",
+      "director": "Production Réalisée pour ZIFLIX",
       "quality_badges": [
         "4K Ultra HD",
         "Spatial Audio",
@@ -5764,7 +5792,7 @@
         "Acteurs Principaux",
         "Distribution Officielle"
       ],
-      "director": "Production Réalisée pour Netflix",
+      "director": "Production Réalisée pour ZIFLIX",
       "quality_badges": [
         "4K Ultra HD",
         "Spatial Audio",
@@ -5802,7 +5830,7 @@
         "Acteurs Principaux",
         "Distribution Officielle"
       ],
-      "director": "Production Réalisée pour Netflix",
+      "director": "Production Réalisée pour ZIFLIX",
       "quality_badges": [
         "4K Ultra HD",
         "Spatial Audio",
@@ -5840,7 +5868,7 @@
         "Acteurs Principaux",
         "Distribution Officielle"
       ],
-      "director": "Production Réalisée pour Netflix",
+      "director": "Production Réalisée pour ZIFLIX",
       "quality_badges": [
         "4K Ultra HD",
         "Spatial Audio",
@@ -5853,7 +5881,7 @@
       "id": "1599993",
       "title": "Animales",
       "original_title": "Animales",
-      "overview": "Une production immersive acclamée par la critique, disponible dès maintenant en haute définition sur Netflix.",
+      "overview": "Une production immersive acclamée par la critique, disponible dès maintenant en haute définition sur ZIFLIX.",
       "media_type": "movie",
       "tmdb_id": "1599993",
       "poster_url": "https://image.tmdb.org/t/p/w500/9fbZdiOI9fRinl44mNm3CYgEtYR.jpg",
@@ -5878,7 +5906,7 @@
         "Acteurs Principaux",
         "Distribution Officielle"
       ],
-      "director": "Production Réalisée pour Netflix",
+      "director": "Production Réalisée pour ZIFLIX",
       "quality_badges": [
         "4K Ultra HD",
         "Spatial Audio",
@@ -5916,7 +5944,7 @@
         "Acteurs Principaux",
         "Distribution Officielle"
       ],
-      "director": "Production Réalisée pour Netflix",
+      "director": "Production Réalisée pour ZIFLIX",
       "quality_badges": [
         "4K Ultra HD",
         "Spatial Audio",
@@ -5954,7 +5982,7 @@
         "Acteurs Principaux",
         "Distribution Officielle"
       ],
-      "director": "Production Réalisée pour Netflix",
+      "director": "Production Réalisée pour ZIFLIX",
       "quality_badges": [
         "4K Ultra HD",
         "Spatial Audio",
@@ -5992,7 +6020,7 @@
         "Acteurs Principaux",
         "Distribution Officielle"
       ],
-      "director": "Production Réalisée pour Netflix",
+      "director": "Production Réalisée pour ZIFLIX",
       "quality_badges": [
         "4K Ultra HD",
         "Spatial Audio",
@@ -6030,7 +6058,7 @@
         "Acteurs Principaux",
         "Distribution Officielle"
       ],
-      "director": "Production Réalisée pour Netflix",
+      "director": "Production Réalisée pour ZIFLIX",
       "quality_badges": [
         "4K Ultra HD",
         "Spatial Audio",
@@ -6068,7 +6096,7 @@
         "Acteurs Principaux",
         "Distribution Officielle"
       ],
-      "director": "Production Réalisée pour Netflix",
+      "director": "Production Réalisée pour ZIFLIX",
       "quality_badges": [
         "4K Ultra HD",
         "Spatial Audio",
@@ -6106,7 +6134,7 @@
         "Acteurs Principaux",
         "Distribution Officielle"
       ],
-      "director": "Production Réalisée pour Netflix",
+      "director": "Production Réalisée pour ZIFLIX",
       "quality_badges": [
         "4K Ultra HD",
         "Spatial Audio",
@@ -6145,7 +6173,7 @@
         "Acteurs Principaux",
         "Distribution Officielle"
       ],
-      "director": "Production Réalisée pour Netflix",
+      "director": "Production Réalisée pour ZIFLIX",
       "quality_badges": [
         "4K Ultra HD",
         "Spatial Audio",
@@ -6184,7 +6212,7 @@
         "Acteurs Principaux",
         "Distribution Officielle"
       ],
-      "director": "Production Réalisée pour Netflix",
+      "director": "Production Réalisée pour ZIFLIX",
       "quality_badges": [
         "4K Ultra HD",
         "Spatial Audio",
@@ -6222,7 +6250,7 @@
         "Acteurs Principaux",
         "Distribution Officielle"
       ],
-      "director": "Production Réalisée pour Netflix",
+      "director": "Production Réalisée pour ZIFLIX",
       "quality_badges": [
         "4K Ultra HD",
         "Spatial Audio",
@@ -6260,7 +6288,7 @@
         "Acteurs Principaux",
         "Distribution Officielle"
       ],
-      "director": "Production Réalisée pour Netflix",
+      "director": "Production Réalisée pour ZIFLIX",
       "quality_badges": [
         "4K Ultra HD",
         "Spatial Audio",
@@ -6298,7 +6326,7 @@
         "Acteurs Principaux",
         "Distribution Officielle"
       ],
-      "director": "Production Réalisée pour Netflix",
+      "director": "Production Réalisée pour ZIFLIX",
       "quality_badges": [
         "4K Ultra HD",
         "Spatial Audio",
@@ -6311,7 +6339,7 @@
       "id": "1432706",
       "title": "Bury the Devil",
       "original_title": "Bury the Devil",
-      "overview": "Une production immersive acclamée par la critique, disponible dès maintenant en haute définition sur Netflix.",
+      "overview": "Une production immersive acclamée par la critique, disponible dès maintenant en haute définition sur ZIFLIX.",
       "media_type": "movie",
       "tmdb_id": "1432706",
       "poster_url": "https://image.tmdb.org/t/p/w500/yQ3GeVsebrhOPIBhIdoSslbndEv.jpg",
@@ -6336,7 +6364,7 @@
         "Acteurs Principaux",
         "Distribution Officielle"
       ],
-      "director": "Production Réalisée pour Netflix",
+      "director": "Production Réalisée pour ZIFLIX",
       "quality_badges": [
         "4K Ultra HD",
         "Spatial Audio",
@@ -6374,7 +6402,7 @@
         "Acteurs Principaux",
         "Distribution Officielle"
       ],
-      "director": "Production Réalisée pour Netflix",
+      "director": "Production Réalisée pour ZIFLIX",
       "quality_badges": [
         "4K Ultra HD",
         "Spatial Audio",
@@ -6387,7 +6415,7 @@
       "id": "1180894",
       "title": "Bajo tus pies",
       "original_title": "Bajo tus pies",
-      "overview": "Une production immersive acclamée par la critique, disponible dès maintenant en haute définition sur Netflix.",
+      "overview": "Une production immersive acclamée par la critique, disponible dès maintenant en haute définition sur ZIFLIX.",
       "media_type": "movie",
       "tmdb_id": "1180894",
       "poster_url": "https://image.tmdb.org/t/p/w500/fQTACeQLpFoMUqYitxY0DMzfQu9.jpg",
@@ -6412,7 +6440,7 @@
         "Acteurs Principaux",
         "Distribution Officielle"
       ],
-      "director": "Production Réalisée pour Netflix",
+      "director": "Production Réalisée pour ZIFLIX",
       "quality_badges": [
         "4K Ultra HD",
         "Spatial Audio",
@@ -6425,7 +6453,7 @@
       "id": "1212461",
       "title": "Obex",
       "original_title": "Obex",
-      "overview": "Une production immersive acclamée par la critique, disponible dès maintenant en haute définition sur Netflix.",
+      "overview": "Une production immersive acclamée par la critique, disponible dès maintenant en haute définition sur ZIFLIX.",
       "media_type": "movie",
       "tmdb_id": "1212461",
       "poster_url": "https://image.tmdb.org/t/p/w500/989voQxc9qAJKuBaoBHngqnpLsD.jpg",
@@ -6450,7 +6478,7 @@
         "Acteurs Principaux",
         "Distribution Officielle"
       ],
-      "director": "Production Réalisée pour Netflix",
+      "director": "Production Réalisée pour ZIFLIX",
       "quality_badges": [
         "4K Ultra HD",
         "Spatial Audio",
@@ -6488,7 +6516,7 @@
         "Acteurs Principaux",
         "Distribution Officielle"
       ],
-      "director": "Production Réalisée pour Netflix",
+      "director": "Production Réalisée pour ZIFLIX",
       "quality_badges": [
         "4K Ultra HD",
         "Spatial Audio",
@@ -6526,7 +6554,7 @@
         "Acteurs Principaux",
         "Distribution Officielle"
       ],
-      "director": "Production Réalisée pour Netflix",
+      "director": "Production Réalisée pour ZIFLIX",
       "quality_badges": [
         "4K Ultra HD",
         "Spatial Audio",
@@ -6539,7 +6567,7 @@
       "id": "967998",
       "title": "Conspiração Fatal",
       "original_title": "Conspiração Fatal",
-      "overview": "Une production immersive acclamée par la critique, disponible dès maintenant en haute définition sur Netflix.",
+      "overview": "Une production immersive acclamée par la critique, disponible dès maintenant en haute définition sur ZIFLIX.",
       "media_type": "movie",
       "tmdb_id": "967998",
       "poster_url": "https://image.tmdb.org/t/p/w500/zpj3nNoc5xaUZTIdnuhwXwUcRag.jpg",
@@ -6564,7 +6592,7 @@
         "Acteurs Principaux",
         "Distribution Officielle"
       ],
-      "director": "Production Réalisée pour Netflix",
+      "director": "Production Réalisée pour ZIFLIX",
       "quality_badges": [
         "4K Ultra HD",
         "Spatial Audio",
@@ -6602,7 +6630,7 @@
         "Acteurs Principaux",
         "Distribution Officielle"
       ],
-      "director": "Production Réalisée pour Netflix",
+      "director": "Production Réalisée pour ZIFLIX",
       "quality_badges": [
         "4K Ultra HD",
         "Spatial Audio",
@@ -6615,7 +6643,7 @@
       "id": "1625673",
       "title": "Blood Covenant",
       "original_title": "Blood Covenant",
-      "overview": "Une production immersive acclamée par la critique, disponible dès maintenant en haute définition sur Netflix.",
+      "overview": "Une production immersive acclamée par la critique, disponible dès maintenant en haute définition sur ZIFLIX.",
       "media_type": "movie",
       "tmdb_id": "1625673",
       "poster_url": "https://image.tmdb.org/t/p/w500/1lskMEArKsp7pzQck90q6ttXAbn.jpg",
@@ -6640,7 +6668,7 @@
         "Acteurs Principaux",
         "Distribution Officielle"
       ],
-      "director": "Production Réalisée pour Netflix",
+      "director": "Production Réalisée pour ZIFLIX",
       "quality_badges": [
         "4K Ultra HD",
         "Spatial Audio",
@@ -6678,7 +6706,7 @@
         "Acteurs Principaux",
         "Distribution Officielle"
       ],
-      "director": "Production Réalisée pour Netflix",
+      "director": "Production Réalisée pour ZIFLIX",
       "quality_badges": [
         "4K Ultra HD",
         "Spatial Audio",
@@ -6716,7 +6744,7 @@
         "Acteurs Principaux",
         "Distribution Officielle"
       ],
-      "director": "Production Réalisée pour Netflix",
+      "director": "Production Réalisée pour ZIFLIX",
       "quality_badges": [
         "4K Ultra HD",
         "Spatial Audio",
@@ -6754,7 +6782,7 @@
         "Acteurs Principaux",
         "Distribution Officielle"
       ],
-      "director": "Production Réalisée pour Netflix",
+      "director": "Production Réalisée pour ZIFLIX",
       "quality_badges": [
         "4K Ultra HD",
         "Spatial Audio",
@@ -6767,7 +6795,7 @@
       "id": "1665287",
       "title": "Tura do Strazbura",
       "original_title": "Tura do Strazbura",
-      "overview": "Une production immersive acclamée par la critique, disponible dès maintenant en haute définition sur Netflix.",
+      "overview": "Une production immersive acclamée par la critique, disponible dès maintenant en haute définition sur ZIFLIX.",
       "media_type": "movie",
       "tmdb_id": "1665287",
       "poster_url": "https://image.tmdb.org/t/p/w500/9ku6cytnYJd8yjEBGitfTA2Ya9y.jpg",
@@ -6782,6 +6810,7 @@
         "server": "/api/stream/1665287"
       },
       "categories": [
+        "🔥 Nouveautés & Les Plus Regardés",
         "Documentaires captivants"
       ],
       "release_year": 2026,
@@ -6792,7 +6821,7 @@
         "Acteurs Principaux",
         "Distribution Officielle"
       ],
-      "director": "Production Réalisée pour Netflix",
+      "director": "Production Réalisée pour ZIFLIX",
       "quality_badges": [
         "4K Ultra HD",
         "Spatial Audio",
@@ -6830,7 +6859,7 @@
         "Acteurs Principaux",
         "Distribution Officielle"
       ],
-      "director": "Production Réalisée pour Netflix",
+      "director": "Production Réalisée pour ZIFLIX",
       "quality_badges": [
         "4K Ultra HD",
         "Spatial Audio",
@@ -6868,7 +6897,7 @@
         "Acteurs Principaux",
         "Distribution Officielle"
       ],
-      "director": "Production Réalisée pour Netflix",
+      "director": "Production Réalisée pour ZIFLIX",
       "quality_badges": [
         "4K Ultra HD",
         "Spatial Audio",
@@ -6881,7 +6910,7 @@
       "id": "1391891",
       "title": "Wild Animals of Virginia",
       "original_title": "Wild Animals of Virginia",
-      "overview": "Une production immersive acclamée par la critique, disponible dès maintenant en haute définition sur Netflix.",
+      "overview": "Une production immersive acclamée par la critique, disponible dès maintenant en haute définition sur ZIFLIX.",
       "media_type": "movie",
       "tmdb_id": "1391891",
       "poster_url": "https://image.tmdb.org/t/p/w500/Aih9WjjR8O4T7wzN3mQmNxuqC9D.jpg",
@@ -6906,7 +6935,7 @@
         "Acteurs Principaux",
         "Distribution Officielle"
       ],
-      "director": "Production Réalisée pour Netflix",
+      "director": "Production Réalisée pour ZIFLIX",
       "quality_badges": [
         "4K Ultra HD",
         "Spatial Audio",
@@ -6919,7 +6948,7 @@
       "id": "1522126",
       "title": "1000 Men and Me: The Bonnie Blue Story",
       "original_title": "1000 Men and Me: The Bonnie Blue Story",
-      "overview": "Une production immersive acclamée par la critique, disponible dès maintenant en haute définition sur Netflix.",
+      "overview": "Une production immersive acclamée par la critique, disponible dès maintenant en haute définition sur ZIFLIX.",
       "media_type": "movie",
       "tmdb_id": "1522126",
       "poster_url": "https://image.tmdb.org/t/p/w500/zO9plf6t2OcxzMWadxQn06OsKqp.jpg",
@@ -6944,7 +6973,7 @@
         "Acteurs Principaux",
         "Distribution Officielle"
       ],
-      "director": "Production Réalisée pour Netflix",
+      "director": "Production Réalisée pour ZIFLIX",
       "quality_badges": [
         "4K Ultra HD",
         "Spatial Audio",
@@ -6982,7 +7011,7 @@
         "Acteurs Principaux",
         "Distribution Officielle"
       ],
-      "director": "Production Réalisée pour Netflix",
+      "director": "Production Réalisée pour ZIFLIX",
       "quality_badges": [
         "4K Ultra HD",
         "Spatial Audio",
@@ -7020,7 +7049,7 @@
         "Acteurs Principaux",
         "Distribution Officielle"
       ],
-      "director": "Production Réalisée pour Netflix",
+      "director": "Production Réalisée pour ZIFLIX",
       "quality_badges": [
         "4K Ultra HD",
         "Spatial Audio",
@@ -7058,7 +7087,7 @@
         "Acteurs Principaux",
         "Distribution Officielle"
       ],
-      "director": "Production Réalisée pour Netflix",
+      "director": "Production Réalisée pour ZIFLIX",
       "quality_badges": [
         "4K Ultra HD",
         "Spatial Audio",
@@ -7071,7 +7100,7 @@
       "id": "384261",
       "title": "Operación Palace",
       "original_title": "Operación Palace",
-      "overview": "Une production immersive acclamée par la critique, disponible dès maintenant en haute définition sur Netflix.",
+      "overview": "Une production immersive acclamée par la critique, disponible dès maintenant en haute définition sur ZIFLIX.",
       "media_type": "movie",
       "tmdb_id": "384261",
       "poster_url": "https://image.tmdb.org/t/p/w500/dXdkE0avA6MVCG7aoS1QDBe0Usg.jpg",
@@ -7096,7 +7125,7 @@
         "Acteurs Principaux",
         "Distribution Officielle"
       ],
-      "director": "Production Réalisée pour Netflix",
+      "director": "Production Réalisée pour ZIFLIX",
       "quality_badges": [
         "4K Ultra HD",
         "Spatial Audio",
@@ -7134,7 +7163,7 @@
         "Acteurs Principaux",
         "Distribution Officielle"
       ],
-      "director": "Production Réalisée pour Netflix",
+      "director": "Production Réalisée pour ZIFLIX",
       "quality_badges": [
         "4K Ultra HD",
         "Spatial Audio",
@@ -7172,7 +7201,7 @@
         "Acteurs Principaux",
         "Distribution Officielle"
       ],
-      "director": "Production Réalisée pour Netflix",
+      "director": "Production Réalisée pour ZIFLIX",
       "quality_badges": [
         "4K Ultra HD",
         "Spatial Audio",
@@ -7210,7 +7239,7 @@
         "Acteurs Principaux",
         "Distribution Officielle"
       ],
-      "director": "Production Réalisée pour Netflix",
+      "director": "Production Réalisée pour ZIFLIX",
       "quality_badges": [
         "4K Ultra HD",
         "Spatial Audio",
@@ -7248,7 +7277,7 @@
         "Acteurs Principaux",
         "Distribution Officielle"
       ],
-      "director": "Production Réalisée pour Netflix",
+      "director": "Production Réalisée pour ZIFLIX",
       "quality_badges": [
         "4K Ultra HD",
         "Spatial Audio",
@@ -7261,7 +7290,7 @@
       "id": "1625396",
       "title": "The Philly Special",
       "original_title": "The Philly Special",
-      "overview": "Une production immersive acclamée par la critique, disponible dès maintenant en haute définition sur Netflix.",
+      "overview": "Une production immersive acclamée par la critique, disponible dès maintenant en haute définition sur ZIFLIX.",
       "media_type": "movie",
       "tmdb_id": "1625396",
       "poster_url": "https://image.tmdb.org/t/p/w500/3bILxCnSYFrd32hMwYwyEpbLYV.jpg",
@@ -7286,7 +7315,7 @@
         "Acteurs Principaux",
         "Distribution Officielle"
       ],
-      "director": "Production Réalisée pour Netflix",
+      "director": "Production Réalisée pour ZIFLIX",
       "quality_badges": [
         "4K Ultra HD",
         "Spatial Audio",
@@ -7324,7 +7353,7 @@
         "Acteurs Principaux",
         "Distribution Officielle"
       ],
-      "director": "Production Réalisée pour Netflix",
+      "director": "Production Réalisée pour ZIFLIX",
       "quality_badges": [
         "4K Ultra HD",
         "Spatial Audio",
@@ -10587,6 +10616,7 @@
       "backdrop_url": "https://image.tmdb.org/t/p/w154/th98VuPadAIm9aPo9hzwsB6X6ht.jpg",
       "video_url": "/api/stream/xtream-series?series_id=4115",
       "categories": [
+        "🔥 Nouveautés & Les Plus Regardés",
         "Télé-Réalité",
         "Series Tendances"
       ],

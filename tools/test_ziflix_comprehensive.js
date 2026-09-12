@@ -34,7 +34,7 @@ async function runTests() {
   
   // 1. Launch server instance on TEST_PORT
   const projectRoot = path.resolve(__dirname, '..');
-  const env = Object.assign({}, process.env, { PORT: String(TEST_PORT) });
+  const env = Object.assign({}, process.env, { PORT: String(TEST_PORT), NODE_ENV: 'test', SKIP_GITHUB_PULL: '1' });
   const serverProcess = spawn('node', ['server.js'], {
     cwd: projectRoot,
     env,
@@ -133,6 +133,8 @@ async function runTests() {
     assert(regRes.body.user.username === testUsername, 'Registered username matches');
     assert(regRes.body.user.avatar === 'assets/avatars/avatar-5.svg', 'Avatar saved correctly');
 
+    assert(regRes.body.user.role === 'user', 'New user defaults to role=user (not escalated to admin)');
+
     // TEST 5: Duplicate registration prevention
     const dupRes = await request({
       host: '127.0.0.1', port: TEST_PORT, path: '/api/auth/register', method: 'POST'
@@ -156,7 +158,7 @@ async function runTests() {
     }, { username: updatedName, avatar: 'assets/avatars/avatar-9.svg' });
     assert(profileRes.status === 200 && profileRes.body.user.username === updatedName, 'Profile updated successfully');
 
-    // TEST 8: Comments API - Post, Fetch, Delete
+    // TEST 8: Comments API - Post, Fetch, Delete (via Body and Query)
     console.log('\n[TEST 8] Testing Comments API');
     const commentRes = await request({
       host: '127.0.0.1', port: TEST_PORT, path: '/api/comments', method: 'POST',
@@ -169,6 +171,17 @@ async function runTests() {
     assert(commentRes.status === 200 && commentRes.body.success, 'Comment posted successfully');
     const commentId = commentRes.body.comment.id;
     assert(!!commentId, 'Comment receives an ID');
+
+    // Post second comment to test deletion via body
+    const commentRes2 = await request({
+      host: '127.0.0.1', port: TEST_PORT, path: '/api/comments', method: 'POST',
+      headers: { 'Authorization': `Bearer ${userToken}` }
+    }, {
+      mediaId: 'test_film_101',
+      mediaTitle: 'Test Film Ziflix 2',
+      text: 'Deuxième avis de test'
+    });
+    const commentId2 = commentRes2.body.comment.id;
 
     // Fetch comments for media
     const getCommentsRes = await request({
@@ -183,12 +196,19 @@ async function runTests() {
     });
     assert(recentRes.status === 200 && recentRes.body.comments.some(c => c.id === commentId), 'Recent comments API works');
 
-    // User can delete own comment
+    // User can delete own comment via query param
     const delRes = await request({
       host: '127.0.0.1', port: TEST_PORT, path: `/api/comments?id=${commentId}`, method: 'DELETE',
       headers: { 'Authorization': `Bearer ${userToken}` }
     });
-    assert(delRes.status === 200 && delRes.body.success, 'Author can delete their own comment');
+    assert(delRes.status === 200 && delRes.body.success, 'Author can delete their own comment via query');
+
+    // User can delete own comment via JSON body
+    const delRes2 = await request({
+      host: '127.0.0.1', port: TEST_PORT, path: '/api/comments', method: 'DELETE',
+      headers: { 'Authorization': `Bearer ${userToken}` }
+    }, { commentId: commentId2 });
+    assert(delRes2.status === 200 && delRes2.body.success, 'Author can delete their own comment via JSON body');
 
     // TEST 9: Admin Studio - Users moderation (Ban, Role)
     console.log('\n[TEST 9] Testing Admin Community Moderation');
@@ -211,7 +231,7 @@ async function runTests() {
       host: '127.0.0.1', port: TEST_PORT, path: '/api/auth/me', method: 'GET',
       headers: { 'Authorization': `Bearer ${userToken}` }
     });
-    assert(bannedCall.status === 403, 'Banned user session is revoked (403 Forbidden)');
+    assert(bannedCall.status === 403, 'Banned user session is revoked immediately (403 Forbidden)');
 
     // Unban user
     const unbanRes = await request({
@@ -227,10 +247,16 @@ async function runTests() {
     }, { userId: testUserId, role: 'admin' });
     assert(roleRes.status === 200 && roleRes.body.user.role === 'admin', 'User role promoted to admin');
 
-    // TEST 10: Catalog endpoint check
+    // TEST 10: Catalog endpoint check & Top Regardés Row 1
     console.log('\n[TEST 10] Testing Catalog API (/api/catalog)');
     const catRes = await request({ host: '127.0.0.1', port: TEST_PORT, path: '/api/catalog', method: 'GET' });
     assert(catRes.body && catRes.body.success && catRes.body.data && Array.isArray(catRes.body.data.rows), 'Catalog payload has valid success and rows');
+    const firstRow = catRes.body.data.rows[0];
+    assert(firstRow && firstRow.category.slug === 'top-regardes', 'Row 1 is "🔥 Nouveautés & Les Plus Regardés"');
+    assert(firstRow.movies.length > 0, `Row 1 contains ${firstRow.movies.length} top movies`);
+
+    const hasNetflixInRows = JSON.stringify(catRes.body.data).includes('Netflix Originals');
+    assert(!hasNetflixInRows, 'Catalog contains 0 references to "Netflix Originals"');
 
     console.log(`\n=== Integration Test Suite Completed: ${passed} PASSED, ${failed} FAILED ===`);
   } catch (err) {
