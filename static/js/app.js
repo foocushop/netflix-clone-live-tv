@@ -25,6 +25,7 @@ class NetflixApp {
     this.initAuthElements();
     this.initEvents();
     this.initAuthEvents();
+    this.initBugReporting();
     this.checkAuth();
   }
 
@@ -2210,6 +2211,152 @@ class NetflixApp {
         this.showToast('Commentaire supprimé.');
       }
     } catch (e) {}
+  }
+
+  // ================= 18. GESTION DU SIGNALEMENT DE BUGS ZIFLIX =================
+  initBugReporting() {
+    const modal = document.getElementById('bugReportModal');
+    const form = document.getElementById('bugReportForm');
+    const closeBtn = document.getElementById('closeBugReportModalBtn');
+    const cancelBtn = document.getElementById('cancelBugReportBtn');
+    const detailBtn = document.getElementById('detailReportBugBtn');
+    const contextBox = document.getElementById('bugContextBox');
+    const contextTitle = document.getElementById('bugContextTitle');
+    const feedbackMsg = document.getElementById('bugFeedbackMsg');
+    const submitBtn = document.getElementById('submitBugReportBtn');
+
+    let currentBugContext = {
+      media_title: '',
+      media_id: '',
+      season: null,
+      episode: null,
+      episode_id: null
+    };
+
+    window.openBugReportModal = (ctx = {}) => {
+      currentBugContext = {
+        media_title: ctx.media_title || '',
+        media_id: ctx.media_id || '',
+        season: ctx.season || null,
+        episode: ctx.episode || null,
+        episode_id: ctx.episode_id || null
+      };
+
+      if (contextBox && contextTitle) {
+        if (currentBugContext.media_title) {
+          let label = currentBugContext.media_title;
+          if (currentBugContext.season && currentBugContext.episode) {
+            label += ` • Saison ${currentBugContext.season} Épisode ${currentBugContext.episode}`;
+          }
+          contextTitle.textContent = label;
+          contextBox.style.display = 'flex';
+        } else {
+          contextBox.style.display = 'none';
+        }
+      }
+
+      if (feedbackMsg) {
+        feedbackMsg.className = 'bug-feedback-msg hidden';
+        feedbackMsg.textContent = '';
+      }
+
+      if (form) form.reset();
+      if (submitBtn) {
+        submitBtn.disabled = false;
+        submitBtn.textContent = 'Envoyer le signalement ▶';
+      }
+
+      if (modal) modal.style.display = 'flex';
+    };
+
+    const closeBugModal = () => {
+      if (modal) modal.style.display = 'none';
+    };
+
+    if (closeBtn) closeBtn.addEventListener('click', closeBugModal);
+    if (cancelBtn) cancelBtn.addEventListener('click', closeBugModal);
+    if (modal) {
+      modal.addEventListener('click', (e) => {
+        if (e.target === modal) closeBugModal();
+      });
+    }
+
+    if (detailBtn) {
+      detailBtn.addEventListener('click', () => {
+        if (this.currentMovie) {
+          window.openBugReportModal({
+            media_title: this.currentMovie.title || '',
+            media_id: this.currentMovie.id || '',
+            season: this.currentSeason || 1,
+            episode: this.currentEpisode || 1
+          });
+        } else {
+          window.openBugReportModal();
+        }
+      });
+    }
+
+    if (form) {
+      form.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const selectedCat = form.querySelector('input[name="bugCategory"]:checked')?.value || 'other';
+        const description = (document.getElementById('bugDescription')?.value || '').trim();
+
+        if (submitBtn) {
+          submitBtn.disabled = true;
+          submitBtn.textContent = 'Envoi en cours...';
+        }
+
+        try {
+          const baseUrl = window.API_BASE || '';
+          const token = localStorage.getItem('ziflix_auth_token');
+          const headers = { 'Content-Type': 'application/json' };
+          if (token) headers['Authorization'] = `Bearer ${token}`;
+
+          const payload = {
+            category: selectedCat,
+            description,
+            media_id: currentBugContext.media_id,
+            media_title: currentBugContext.media_title,
+            season: currentBugContext.season,
+            episode: currentBugContext.episode,
+            episode_id: currentBugContext.episode_id,
+            url: window.location.href
+          };
+
+          const res = await fetch(`${baseUrl}/api/bugs/report`, {
+            method: 'POST',
+            headers,
+            body: JSON.stringify(payload)
+          });
+          const data = await res.json();
+
+          if (data.success) {
+            if (feedbackMsg) {
+              feedbackMsg.className = 'bug-feedback-msg success';
+              feedbackMsg.textContent = '✅ ' + (data.message || 'Signalement transmis à l\'administrateur !');
+              feedbackMsg.classList.remove('hidden');
+            }
+            setTimeout(() => {
+              closeBugModal();
+              this.showToast('Signalement transmis avec succès.');
+            }, 1600);
+          } else {
+            throw new Error(data.error || 'Erreur lors de l\'envoi');
+          }
+        } catch (err) {
+          if (feedbackMsg) {
+            feedbackMsg.className = 'bug-feedback-msg error';
+            feedbackMsg.textContent = '⚠️ ' + err.message;
+            feedbackMsg.classList.remove('hidden');
+          }
+          if (submitBtn) {
+            submitBtn.disabled = false;
+            submitBtn.textContent = 'Réessayer ▶';
+          }
+        }
+      });
+    }
   }
 
   showToast(message, isError = false) {

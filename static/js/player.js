@@ -113,6 +113,7 @@ class NetflixPlayer {
     this.commentsList = document.getElementById('playerDrawerCommentsList');
     this.commentInput = document.getElementById('playerCommentInput');
     this.commentSubmitBtn = document.getElementById('playerCommentSubmitBtn');
+    this.playerReportBugBtn = document.getElementById('playerReportBugBtn');
 
     // État Interne
     this.currentMovie = null;
@@ -128,6 +129,8 @@ class NetflixPlayer {
     this.activeExtractionAbort = null;
     this.inactivityTimer = null;
     this.isScrubbing = false;
+    this._isRemuxedMp4 = false;
+    this._currentDirectVideoUrl = '';
 
     // Initialisation
     this.initEvents();
@@ -246,6 +249,25 @@ class NetflixPlayer {
     // Actions Bannière de Statut
     if (this.statusRetryBtn) {
       this.statusRetryBtn.addEventListener('click', () => this.loadStream());
+    }
+
+    // Bouton de signalement de bug sur le lecteur
+    if (this.playerReportBugBtn) {
+      this.playerReportBugBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        if (this.video && !this.video.paused) {
+          this.video.pause();
+        }
+        if (window.openBugReportModal) {
+          window.openBugReportModal({
+            media_title: this.currentMovie?.title || 'Programme en cours',
+            media_id: this.currentMovie?.id || '',
+            season: this.currentSeason || 1,
+            episode: this.currentEpisode || 1,
+            episode_id: this.currentEpisodeId || null
+          });
+        }
+      });
     }
   }
 
@@ -371,7 +393,15 @@ class NetflixPlayer {
       const rect = this.scrubberContainer.getBoundingClientRect();
       const clientX = e.clientX !== undefined ? e.clientX : (e.touches && e.touches[0] ? e.touches[0].clientX : rect.left);
       const pos = Math.max(0, Math.min(1, (clientX - rect.left) / rect.width));
-      this.video.currentTime = pos * duration;
+      const targetTime = pos * duration;
+      if (this._isRemuxedMp4 && this._currentDirectVideoUrl) {
+        const cleanUrl = this._currentDirectVideoUrl.replace(/&start=\d+/g, '').replace(/\?start=\d+/g, '?');
+        const sep = cleanUrl.includes('?') ? '&' : '?';
+        this.video.src = `${cleanUrl}${sep}start=${Math.floor(targetTime)}`;
+        this.video.play().catch(() => {});
+      } else {
+        this.video.currentTime = targetTime;
+      }
       this.updateScrubberProgress(pos * 100);
     };
 
@@ -1598,6 +1628,17 @@ class NetflixPlayer {
       videoUrl = `${videoUrl}${sep}auth_token=${encodeURIComponent(authToken)}`;
     }
 
+    // Détection de compatibilité MKV (Safari / iOS)
+    const canPlayMkv = (this.video.canPlayType('video/x-matroska') !== '' || this.video.canPlayType('video/mkv') !== '');
+    const isApple = /iPad|iPhone|iPod/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+    this._isRemuxedMp4 = false;
+    if ((!canPlayMkv || isApple) && videoUrl.includes('/api/stream/xtream-series') && !videoUrl.includes('format=mp4')) {
+      const sep = videoUrl.includes('?') ? '&' : '?';
+      videoUrl = `${videoUrl}${sep}format=mp4`;
+      this._isRemuxedMp4 = true;
+    }
+    this._currentDirectVideoUrl = videoUrl;
+
     this.cleanupActivePlayback();
     this.streamAbortController = new AbortController();
     const { signal } = this.streamAbortController;
@@ -1732,7 +1773,14 @@ class NetflixPlayer {
     }
     if (!total || !isFinite(total)) return;
     const newTime = Math.max(0, Math.min(total, this.video.currentTime + seconds));
-    this.video.currentTime = newTime;
+    if (this._isRemuxedMp4 && this._currentDirectVideoUrl) {
+      const cleanUrl = this._currentDirectVideoUrl.replace(/&start=\d+/g, '').replace(/\?start=\d+/g, '?');
+      const sep = cleanUrl.includes('?') ? '&' : '?';
+      this.video.src = `${cleanUrl}${sep}start=${Math.floor(newTime)}`;
+      this.video.play().catch(() => {});
+    } else {
+      this.video.currentTime = newTime;
+    }
     this.triggerCenterRipple(seconds > 0 ? `+${seconds}s` : `${seconds}s`);
   }
 

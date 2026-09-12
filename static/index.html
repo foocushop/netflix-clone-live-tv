@@ -2,7 +2,7 @@
 <html lang="fr">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
   <title>ZIFLIX - Streaming & Télévision en Direct</title>
   <link rel="icon" type="image/svg+xml" href="assets/logos/ziflix-icon.svg">
   <link rel="stylesheet" href="css/netflix.css">
@@ -198,6 +198,9 @@
           <div class="detail-line">Réalisateur : <span id="modalDirector">Réalisateur</span></div>
           <div class="detail-line">Genres : <span>Action, Sci-Fi, Suspense</span></div>
           <div class="detail-line">Ce programme est : <span>Captivant, Passionnant</span></div>
+          <button type="button" class="btn-detail-report-bug" id="detailReportBugBtn" title="Signaler un problème avec cette vidéo ou cet épisode">
+            🚨 Signaler un problème
+          </button>
         </div>
       </div>
 
@@ -257,6 +260,11 @@
       <!-- Bouton d'ouverture des commentaires en direct -->
       <button class="player-comments-toggle-btn" id="playerCommentsToggleBtn" type="button" title="Afficher les commentaires en direct">
         💬 <span class="comments-toggle-label">Commentaires</span>
+      </button>
+
+      <!-- Bouton de signalement de bug sur le lecteur -->
+      <button class="player-report-bug-btn" id="playerReportBugBtn" type="button" title="Signaler un problème sur cette vidéo">
+        🚨 <span class="report-bug-label">Signaler</span>
       </button>
 
       <!-- Sélecteur d'Épisodes (pour Séries) -->
@@ -824,6 +832,40 @@
             </div>
           </div>
         </div>
+
+        <!-- Section Signalements de Bugs & Problèmes Techniques -->
+        <div style="background: var(--admin-surface-card); border: 1px solid var(--admin-border); border-radius: 12px; padding: 16px; overflow: hidden;" id="adminBugsCard">
+          <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; flex-wrap: wrap; gap: 10px;">
+            <h3 style="margin: 0; font-size: 1rem; color: #fff; display: flex; align-items: center; gap: 8px;">
+              <span>🚨</span>
+              <span>Signalements de Bugs & Incidents (<span id="adminBugsCount">0</span>)</span>
+            </h3>
+            <div style="display: flex; align-items: center; gap: 8px;">
+              <button type="button" class="btn-admin btn-admin-secondary btn-sm active" id="adminBugsFilterAll">Tous (<span id="adminBugsCountAll">0</span>)</button>
+              <button type="button" class="btn-admin btn-admin-secondary btn-sm" id="adminBugsFilterOpen" style="border-color: rgba(229,9,20,0.5); color: #ff5555;">Ouverts (<span id="adminBugsCountOpen">0</span>)</button>
+              <button type="button" class="btn-admin btn-admin-secondary btn-sm" id="adminBugsRefreshBtn" title="Actualiser les bugs signalés">🔄 Actualiser</button>
+            </div>
+          </div>
+          <div style="max-height: 340px; overflow-y: auto;">
+            <table class="admin-table" style="width: 100%; border-collapse: collapse;">
+              <thead>
+                <tr style="background: rgba(255,255,255,0.03); border-bottom: 1px solid var(--admin-border);">
+                  <th style="padding: 8px; text-align: left; font-size: 0.75rem;">Date</th>
+                  <th style="padding: 8px; text-align: left; font-size: 0.75rem;">Utilisateur</th>
+                  <th style="padding: 8px; text-align: left; font-size: 0.75rem;">Type</th>
+                  <th style="padding: 8px; text-align: left; font-size: 0.75rem;">Programme concerné</th>
+                  <th style="padding: 8px; text-align: left; font-size: 0.75rem;">Appareil</th>
+                  <th style="padding: 8px; text-align: left; font-size: 0.75rem;">Description</th>
+                  <th style="padding: 8px; text-align: center; font-size: 0.75rem;">Statut</th>
+                  <th style="padding: 8px; text-align: right; font-size: 0.75rem;">Actions</th>
+                </tr>
+              </thead>
+              <tbody id="adminBugsTableBody">
+                <!-- Rempli dynamiquement par admin.js -->
+              </tbody>
+            </table>
+          </div>
+        </div>
       </div>
 
       <!-- Barre d'outils pratique : Recherche instantanée & Filtres de type -->
@@ -1112,6 +1154,85 @@
     </div>
   </div>
 
+  <!-- ================= MODALE SIGNALEMENT DE BUGS ZIFLIX ================= -->
+  <div class="bug-modal-backdrop" id="bugReportModal" style="display: none;">
+    <div class="bug-modal-card">
+      <div class="bug-modal-header">
+        <div class="bug-modal-title-group">
+          <span class="bug-modal-icon">🚨</span>
+          <div>
+            <h3 class="bug-modal-title">Signaler un problème</h3>
+            <p class="bug-modal-subtitle">Une vidéo qui ne démarre pas, un son absent ou un bug d'affichage ? Dites-le nous !</p>
+          </div>
+        </div>
+        <button type="button" class="bug-modal-close" id="closeBugReportModalBtn" title="Fermer">✕</button>
+      </div>
+
+      <form id="bugReportForm" class="bug-modal-form">
+        <!-- Contexte automatique (Média / Épisode en cours) -->
+        <div class="bug-context-box" id="bugContextBox" style="display: none;">
+          <span class="bug-context-badge">Programme concerné :</span>
+          <span class="bug-context-title" id="bugContextTitle">-</span>
+        </div>
+
+        <div class="bug-form-group">
+          <label class="bug-label">Nature du problème *</label>
+          <div class="bug-categories-grid">
+            <label class="bug-cat-label">
+              <input type="radio" name="bugCategory" value="playback" checked>
+              <span class="bug-cat-card">
+                <span class="bug-cat-icon">🎬</span>
+                <span class="bug-cat-text">Lecture impossible / Format</span>
+              </span>
+            </label>
+            <label class="bug-cat-label">
+              <input type="radio" name="bugCategory" value="audio">
+              <span class="bug-cat-card">
+                <span class="bug-cat-icon">🔇</span>
+                <span class="bug-cat-text">Son manquant ou décalé</span>
+              </span>
+            </label>
+            <label class="bug-cat-label">
+              <input type="radio" name="bugCategory" value="episode">
+              <span class="bug-cat-card">
+                <span class="bug-cat-icon">📺</span>
+                <span class="bug-cat-text">Mauvais épisode / Coupé</span>
+              </span>
+            </label>
+            <label class="bug-cat-label">
+              <input type="radio" name="bugCategory" value="display">
+              <span class="bug-cat-card">
+                <span class="bug-cat-icon">📱</span>
+                <span class="bug-cat-text">Affichage / Zoom mobile</span>
+              </span>
+            </label>
+            <label class="bug-cat-label">
+              <input type="radio" name="bugCategory" value="other">
+              <span class="bug-cat-card">
+                <span class="bug-cat-icon">💡</span>
+                <span class="bug-cat-text">Autre problème</span>
+              </span>
+            </label>
+          </div>
+        </div>
+
+        <div class="bug-form-group">
+          <label class="bug-label" for="bugDescription">Détails ou précisions (optionnel)</label>
+          <textarea id="bugDescription" class="bug-textarea" rows="3" placeholder="Ex: Sur Safari iPhone, la vidéo affiche une erreur au lancement de l'épisode 1..."></textarea>
+        </div>
+
+        <div class="bug-feedback-msg hidden" id="bugFeedbackMsg"></div>
+
+        <div class="bug-modal-actions">
+          <button type="button" class="btn-netflix btn-netflix-secondary btn-sm" id="cancelBugReportBtn">Annuler</button>
+          <button type="submit" class="btn-netflix btn-netflix-primary btn-sm" id="submitBugReportBtn">
+            Envoyer le signalement ▶
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
   <!-- ================= FOOTER ================= -->
   <footer class="netflix-footer">
     <p>Des questions ? Contactez le support ZIFLIX</p>
@@ -1187,6 +1308,5 @@
   <script src="js/player.js"></script>
   <script src="js/admin.js"></script>
   <script src="js/app.js"></script>
-  <script src="js/tv-nav.js"></script>
 </body>
 </html>

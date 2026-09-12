@@ -4158,4 +4158,302 @@ body {
   }
 }
 
+/* ==========================================================================
+   PROTECTION ANTI-ZOOM MOBILE (IOS SAFARI & ANDROID)
+   ========================================================================== */
+@media (max-width: 768px) {
+  input,
+  select,
+  textarea,
+  .search-input,
+  .auth-input,
+  .admin-auth-input,
+  .admin-form-input,
+  .admin-form-textarea,
+  .admin-form-select,
+  .xtream-search-input,
+  .telerealite-search-input,
+  .player-drawer-input,
+  .comment-textarea,
+  .bug-textarea {
+    font-size: 16px !important;
+  }
+}
+
+/* ==========================================================================
+   BOUTONS DE SIGNALEMENT DE BUGS (LECTEUR & DÉTAILS)
+   ========================================================================== */
+.player-report-bug-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(229, 9, 20, 0.18);
+  border: 1px solid rgba(229, 9, 20, 0.45);
+  color: #ff6b6b;
+  padding: 6px 12px;
+  border-radius: 20px;
+  font-size: 0.78rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  margin-left: 8px;
+}
+
+.player-report-bug-btn:hover {
+  background: rgba(229, 9, 20, 0.35);
+  border-color: #e50914;
+  color: #fff;
+  transform: translateY(-1px);
+}
+
+@media (max-width: 600px) {
+  .player-report-bug-btn {
+    padding: 4px 8px;
+    font-size: 0.72rem;
+  }
+  .player-report-bug-btn .report-bug-label {
+    display: none;
+  }
+}
+
+.btn-detail-report-bug {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  color: #bbb;
+  padding: 6px 14px;
+  border-radius: 6px;
+  font-size: 0.78rem;
+  font-weight: 600;
+  cursor: pointer;
+  margin-top: 14px;
+  transition: all 0.2s ease;
+}
+
+.btn-detail-report-bug:hover {
+  background: rgba(229, 9, 20, 0.2);
+  border-color: #e50914;
+  color: #ff8888;
+}
+
+/* ==========================================================================
+   MODALE DE SIGNALEMENT DE BUGS (#bugReportModal)
+   ========================================================================== */
+.bug-modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.85);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  z-index: 999999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+}
+
+.bug-modal-card {
+  background: #181818;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 14px;
+  width: 100%;
+  max-width: 520px;
+  box-shadow: 0 25px 60px rgba(0, 0, 0, 0.8), 0 0 30px rgba(229, 9, 20, 0.15);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.bug-modal-header {
+  padding: 18px 22px;
+  background: rgba(255, 255, 255, 0.03);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.bug-modal-title-group {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+}
+
+.bug-modal-icon {
+  font-size: 1.8rem;
+  line-height: 1;
+}
+
+.bug-modal-title {
+  margin: 0 0 4px 0;
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: #fff;
+}
+
+.bug-modal-subtitle {
+  margin: 0;
+  font-size: 0.78rem;
+  color: #999;
+  line-height: 1.4;
+}
+
+.bug-modal-close {
+  background: transparent;
+  border: none;
+  color: #888;
+  font-size: 1.3rem;
+  cursor: pointer;
+  padding: 4px;
+  border-radius: 50%;
+  line-height: 1;
+  transition: color 0.2s ease;
+}
+
+.bug-modal-close:hover {
+  color: #fff;
+}
+
+.bug-modal-form {
+  padding: 20px 22px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.bug-context-box {
+  background: rgba(229, 9, 20, 0.1);
+  border: 1px solid rgba(229, 9, 20, 0.25);
+  border-radius: 8px;
+  padding: 10px 14px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.8rem;
+}
+
+.bug-context-badge {
+  color: #ff6b6b;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.bug-context-title {
+  color: #fff;
+  font-weight: 600;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.bug-form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.bug-label {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: #ddd;
+}
+
+.bug-categories-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 8px;
+}
+
+.bug-cat-label {
+  cursor: pointer;
+  display: block;
+}
+
+.bug-cat-label input[type="radio"] {
+  display: none;
+}
+
+.bug-cat-card {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+  transition: all 0.2s ease;
+}
+
+.bug-cat-label input[type="radio"]:checked + .bug-cat-card {
+  background: rgba(229, 9, 20, 0.16);
+  border-color: #e50914;
+  box-shadow: 0 0 10px rgba(229, 9, 20, 0.25);
+}
+
+.bug-cat-icon {
+  font-size: 1.1rem;
+}
+
+.bug-cat-text {
+  font-size: 0.74rem;
+  color: #ccc;
+  font-weight: 500;
+}
+
+.bug-cat-label input[type="radio"]:checked + .bug-cat-card .bug-cat-text {
+  color: #fff;
+  font-weight: 700;
+}
+
+.bug-textarea {
+  background: rgba(0, 0, 0, 0.5);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 8px;
+  color: #fff;
+  padding: 10px 12px;
+  font-family: inherit;
+  font-size: 0.85rem;
+  resize: vertical;
+  min-height: 70px;
+  outline: none;
+  transition: border-color 0.2s ease;
+}
+
+.bug-textarea:focus {
+  border-color: #e50914;
+}
+
+.bug-feedback-msg {
+  padding: 10px 14px;
+  border-radius: 8px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  text-align: center;
+}
+
+.bug-feedback-msg.success {
+  background: rgba(46, 204, 113, 0.15);
+  border: 1px solid rgba(46, 204, 113, 0.4);
+  color: #2ecc71;
+}
+
+.bug-feedback-msg.error {
+  background: rgba(231, 76, 60, 0.15);
+  border: 1px solid rgba(231, 76, 60, 0.4);
+  color: #e74c3c;
+}
+
+.bug-modal-actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 4px;
+}
+
 

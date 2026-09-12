@@ -47,6 +47,17 @@ class NetflixAdmin {
     this.adminCommentsCount = document.getElementById('adminCommentsCount');
     this.adminUsersRefreshBtn = document.getElementById('adminUsersRefreshBtn');
 
+    // Signalements de Bugs ZIFLIX
+    this.adminBugsTableBody = document.getElementById('adminBugsTableBody');
+    this.adminBugsCount = document.getElementById('adminBugsCount');
+    this.adminBugsCountAll = document.getElementById('adminBugsCountAll');
+    this.adminBugsCountOpen = document.getElementById('adminBugsCountOpen');
+    this.adminBugsRefreshBtn = document.getElementById('adminBugsRefreshBtn');
+    this.adminBugsFilterAll = document.getElementById('adminBugsFilterAll');
+    this.adminBugsFilterOpen = document.getElementById('adminBugsFilterOpen');
+    this.currentBugFilter = 'all';
+    this.cachedBugsList = [];
+
     window.netflixAdmin = this;
 
     this.initEvents();
@@ -242,7 +253,33 @@ class NetflixAdmin {
       this.adminUsersRefreshBtn.addEventListener('click', () => {
         this.loadCommunityUsers();
         this.loadCommunityComments();
+        this.loadReportedBugs();
         this.showToast('👥 Modération actualisée');
+      });
+    }
+
+    if (this.adminBugsRefreshBtn) {
+      this.adminBugsRefreshBtn.addEventListener('click', () => {
+        this.loadReportedBugs();
+        this.showToast('🚨 Signalements actualisés');
+      });
+    }
+
+    if (this.adminBugsFilterAll) {
+      this.adminBugsFilterAll.addEventListener('click', () => {
+        this.currentBugFilter = 'all';
+        this.adminBugsFilterAll.classList.add('active');
+        if (this.adminBugsFilterOpen) this.adminBugsFilterOpen.classList.remove('active');
+        this.renderReportedBugs();
+      });
+    }
+
+    if (this.adminBugsFilterOpen) {
+      this.adminBugsFilterOpen.addEventListener('click', () => {
+        this.currentBugFilter = 'open';
+        this.adminBugsFilterOpen.classList.add('active');
+        if (this.adminBugsFilterAll) this.adminBugsFilterAll.classList.remove('active');
+        this.renderReportedBugs();
       });
     }
   }
@@ -266,6 +303,7 @@ class NetflixAdmin {
     this.loadXtreamUsers();
     this.loadCommunityUsers();
     this.loadCommunityComments();
+    this.loadReportedBugs();
     this.startClusterPolling();
   }
 
@@ -314,6 +352,7 @@ class NetflixAdmin {
         this.loadXtreamUsers();
         this.loadCommunityUsers();
         this.loadCommunityComments();
+        this.loadReportedBugs();
       } else {
         this.showAuthError(data.message || "Code PIN ou mot de passe incorrect");
       }
@@ -331,6 +370,7 @@ class NetflixAdmin {
         this.loadXtreamUsers();
         this.loadCommunityUsers();
         this.loadCommunityComments();
+        this.loadReportedBugs();
       } else {
         this.showAuthError("Code PIN incorrect. Veuillez réessayer.");
       }
@@ -1545,6 +1585,120 @@ class NetflixAdmin {
       }
     } catch (e) {
       this.showToast('Erreur réseau', true);
+    }
+  }
+
+  // ================= 15. GESTION DES SIGNALEMENTS DE BUGS ZIFLIX =================
+  async loadReportedBugs() {
+    if (!this.adminBugsTableBody) return;
+    try {
+      const headers = this.getAdminHeaders();
+      const res = await fetch('/api/admin/bugs', { headers });
+      const json = await res.json();
+      if (json.success && Array.isArray(json.bugs)) {
+        this.cachedBugsList = json.bugs;
+        const openCount = json.bugs.filter(b => b.status === 'open').length;
+
+        if (this.adminBugsCount) this.adminBugsCount.textContent = openCount;
+        if (this.adminBugsCountAll) this.adminBugsCountAll.textContent = json.bugs.length;
+        if (this.adminBugsCountOpen) this.adminBugsCountOpen.textContent = openCount;
+
+        this.renderReportedBugs();
+      }
+    } catch (e) {}
+  }
+
+  renderReportedBugs() {
+    if (!this.adminBugsTableBody) return;
+    const list = this.currentBugFilter === 'open' 
+      ? this.cachedBugsList.filter(b => b.status === 'open')
+      : this.cachedBugsList;
+
+    if (list.length === 0) {
+      this.adminBugsTableBody.innerHTML = '<tr><td colspan="8" style="text-align: center; color: #888; padding: 20px;">Aucun signalement de bug trouvé.</td></tr>';
+      return;
+    }
+
+    const catLabels = {
+      playback: '🎬 Lecture / Format',
+      audio: '🔇 Son décalé/muet',
+      episode: '📺 Épisode coupé',
+      display: '📱 Affichage / Zoom',
+      other: '💡 Autre'
+    };
+
+    this.adminBugsTableBody.innerHTML = '';
+    list.forEach(b => {
+      const tr = document.createElement('tr');
+      tr.style.cssText = 'border-bottom: 1px solid rgba(255,255,255,0.05); transition: background 0.15s ease;';
+      const isOpen = (b.status === 'open');
+      const statusBadge = isOpen
+        ? '<span style="background: rgba(229,9,20,0.2); color: #ff5555; border: 1px solid rgba(229,9,20,0.4); border-radius: 4px; padding: 2px 6px; font-size: 0.7rem; font-weight: 700;">OUVERT</span>'
+        : '<span style="background: rgba(46,204,113,0.2); color: #2ecc71; border: 1px solid rgba(46,204,113,0.4); border-radius: 4px; padding: 2px 6px; font-size: 0.7rem; font-weight: 700;">RÉSOLU</span>';
+
+      const dateStr = b.created_at ? new Date(b.created_at).toLocaleString('fr-FR', { dateStyle: 'short', timeStyle: 'short' }) : '-';
+      const catText = catLabels[b.category] || b.category || 'Général';
+      const mediaStr = b.media_title 
+        ? `<strong>${this.escapeHtml(b.media_title)}</strong>${b.season ? `<br><span style="font-size: 0.7rem; color: #888;">S${b.season}E${b.episode}</span>` : ''}`
+        : '<span style="color: #666;">-</span>';
+
+      tr.innerHTML = `
+        <td style="padding: 10px 8px; font-size: 0.72rem; color: #888; white-space: nowrap;">${dateStr}</td>
+        <td style="padding: 10px 8px; font-size: 0.8rem; font-weight: 600; color: #fff;">${this.escapeHtml(b.username || 'Visiteur')}</td>
+        <td style="padding: 10px 8px; font-size: 0.75rem; color: #e50914; font-weight: 600;">${catText}</td>
+        <td style="padding: 10px 8px; font-size: 0.75rem;">${mediaStr}</td>
+        <td style="padding: 10px 8px; font-size: 0.72rem; color: #aaa;">${this.escapeHtml(b.device_info || 'Inconnu')}</td>
+        <td style="padding: 10px 8px; font-size: 0.75rem; color: #ddd; max-width: 220px; word-break: break-word;">${this.escapeHtml(b.description || 'Aucun détail fourni')}</td>
+        <td style="padding: 10px 8px; text-align: center;">${statusBadge}</td>
+        <td style="padding: 10px 8px; text-align: right; white-space: nowrap;">
+          ${isOpen 
+            ? `<button type="button" class="btn-admin btn-admin-blue btn-sm resolve-bug-btn" style="padding: 3px 8px; font-size: 0.7rem; margin-right: 4px;">✓ Résolu</button>`
+            : `<button type="button" class="btn-admin btn-admin-secondary btn-sm reopen-bug-btn" style="padding: 3px 8px; font-size: 0.7rem; margin-right: 4px;">↺ Rouvrir</button>`}
+          <button type="button" class="btn-admin btn-admin-red btn-sm delete-bug-btn" style="padding: 3px 6px; font-size: 0.7rem;" title="Supprimer">🗑️</button>
+        </td>
+      `;
+
+      tr.querySelector('.resolve-bug-btn')?.addEventListener('click', () => this.updateBugStatus(b.id, 'resolved'));
+      tr.querySelector('.reopen-bug-btn')?.addEventListener('click', () => this.updateBugStatus(b.id, 'open'));
+      tr.querySelector('.delete-bug-btn')?.addEventListener('click', () => this.deleteBugAdmin(b.id));
+
+      this.adminBugsTableBody.appendChild(tr);
+    });
+  }
+
+  async updateBugStatus(bugId, newStatus) {
+    try {
+      const headers = this.getAdminHeaders({ 'Content-Type': 'application/json' });
+      const res = await fetch('/api/admin/bugs/status', {
+        method: 'POST',
+        headers,
+        body: JSON.stringify({ id: bugId, status: newStatus })
+      });
+      const json = await res.json();
+      if (json.success) {
+        this.showToast(newStatus === 'resolved' ? '✅ Signalement marqué comme résolu !' : '↺ Signalement rouvert');
+        this.loadReportedBugs();
+      }
+    } catch (e) {
+      this.showToast('Erreur lors de la mise à jour', true);
+    }
+  }
+
+  async deleteBugAdmin(bugId) {
+    if (!confirm('Supprimer définitivement ce signalement de bug ?')) return;
+    try {
+      const headers = this.getAdminHeaders();
+      const res = await fetch(`/api/admin/bugs?id=${encodeURIComponent(bugId)}`, {
+        method: 'DELETE',
+        headers
+      });
+      const json = await res.json();
+      if (json.success) {
+        this.showToast('🗑️ Signalement supprimé');
+        this.loadReportedBugs();
+      }
+    } catch (e) {
+      this.showToast('Erreur lors de la suppression', true);
     }
   }
 }

@@ -2,6 +2,7 @@
 // Ce serveur reproduit fidèlement les endpoints de l'API Axum/Rust pour un test immédiat
 const http = require('http');
 const https = require('https');
+const { spawn } = require('child_process');
 const fs = require('fs');
 const path = require('path');
 const url = require('url');
@@ -2620,9 +2621,55 @@ function saveZiflixSessions() {
   } catch (e) {}
 }
 
+// ================= GESTION DES SIGNALEMENTS DE BUGS ZIFLIX =================
+let ZIFLIX_BUGS = [];
+const BUGS_LOCAL = path.join(__dirname, 'data', 'bugs.json');
+const BUGS_BACKUP = path.join(SYSTEM_PERSISTENT_DIR, 'bugs.json');
+
+function loadZiflixBugs() {
+  let localData = null;
+  let backupData = null;
+  try {
+    if (fs.existsSync(BUGS_LOCAL)) {
+      localData = JSON.parse(fs.readFileSync(BUGS_LOCAL, 'utf8'));
+    }
+  } catch (e) {}
+  try {
+    if (fs.existsSync(BUGS_BACKUP)) {
+      backupData = JSON.parse(fs.readFileSync(BUGS_BACKUP, 'utf8'));
+    }
+  } catch (e) {}
+
+  const bugsMap = new Map();
+  if (Array.isArray(localData)) {
+    localData.forEach(b => { if (b && b.id) bugsMap.set(b.id, b); });
+  }
+  if (Array.isArray(backupData)) {
+    backupData.forEach(b => { if (b && b.id) bugsMap.set(b.id, b); });
+  }
+
+  ZIFLIX_BUGS = Array.from(bugsMap.values());
+  ZIFLIX_BUGS.sort((a, b) => new Date(b.created_at || b.createdAt || 0) - new Date(a.created_at || a.createdAt || 0));
+  saveZiflixBugs();
+}
+
+function saveZiflixBugs() {
+  try {
+    const dir = path.dirname(BUGS_LOCAL);
+    if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
+    fs.writeFileSync(BUGS_LOCAL, JSON.stringify(ZIFLIX_BUGS, null, 2), 'utf8');
+  } catch (e) {}
+  try {
+    const bDir = path.dirname(BUGS_BACKUP);
+    if (!fs.existsSync(bDir)) fs.mkdirSync(bDir, { recursive: true });
+    fs.writeFileSync(BUGS_BACKUP, JSON.stringify(ZIFLIX_BUGS, null, 2), 'utf8');
+  } catch (e) {}
+}
+
 loadZiflixUsers();
 loadZiflixComments();
 loadZiflixSessions();
+loadZiflixBugs();
 
 function getAuthUser(req) {
   const authHeader = req.headers['authorization'] || '';
@@ -3742,6 +3789,75 @@ const server = http.createServer((req, res) => {
     return;
   }
 
+  // ================= ROUTE SIGNALEMENT DE BUGS (/api/bugs/report) =================
+  if (pathname === '/api/bugs/report' && req.method === 'POST') {
+    let body = '';
+    req.on('data', chunk => body += chunk);
+    req.on('end', () => {
+      try {
+        const payload = JSON.parse(body || '{}');
+        const user = getAuthUser(req);
+        const category = String(payload.category || 'other').trim();
+        const description = String(payload.description || '').trim();
+        const mediaTitle = String(payload.media_title || payload.title || '').trim();
+        const mediaId = String(payload.media_id || '').trim();
+        const season = payload.season !== undefined ? payload.season : null;
+        const episode = payload.episode !== undefined ? payload.episode : null;
+        const episodeId = payload.episode_id ? String(payload.episode_id).trim() : null;
+
+        const ua = req.headers['user-agent'] || '';
+        let detectedDevice = 'Navigateur Web';
+        if (/iphone/i.test(ua)) detectedDevice = 'iPhone (iOS)';
+        else if (/ipad/i.test(ua)) detectedDevice = 'iPad (iPadOS)';
+        else if (/android/i.test(ua)) detectedDevice = 'Android';
+        else if (/macintosh/i.test(ua)) detectedDevice = 'Mac (macOS)';
+        else if (/windows/i.test(ua)) detectedDevice = 'PC Windows';
+        else if (/linux/i.test(ua)) detectedDevice = 'Linux';
+
+        if (/safari/i.test(ua) && !/chrome/i.test(ua)) detectedDevice += ' • Safari';
+        else if (/chrome/i.test(ua)) detectedDevice += ' • Chrome';
+        else if (/firefox/i.test(ua)) detectedDevice += ' • Firefox';
+        else if (/edg/i.test(ua)) detectedDevice += ' • Edge';
+
+        const bug = {
+          id: 'bug_' + Date.now() + '_' + cryptoModule.randomBytes(3).toString('hex'),
+          user_id: user ? user.id : 'guest',
+          username: user ? user.username : (String(payload.username || '').trim() || 'Visiteur anonyme'),
+          avatar: user ? user.avatar : null,
+          category,
+          title: mediaTitle ? `Signalement : ${mediaTitle}${season ? ` S${season}` : ''}${episode ? `E${episode}` : ''}` : 'Signalement problème',
+          description,
+          media_id: mediaId,
+          media_title: mediaTitle,
+          season,
+          episode,
+          episode_id: episodeId,
+          device_info: payload.device_info || detectedDevice,
+          user_agent: ua,
+          url: String(payload.url || '').slice(0, 200),
+          status: 'open',
+          created_at: new Date().toISOString()
+        };
+
+        ZIFLIX_BUGS.unshift(bug);
+        if (ZIFLIX_BUGS.length > 500) ZIFLIX_BUGS.pop();
+        saveZiflixBugs();
+
+        res.writeHead(200, { 'Content-Type': 'application/json; charset=utf-8', 'Access-Control-Allow-Origin': '*' });
+        return res.end(JSON.stringify({
+          success: true,
+          message: 'Votre signalement a bien été transmis à l\'administrateur. Merci pour votre aide !',
+          bug_id: bug.id,
+          bug
+        }));
+      } catch (e) {
+        res.writeHead(400, { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' });
+        return res.end(JSON.stringify({ success: false, error: 'Données JSON invalides' }));
+      }
+    });
+    return;
+  }
+
   // ================= SÉCURITÉ ADMIN STUDIO (CODE PIN 1965 & ADMIN USER) =================
   if (pathname.startsWith('/api/admin/')) {
     // Route de vérification explicite du mot de passe
@@ -3848,6 +3964,68 @@ const server = http.createServer((req, res) => {
           saveZiflixUsers();
           res.writeHead(200, { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' });
           return res.end(JSON.stringify({ success: true, user: { id: target.id, username: target.username, role: target.role } }));
+        } catch (e) {
+          res.writeHead(400, { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' });
+          return res.end(JSON.stringify({ success: false, error: 'Corps JSON invalide' }));
+        }
+      });
+      return;
+    }
+
+    // --- Gestion des Signalements de Bugs (Admin) ---
+    if (pathname === '/api/admin/bugs' && req.method === 'GET') {
+      res.writeHead(200, { 'Content-Type': 'application/json; charset=utf-8', 'Access-Control-Allow-Origin': '*' });
+      return res.end(JSON.stringify({ success: true, count: ZIFLIX_BUGS.length, bugs: ZIFLIX_BUGS }));
+    }
+
+    if (pathname === '/api/admin/bugs/status' && req.method === 'POST') {
+      let body = '';
+      req.on('data', chunk => body += chunk);
+      req.on('end', () => {
+        try {
+          const payload = JSON.parse(body || '{}');
+          const bugId = String(payload.id || '').trim();
+          const newStatus = String(payload.status || 'resolved').trim();
+          const target = ZIFLIX_BUGS.find(b => b.id === bugId);
+          if (!target) {
+            res.writeHead(404, { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' });
+            return res.end(JSON.stringify({ success: false, error: 'Bug introuvable' }));
+          }
+          target.status = newStatus;
+          target.updated_at = new Date().toISOString();
+          saveZiflixBugs();
+          res.writeHead(200, { 'Content-Type': 'application/json; charset=utf-8', 'Access-Control-Allow-Origin': '*' });
+          return res.end(JSON.stringify({ success: true, bug: target }));
+        } catch (e) {
+          res.writeHead(400, { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' });
+          return res.end(JSON.stringify({ success: false, error: 'Corps JSON invalide' }));
+        }
+      });
+      return;
+    }
+
+    if (pathname === '/api/admin/bugs' && req.method === 'DELETE') {
+      let id = (parsedUrl.query.id || '').toString().trim();
+      const processDeleteBug = (targetId) => {
+        const idx = ZIFLIX_BUGS.findIndex(b => b.id === targetId);
+        if (idx === -1) {
+          res.writeHead(404, { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' });
+          return res.end(JSON.stringify({ success: false, error: 'Bug introuvable' }));
+        }
+        ZIFLIX_BUGS.splice(idx, 1);
+        saveZiflixBugs();
+        res.writeHead(200, { 'Content-Type': 'application/json; charset=utf-8', 'Access-Control-Allow-Origin': '*' });
+        return res.end(JSON.stringify({ success: true, message: 'Signalement supprimé' }));
+      };
+
+      if (id) return processDeleteBug(id);
+
+      let body = '';
+      req.on('data', chunk => body += chunk);
+      req.on('end', () => {
+        try {
+          const payload = JSON.parse(body || '{}');
+          processDeleteBug(String(payload.id || '').trim());
         } catch (e) {
           res.writeHead(400, { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' });
           return res.end(JSON.stringify({ success: false, error: 'Corps JSON invalide' }));
@@ -5706,6 +5884,73 @@ const server = http.createServer((req, res) => {
         };
 
         const ct = (upstreamRes.headers['content-type'] || '').toLowerCase();
+        const ua = (req.headers['user-agent'] || '').toLowerCase();
+        const isAppleDevice = /iphone|ipad|ipod/.test(ua) || (ua.includes('macintosh') && !ua.includes('chrome')) || (ua.includes('safari') && !ua.includes('chrome') && !ua.includes('android'));
+        const forceMp4 = (parsedUrl.query.format === 'mp4' || parsedUrl.query.remux === '1');
+        const needsMp4Remux = (isAppleDevice || forceMp4) && (ext === 'mkv' || ct.includes('matroska'));
+
+        if (needsMp4Remux) {
+          const startTime = parseFloat(parsedUrl.query.start || parsedUrl.query.time || parsedUrl.query.t || 0) || 0;
+          let ffmpegProc = null;
+
+          const outHeaders = {
+            'Access-Control-Allow-Origin': '*',
+            'Access-Control-Allow-Headers': '*',
+            'Content-Type': 'video/mp4',
+            'Cache-Control': 'no-cache, no-store',
+            'Connection': 'keep-alive',
+            'X-Content-Type-Options': 'nosniff'
+          };
+          res.writeHead(200, outHeaders);
+
+          if (startTime > 0) {
+            // Seek précis sur la source avec -ss
+            try { upstreamRes.destroy(); } catch (e) {}
+            ffmpegProc = spawn('ffmpeg', [
+              '-v', 'error',
+              '-user_agent', 'IPTVSmartersPro/1.0',
+              '-ss', startTime.toString(),
+              '-i', targetUrl,
+              '-c', 'copy',
+              '-f', 'mp4',
+              '-movflags', 'frag_keyframe+empty_moov+default_base_moof',
+              'pipe:1'
+            ], { stdio: ['ignore', 'pipe', 'ignore'] });
+          } else {
+            // Remuxage ultra-rapide par pipe direct depuis upstreamRes
+            ffmpegProc = spawn('ffmpeg', [
+              '-v', 'error',
+              '-i', 'pipe:0',
+              '-c', 'copy',
+              '-f', 'mp4',
+              '-movflags', 'frag_keyframe+empty_moov+default_base_moof',
+              'pipe:1'
+            ], { stdio: ['pipe', 'pipe', 'ignore'] });
+
+            upstreamRes.pipe(ffmpegProc.stdin);
+            ffmpegProc.stdin.on('error', () => {});
+          }
+
+          ffmpegProc.stdout.pipe(res);
+
+          const killFfmpeg = () => {
+            if (ffmpegProc) {
+              try { ffmpegProc.stdout.destroy(); } catch (e) {}
+              try { ffmpegProc.kill('SIGKILL'); } catch (e) {}
+              ffmpegProc = null;
+            }
+            try { upstreamRes.destroy(); } catch (e) {}
+          };
+
+          req.once('close', killFfmpeg);
+          res.once('close', killFfmpeg);
+          ffmpegProc.once('close', () => {
+            req.removeListener('close', killFfmpeg);
+            res.removeListener('close', killFfmpeg);
+          });
+          return;
+        }
+
         if (ext === 'mkv' || ct.includes('matroska')) {
           outHeaders['Content-Type'] = 'video/x-matroska';
         } else if (ext === 'mp4' || ct.includes('mp4')) {
