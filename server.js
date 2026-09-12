@@ -1562,12 +1562,9 @@ async function extractChannelMultiProvider(channelId, serverNum) {
   // ── PRIORITÉ ABSOLUE N°1 : SERVEUR 1 = DIRECT XTREAM VIP (H.264/AAC) ──
   if (srvNum === 1) {
     const rawChan = (channelId || '').toString().toLowerCase().trim();
-    // Les flux TV avec audio Dolby EC-3 dans M2TS ne peuvent pas être décodés par MSE dans les navigateurs web.
-    // Pour ces chaînes spécifiques, redirection automatique vers le miroir Ultra HD 1080p/60fps compatible AAC.
-    const isEc3Xtream = (rawChan === 'tv_canal_sport' || rawChan === 'canal_sport');
-    const hasXtream = !isEc3Xtream && (XTREAM_CHANNELS[rawChan] 
+    const hasXtream = XTREAM_CHANNELS[rawChan] 
       || XTREAM_CHANNELS[rawChan.replace(/^tv_/, '')] 
-      || XTREAM_CHANNELS[rawChan.replace(/_/g, ' ')]);
+      || XTREAM_CHANNELS[rawChan.replace(/_/g, ' ')];
 
     if (hasXtream) {
       return {
@@ -5055,7 +5052,15 @@ const server = http.createServer((req, res) => {
       return;
     }
 
-    getLiveM3u8Url(channelId, mirror)
+    const foundChan = catalog.movies.find(m => m.id === channelId || m.tmdb_id === channelId || String(m.daddy_id) === String(channelId));
+    let targetDaddyId = foundChan?.daddy_id || foundChan?.sources?.daddylive_id;
+    if (!targetDaddyId && channelId && channelId.startsWith('tv_')) {
+      const rawNum = channelId.replace('tv_', '');
+      if (/^\d+$/.test(rawNum)) targetDaddyId = parseInt(rawNum, 10);
+    }
+    if (!targetDaddyId) targetDaddyId = channelId;
+
+    getLiveM3u8Url(targetDaddyId, mirror, channelId)
       .then(async masterUrl => {
         if (!masterUrl) {
           res.writeHead(503, { 'Content-Type': 'text/plain', 'Access-Control-Allow-Origin': '*' });
@@ -5086,13 +5091,16 @@ const server = http.createServer((req, res) => {
           return;
         }
 
+        const authToken = parsedUrl.query.auth_token || parsedUrl.query.token || req.headers['x-auth-token'];
+        const authParam = authToken ? `&token=${encodeURIComponent(authToken)}` : '';
+
         let outputBody = hlsRes.text;
         if (!track) {
           const lines = outputBody.split(/\r?\n/);
           outputBody = lines.map(line => {
             const trimmed = line.trim();
             if (!trimmed || trimmed.startsWith('#')) return line;
-            return `/api/stream/live?channel=${encodeURIComponent(channelId)}&mirror=${encodeURIComponent(mirror)}&track=${encodeURIComponent(trimmed)}`;
+            return `/api/stream/live?channel=${encodeURIComponent(channelId)}&mirror=${encodeURIComponent(mirror)}&track=${encodeURIComponent(trimmed)}${authParam}`;
           }).join('\n');
         } else if (isWideIptv) {
           // Pour WideIPTV, résoudre les segments relatifs .ts en URLs directes Bluetier compatibles CORS
