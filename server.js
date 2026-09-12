@@ -792,10 +792,9 @@ try {
 }
 
 const xtreamSocksAgent = SocksProxyAgent ? new SocksProxyAgent('socks5h://127.0.0.1:40000', {
-  keepAlive: true,
-  maxSockets: 300,
-  maxFreeSockets: 20,
-  timeout: 10000
+  keepAlive: false,
+  maxSockets: 50,
+  timeout: 8000
 }) : null;
 
 function getFreshXtreamSocksAgent() {
@@ -805,12 +804,13 @@ function getFreshXtreamSocksAgent() {
   }) : null;
 }
 
-function getXtreamAgent(urlStr, isSeries = false, useFresh = false) {
-  if (xtreamSocksAgent && (urlStr.includes(XTREAM_CONFIG.host) || urlStr.includes('foxbleu.org'))) {
-    if (useFresh) {
-      return getFreshXtreamSocksAgent() || xtreamSocksAgent;
-    }
-    return xtreamSocksAgent;
+// Le nouveau VPS (162.35.186.177) n'est PAS bloqué par FoxBleu en direct (contrairement à l'ancien 74.50.66.196).
+// La connexion directe évite les blocages / timeouts de WARP. SOCKS ne sert qu'en fallback si besoin.
+const USE_SOCKS_PROXY = false;
+
+function getXtreamAgent(urlStr, isSeries = false, forceSocks = false) {
+  if (forceSocks && xtreamSocksAgent) {
+    return getFreshXtreamSocksAgent() || xtreamSocksAgent;
   }
   const isHttps = urlStr.startsWith('https:');
   if (isSeries) {
@@ -908,8 +908,8 @@ function fetchXtreamPlaylist(targetUrl, headers = {}, hops = 0, retry = 0) {
       return reject(new Error('URL Xtream invalide: ' + targetUrl));
     }
     const isFoxBleu = targetUrl.includes(XTREAM_CONFIG.host) || targetUrl.includes('foxbleu.org');
-    const client = isFoxBleu && xtreamSocksAgent ? http : (parsed.protocol === 'https:' ? https : http);
-    const agent = getXtreamAgent(targetUrl, false, retry > 0);
+    const client = (isFoxBleu && USE_SOCKS_PROXY && xtreamSocksAgent) ? http : (parsed.protocol === 'https:' ? https : http);
+    const agent = getXtreamAgent(targetUrl, false, isFoxBleu && USE_SOCKS_PROXY);
     let settled = false;
 
     const req = client.get(targetUrl, {
@@ -5783,8 +5783,8 @@ const server = http.createServer((req, res) => {
       }
 
       const isFoxBleu = urlToFetch.includes(XTREAM_CONFIG.host) || urlToFetch.includes('foxbleu.org');
-      const client = isFoxBleu && xtreamSocksAgent ? http : (parsed.protocol === 'https:' ? https : http);
-      const agent = getXtreamAgent(urlToFetch, false, retry > 0);
+      const client = (isFoxBleu && USE_SOCKS_PROXY && xtreamSocksAgent) ? http : (parsed.protocol === 'https:' ? https : http);
+      const agent = getXtreamAgent(urlToFetch, false, isFoxBleu && USE_SOCKS_PROXY);
       let isAborted = false;
       let activeChunkRes = null;
 
@@ -6195,8 +6195,8 @@ const server = http.createServer((req, res) => {
       }
 
       const isFoxBleu = targetUrl.includes(XTREAM_CONFIG.host) || targetUrl.includes('foxbleu.org');
-      const client = isFoxBleu && xtreamSocksAgent ? http : (parsed.protocol === 'https:' ? https : http);
-      const agent = isFoxBleu && xtreamSocksAgent ? getXtreamAgent(targetUrl, true, retry > 0) : (parsed.protocol === 'https:' ? xtreamSeriesHttpsAgent : xtreamSeriesHttpAgent);
+      const client = (isFoxBleu && USE_SOCKS_PROXY && xtreamSocksAgent) ? http : (parsed.protocol === 'https:' ? https : http);
+      const agent = (isFoxBleu && USE_SOCKS_PROXY && xtreamSocksAgent) ? getXtreamAgent(targetUrl, true, true) : (parsed.protocol === 'https:' ? xtreamSeriesHttpsAgent : xtreamSeriesHttpAgent);
       const headersToForward = {
         'User-Agent': 'IPTVSmartersPro/1.0',
         'Accept': '*/*'
