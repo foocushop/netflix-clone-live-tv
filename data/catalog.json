@@ -73,6 +73,12 @@
       "description": "Canal+ Sport, beIN SPORTS, RMC Sport, Eurosport, L'Équipe, DAZN en direct"
     },
     {
+      "id": "c_ligue1_fr",
+      "name": "⚽ Ligue 1+ FR",
+      "slug": "ligue-1-plus-fr",
+      "description": "Toutes les chaînes Ligue 1+ (1 à 10) et DAZN France en direct"
+    },
+    {
       "id": "c_ppv_combat",
       "name": "🥊 Chaînes PPV & Sports de Combat",
       "slug": "ppv_combat",
@@ -8768,6 +8774,7 @@
         }
       ],
       "categories": [
+        "⚽ Ligue 1+ FR",
         "⚽ Chaînes Sport Françaises"
       ],
       "release_year": 2026,
@@ -8847,6 +8854,7 @@
         }
       ],
       "categories": [
+        "⚽ Ligue 1+ FR",
         "⚽ Chaînes Sport Françaises"
       ],
       "release_year": 2026,
@@ -10945,6 +10953,416 @@
       "is_xtream_series": true,
       "series_id": 8394,
       "created_at": "2026-09-09T00:54:35.334Z"
+    },
+    {
+      "id": "tv_dazn2",
+      "daddy_id": 180,
+      "title": "DAZN 2 France",
+      "original_title": "DAZN 2 France Live",
+      "overview": "Diffusion des grands événements sportifs DAZN : Ligue 1, football européen, combat et sports US.",
+      "media_type": "channel",
+      "is_live": true,
+      "channel_number": 20,
+      "poster_url": "https://i.imgur.com/fI7y4Z0.png",
+      "backdrop_url": "https://images.unsplash.com/photo-1508098682722-e99c43a406b2?auto=format&fit=crop&w=1920&q=80",
+      "video_url": "/api/extract?id=tv_dazn2&type=channel&server=1",
+      "sources": {
+        "server1": "/api/extract?id=tv_dazn2&type=channel&server=1",
+        "daddylive_id": 180
+      },
+      "players": [
+        {
+          "name": "Player 1 (Direct HLS VIP)",
+          "tag": "VIP",
+          "url": "/api/extract?id=tv_dazn2&type=channel&server=1"
+        }
+      ],
+      "categories": [
+        "⚽ Ligue 1+ FR",
+        "⚽ Chaînes Sport Françaises"
+      ],
+      "release_year": 2026,
+      "match_score": 99,
+      "age_rating": "Tous publics",
+      "duration": "DIRECT HD",
+      "quality_badges": [
+        "1080p FHD",
+        "DIRECT",
+        "Anti-Pubs 🛡️"
+      ],
+      "is_hero": false,
+      "created_at": "2026-09-12T16:49:29.774Z",
+      "cast": [],
+      "logo_url": "https://i.imgur.com/fI7y4Z0.png"
+    },
+    {
+      "id": "tv_ligue1_2",
+      "daddy_id": 961,
+      "title": "Ligue 1+ 2",
+      "original_title": "Ligue 1+ Canal 2",
+      "overview": "Canal multiplex et diffusion intégrale des matchs de Ligue 1 en direct.",
+      "media_type": "channel",
+      "is_live": true,
+      "channel_number": 21,
+      "poster_url": "https://i.imgur.com/XRTHuBj.png",
+      "backdrop_url": "https://images.unsplash.com/photo-1508098682722-e99c43a406b2?auto=format&fit=crop&w=1920&q=80",
+      "video_url": "/api/extract?id=tv_ligue1_2&type=channel&server=1",
+      "sources": {
+        "server1": "/api/extract?id=tv_ligue1_2&type=channel&server=1",
+        "daddylive_id": 961
+      },
+      "players": [
+        {
+          "name": "Player 1 (Direct HLS VIP)",
+          "tag": "VIP",
+          "url": "/api/extract?id=tv_ligue1_2&type=channel&server=1"
+        }
+      ],
+      "categories": [
+        "⚽ Ligue 1+ FR",
+        "⚽ Chaînes Sport Françaises"
+      ],
+      "release_year": 2026,
+      "match_score": 99,
+      "age_rating": "Tous publics",
+      "duration": "DIRECT HD",
+      "quality_badges": [
+        "1080p FHD",
+        "DIRECT",
+        "Anti-Pubs 🛡️"
+      ],
+      "is_hero": false,
+      "created_at": "2026-09-12T16:49:29.775Z",
+      "cast": [],
+      "logo_url": "https://i.imgur.com/XRTHuBj.png"
+    },
+    {
+      "id": "tv_ligue1_3",
+      "daddy_id": 962,
+      "title": "Ligue 1+ 3",
+      "original_title": "Ligue 1+ Canal 3",
+      "overview": "Canal multiplex et diffusion intégrale des matchs de Ligue 1 en direct.",
+      "media_type": "channel",
+      "is_live": true,
+      "channel_number": 22,
+      "poster_url": "https://i.imgur.com/XRTHuBj.png",
+      "backdrop_url": "https://images.unsplash.com/photo-1508098682722-e99c43a406b2?auto=format&fit=crop&w=1920&q=80",
+      "video_url": "/api/extract?id=tv_ligue1_3&type=channel&server=1",
+      "sources": {
+        "server1": "/api/extract?id=tv_ligue1_3&type=channel&server=1",
+        "daddylive_id": 962
+      },
+      "players": [
+        {
+          "name": "Player 1 (Direct HLS VIP)",
+          "tag": "VIP",
+          "url": "/api/extract?id=tv_ligue1_3&type=channel&server=1"
+        }
+      ],
+      "categories": [
+        "⚽ Ligue 1+ FR",
+        "⚽ Chaînes Sport Françaises"
+      ],
+      "release_year": 2026,
+      "match_score": 99,
+      "age_rating": "Tous publics",
+      "duration": "DIRECT HD",
+      "quality_badges": [
+        "1080p FHD",
+        "DIRECT",
+        "Anti-Pubs 🛡️"
+      ],
+      "is_hero": false,
+      "created_at": "2026-09-12T16:49:29.775Z",
+      "cast": [],
+      "logo_url": "https://i.imgur.com/XRTHuBj.png"
+    },
+    {
+      "id": "tv_ligue1_4",
+      "daddy_id": 963,
+      "title": "Ligue 1+ 4",
+      "original_title": "Ligue 1+ Canal 4",
+      "overview": "Canal multiplex et diffusion intégrale des matchs de Ligue 1 en direct.",
+      "media_type": "channel",
+      "is_live": true,
+      "channel_number": 23,
+      "poster_url": "https://i.imgur.com/XRTHuBj.png",
+      "backdrop_url": "https://images.unsplash.com/photo-1508098682722-e99c43a406b2?auto=format&fit=crop&w=1920&q=80",
+      "video_url": "/api/extract?id=tv_ligue1_4&type=channel&server=1",
+      "sources": {
+        "server1": "/api/extract?id=tv_ligue1_4&type=channel&server=1",
+        "daddylive_id": 963
+      },
+      "players": [
+        {
+          "name": "Player 1 (Direct HLS VIP)",
+          "tag": "VIP",
+          "url": "/api/extract?id=tv_ligue1_4&type=channel&server=1"
+        }
+      ],
+      "categories": [
+        "⚽ Ligue 1+ FR",
+        "⚽ Chaînes Sport Françaises"
+      ],
+      "release_year": 2026,
+      "match_score": 99,
+      "age_rating": "Tous publics",
+      "duration": "DIRECT HD",
+      "quality_badges": [
+        "1080p FHD",
+        "DIRECT",
+        "Anti-Pubs 🛡️"
+      ],
+      "is_hero": false,
+      "created_at": "2026-09-12T16:49:29.775Z",
+      "cast": [],
+      "logo_url": "https://i.imgur.com/XRTHuBj.png"
+    },
+    {
+      "id": "tv_ligue1_5",
+      "daddy_id": 965,
+      "title": "Ligue 1+ 5",
+      "original_title": "Ligue 1+ Canal 5",
+      "overview": "Canal multiplex et diffusion intégrale des matchs de Ligue 1 en direct.",
+      "media_type": "channel",
+      "is_live": true,
+      "channel_number": 24,
+      "poster_url": "https://i.imgur.com/XRTHuBj.png",
+      "backdrop_url": "https://images.unsplash.com/photo-1508098682722-e99c43a406b2?auto=format&fit=crop&w=1920&q=80",
+      "video_url": "/api/extract?id=tv_ligue1_5&type=channel&server=1",
+      "sources": {
+        "server1": "/api/extract?id=tv_ligue1_5&type=channel&server=1",
+        "daddylive_id": 965
+      },
+      "players": [
+        {
+          "name": "Player 1 (Direct HLS VIP)",
+          "tag": "VIP",
+          "url": "/api/extract?id=tv_ligue1_5&type=channel&server=1"
+        }
+      ],
+      "categories": [
+        "⚽ Ligue 1+ FR",
+        "⚽ Chaînes Sport Françaises"
+      ],
+      "release_year": 2026,
+      "match_score": 99,
+      "age_rating": "Tous publics",
+      "duration": "DIRECT HD",
+      "quality_badges": [
+        "1080p FHD",
+        "DIRECT",
+        "Anti-Pubs 🛡️"
+      ],
+      "is_hero": false,
+      "created_at": "2026-09-12T16:49:29.775Z",
+      "cast": [],
+      "logo_url": "https://i.imgur.com/XRTHuBj.png"
+    },
+    {
+      "id": "tv_ligue1_6",
+      "daddy_id": 966,
+      "title": "Ligue 1+ 6",
+      "original_title": "Ligue 1+ Canal 6",
+      "overview": "Canal multiplex et diffusion intégrale des matchs de Ligue 1 en direct.",
+      "media_type": "channel",
+      "is_live": true,
+      "channel_number": 25,
+      "poster_url": "https://i.imgur.com/XRTHuBj.png",
+      "backdrop_url": "https://images.unsplash.com/photo-1508098682722-e99c43a406b2?auto=format&fit=crop&w=1920&q=80",
+      "video_url": "/api/extract?id=tv_ligue1_6&type=channel&server=1",
+      "sources": {
+        "server1": "/api/extract?id=tv_ligue1_6&type=channel&server=1",
+        "daddylive_id": 966
+      },
+      "players": [
+        {
+          "name": "Player 1 (Direct HLS VIP)",
+          "tag": "VIP",
+          "url": "/api/extract?id=tv_ligue1_6&type=channel&server=1"
+        }
+      ],
+      "categories": [
+        "⚽ Ligue 1+ FR",
+        "⚽ Chaînes Sport Françaises"
+      ],
+      "release_year": 2026,
+      "match_score": 99,
+      "age_rating": "Tous publics",
+      "duration": "DIRECT HD",
+      "quality_badges": [
+        "1080p FHD",
+        "DIRECT",
+        "Anti-Pubs 🛡️"
+      ],
+      "is_hero": false,
+      "created_at": "2026-09-12T16:49:29.775Z",
+      "cast": [],
+      "logo_url": "https://i.imgur.com/XRTHuBj.png"
+    },
+    {
+      "id": "tv_ligue1_7",
+      "daddy_id": 967,
+      "title": "Ligue 1+ 7",
+      "original_title": "Ligue 1+ Canal 7",
+      "overview": "Canal multiplex et diffusion intégrale des matchs de Ligue 1 en direct.",
+      "media_type": "channel",
+      "is_live": true,
+      "channel_number": 26,
+      "poster_url": "https://i.imgur.com/XRTHuBj.png",
+      "backdrop_url": "https://images.unsplash.com/photo-1508098682722-e99c43a406b2?auto=format&fit=crop&w=1920&q=80",
+      "video_url": "/api/extract?id=tv_ligue1_7&type=channel&server=1",
+      "sources": {
+        "server1": "/api/extract?id=tv_ligue1_7&type=channel&server=1",
+        "daddylive_id": 967
+      },
+      "players": [
+        {
+          "name": "Player 1 (Direct HLS VIP)",
+          "tag": "VIP",
+          "url": "/api/extract?id=tv_ligue1_7&type=channel&server=1"
+        }
+      ],
+      "categories": [
+        "⚽ Ligue 1+ FR",
+        "⚽ Chaînes Sport Françaises"
+      ],
+      "release_year": 2026,
+      "match_score": 99,
+      "age_rating": "Tous publics",
+      "duration": "DIRECT HD",
+      "quality_badges": [
+        "1080p FHD",
+        "DIRECT",
+        "Anti-Pubs 🛡️"
+      ],
+      "is_hero": false,
+      "created_at": "2026-09-12T16:49:29.775Z",
+      "cast": [],
+      "logo_url": "https://i.imgur.com/XRTHuBj.png"
+    },
+    {
+      "id": "tv_ligue1_8",
+      "daddy_id": 968,
+      "title": "Ligue 1+ 8",
+      "original_title": "Ligue 1+ Canal 8",
+      "overview": "Canal multiplex et diffusion intégrale des matchs de Ligue 1 en direct.",
+      "media_type": "channel",
+      "is_live": true,
+      "channel_number": 27,
+      "poster_url": "https://i.imgur.com/XRTHuBj.png",
+      "backdrop_url": "https://images.unsplash.com/photo-1508098682722-e99c43a406b2?auto=format&fit=crop&w=1920&q=80",
+      "video_url": "/api/extract?id=tv_ligue1_8&type=channel&server=1",
+      "sources": {
+        "server1": "/api/extract?id=tv_ligue1_8&type=channel&server=1",
+        "daddylive_id": 968
+      },
+      "players": [
+        {
+          "name": "Player 1 (Direct HLS VIP)",
+          "tag": "VIP",
+          "url": "/api/extract?id=tv_ligue1_8&type=channel&server=1"
+        }
+      ],
+      "categories": [
+        "⚽ Ligue 1+ FR",
+        "⚽ Chaînes Sport Françaises"
+      ],
+      "release_year": 2026,
+      "match_score": 99,
+      "age_rating": "Tous publics",
+      "duration": "DIRECT HD",
+      "quality_badges": [
+        "1080p FHD",
+        "DIRECT",
+        "Anti-Pubs 🛡️"
+      ],
+      "is_hero": false,
+      "created_at": "2026-09-12T16:49:29.775Z",
+      "cast": [],
+      "logo_url": "https://i.imgur.com/XRTHuBj.png"
+    },
+    {
+      "id": "tv_ligue1_9",
+      "daddy_id": 969,
+      "title": "Ligue 1+ 9",
+      "original_title": "Ligue 1+ Canal 9",
+      "overview": "Canal multiplex et diffusion intégrale des matchs de Ligue 1 en direct.",
+      "media_type": "channel",
+      "is_live": true,
+      "channel_number": 28,
+      "poster_url": "https://i.imgur.com/XRTHuBj.png",
+      "backdrop_url": "https://images.unsplash.com/photo-1508098682722-e99c43a406b2?auto=format&fit=crop&w=1920&q=80",
+      "video_url": "/api/extract?id=tv_ligue1_9&type=channel&server=1",
+      "sources": {
+        "server1": "/api/extract?id=tv_ligue1_9&type=channel&server=1",
+        "daddylive_id": 969
+      },
+      "players": [
+        {
+          "name": "Player 1 (Direct HLS VIP)",
+          "tag": "VIP",
+          "url": "/api/extract?id=tv_ligue1_9&type=channel&server=1"
+        }
+      ],
+      "categories": [
+        "⚽ Ligue 1+ FR",
+        "⚽ Chaînes Sport Françaises"
+      ],
+      "release_year": 2026,
+      "match_score": 99,
+      "age_rating": "Tous publics",
+      "duration": "DIRECT HD",
+      "quality_badges": [
+        "1080p FHD",
+        "DIRECT",
+        "Anti-Pubs 🛡️"
+      ],
+      "is_hero": false,
+      "created_at": "2026-09-12T16:49:29.775Z",
+      "cast": [],
+      "logo_url": "https://i.imgur.com/XRTHuBj.png"
+    },
+    {
+      "id": "tv_ligue1_10",
+      "daddy_id": 970,
+      "title": "Ligue 1+ 10",
+      "original_title": "Ligue 1+ Canal 10",
+      "overview": "Canal multiplex et diffusion intégrale des matchs de Ligue 1 en direct.",
+      "media_type": "channel",
+      "is_live": true,
+      "channel_number": 29,
+      "poster_url": "https://i.imgur.com/XRTHuBj.png",
+      "backdrop_url": "https://images.unsplash.com/photo-1508098682722-e99c43a406b2?auto=format&fit=crop&w=1920&q=80",
+      "video_url": "/api/extract?id=tv_ligue1_10&type=channel&server=1",
+      "sources": {
+        "server1": "/api/extract?id=tv_ligue1_10&type=channel&server=1",
+        "daddylive_id": 970
+      },
+      "players": [
+        {
+          "name": "Player 1 (Direct HLS VIP)",
+          "tag": "VIP",
+          "url": "/api/extract?id=tv_ligue1_10&type=channel&server=1"
+        }
+      ],
+      "categories": [
+        "⚽ Ligue 1+ FR",
+        "⚽ Chaînes Sport Françaises"
+      ],
+      "release_year": 2026,
+      "match_score": 99,
+      "age_rating": "Tous publics",
+      "duration": "DIRECT HD",
+      "quality_badges": [
+        "1080p FHD",
+        "DIRECT",
+        "Anti-Pubs 🛡️"
+      ],
+      "is_hero": false,
+      "created_at": "2026-09-12T16:49:29.776Z",
+      "cast": [],
+      "logo_url": "https://i.imgur.com/XRTHuBj.png"
     }
   ]
 }

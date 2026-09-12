@@ -874,7 +874,7 @@ process.on('SIGINT', () => process.exit(0));
 // Préchauffage automatique des flux et connexions Keep-Alive au démarrage (supprime la lenteur du cold-start <1min)
 async function prewarmXtreamConnections() {
   console.log('[Xtream Pre-Warm] ⚡ Préchauffage automatique des connexions et des caches Edge au démarrage...');
-  const keyStreams = ['13917', '13738', '14003', '13973', '13696', '14167', '14170', '13839', '14020'];
+  const keyStreams = ['13917', '13738', '14003', '13973', '13696', '14167', '14170', '13839', '14020', '481112', '479049', '479050'];
   for (const sId of keyStreams) {
     try {
       const url = `http://${XTREAM_CONFIG.host}:${XTREAM_CONFIG.port}/live/${XTREAM_CONFIG.username}/${XTREAM_CONFIG.password}/${sId}.m3u8`;
@@ -5560,7 +5560,22 @@ const server = http.createServer((req, res) => {
         '180947': '181486',  // Canal+ 360 FHD -> HD (H.264)
         '14156': '14161',   // Canal+ Sport FHD -> HD (H.264)
         '14151': '14167',   // Canal+ France FHD -> HD (H.264)
-        '408065': '408064'  // RMC 1 FHD -> HD (H.264)
+        '408065': '408064', // RMC 1 FHD -> HD (H.264)
+        // Ligue 1+ streams (FHD est HEVC -> bascule automatique en HD H.264 pour navigateurs web)
+        '479051': '479049', // Ligue 1+ UHD -> HD H.264
+        '479050': '479049', // Ligue 1+ FHD (HEVC) -> HD (H.264)
+        '479048': '479047', // Ligue 1+ 2 FHD -> HD (H.264)
+        '479046': '479045', // Ligue 1+ 3 FHD -> HD (H.264)
+        '479044': '479043', // Ligue 1+ 4 FHD -> HD (H.264)
+        '479042': '479041', // Ligue 1+ 5 FHD -> HD (H.264)
+        '479040': '479039', // Ligue 1+ 6 FHD -> HD (H.264)
+        '479038': '479037', // Ligue 1+ 7 FHD -> HD (H.264)
+        '479036': '479035', // Ligue 1+ 8 FHD -> HD (H.264)
+        '479034': '479033', // Ligue 1+ 9 FHD -> HD (H.264)
+        '479032': '479031', // Ligue 1+ 10 FHD -> HD (H.264)
+        // DAZN streams
+        '481112': '481111', // DAZN 1 FR FHD -> HD (H.264)
+        '481109': '481108'  // DAZN 2 FR FHD -> HD (H.264)
       };
 
       const candidates = [];
