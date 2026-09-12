@@ -2988,6 +2988,17 @@ const server = http.createServer((req, res) => {
     return;
   }
 
+  // Redirection HTTPS automatique pour tout accès direct externe en clair (port 8080 ou IP 74.50.66.196)
+  const hostHeader = (req.headers.host || '').toLowerCase();
+  const isLocalInternal = hostHeader.startsWith('127.0.0.1') || hostHeader.startsWith('localhost') || hostHeader.startsWith('[::1]');
+  if (!isLocalInternal && (hostHeader.includes(':8080') || hostHeader.includes('74.50.66.196'))) {
+    res.writeHead(301, {
+      'Location': `https://ziablo.xyz${req.url}`,
+      'Access-Control-Allow-Origin': '*'
+    });
+    return res.end();
+  }
+
   // ── GITHUB DEPLOY WEBHOOK (DÉPLOIEMENT AUTOMATIQUE À CHAQUE GIT PUSH) ──
   if (pathname === '/api/webhook/github' && (req.method === 'POST' || req.method === 'GET')) {
     const WEBHOOK_SECRET = 'ZiablosurYoutubeDeployKey2026';
@@ -5874,11 +5885,31 @@ const server = http.createServer((req, res) => {
     }
 
     // 2. Requête pour la playlist M3U8
+    const startTime = parseFloat(parsedUrl.query.start || parsedUrl.query.time || 0) || 0;
+    const seg0 = path.join(hlsDir, 'seg_0000.ts');
     let session = xtreamHlsSessions.get(String(episodeId));
+
+    // Si le temps de départ a changé (seek au-delà du buffer) ou si la session précédente a crashé sans générer de flux
+    const isDifferentStart = session && Math.abs((session.startTime || 0) - startTime) > 2;
+    const isBrokenSession = session && session.isDone && (!fs.existsSync(playlistPath) || !fs.existsSync(seg0));
+
+    if (isDifferentStart || isBrokenSession) {
+      if (session && session.proc) {
+        try { session.proc.kill('SIGTERM'); } catch (e) {}
+        try { session.proc.kill('SIGKILL'); } catch (e) {}
+      }
+      try {
+        if (fs.existsSync(hlsDir)) {
+          fs.rmSync(hlsDir, { recursive: true, force: true });
+        }
+      } catch (e) {}
+      xtreamHlsSessions.delete(String(episodeId));
+      session = null;
+    }
+
     if (!session) {
       if (!fs.existsSync(hlsDir)) fs.mkdirSync(hlsDir, { recursive: true });
 
-      const startTime = parseFloat(parsedUrl.query.start || parsedUrl.query.time || 0) || 0;
       const ffmpegArgs = [
         '-v', 'warning',
         '-user_agent', 'IPTVSmartersPro/1.0'
@@ -5890,6 +5921,7 @@ const server = http.createServer((req, res) => {
         '-i', initialUrl,
         '-c', 'copy',
         '-sn',
+        '-avoid_negative_ts', 'make_zero',
         '-f', 'hls',
         '-hls_time', '4',
         '-hls_list_size', '0',

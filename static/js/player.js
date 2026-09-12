@@ -1086,6 +1086,10 @@ class NetflixPlayer {
       const epObj = sObj?.episodes?.find(e => parseInt(e.episode_number, 10) === this.currentEpisode) || sObj?.episodes?.[0];
       if (epObj?.still_url) posterImg = epObj.still_url;
     }
+    if (posterImg && posterImg.startsWith('http://')) {
+      const baseUrl = window.API_BASE || '';
+      posterImg = `${baseUrl}/api/proxy-image?url=${encodeURIComponent(posterImg)}`;
+    }
     if (this.backdrop) {
       this.backdrop.style.backgroundImage = posterImg ? `url('${posterImg}')` : 'none';
       this.backdrop.style.display = 'block';
@@ -1410,38 +1414,30 @@ class NetflixPlayer {
     let hasReadied = false;
     const onReady = () => {
       if (hasReadied) return;
-      if (this.video.readyState < 2 && this.video.currentTime <= 0) return;
       hasReadied = true;
       this.setStep(4, 'done', `4. Flux connecté • Lecture fluide 1080p`);
       this.hideLoader();
+      this.hideStatusBanner();
       if (this.backdrop) {
         this.backdrop.classList.add('fade-out');
         setTimeout(() => {
           if (this.backdrop) this.backdrop.style.display = 'none';
-        }, 200);
+        }, 250);
       }
     };
 
-    this.video.addEventListener('loadeddata', () => onReady(), { signal });
-    this.video.addEventListener('canplay', () => onReady(), { signal });
     this.video.addEventListener('playing', () => onReady(), { signal });
     this.video.addEventListener('timeupdate', () => {
       if (this.video.currentTime > 0) onReady();
     }, { signal });
 
-    // Sécurité absolue : masquer le loader après 3.5s max
-    setTimeout(() => {
+    // Avertissement doux si le chargement dépasse 12s, sans jamais masquer prématurément le poster d'attente
+    const slowLoadTimer = setTimeout(() => {
       if (!hasReadied) {
-        hasReadied = true;
-        this.hideLoader();
-        if (this.backdrop) {
-          this.backdrop.classList.add('fade-out');
-          setTimeout(() => {
-            if (this.backdrop) this.backdrop.style.display = 'none';
-          }, 200);
-        }
+        this.showStatusBanner("Le flux met un peu de temps à démarrer. Patientez ou cliquez sur Réessayer.");
       }
-    }, 3500);
+    }, 12000);
+    signal.addEventListener('abort', () => clearTimeout(slowLoadTimer));
 
     const isChannel = !!(this.currentMovie?.media_type === 'channel' || this.currentMovie?.is_live);
 
@@ -1641,21 +1637,33 @@ class NetflixPlayer {
       });
     } else if (this.video.canPlayType('application/vnd.apple.mpegurl')) {
       this.video.src = streamUrl;
+      let startTriggered = false;
       const startPlay = () => {
-        onReady();
+        if (startTriggered) return;
+        startTriggered = true;
         const playPromise = this.video.play();
         if (playPromise !== undefined) {
           playPromise.catch(err => {
-            console.warn('[Player] Autoplay avec son restreint sur Safari, démarrage muet :', err.message);
+            console.warn('[Player] Autoplay avec son restreint sur Safari, tentative démarrage muet :', err.message);
             this.video.muted = true;
             this.syncVolumeUI();
-            this.video.play().catch(() => {});
+            const secondPromise = this.video.play();
+            if (secondPromise !== undefined) {
+              secondPromise.catch(err2 => {
+                console.warn('[Player] Lecture bloquée par Safari, attente interaction utilisateur :', err2.message);
+                this.showStatusBanner("Lecture prête — Touchez l'écran pour démarrer la vidéo");
+                this.updatePlayStateUI(false);
+              });
+            }
           });
         }
       };
       this.video.addEventListener('loadedmetadata', startPlay, { signal, once: true });
       this.video.addEventListener('canplay', startPlay, { signal, once: true });
       this.video.addEventListener('loadeddata', startPlay, { signal, once: true });
+      if (this.video.readyState >= 1) {
+        startPlay();
+      }
     } else {
       this.showStatusBanner("Votre navigateur ne supporte pas la lecture HLS directe.");
     }
@@ -1823,7 +1831,16 @@ class NetflixPlayer {
     }
     if (!total || !isFinite(total)) return;
     const newTime = Math.max(0, Math.min(total, this.video.currentTime + seconds));
-    if (this._isRemuxedMp4 && this._currentDirectVideoUrl) {
+    if (this._currentHlsUrl && this._currentHlsUrl.includes('/api/stream/xtream-series-hls')) {
+      const bufferedEnd = (this.video.buffered && this.video.buffered.length > 0) ? this.video.buffered.end(this.video.buffered.length - 1) : 0;
+      if (newTime > bufferedEnd + 4 || newTime < this.video.currentTime - 30) {
+        const cleanUrl = this._currentHlsUrl.replace(/[?&]start=\d+/g, '');
+        const sep = cleanUrl.includes('?') ? '&' : '?';
+        this.playDirectHls(`${cleanUrl}${sep}start=${Math.floor(newTime)}`);
+      } else {
+        this.video.currentTime = newTime;
+      }
+    } else if (this._isRemuxedMp4 && this._currentDirectVideoUrl) {
       const cleanUrl = this._currentDirectVideoUrl.replace(/&start=\d+/g, '').replace(/\?start=\d+/g, '?');
       const sep = cleanUrl.includes('?') ? '&' : '?';
       this.video.src = `${cleanUrl}${sep}start=${Math.floor(newTime)}`;
