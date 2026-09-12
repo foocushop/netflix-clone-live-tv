@@ -6868,7 +6868,8 @@ const server = http.createServer((req, res) => {
   res.end('404 Not Found');
 });
 
-server.listen(PORT, '0.0.0.0', () => {
+const HOST = process.env.HOST || '127.0.0.1';
+server.listen(PORT, HOST, () => {
   console.log("\n=======================================================");
   console.log("  🍿 ZIFLIX - PRÉVISUALISATION & API REST ACTIVES");
   console.log("=======================================================");
