@@ -48,8 +48,6 @@ async function runSuite() {
 
   const requiredIds = [
     'netflixPlayer', 'playerTopBar', 'playerBackBtn', 'playerTitle', 'playerMeta',
-    'playerLangSwitch', 'playerLangVo', 'playerLangVf',
-    'playerServerWrapper', 'playerServerSelector', 'serverNavPrev', 'serverNavNext',
     'playerEpisodeBox', 'playerSeasonSelect', 'playerEpisodeSelect',
     'playerMediaContainer', 'mainVideo', 'streamIframe', 'centerPlayRipple',
     'playerLoader', 'loaderTitle', 'step1', 'step2', 'step3', 'step4',
@@ -59,7 +57,8 @@ async function runSuite() {
     'ctrlCurrentTime', 'ctrlTotalDuration', 'ctrlMediaTitle',
     'ctrlSpeedBtn', 'speedMenu', 'qualityBadge', 'qualityCurrentText', 'ctrlQualityBtn', 'qualityMenu',
     'ctrlFullscreenBtn', 'iconEnterFs', 'iconExitFs',
-    'playerStatusBanner', 'statusBannerText', 'statusSwitchBtn', 'statusRetryBtn'
+    'playerStatusBanner', 'statusBannerText', 'statusSwitchBtn', 'statusRetryBtn',
+    'playerCommentsDrawer', 'playerCommentsCloseBtn', 'playerDrawerCommentsList', 'playerCommentInput', 'playerCommentSubmitBtn', 'playerReportBugBtn'
   ];
 
   let missingIds = 0;
@@ -72,10 +71,38 @@ async function runSuite() {
   }
   assert(missingIds === 0, `Tous les éléments requis (${requiredIds.length}/${requiredIds.length}) sont présents dans index.html`);
 
+  // --- AUTH : Obtention d'un jeton de session actif ---
+  console.log('\n▶ Authentification préalable auprès de ZIFLIX (admin / 1965)...');
+  const token = await new Promise((resolve, reject) => {
+    const payload = JSON.stringify({ username: 'admin', password: '1965' });
+    const req = http.request('http://127.0.0.1:8080/api/auth/login', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Content-Length': Buffer.byteLength(payload)
+      }
+    }, res => {
+      let b = '';
+      res.on('data', d => b += d);
+      res.on('end', () => {
+        try {
+          const j = JSON.parse(b);
+          resolve(j.token);
+        } catch (e) {
+          resolve(null);
+        }
+      });
+    });
+    req.on('error', () => resolve(null));
+    req.write(payload);
+    req.end();
+  });
+  console.log(`   Session active : ${token ? token.substring(0, 10) + '...' : 'Échec'}`);
+
   // --- TEST 3 : Test du serveur local & Stream Live TV HLS ---
   console.log('\n▶ [3/5] Test réel du streaming Live TV Xtream (M3U8 & Segments TS)...');
   const liveResult = await new Promise((resolve) => {
-    http.get('http://127.0.0.1:8080/api/stream/xtream?stream_id=13847', (res) => {
+    http.get(`http://127.0.0.1:8080/api/stream/xtream?stream_id=13847&auth_token=${token}`, (res) => {
       let data = '';
       res.on('data', chunk => data += chunk);
       res.on('end', () => {
@@ -95,7 +122,10 @@ async function runSuite() {
   // Tester un segment .ts réel
   const chunkMatch = liveResult.body ? liveResult.body.match(/\/api\/stream\/xtream-chunk\?url=([^\r\n]+)/) : null;
   if (chunkMatch) {
-    const chunkRelPath = chunkMatch[0];
+    let chunkRelPath = chunkMatch[0];
+    if (!chunkRelPath.includes('auth_token=')) {
+      chunkRelPath += `&auth_token=${token}`;
+    }
     const chunkResult = await new Promise((resolve) => {
       http.get(`http://127.0.0.1:8080${chunkRelPath}`, (res) => {
         let bytes = 0;
@@ -111,7 +141,7 @@ async function runSuite() {
   // --- TEST 4 : Test réel du streaming Séries VOD (Range 206) ---
   console.log('\n▶ [4/5] Test réel du streaming Séries VOD Xtream (HTTP Range 206)...');
   const vodResult = await new Promise((resolve) => {
-    http.get('http://127.0.0.1:8080/api/stream/xtream-series?episode_id=385622&ext=mkv', {
+    http.get(`http://127.0.0.1:8080/api/stream/xtream-series?episode_id=385622&ext=mkv&auth_token=${token}`, {
       headers: { 'Range': 'bytes=0-1024' }
     }, (res) => {
       let chunks = [];
@@ -135,7 +165,7 @@ async function runSuite() {
   // --- TEST 5 : Intégrité du catalogue et de l'accès aux métadonnées ---
   console.log('\n▶ [5/5] Test de résolution des métadonnées de séries (/api/xtream/series-info)...');
   const seriesInfoResult = await new Promise((resolve) => {
-    http.get('http://127.0.0.1:8080/api/xtream/series-info?series_id=6715', (res) => {
+    http.get(`http://127.0.0.1:8080/api/xtream/series-info?series_id=6715&auth_token=${token}`, (res) => {
       let d = '';
       res.on('data', c => d += c);
       res.on('end', () => {

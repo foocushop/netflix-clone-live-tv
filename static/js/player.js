@@ -174,6 +174,15 @@ class NetflixPlayer {
       this.ctrlFullscreenBtn.addEventListener('click', () => this.toggleFullscreen());
     }
 
+    const syncFullscreenUI = () => {
+      const isFs = !!(document.fullscreenElement || document.webkitFullscreenElement || this.video?.webkitDisplayingFullscreen);
+      if (this.iconEnterFs) this.iconEnterFs.classList.toggle('hidden', isFs);
+      if (this.iconExitFs) this.iconExitFs.classList.toggle('hidden', !isFs);
+    };
+
+    document.addEventListener('fullscreenchange', syncFullscreenUI);
+    document.addEventListener('webkitfullscreenchange', syncFullscreenUI);
+
     // Clic & Double-clic sur la vidéo
     if (this.video) {
       this.video.addEventListener('click', (e) => {
@@ -193,6 +202,51 @@ class NetflixPlayer {
         if (isSeries) {
           this.goToNextEpisode();
         }
+      });
+
+      // Synchronisation plein écran natif iOS Safari
+      this.video.addEventListener('webkitbeginfullscreen', () => {
+        if (this.iconEnterFs) this.iconEnterFs.classList.add('hidden');
+        if (this.iconExitFs) this.iconExitFs.classList.remove('hidden');
+      });
+      this.video.addEventListener('webkitendfullscreen', () => {
+        if (this.iconEnterFs) this.iconEnterFs.classList.remove('hidden');
+        if (this.iconExitFs) this.iconExitFs.classList.add('hidden');
+      });
+
+      // Détection intelligente du buffering & des lags amont
+      let bufferTimeout = null;
+      let slowStreamTimeout = null;
+
+      const clearBufferState = () => {
+        if (bufferTimeout) { clearTimeout(bufferTimeout); bufferTimeout = null; }
+        if (slowStreamTimeout) { clearTimeout(slowStreamTimeout); slowStreamTimeout = null; }
+        this.hideStatusBanner();
+      };
+
+      this.video.addEventListener('waiting', () => {
+        if (bufferTimeout) clearTimeout(bufferTimeout);
+        if (slowStreamTimeout) clearTimeout(slowStreamTimeout);
+
+        bufferTimeout = setTimeout(() => {
+          if (this.video && !this.video.paused) {
+            this.triggerCenterRipple('⏳ Buffer...');
+          }
+        }, 1800);
+
+        slowStreamTimeout = setTimeout(() => {
+          if (this.video && !this.video.paused) {
+            this.showStatusBanner('Flux ralenti. Patientez un instant ou essayez un autre serveur.');
+          }
+        }, 8000);
+      });
+
+      this.video.addEventListener('playing', clearBufferState);
+      this.video.addEventListener('canplay', clearBufferState);
+      this.video.addEventListener('seeked', clearBufferState);
+      this.video.addEventListener('pause', () => {
+        if (bufferTimeout) clearTimeout(bufferTimeout);
+        if (slowStreamTimeout) clearTimeout(slowStreamTimeout);
       });
     }
 
@@ -249,6 +303,13 @@ class NetflixPlayer {
     // Actions Bannière de Statut
     if (this.statusRetryBtn) {
       this.statusRetryBtn.addEventListener('click', () => this.loadStream());
+    }
+    if (this.statusSwitchBtn) {
+      this.statusSwitchBtn.addEventListener('click', () => {
+        this.hideStatusBanner();
+        this.triggerCenterRipple('🔄 Reconnexion...');
+        this.loadStream();
+      });
     }
 
     // Bouton de signalement de bug sur le lecteur
@@ -387,14 +448,19 @@ class NetflixPlayer {
       return (total && isFinite(total) && total > 0) ? total : 0;
     };
 
-    const onScrub = (e) => {
-      const duration = getEffectiveDuration();
-      if (!duration) return;
-      const rect = this.scrubberContainer.getBoundingClientRect();
-      const clientX = e.clientX !== undefined ? e.clientX : (e.touches && e.touches[0] ? e.touches[0].clientX : rect.left);
-      const pos = Math.max(0, Math.min(1, (clientX - rect.left) / rect.width));
-      const targetTime = pos * duration;
-      if (this._isRemuxedMp4 && this._currentDirectVideoUrl) {
+    const applySeek = (targetTime) => {
+      const isChannel = (this.currentMovie?.media_type === 'channel' || this.currentMovie?.is_live);
+      if (isChannel) return;
+      if (this._currentHlsUrl && this._currentHlsUrl.includes('/api/stream/xtream-series-hls')) {
+        const bufferedEnd = (this.video.buffered && this.video.buffered.length > 0) ? this.video.buffered.end(this.video.buffered.length - 1) : 0;
+        if (targetTime > bufferedEnd + 4 || targetTime < this.video.currentTime - 30) {
+          const cleanUrl = this._currentHlsUrl.replace(/[?&]start=\d+/g, '');
+          const sep = cleanUrl.includes('?') ? '&' : '?';
+          this.playDirectHls(`${cleanUrl}${sep}start=${Math.floor(targetTime)}`);
+        } else {
+          this.video.currentTime = targetTime;
+        }
+      } else if (this._isRemuxedMp4 && this._currentDirectVideoUrl) {
         const cleanUrl = this._currentDirectVideoUrl.replace(/&start=\d+/g, '').replace(/\?start=\d+/g, '?');
         const sep = cleanUrl.includes('?') ? '&' : '?';
         this.video.src = `${cleanUrl}${sep}start=${Math.floor(targetTime)}`;
@@ -402,7 +468,23 @@ class NetflixPlayer {
       } else {
         this.video.currentTime = targetTime;
       }
+    };
+
+    const onScrub = (e, commit = true) => {
+      const duration = getEffectiveDuration();
+      if (!duration) return;
+      const rect = this.scrubberContainer.getBoundingClientRect();
+      const clientX = e.clientX !== undefined
+        ? e.clientX
+        : (e.touches && e.touches[0] ? e.touches[0].clientX : (e.changedTouches && e.changedTouches[0] ? e.changedTouches[0].clientX : rect.left));
+      const pos = Math.max(0, Math.min(1, (clientX - rect.left) / rect.width));
+      const targetTime = pos * duration;
+      this._pendingScrubTime = targetTime;
+      if (this.ctrlCurrentTime) this.ctrlCurrentTime.textContent = this.formatTime(targetTime);
       this.updateScrubberProgress(pos * 100);
+      if (commit) {
+        applySeek(targetTime);
+      }
     };
 
     const updateTooltip = (e) => {
@@ -420,7 +502,9 @@ class NetflixPlayer {
       }
       const rect = this.scrubberContainer.getBoundingClientRect();
       if (!rect.width) return;
-      const clientX = e.clientX !== undefined ? e.clientX : (e.touches && e.touches[0] ? e.touches[0].clientX : rect.left);
+      const clientX = e.clientX !== undefined
+        ? e.clientX
+        : (e.touches && e.touches[0] ? e.touches[0].clientX : (e.changedTouches && e.changedTouches[0] ? e.changedTouches[0].clientX : rect.left));
       const offsetX = Math.max(0, Math.min(rect.width, clientX - rect.left));
       const pos = offsetX / rect.width;
       const targetTime = pos * duration;
@@ -444,15 +528,15 @@ class NetflixPlayer {
       }
     });
 
-    // Clic & Glissement (Scrubbing)
+    // Clic & Glissement Souris (Desktop)
     this.scrubberContainer.addEventListener('mousedown', (e) => {
       this.isScrubbing = true;
       this.scrubberContainer.classList.add('dragging');
-      onScrub(e);
+      onScrub(e, false);
       updateTooltip(e);
       const onMouseMove = (ev) => {
         if (this.isScrubbing) {
-          onScrub(ev);
+          onScrub(ev, false);
           updateTooltip(ev);
         }
       };
@@ -460,12 +544,47 @@ class NetflixPlayer {
         this.isScrubbing = false;
         this.scrubberContainer.classList.remove('dragging');
         if (this.scrubberTooltip) this.scrubberTooltip.classList.remove('visible');
+        if (this._pendingScrubTime !== undefined && this._pendingScrubTime !== null) {
+          applySeek(this._pendingScrubTime);
+          this._pendingScrubTime = null;
+        }
         window.removeEventListener('mousemove', onMouseMove);
         window.removeEventListener('mouseup', onMouseUp);
       };
       window.addEventListener('mousemove', onMouseMove);
       window.addEventListener('mouseup', onMouseUp);
     });
+
+    // Touch & Glissement Doigt Tactile (Mobile iPhone, iPad, Android)
+    this.scrubberContainer.addEventListener('touchstart', (e) => {
+      if (e.cancelable) e.preventDefault();
+      this.isScrubbing = true;
+      this.scrubberContainer.classList.add('dragging');
+      onScrub(e, false);
+      updateTooltip(e);
+      const onTouchMove = (ev) => {
+        if (this.isScrubbing) {
+          if (ev.cancelable) ev.preventDefault();
+          onScrub(ev, false);
+          updateTooltip(ev);
+        }
+      };
+      const onTouchEnd = () => {
+        this.isScrubbing = false;
+        this.scrubberContainer.classList.remove('dragging');
+        if (this.scrubberTooltip) this.scrubberTooltip.classList.remove('visible');
+        if (this._pendingScrubTime !== undefined && this._pendingScrubTime !== null) {
+          applySeek(this._pendingScrubTime);
+          this._pendingScrubTime = null;
+        }
+        window.removeEventListener('touchmove', onTouchMove);
+        window.removeEventListener('touchend', onTouchEnd);
+        window.removeEventListener('touchcancel', onTouchEnd);
+      };
+      window.addEventListener('touchmove', onTouchMove, { passive: false });
+      window.addEventListener('touchend', onTouchEnd);
+      window.addEventListener('touchcancel', onTouchEnd);
+    }, { passive: false });
 
     // Progression temps réel allégée (optimisation 60fps : DOM throttlé à 4Hz max)
     let lastTimeUpdate = 0;
@@ -1170,6 +1289,10 @@ class NetflixPlayer {
 
     if (document.fullscreenElement) {
       document.exitFullscreen().catch(() => {});
+    } else if (document.webkitFullscreenElement) {
+      document.webkitExitFullscreen().catch(() => {});
+    } else if (this.video && typeof this.video.webkitExitFullscreen === 'function') {
+      try { this.video.webkitExitFullscreen(); } catch (e) {}
     }
 
     window.isVideoPlaying = false;
@@ -1844,15 +1967,24 @@ class NetflixPlayer {
   }
 
   toggleFullscreen() {
-    if (!document.fullscreenElement) {
-      if (this.overlay.requestFullscreen) {
+    const isFs = !!(document.fullscreenElement || document.webkitFullscreenElement || this.video?.webkitDisplayingFullscreen);
+    if (!isFs) {
+      if (this.overlay && this.overlay.requestFullscreen) {
         this.overlay.requestFullscreen().catch(() => {});
+      } else if (this.overlay && this.overlay.webkitRequestFullscreen) {
+        this.overlay.webkitRequestFullscreen();
+      } else if (this.video && typeof this.video.webkitEnterFullscreen === 'function') {
+        this.video.webkitEnterFullscreen();
       }
       if (this.iconEnterFs) this.iconEnterFs.classList.add('hidden');
       if (this.iconExitFs) this.iconExitFs.classList.remove('hidden');
     } else {
       if (document.exitFullscreen) {
         document.exitFullscreen().catch(() => {});
+      } else if (document.webkitExitFullscreen) {
+        document.webkitExitFullscreen().catch(() => {});
+      } else if (this.video && typeof this.video.webkitExitFullscreen === 'function') {
+        this.video.webkitExitFullscreen();
       }
       if (this.iconEnterFs) this.iconEnterFs.classList.remove('hidden');
       if (this.iconExitFs) this.iconExitFs.classList.add('hidden');

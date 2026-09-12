@@ -747,36 +747,36 @@ const XTREAM_STREAM_FALLBACKS = {
 };
 
 // Agents HTTP/HTTPS persistants avec réutilisation de sockets (Keep-Alive Pool)
-// keepAliveMsecs réglé à 4s pour concorder avec les timeouts des reverse-proxies Nginx IPTV
+// Optimisé pour supporter plus de 200 utilisateurs simultanés sans latence de queue
 const xtreamHttpAgent = new http.Agent({
   keepAlive: true,
-  maxSockets: 30,
-  maxFreeSockets: 5,
-  keepAliveMsecs: 4000,
-  timeout: 12000
+  maxSockets: 250,
+  maxFreeSockets: 50,
+  keepAliveMsecs: 6000,
+  timeout: 15000
 });
 
 const xtreamHttpsAgent = new https.Agent({
   keepAlive: true,
-  maxSockets: 30,
-  maxFreeSockets: 5,
-  keepAliveMsecs: 4000,
-  timeout: 12000
+  maxSockets: 250,
+  maxFreeSockets: 50,
+  keepAliveMsecs: 6000,
+  timeout: 15000
 });
 
 // Agents dédiés au streaming VOD Séries Xtream (Range requests volumineuses, tolérance aux coupures)
 const xtreamSeriesHttpAgent = new http.Agent({
   keepAlive: true,
-  maxSockets: 100,
-  maxFreeSockets: 25,
+  maxSockets: 250,
+  maxFreeSockets: 50,
   keepAliveMsecs: 10000,
   timeout: 30000
 });
 
 const xtreamSeriesHttpsAgent = new https.Agent({
   keepAlive: true,
-  maxSockets: 100,
-  maxFreeSockets: 25,
+  maxSockets: 250,
+  maxFreeSockets: 50,
   keepAliveMsecs: 10000,
   timeout: 30000
 });
@@ -793,9 +793,9 @@ try {
 
 const xtreamSocksAgent = SocksProxyAgent ? new SocksProxyAgent('socks5h://127.0.0.1:40000', {
   keepAlive: true,
-  maxSockets: 50,
-  maxFreeSockets: 10,
-  timeout: 10000
+  maxSockets: 250,
+  maxFreeSockets: 50,
+  timeout: 15000
 }) : null;
 
 function getXtreamAgent(urlStr, isSeries = false) {
@@ -868,6 +868,8 @@ process.on('exit', () => {
     } catch (e) {}
   }
 });
+process.on('SIGTERM', () => process.exit(0));
+process.on('SIGINT', () => process.exit(0));
 
 // Préchauffage automatique des flux et connexions Keep-Alive au démarrage (supprime la lenteur du cold-start <1min)
 async function prewarmXtreamConnections() {
@@ -2763,9 +2765,21 @@ function getAuthUser(req) {
 
 function authenticateXtreamClient(username, password) {
   loadXtreamUsers();
-  const u = String(username || '').trim();
+  const u = String(username || '').trim().toLowerCase();
   const p = String(password || '').trim();
-  return XTREAM_USERS.find(user => user.username === u && user.password === p && user.status === 'Active');
+  return XTREAM_USERS.find(user => (user.username || '').trim().toLowerCase() === u && user.password === p && user.status === 'Active');
+}
+
+function getRequestAuth(req, parsedUrl) {
+  if (req.isXtreamAuthenticated) {
+    return { username: req.xtreamUser?.username || 'xtream_client', role: 'xtream' };
+  }
+  const q = parsedUrl?.query;
+  if (q && q.username && q.password) {
+    const xu = authenticateXtreamClient(q.username, q.password);
+    if (xu) return { username: xu.username, role: 'xtream' };
+  }
+  return getAuthUser(req);
 }
 
 async function handlePlayerApi(req, res, q) {
@@ -3019,10 +3033,22 @@ const server = http.createServer((req, res) => {
     return;
   }
 
-  // Redirection HTTPS automatique pour tout accès direct externe en clair (port 8080 ou IP 74.50.66.196)
+  // Redirection HTTPS automatique pour les navigateurs Web accédant directement en clair (port 8080 ou IP 74.50.66.196)
+  // Exception absolue pour TOUS les flux et endpoints IPTV Xtream Codes (Televizio, TiviMate, Smart TV, VLC, etc.)
   const hostHeader = (req.headers.host || '').toLowerCase();
   const isLocalInternal = hostHeader.startsWith('127.0.0.1') || hostHeader.startsWith('localhost') || hostHeader.startsWith('[::1]');
-  if (!isLocalInternal && (hostHeader.includes(':8080') || hostHeader.includes('74.50.66.196'))) {
+  const isIptvPath = pathname === '/player_api.php' ||
+                     pathname.startsWith('/live/') ||
+                     pathname.startsWith('/series/') ||
+                     pathname.startsWith('/movie/') ||
+                     pathname === '/get.php' ||
+                     pathname === '/xmltv.php' ||
+                     pathname === '/epg.php' ||
+                     pathname.startsWith('/api/stream/');
+  const ua = (req.headers['user-agent'] || '').toLowerCase();
+  const isIptvClient = ua.includes('televizio') || ua.includes('exoplayer') || ua.includes('tivimate') || ua.includes('smarters') || ua.includes('vlc') || ua.includes('kodi') || ua.includes('okhttp');
+
+  if (!isLocalInternal && !isIptvPath && !isIptvClient && (hostHeader.includes(':8080') || hostHeader.includes('74.50.66.196'))) {
     res.writeHead(301, {
       'Location': `https://ziablo.xyz${req.url}`,
       'Access-Control-Allow-Origin': '*'
@@ -3118,10 +3144,14 @@ const server = http.createServer((req, res) => {
       const pass = parts[2];
       const fileWithExt = parts[3];
 
-      if (!authenticateXtreamClient(user, pass)) {
+      const xtreamUser = authenticateXtreamClient(user, pass);
+      if (!xtreamUser) {
         res.writeHead(403, { 'Content-Type': 'text/plain; charset=utf-8', 'Access-Control-Allow-Origin': '*' });
         return res.end('Accès refusé : Identifiants Xtream incorrects');
       }
+
+      req.isXtreamAuthenticated = true;
+      req.xtreamUser = xtreamUser;
 
       if (type === 'live') {
         const streamId = fileWithExt.replace(/\.(m3u8|ts)$/i, '');
@@ -4106,7 +4136,6 @@ const server = http.createServer((req, res) => {
       });
       return;
     }
-  }
 
   if (pathname === '/api/admin/stats' && req.method === 'GET') {
     const hero = catalog.movies.find(m => m.is_hero);
@@ -4726,6 +4755,7 @@ const server = http.createServer((req, res) => {
     }
     return;
   }
+}
 
   // ================= ROUTE EXTRACTION DIRECTE HLS (/api/extract) =================
   if (pathname === '/api/extract' && req.method === 'GET') {
@@ -5010,7 +5040,7 @@ const server = http.createServer((req, res) => {
 
   // ================= ROUTE DIRECT LIVE STREAM HLS PROXY (/api/stream/live) =================
   if (pathname === '/api/stream/live' && req.method === 'GET') {
-    const authUser = getAuthUser(req);
+    const authUser = getRequestAuth(req, parsedUrl);
     if (!authUser || authUser.is_banned) {
       res.writeHead(401, { 'Content-Type': 'text/plain; charset=utf-8', 'Access-Control-Allow-Origin': '*' });
       return res.end('Accès refusé : Authentification ZIFLIX requise');
@@ -5450,7 +5480,7 @@ const server = http.createServer((req, res) => {
   // 4. Réécriture dynamique des segments HLS (.ts) vers le proxy local /api/stream/xtream-chunk
   // 5. Élimination des erreurs Mixed-Content (HTTP -> HTTPS) et contournement CORS total
   if (pathname === '/api/stream/xtream' && req.method === 'GET') {
-    const authUser = getAuthUser(req);
+    const authUser = getRequestAuth(req, parsedUrl);
     if (!authUser || authUser.is_banned) {
       res.writeHead(401, { 'Content-Type': 'text/plain; charset=utf-8', 'Access-Control-Allow-Origin': '*' });
       return res.end('Accès refusé : Session ZIFLIX requise');
@@ -5708,8 +5738,9 @@ const server = http.createServer((req, res) => {
         return;
       }
 
-      const client = parsed.protocol === 'https:' ? https : http;
-      const agent = parsed.protocol === 'https:' ? xtreamHttpsAgent : xtreamHttpAgent;
+      const isFoxBleu = urlToFetch.includes(XTREAM_CONFIG.host) || urlToFetch.includes('foxbleu.org');
+      const client = isFoxBleu && xtreamSocksAgent ? http : (parsed.protocol === 'https:' ? https : http);
+      const agent = getXtreamAgent(urlToFetch);
       let isAborted = false;
       let activeChunkRes = null;
 
@@ -5837,7 +5868,7 @@ const server = http.createServer((req, res) => {
   // Remuxage ultra-performant à la volée MKV -> HLS (.m3u8 + segments MPEG-TS)
   // Résout définitivement l'incompatibilité Safari / iOS (black screen sur MKV ou MP4 chunked)
   if (pathname.startsWith('/api/stream/xtream-series-hls') && (req.method === 'GET' || req.method === 'HEAD')) {
-    const authUser = getAuthUser(req);
+    const authUser = getRequestAuth(req, parsedUrl);
     if (!authUser || authUser.is_banned) {
       res.writeHead(401, { 'Content-Type': 'text/plain; charset=utf-8', 'Access-Control-Allow-Origin': '*' });
       return res.end('Accès refusé : Session ZIFLIX requise');
@@ -5862,7 +5893,8 @@ const server = http.createServer((req, res) => {
     const cacheKey = `${episodeId}_${ext}`;
     const originUrl = `http://${XTREAM_CONFIG.host}:${XTREAM_CONFIG.port}/series/${XTREAM_CONFIG.username}/${XTREAM_CONFIG.password}/${episodeId}.${ext}`;
     const cachedEdge = xtreamSeriesEdgeCache.get(cacheKey);
-    const initialUrl = (cachedEdge && cachedEdge.expiresAt > Date.now()) ? cachedEdge.url : originUrl;
+    const hasCachedEdge = !!(cachedEdge && cachedEdge.expiresAt > Date.now());
+    const initialUrl = hasCachedEdge ? cachedEdge.url : originUrl;
 
     const hlsDir = path.join('/tmp', 'ziflix_hls', String(episodeId));
     const playlistPath = path.join(hlsDir, 'playlist.m3u8');
@@ -6087,7 +6119,7 @@ const server = http.createServer((req, res) => {
   // Support complet des requêtes HTTP Range (206 Partial Content), mise en cache Edge 0ms,
   // pool Keep-Alive persistant et débit maximal anti-buffering
   if (pathname === '/api/stream/xtream-series' && (req.method === 'GET' || req.method === 'HEAD')) {
-    const authUser = getAuthUser(req);
+    const authUser = getRequestAuth(req, parsedUrl);
     if (!authUser || authUser.is_banned) {
       res.writeHead(401, { 'Content-Type': 'text/plain; charset=utf-8', 'Access-Control-Allow-Origin': '*' });
       return res.end('Accès refusé : Session ZIFLIX requise');
@@ -6613,7 +6645,7 @@ const server = http.createServer((req, res) => {
 
   // ================= ROUTE STREAMING DÉDIÉE (/api/stream/:id) =================
   if (pathname.startsWith('/api/stream/') && req.method === 'GET') {
-    const authUser = getAuthUser(req);
+    const authUser = getRequestAuth(req, parsedUrl);
     if (!authUser || authUser.is_banned) {
       res.writeHead(401, { 'Content-Type': 'text/plain; charset=utf-8', 'Access-Control-Allow-Origin': '*' });
       return res.end('Accès refusé : Session ZIFLIX requise');

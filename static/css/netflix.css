@@ -4263,6 +4263,8 @@ button:focus-visible {
   border-radius: 14px;
   width: 100%;
   max-width: 520px;
+  max-height: calc(100dvh - 32px);
+  max-height: 92vh;
   box-shadow: 0 25px 60px rgba(0, 0, 0, 0.8), 0 0 30px rgba(229, 9, 20, 0.15);
   overflow: hidden;
   display: flex;
@@ -4277,6 +4279,7 @@ button:focus-visible {
   align-items: flex-start;
   justify-content: space-between;
   gap: 12px;
+  flex-shrink: 0;
 }
 
 .bug-modal-title-group {
@@ -4325,6 +4328,9 @@ button:focus-visible {
   display: flex;
   flex-direction: column;
   gap: 16px;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior: contain;
 }
 
 .bug-context-box {
@@ -4456,5 +4462,31 @@ button:focus-visible {
   gap: 10px;
   margin-top: 4px;
 }
+
+@media (max-width: 480px) {
+  .bug-modal-backdrop {
+    padding: 0 !important;
+    align-items: flex-end !important;
+  }
+  .bug-modal-card {
+    max-height: 90dvh !important;
+    max-height: 90vh !important;
+    border-radius: 18px 18px 0 0 !important;
+    padding-bottom: calc(16px + env(safe-area-inset-bottom, 0px)) !important;
+    animation: modalSlideUp 0.28s cubic-bezier(0.16, 1, 0.3, 1) !important;
+  }
+  .bug-modal-header {
+    padding: 14px 16px !important;
+  }
+  .bug-modal-form {
+    padding: 14px 16px !important;
+    gap: 12px !important;
+  }
+  .bug-categories-grid {
+    grid-template-columns: 1fr !important;
+    gap: 6px !important;
+  }
+}
+
 
 
