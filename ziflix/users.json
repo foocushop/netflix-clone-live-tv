@@ -185,5 +185,16 @@
     "banned": false,
     "created_at": "2026-09-12T17:22:31.742Z",
     "last_login": "2026-09-12T17:22:31.742Z"
+  },
+  {
+    "id": "u_1789233943172_87adf613",
+    "username": "Marynelle",
+    "password_hash": "dc4065e4f83adbb50096afd0b284a591168ba17c1a29eae8e93bbafc6456914f57f378c912068e90d024b150c4543e51c49a70f10cbfc39cdb953343e1edd9e6",
+    "salt": "d2ccf03e1202299d0db1258ed717e5e0",
+    "avatar": "assets/avatars/avatar-1.svg",
+    "role": "user",
+    "banned": false,
+    "created_at": "2026-09-12T17:25:43.173Z",
+    "last_login": "2026-09-12T17:25:43.173Z"
   }
 ]
