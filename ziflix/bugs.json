@@ -1,5 +1,24 @@
 [
   {
+    "id": "bug_1789243089105_bda05a",
+    "user_id": "u_1789239615427_7fe79462",
+    "username": "asoumare2003@gmail.com",
+    "avatar": "assets/avatars/avatar-1.svg",
+    "category": "episode",
+    "title": "Signalement problème",
+    "description": "",
+    "media_id": "",
+    "media_title": "",
+    "season": null,
+    "episode": null,
+    "episode_id": null,
+    "device_info": "PC Windows • Chrome",
+    "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36 Edg/152.0.0.0",
+    "url": "https://ziablo.xyz/",
+    "status": "open",
+    "created_at": "2026-09-12T19:58:09.105Z"
+  },
+  {
     "id": "bug_1789234177737_e2579e",
     "user_id": "u_1789233751742_12454dfa",
     "username": "oklex",
