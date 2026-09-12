@@ -10,7 +10,7 @@ const cmds = [
   'node --check static/js/app.js',
   'node --check static/js/player.js',
   'node --check static/js/admin.js',
-  'pm2 reload netflix-clone --update-env',
+  'pm2 reload netflix-clone --force --update-env',
   'sleep 2',
   'pm2 status',
   'echo "--- HEALTH CHECK ---"',
