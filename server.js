@@ -5893,11 +5893,12 @@ const server = http.createServer((req, res) => {
         '-f', 'hls',
         '-hls_time', '4',
         '-hls_list_size', '0',
+        '-hls_playlist_type', 'event',
         '-hls_segment_filename', path.join(hlsDir, 'seg_%04d.ts'),
         playlistPath
       );
 
-      const proc = spawn('ffmpeg', ffmpegArgs, { stdio: ['ignore', 'pipe', 'pipe'] });
+      const proc = spawn('ffmpeg', ffmpegArgs, { stdio: 'ignore' });
       session = {
         proc,
         hlsDir,
@@ -5947,6 +5948,12 @@ const server = http.createServer((req, res) => {
       if (checkReady()) {
         clearInterval(waitTimer);
         sendPlaylist();
+      } else if (session.isDone && !fs.existsSync(playlistPath)) {
+        clearInterval(waitTimer);
+        if (!res.headersSent) {
+          res.writeHead(502, { 'Content-Type': 'text/plain; charset=utf-8', 'Access-Control-Allow-Origin': '*' });
+          res.end('Échec de la génération du flux HLS (flux source inaccessible)');
+        }
       } else if (waited >= maxWait) {
         clearInterval(waitTimer);
         if (!res.headersSent) {

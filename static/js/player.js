@@ -394,16 +394,7 @@ class NetflixPlayer {
       const clientX = e.clientX !== undefined ? e.clientX : (e.touches && e.touches[0] ? e.touches[0].clientX : rect.left);
       const pos = Math.max(0, Math.min(1, (clientX - rect.left) / rect.width));
       const targetTime = pos * duration;
-      if (this._currentHlsUrl && this._currentHlsUrl.includes('/api/stream/xtream-series-hls')) {
-        const bufferedEnd = (this.video.buffered && this.video.buffered.length > 0) ? this.video.buffered.end(this.video.buffered.length - 1) : 0;
-        if (targetTime > bufferedEnd + 4) {
-          const cleanUrl = this._currentHlsUrl.replace(/[?&]start=\d+/g, '');
-          const sep = cleanUrl.includes('?') ? '&' : '?';
-          this.playDirectHls(`${cleanUrl}${sep}start=${Math.floor(targetTime)}`);
-        } else {
-          this.video.currentTime = targetTime;
-        }
-      } else if (this._isRemuxedMp4 && this._currentDirectVideoUrl) {
+      if (this._isRemuxedMp4 && this._currentDirectVideoUrl) {
         const cleanUrl = this._currentDirectVideoUrl.replace(/&start=\d+/g, '').replace(/\?start=\d+/g, '?');
         const sep = cleanUrl.includes('?') ? '&' : '?';
         this.video.src = `${cleanUrl}${sep}start=${Math.floor(targetTime)}`;
