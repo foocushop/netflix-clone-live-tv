@@ -6,8 +6,8 @@
   <title>ZIFLIX - Streaming & Télévision en Direct</title>
   <link rel="icon" type="image/svg+xml" href="assets/logos/ziflix-icon.svg">
   <link rel="preload" href="assets/logos/ziflix-logo.svg?v=4" as="image" type="image/svg+xml">
-  <link rel="stylesheet" href="css/netflix.css?v=7">
-  <link rel="stylesheet" href="css/admin.css?v=7">
+  <link rel="stylesheet" href="css/netflix.css?v=8">
+  <link rel="stylesheet" href="css/admin.css?v=8">
   <!-- Critical Zero-FOUC & Splash early styles -->
   <style>
     .auth-gate-backdrop.hidden { display: none !important; }
@@ -326,27 +326,23 @@
         allow="autoplay; encrypted-media; picture-in-picture">
       </iframe>
 
-      <!-- Spinner & Timeline d'extraction progressive FetchV -->
+      <!-- Indicateur de Chargement & Buffering Cinématique ZIFLIX -->
       <div class="player-loader hidden" id="playerLoader">
-        <div class="netflix-spinner"></div>
-        <div class="loader-title" id="loaderTitle">Extraction du flux en cours...</div>
-        <div class="loader-steps" id="loaderSteps">
-          <div class="step-item" id="step1">
-            <span class="step-icon">🔍</span>
-            <span class="step-label" id="step1Label">1. Recherche de la source et des métadonnées</span>
+        <div class="player-loader-content">
+          <div class="player-loader-glow"></div>
+          <img src="assets/logos/ziflix-logo.svg?v=4" alt="ZIFLIX" class="player-loader-logo" width="150" height="48" decoding="async">
+          <div class="player-loader-bar">
+            <div class="player-loader-shimmer"></div>
           </div>
-          <div class="step-item" id="step2">
-            <span class="step-icon">⚡</span>
-            <span class="step-label" id="step2Label">2. Récupération des flux chiffrés</span>
-          </div>
-          <div class="step-item" id="step3">
-            <span class="step-icon">🔓</span>
-            <span class="step-label" id="step3Label">3. Déchiffrement WebAssembly ChaCha20 & Jeton IP</span>
-          </div>
-          <div class="step-item" id="step4">
-            <span class="step-icon">🎬</span>
-            <span class="step-label" id="step4Label">4. Initialisation du flux Ultra HD dans le lecteur ZIFLIX</span>
-          </div>
+          <div class="player-loader-status" id="loaderTitle">Connexion au flux...</div>
+        </div>
+
+        <!-- Anciennes étapes conservées masquées pour compatibilité JS -->
+        <div class="loader-steps hidden" id="loaderSteps" style="display:none !important;">
+          <div class="step-item" id="step1"><span class="step-label" id="step1Label"></span></div>
+          <div class="step-item" id="step2"><span class="step-label" id="step2Label"></span></div>
+          <div class="step-item" id="step3"><span class="step-label" id="step3Label"></span></div>
+          <div class="step-item" id="step4"><span class="step-label" id="step4Label"></span></div>
         </div>
       </div>
 
@@ -1338,8 +1334,8 @@
 
   <!-- Scripts -->
   <script src="js/hls.min.js"></script>
-  <script src="js/player.js?v=7"></script>
-  <script src="js/admin.js?v=7"></script>
-  <script src="js/app.js?v=7"></script>
+  <script src="js/player.js?v=8"></script>
+  <script src="js/admin.js?v=8"></script>
+  <script src="js/app.js?v=8"></script>
 </body>
 </html>

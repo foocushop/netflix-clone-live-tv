@@ -236,20 +236,16 @@ class NetflixPlayer {
       let slowStreamTimeout = null;
 
       const clearBufferState = () => {
+        this.showBuffering(false);
         if (bufferTimeout) { clearTimeout(bufferTimeout); bufferTimeout = null; }
         if (slowStreamTimeout) { clearTimeout(slowStreamTimeout); slowStreamTimeout = null; }
         this.hideStatusBanner();
       };
 
       this.video.addEventListener('waiting', () => {
+        this.showBuffering(true, 'Mise en mémoire tampon...');
         if (bufferTimeout) clearTimeout(bufferTimeout);
         if (slowStreamTimeout) clearTimeout(slowStreamTimeout);
-
-        bufferTimeout = setTimeout(() => {
-          if (this.video && !this.video.paused) {
-            this.triggerCenterRipple('⏳ Buffer...');
-          }
-        }, 1800);
 
         slowStreamTimeout = setTimeout(() => {
           if (this.video && !this.video.paused) {
@@ -258,12 +254,17 @@ class NetflixPlayer {
         }, 8000);
       });
 
+      this.video.addEventListener('seeking', () => {
+        this.showBuffering(true, 'Chargement...');
+      });
+
       this.video.addEventListener('playing', clearBufferState);
       this.video.addEventListener('canplay', clearBufferState);
       this.video.addEventListener('seeked', clearBufferState);
       this.video.addEventListener('pause', () => {
         if (bufferTimeout) clearTimeout(bufferTimeout);
         if (slowStreamTimeout) clearTimeout(slowStreamTimeout);
+        this.showBuffering(false);
       });
     }
 
@@ -472,6 +473,8 @@ class NetflixPlayer {
       const isChannel = (this.currentMovie?.media_type === 'channel' || this.currentMovie?.is_live);
       if (isChannel) return;
       if (!this.video || !isFinite(targetTime) || targetTime < 0) return;
+
+      this.showBuffering(true, 'Chargement...');
 
       if (this._currentHlsUrl && this._currentHlsUrl.includes('/api/stream/xtream-series-hls')) {
         const offset = this._hlsStreamOffset || 0;
@@ -2051,14 +2054,52 @@ class NetflixPlayer {
   }
 
   showLoader(titleText = null) {
+    if (this._bufferTimer) {
+      clearTimeout(this._bufferTimer);
+      this._bufferTimer = null;
+    }
     if (this.loader) {
-      if (titleText && this.loaderTitle) this.loaderTitle.textContent = titleText;
-      this.loader.classList.remove('hidden');
+      if (this.loaderTitle) {
+        let cleanText = titleText || 'Connexion au flux...';
+        cleanText = cleanText.replace(/^[⚡🔍🔓🎬💎🍿]\s*/, '');
+        this.loaderTitle.textContent = cleanText;
+      }
+      this.loader.classList.remove('hidden', 'fade-out', 'buffering-mode');
     }
   }
 
   hideLoader() {
-    if (this.loader) this.loader.classList.add('hidden');
+    if (this._bufferTimer) {
+      clearTimeout(this._bufferTimer);
+      this._bufferTimer = null;
+    }
+    if (this.loader && !this.loader.classList.contains('hidden')) {
+      this.loader.classList.add('fade-out');
+      setTimeout(() => {
+        if (this.loader && this.loader.classList.contains('fade-out')) {
+          this.loader.classList.add('hidden');
+          this.loader.classList.remove('fade-out', 'buffering-mode');
+        }
+      }, 250);
+    }
+  }
+
+  showBuffering(show, text = 'Chargement...') {
+    if (this._bufferTimer) {
+      clearTimeout(this._bufferTimer);
+      this._bufferTimer = null;
+    }
+    if (show) {
+      this._bufferTimer = setTimeout(() => {
+        if (this.loader) {
+          if (this.loaderTitle) this.loaderTitle.textContent = text;
+          this.loader.classList.remove('hidden', 'fade-out');
+          this.loader.classList.add('buffering-mode');
+        }
+      }, 100);
+    } else {
+      this.hideLoader();
+    }
   }
 
   setStep(stepNum, status, labelText = null) {
