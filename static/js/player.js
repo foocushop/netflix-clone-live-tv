@@ -131,6 +131,7 @@ class NetflixPlayer {
     this.isScrubbing = false;
     this._isRemuxedMp4 = false;
     this._currentDirectVideoUrl = '';
+    this._hlsStreamOffset = 0;
 
     // Initialisation
     this.initEvents();
@@ -142,6 +143,17 @@ class NetflixPlayer {
     this.initServerNavEvents();
     this.initEpisodeSelectEvents();
     this.initInactivityTimer();
+  }
+
+  // Horloge unifiée : réconcilie le currentTime relatif (Safari/iOS) avec le point de départ HLS réel
+  getCurrentPlaybackTime() {
+    if (!this.video) return 0;
+    const rawCurrent = this.video.currentTime || 0;
+    const offset = this._hlsStreamOffset || 0;
+    if (offset > 0 && rawCurrent < offset - 10) {
+      return rawCurrent + offset;
+    }
+    return rawCurrent;
   }
 
   // ================= 1. INITIALISATION DES ÉVÉNEMENTS =================
@@ -454,20 +466,25 @@ class NetflixPlayer {
       }
       return (total && isFinite(total) && total > 0) ? total : 0;
     };
+    this.getEffectiveDuration = getEffectiveDuration;
 
-    const applySeek = (targetTime) => {
+    this.applySeek = (targetTime) => {
       const isChannel = (this.currentMovie?.media_type === 'channel' || this.currentMovie?.is_live);
       if (isChannel) return;
       if (!this.video || !isFinite(targetTime) || targetTime < 0) return;
 
       if (this._currentHlsUrl && this._currentHlsUrl.includes('/api/stream/xtream-series-hls')) {
-        const maxSeekable = (this.video.seekable && this.video.seekable.length > 0)
-          ? this.video.seekable.end(this.video.seekable.length - 1)
-          : 0;
+        const offset = this._hlsStreamOffset || 0;
+        const isZeroBased = (offset > 0 && (this.video.currentTime || 0) < offset - 10);
+        const relativeTarget = isZeroBased ? (targetTime - offset) : targetTime;
 
-        // Si la durée demandée dépasse très largement ce qui a été généré sur le serveur (> 90s au-delà)
-        // et que la playlist n'est pas encore complète, on demande au serveur de démarrer FFmpeg à ce point
-        if (maxSeekable > 0 && targetTime > maxSeekable + 90) {
+        let maxSeekable = 0;
+        if (this.video.seekable && this.video.seekable.length > 0) {
+          maxSeekable = this.video.seekable.end(this.video.seekable.length - 1);
+        }
+
+        // Si le point demandé précède le début du flux actuel ou dépasse largement le seekable actuel
+        if ((offset > 0 && targetTime < offset) || (maxSeekable > 0 && relativeTarget > maxSeekable + 90)) {
           const cleanUrl = this._currentHlsUrl.replace(/[?&]start=\d+/g, '');
           const sep = cleanUrl.includes('?') ? '&' : '?';
           this.playDirectHls(`${cleanUrl}${sep}start=${Math.floor(targetTime)}`);
@@ -475,7 +492,8 @@ class NetflixPlayer {
         }
 
         // Sinon, seek natif instantané ultra-fluide dans la playlist existante
-        this.video.currentTime = targetTime;
+        const inStreamSeek = Math.max(0, relativeTarget);
+        this.video.currentTime = inStreamSeek;
         if (this.video.paused) {
           this.video.play().catch(() => {});
         }
@@ -491,6 +509,7 @@ class NetflixPlayer {
         }
       }
     };
+    const applySeek = this.applySeek;
 
     const onScrub = (e, commit = true) => {
       const duration = getEffectiveDuration();
@@ -624,7 +643,7 @@ class NetflixPlayer {
         return;
       }
 
-      const current = this.video.currentTime || 0;
+      const current = this.getCurrentPlaybackTime();
       let total = this.video.duration;
       if (this.currentEpisodeDuration > 0 && (!total || isNaN(total) || total === Infinity || (this._currentHlsUrl && total < this.currentEpisodeDuration))) {
         total = this.currentEpisodeDuration;
@@ -688,6 +707,8 @@ class NetflixPlayer {
     }
     if (!total || total <= 0) return;
 
+    const offset = this._hlsStreamOffset || 0;
+    const isZeroBased = (offset > 0 && (this.video.currentTime || 0) < offset - 10);
     const cur = this.video.currentTime || 0;
     let bufferedEnd = 0;
 
@@ -704,7 +725,8 @@ class NetflixPlayer {
       }
     }
 
-    const percent = Math.min(100, Math.max(0, (bufferedEnd / total) * 100));
+    const effectiveBufferedEnd = isZeroBased ? (bufferedEnd + offset) : bufferedEnd;
+    const percent = Math.min(100, Math.max(0, (effectiveBufferedEnd / total) * 100));
     this.scrubberBuffered.style.width = `${percent}%`;
   }
 
@@ -1392,11 +1414,12 @@ class NetflixPlayer {
       const browserCanPlayHevc = (this.video.canPlayType('video/mp4; codecs="hvc1.1.6.L93.B0"') === 'probably' ||
                                   this.video.canPlayType('video/mp4; codecs="hev1.1.6.L93.B0"') === 'probably');
 
-      // Détection Safari / iOS : Matroska (.mkv) incompatible -> Moteur HLS natif
+      // Détection Mobile (Android & iOS) / Safari : Moteur HLS natif
+      const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
       const isApple = /iPad|iPhone|iPod/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
       const isSafari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent) || isApple || (navigator.platform === 'MacIntel' && !/Chrome|CriOS/i.test(navigator.userAgent));
       const canPlayMkv = (this.video.canPlayType('video/x-matroska') !== '' || this.video.canPlayType('video/mkv') !== '');
-      const needsHls = (!canPlayMkv || isSafari || isApple);
+      const needsHls = (isMobile || !canPlayMkv || isSafari || isApple);
 
       if (epObj && epStreamUrl && (!isHevc || browserCanPlayHevc)) {
         this.currentSeason = parseInt(sObj.season_number, 10);
@@ -1538,6 +1561,8 @@ class NetflixPlayer {
       streamUrl = `${streamUrl}${sep}auth_token=${encodeURIComponent(authToken)}`;
     }
     this._currentHlsUrl = streamUrl;
+    const startMatch = streamUrl.match(/[?&]start=(\d+)/);
+    this._hlsStreamOffset = startMatch ? parseInt(startMatch[1], 10) : 0;
 
     this.cleanupActivePlayback();
     this.streamAbortController = new AbortController();
@@ -1817,13 +1842,14 @@ class NetflixPlayer {
       videoUrl = `${videoUrl}${sep}auth_token=${encodeURIComponent(authToken)}`;
     }
 
-    // Détection Apple (iOS / Safari WebKit) & appareils sans support MKV natif
+    // Détection Mobile (Android & iOS) & appareils sans support MKV natif
+    const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
     const isApple = /iPad|iPhone|iPod/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
     const isSafari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent) || isApple || (navigator.platform === 'MacIntel' && !/Chrome|CriOS/i.test(navigator.userAgent));
     const canPlayMkv = (this.video.canPlayType('video/x-matroska') !== '' || this.video.canPlayType('video/mkv') !== '');
 
-    // Safari, iOS ou navigateurs sans support MKV natif : basculement direct et transparent vers le moteur HLS
-    if ((!canPlayMkv || isSafari || isApple) && videoUrl.includes('/api/stream/xtream-series')) {
+    // Mobile (Android / iOS), Safari ou navigateurs sans support MKV : basculement direct et transparent vers le moteur HLS
+    if ((isMobile || !canPlayMkv || isSafari || isApple) && videoUrl.includes('/api/stream/xtream-series')) {
       const epMatch = videoUrl.match(/episode_id=([^&]+)/);
       if (epMatch && epMatch[1]) {
         const epId = epMatch[1];
@@ -1974,15 +2000,15 @@ class NetflixPlayer {
   }
 
   seekRelative(seconds) {
-    let total = this.video.duration;
-    if (this.currentEpisodeDuration > 0 && (!total || isNaN(total) || total === Infinity || (this._currentHlsUrl && total < this.currentEpisodeDuration))) {
-      total = this.currentEpisodeDuration;
-    } else if (!total || isNaN(total) || total === Infinity) {
-      total = this.currentEpisodeDuration || 0;
-    }
+    const isChannel = (this.currentMovie?.media_type === 'channel' || this.currentMovie?.is_live);
+    if (isChannel) return;
+    let total = typeof this.getEffectiveDuration === 'function' ? this.getEffectiveDuration() : (this.video?.duration || 0);
     if (!total || !isFinite(total)) return;
-    const newTime = Math.max(0, Math.min(total - 1, (this.video.currentTime || 0) + seconds));
-    if (this.video) {
+    const cur = this.getCurrentPlaybackTime();
+    const newTime = Math.max(0, Math.min(total - 1, cur + seconds));
+    if (typeof this.applySeek === 'function') {
+      this.applySeek(newTime);
+    } else if (this.video) {
       this.video.currentTime = newTime;
       if (this.video.paused) {
         this.video.play().catch(() => {});

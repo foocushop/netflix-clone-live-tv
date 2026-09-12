@@ -6373,11 +6373,11 @@ const server = http.createServer((req, res) => {
 
         const ct = (upstreamRes.headers['content-type'] || '').toLowerCase();
         const ua = (req.headers['user-agent'] || '').toLowerCase();
-        const isAppleDevice = /iphone|ipad|ipod/.test(ua) || (ua.includes('macintosh') && !ua.includes('chrome')) || (ua.includes('safari') && !ua.includes('chrome') && !ua.includes('android'));
+        const isMobileDevice = /iphone|ipad|ipod|android|mobile/i.test(ua) || (ua.includes('macintosh') && !ua.includes('chrome')) || (ua.includes('safari') && !ua.includes('chrome'));
         const forceHls = (parsedUrl.query.format === 'hls');
         const forceMp4 = (parsedUrl.query.format === 'mp4' || parsedUrl.query.remux === '1');
 
-        if (isAppleDevice || forceHls) {
+        if (isMobileDevice || forceHls) {
           try { upstreamRes.destroy(); } catch (e) {}
           const authToken = parsedUrl.query.auth_token || parsedUrl.query.token || req.headers['x-auth-token'];
           const tokenParam = authToken ? `?auth_token=${encodeURIComponent(authToken)}` : '';
