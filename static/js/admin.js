@@ -951,7 +951,7 @@ class NetflixAdmin {
 
           <div class="node-url-row">
             <span class="node-url-text" title="${this.escapeHtml(node.url || '')}">
-              ${this.escapeHtml(node.url || 'http://74.50.66.196')}
+              ${this.escapeHtml(node.url || 'https://ziablo.xyz')}
             </span>
             <span class="node-latency-pill" title="Latence de réponse">${latencyStr}</span>
           </div>

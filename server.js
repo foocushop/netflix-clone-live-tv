@@ -138,7 +138,7 @@ function loadClusterNodes() {
     {
       id: 'node-vps-1',
       name: process.env.NODE_NAME || 'VPS InterServer (Production)',
-      url: process.env.SERVER_URL || 'http://74.50.66.196',
+      url: process.env.SERVER_URL || 'https://ziablo.xyz',
       role: 'master',
       addedAt: new Date().toISOString()
     }
@@ -3048,7 +3048,7 @@ const server = http.createServer((req, res) => {
   const ua = (req.headers['user-agent'] || '').toLowerCase();
   const isIptvClient = ua.includes('televizio') || ua.includes('exoplayer') || ua.includes('tivimate') || ua.includes('smarters') || ua.includes('vlc') || ua.includes('kodi') || ua.includes('okhttp');
 
-  if (!isLocalInternal && !isIptvPath && !isIptvClient && (hostHeader.includes(':8080') || hostHeader.includes('74.50.66.196'))) {
+  if (!isLocalInternal && !isIptvPath && !isIptvClient && (hostHeader.includes(':8080') || hostHeader.includes('162.35.186.177') || hostHeader.includes('74.50.66.196'))) {
     res.writeHead(301, {
       'Location': `https://ziablo.xyz${req.url}`,
       'Access-Control-Allow-Origin': '*'
@@ -5994,7 +5994,13 @@ const server = http.createServer((req, res) => {
         playlistPath
       );
 
-      const proc = spawn('ffmpeg', ffmpegArgs, { stdio: 'ignore' });
+      const proc = spawn('ffmpeg', ffmpegArgs, { stdio: ['ignore', 'ignore', 'pipe'] });
+      proc.stderr.on('data', (chunk) => {
+        const text = chunk.toString();
+        if (text.includes('Error') || text.includes('HTTP error')) {
+          console.warn(`[Xtream HLS FFmpeg]: ${text.trim()}`);
+        }
+      });
       session = {
         proc,
         hlsDir,
@@ -6018,27 +6024,7 @@ const server = http.createServer((req, res) => {
     }
 
     if (!session) {
-      if (hasCachedEdge && cachedEdge.url) {
-        spawnHlsProc(cachedEdge.url);
-      } else {
-        const edgeAgent = getXtreamAgent(originUrl, true);
-        const reqResolve = http.get(originUrl, {
-          agent: edgeAgent,
-          headers: { 'User-Agent': 'IPTVSmartersPro/1.0', 'Accept': '*/*' },
-          timeout: 5000
-        }, (resResolve) => {
-          const loc = resResolve.headers.location;
-          resResolve.destroy();
-          const edgeUrl = (loc && loc.startsWith('http')) ? loc : (loc ? new URL(loc, originUrl).href : originUrl);
-          if (loc) {
-            xtreamSeriesEdgeCache.set(cacheKey, { url: edgeUrl, expiresAt: Date.now() + 60 * 60 * 1000 });
-          }
-          spawnHlsProc(edgeUrl);
-        });
-        reqResolve.on('error', () => {
-          spawnHlsProc(originUrl);
-        });
-      }
+      spawnHlsProc(originUrl);
     } else {
       session.lastAccess = Date.now();
     }

@@ -1,6 +1,6 @@
 // ================= NETFLIX APP CONTROLLER =================
 window.API_BASE = window.API_BASE || ((window.location.protocol === 'file:' || !window.location.origin || window.location.origin === 'null' || window.location.origin.startsWith('file:'))
-  ? 'http://74.50.66.196'
+  ? 'https://ziablo.xyz'
   : '');
 
 class NetflixApp {

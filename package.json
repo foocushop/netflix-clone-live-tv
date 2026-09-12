@@ -11,7 +11,7 @@
     "node": ">=18"
   },
   "dependencies": {
-    "socks-proxy-agent": "^10.1.0",
+    "socks-proxy-agent": "^8.0.4",
     "ssh2": "^1.17.0"
   }
 }

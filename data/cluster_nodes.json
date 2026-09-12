@@ -2,7 +2,7 @@
   {
     "id": "node-vps-1",
     "name": "VPS InterServer (Production)",
-    "url": "http://74.50.66.196",
+    "url": "https://ziablo.xyz",
     "role": "master",
     "addedAt": "2026-09-11T16:50:00.000Z"
   }
