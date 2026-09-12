@@ -200,6 +200,11 @@ class NetflixPlayer {
       this.video.addEventListener('ended', () => {
         const isSeries = (this.currentMovie?.media_type === 'series' || this.currentMovie?.is_xtream_series);
         if (isSeries) {
+          const dur = this.currentEpisodeDuration || 0;
+          if (dur > 60 && this.video.currentTime < dur - 30) {
+            console.warn('[Player] Vidéo arrêtée avant la fin réelle de l\'épisode (currentTime:', this.video.currentTime, 'durée attendue:', dur, ')');
+            return;
+          }
           this.goToNextEpisode();
         }
       });
@@ -442,7 +447,9 @@ class NetflixPlayer {
 
     const getEffectiveDuration = () => {
       let total = this.video.duration;
-      if (!total || isNaN(total) || total === Infinity) {
+      if (this.currentEpisodeDuration > 0 && (!total || isNaN(total) || total === Infinity || (this._currentHlsUrl && total < this.currentEpisodeDuration))) {
+        total = this.currentEpisodeDuration;
+      } else if (!total || isNaN(total) || total === Infinity) {
         total = this.currentEpisodeDuration || 0;
       }
       return (total && isFinite(total) && total > 0) ? total : 0;
@@ -604,7 +611,9 @@ class NetflixPlayer {
 
       const current = this.video.currentTime || 0;
       let total = this.video.duration;
-      if (!total || isNaN(total) || total === Infinity) {
+      if (this.currentEpisodeDuration > 0 && (!total || isNaN(total) || total === Infinity || (this._currentHlsUrl && total < this.currentEpisodeDuration))) {
+        total = this.currentEpisodeDuration;
+      } else if (!total || isNaN(total) || total === Infinity) {
         total = this.currentEpisodeDuration || 0;
       }
 
@@ -628,7 +637,9 @@ class NetflixPlayer {
         return;
       }
       let total = this.video.duration;
-      if (!total || isNaN(total) || total === Infinity) {
+      if (this.currentEpisodeDuration > 0 && (!total || isNaN(total) || total === Infinity || (this._currentHlsUrl && total < this.currentEpisodeDuration))) {
+        total = this.currentEpisodeDuration;
+      } else if (!total || isNaN(total) || total === Infinity) {
         total = this.currentEpisodeDuration || 0;
       }
       if (total > 0 && isFinite(total)) {
@@ -655,7 +666,9 @@ class NetflixPlayer {
     }
 
     let total = this.video.duration;
-    if (!total || isNaN(total) || total === Infinity) {
+    if (this.currentEpisodeDuration > 0 && (!total || isNaN(total) || total === Infinity || (this._currentHlsUrl && total < this.currentEpisodeDuration))) {
+      total = this.currentEpisodeDuration;
+    } else if (!total || isNaN(total) || total === Infinity) {
       total = this.currentEpisodeDuration || 0;
     }
     if (!total || total <= 0) return;
@@ -1373,7 +1386,7 @@ class NetflixPlayer {
       if (epObj && epStreamUrl && (!isHevc || browserCanPlayHevc)) {
         this.currentSeason = parseInt(sObj.season_number, 10);
         this.currentEpisode = parseInt(epObj.episode_number, 10);
-        this.currentEpisodeDuration = this.parseDurationToSeconds(epObj.duration || epObj.info?.duration || this.currentMovie.duration);
+        this.currentEpisodeDuration = this.parseDurationToSeconds(epObj.info?.duration_secs || epObj.duration || epObj.info?.duration || this.currentMovie.duration);
         if (this.currentEpisodeDuration > 0 && this.ctrlTotalDuration) {
           this.ctrlTotalDuration.textContent = this.formatTime(this.currentEpisodeDuration);
         }
@@ -1789,16 +1802,22 @@ class NetflixPlayer {
       videoUrl = `${videoUrl}${sep}auth_token=${encodeURIComponent(authToken)}`;
     }
 
-    // Détection Apple (iOS / Safari WebKit) qui nécessite le conteneur MP4 fragmenté
+    // Détection Apple (iOS / Safari WebKit) & appareils sans support MKV natif
     const isApple = /iPad|iPhone|iPod/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
     const isSafari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent) || isApple || (navigator.platform === 'MacIntel' && !/Chrome|CriOS/i.test(navigator.userAgent));
+    const canPlayMkv = (this.video.canPlayType('video/x-matroska') !== '' || this.video.canPlayType('video/mkv') !== '');
+
+    // Safari, iOS ou navigateurs sans support MKV natif : basculement direct et transparent vers le moteur HLS
+    if ((!canPlayMkv || isSafari || isApple) && videoUrl.includes('/api/stream/xtream-series')) {
+      const epMatch = videoUrl.match(/episode_id=([^&]+)/);
+      if (epMatch && epMatch[1]) {
+        const epId = epMatch[1];
+        const hlsUrl = `${baseUrl}/api/stream/xtream-series-hls/${epId}/playlist.m3u8`;
+        return this.playDirectHls(hlsUrl);
+      }
+    }
 
     this._isRemuxedMp4 = false;
-    if ((isSafari || isApple) && videoUrl.includes('/api/stream/xtream-series') && !videoUrl.includes('format=mp4') && !videoUrl.includes('format=hls')) {
-      const sep = videoUrl.includes('?') ? '&' : '?';
-      videoUrl = `${videoUrl}${sep}format=mp4`;
-      this._isRemuxedMp4 = true;
-    }
     this._currentDirectVideoUrl = videoUrl;
 
     this.cleanupActivePlayback();
@@ -1941,7 +1960,9 @@ class NetflixPlayer {
 
   seekRelative(seconds) {
     let total = this.video.duration;
-    if (!total || isNaN(total) || total === Infinity) {
+    if (this.currentEpisodeDuration > 0 && (!total || isNaN(total) || total === Infinity || (this._currentHlsUrl && total < this.currentEpisodeDuration))) {
+      total = this.currentEpisodeDuration;
+    } else if (!total || isNaN(total) || total === Infinity) {
       total = this.currentEpisodeDuration || 0;
     }
     if (!total || !isFinite(total)) return;

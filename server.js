@@ -5997,9 +5997,28 @@ const server = http.createServer((req, res) => {
     const seg0 = path.join(hlsDir, 'seg_0000.ts');
     let session = xtreamHlsSessions.get(String(episodeId));
 
-    // Si le temps de départ a changé (seek au-delà du buffer) ou si la session précédente a crashé sans générer de flux
+    // Détection de playlist tronquée résiduelle sur disque (< 600 secondes)
+    let isTruncatedPlaylist = false;
+    if (fs.existsSync(playlistPath)) {
+      try {
+        const existingContent = fs.readFileSync(playlistPath, 'utf8');
+        if (existingContent.includes('#EXT-X-ENDLIST')) {
+          let dur = 0;
+          const re = /#EXTINF:([0-9.]+)/g;
+          let m;
+          while ((m = re.exec(existingContent)) !== null) {
+            dur += parseFloat(m[1]);
+          }
+          if (dur < 600) {
+            isTruncatedPlaylist = true;
+          }
+        }
+      } catch (e) {}
+    }
+
+    // Si le temps de départ a changé (seek au-delà du buffer) ou si la session précédente a crashé sans générer de flux ou est tronquée
     const isDifferentStart = session && Math.abs((session.startTime || 0) - startTime) > 2;
-    const isBrokenSession = session && session.isDone && (!fs.existsSync(playlistPath) || !fs.existsSync(seg0));
+    const isBrokenSession = (session && session.isDone && (!fs.existsSync(playlistPath) || !fs.existsSync(seg0) || isTruncatedPlaylist)) || (!session && isTruncatedPlaylist);
 
     if (isDifferentStart || isBrokenSession) {
       if (session && session.proc) {
@@ -6020,6 +6039,11 @@ const server = http.createServer((req, res) => {
 
       const ffmpegArgs = [
         '-v', 'warning',
+        '-reconnect', '1',
+        '-reconnect_streamed', '1',
+        '-reconnect_delay_max', '5',
+        '-reconnect_on_network_error', '1',
+        '-reconnect_on_http_error', '4xx,5xx',
         '-user_agent', 'IPTVSmartersPro/1.0'
       ];
       if (startTime > 0) {
@@ -6056,9 +6080,24 @@ const server = http.createServer((req, res) => {
       };
       xtreamHlsSessions.set(String(episodeId), session);
 
-      proc.on('close', () => {
+      proc.on('close', (code) => {
         session.isDone = true;
         session.proc = null;
+        if (fs.existsSync(playlistPath)) {
+          try {
+            let content = fs.readFileSync(playlistPath, 'utf8');
+            if (content.includes('#EXT-X-ENDLIST')) {
+              let dur = 0;
+              const re = /#EXTINF:([0-9.]+)/g;
+              let m;
+              while ((m = re.exec(content)) !== null) dur += parseFloat(m[1]);
+              if (dur < 600) {
+                content = content.replace(/#EXT-X-ENDLIST\r?\n?/g, '');
+                fs.writeFileSync(playlistPath, content);
+              }
+            }
+          } catch (e) {}
+        }
       });
       proc.on('error', (err) => {
         console.warn(`[Xtream HLS FFmpeg Error]: ${err.message}`);
@@ -6122,6 +6161,15 @@ const server = http.createServer((req, res) => {
       if (res.headersSent || res.writableEnded) return;
       try {
         let content = fs.readFileSync(playlistPath, 'utf8');
+        if (content.includes('#EXT-X-ENDLIST')) {
+          let dur = 0;
+          const re = /#EXTINF:([0-9.]+)/g;
+          let m;
+          while ((m = re.exec(content)) !== null) dur += parseFloat(m[1]);
+          if (dur < 600 || (session && !session.isDone)) {
+            content = content.replace(/#EXT-X-ENDLIST\r?\n?/g, '');
+          }
+        }
         const authToken = parsedUrl.query.auth_token || parsedUrl.query.token || req.headers['x-auth-token'];
         if (authToken) {
           content = content.replace(/^(seg_\d+\.ts)$/gm, `$1?auth_token=${encodeURIComponent(authToken)}`);
@@ -6296,9 +6344,8 @@ const server = http.createServer((req, res) => {
         const isAppleDevice = /iphone|ipad|ipod/.test(ua) || (ua.includes('macintosh') && !ua.includes('chrome')) || (ua.includes('safari') && !ua.includes('chrome') && !ua.includes('android'));
         const forceHls = (parsedUrl.query.format === 'hls');
         const forceMp4 = (parsedUrl.query.format === 'mp4' || parsedUrl.query.remux === '1');
-        const needsMp4Remux = (isAppleDevice || forceMp4) && (ext === 'mkv' || ct.includes('matroska') || !ct);
 
-        if (forceHls) {
+        if (isAppleDevice || forceHls) {
           try { upstreamRes.destroy(); } catch (e) {}
           const authToken = parsedUrl.query.auth_token || parsedUrl.query.token || req.headers['x-auth-token'];
           const tokenParam = authToken ? `?auth_token=${encodeURIComponent(authToken)}` : '';
@@ -6312,7 +6359,9 @@ const server = http.createServer((req, res) => {
           return res.end();
         }
 
+        const needsMp4Remux = forceMp4 && (ext === 'mkv' || ct.includes('matroska') || !ct);
         if (needsMp4Remux) {
+          try { upstreamRes.destroy(); } catch (e) {}
           const startTime = parseFloat(parsedUrl.query.start || parsedUrl.query.time || parsedUrl.query.t || 0) || 0;
           let ffmpegProc = null;
 
@@ -6326,32 +6375,26 @@ const server = http.createServer((req, res) => {
           };
           res.writeHead(200, remuxHeaders);
 
+          const ffmpegArgs = [
+            '-v', 'error',
+            '-reconnect', '1',
+            '-reconnect_streamed', '1',
+            '-reconnect_delay_max', '5',
+            '-reconnect_on_network_error', '1',
+            '-user_agent', 'IPTVSmartersPro/1.0'
+          ];
           if (startTime > 0) {
-            try { upstreamRes.destroy(); } catch (e) {}
-            ffmpegProc = spawn('ffmpeg', [
-              '-v', 'error',
-              '-user_agent', 'IPTVSmartersPro/1.0',
-              '-ss', startTime.toString(),
-              '-i', targetUrl,
-              '-c', 'copy',
-              '-f', 'mp4',
-              '-movflags', 'frag_keyframe+empty_moov+default_base_moof',
-              'pipe:1'
-            ], { stdio: ['ignore', 'pipe', 'ignore'] });
-          } else {
-            ffmpegProc = spawn('ffmpeg', [
-              '-v', 'error',
-              '-i', 'pipe:0',
-              '-c', 'copy',
-              '-f', 'mp4',
-              '-movflags', 'frag_keyframe+empty_moov+default_base_moof',
-              'pipe:1'
-            ], { stdio: ['pipe', 'pipe', 'ignore'] });
-
-            upstreamRes.pipe(ffmpegProc.stdin);
-            ffmpegProc.stdin.on('error', () => {});
+            ffmpegArgs.push('-ss', startTime.toString());
           }
+          ffmpegArgs.push(
+            '-i', targetUrl,
+            '-c', 'copy',
+            '-f', 'mp4',
+            '-movflags', 'frag_keyframe+empty_moov+default_base_moof',
+            'pipe:1'
+          );
 
+          ffmpegProc = spawn('ffmpeg', ffmpegArgs, { stdio: ['ignore', 'pipe', 'ignore'] });
           ffmpegProc.stdout.pipe(res);
 
           const killFfmpeg = () => {
@@ -6360,7 +6403,6 @@ const server = http.createServer((req, res) => {
               try { ffmpegProc.kill('SIGKILL'); } catch (e) {}
               ffmpegProc = null;
             }
-            try { upstreamRes.destroy(); } catch (e) {}
           };
 
           req.once('close', killFfmpeg);
