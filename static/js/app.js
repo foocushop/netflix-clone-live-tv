@@ -1736,6 +1736,11 @@ class NetflixApp {
   initAuthEvents() {
     // Onglets Connexion / Inscription
     if (this.tabLoginBtn && this.tabRegisterBtn) {
+      const resetModalScroll = () => {
+        const modal = document.getElementById('authGateModal');
+        if (modal) modal.scrollTop = 0;
+      };
+
       this.tabLoginBtn.addEventListener('click', () => {
         this.tabLoginBtn.classList.add('active');
         this.tabRegisterBtn.classList.remove('active');
@@ -1743,7 +1748,8 @@ class NetflixApp {
         if (this.registerForm) this.registerForm.classList.add('hidden');
         if (this.loginError) this.loginError.classList.add('hidden');
         if (this.authGateTitle) this.authGateTitle.textContent = 'Bienvenue sur ZIFLIX';
-        if (this.authGateSubtitle) this.authGateSubtitle.textContent = 'Connectez-vous ou créez votre profil pour accéder aux films et séries';
+        if (this.authGateSubtitle) this.authGateSubtitle.textContent = 'Films & séries en streaming illimité';
+        resetModalScroll();
       });
 
       this.tabRegisterBtn.addEventListener('click', () => {
@@ -1754,6 +1760,35 @@ class NetflixApp {
         if (this.registerError) this.registerError.classList.add('hidden');
         if (this.authGateTitle) this.authGateTitle.textContent = 'Créer mon profil ZIFLIX';
         if (this.authGateSubtitle) this.authGateSubtitle.textContent = 'Choisissez votre pseudo et votre avatar exclusif';
+        resetModalScroll();
+      });
+    }
+
+    // Toggle d'URL personnalisée (Création de profil)
+    const toggleCustomBtn = document.getElementById('regToggleCustomUrlBtn');
+    const customContainer = document.getElementById('regCustomUrlContainer');
+    const toggleArrow = document.getElementById('regToggleArrow');
+    if (toggleCustomBtn && customContainer) {
+      toggleCustomBtn.addEventListener('click', () => {
+        customContainer.classList.toggle('hidden');
+        const isOpen = !customContainer.classList.contains('hidden');
+        if (toggleArrow) toggleArrow.classList.toggle('open', isOpen);
+        if (isOpen) {
+          const inp = document.getElementById('regCustomAvatarUrl');
+          if (inp) inp.focus();
+        }
+      });
+    }
+
+    const regCustomInput = document.getElementById('regCustomAvatarUrl');
+    if (regCustomInput) {
+      regCustomInput.addEventListener('input', () => {
+        if (regCustomInput.value.trim()) {
+          const regGrid = document.getElementById('regAvatarGrid');
+          if (regGrid) {
+            regGrid.querySelectorAll('.avatar-choice-item').forEach(el => el.classList.remove('active'));
+          }
+        }
       });
     }
 

@@ -3425,18 +3425,35 @@ body {
 .auth-gate-backdrop {
   position: fixed;
   inset: 0;
+  width: 100vw;
+  height: 100vh;
+  height: 100dvh;
   background: radial-gradient(circle at center, rgba(20, 20, 30, 0.98) 0%, rgba(10, 10, 15, 0.99) 100%);
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
   z-index: 10000;
   display: flex;
+  flex-direction: column;
   align-items: center;
-  justify-content: center;
-  padding: 16px;
+  justify-content: flex-start;
+  padding: clamp(12px, 3vh, 24px) 14px;
   overflow-y: auto;
   -webkit-overflow-scrolling: touch;
+  overscroll-behavior: contain;
+  box-sizing: border-box;
   opacity: 1;
-  transition: opacity 0.3s ease;
+  transition: opacity 0.25s ease;
+}
+
+.auth-gate-backdrop::-webkit-scrollbar {
+  width: 6px;
+}
+.auth-gate-backdrop::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.3);
+}
+.auth-gate-backdrop::-webkit-scrollbar-thumb {
+  background: rgba(229, 9, 20, 0.5);
+  border-radius: 4px;
 }
 
 .auth-gate-backdrop.hidden {
@@ -3445,71 +3462,57 @@ body {
 
 .auth-gate-card {
   width: 100%;
-  max-width: 480px;
-  max-height: calc(100vh - 32px);
-  max-height: 94vh;
-  overflow-y: auto;
-  overscroll-behavior: contain;
-  margin: auto;
-  background: rgba(24, 24, 32, 0.96);
+  max-width: 420px;
+  margin-top: auto;
+  margin-bottom: auto;
+  flex-shrink: 0;
+  background: rgba(22, 22, 30, 0.98);
   border: 1px solid rgba(229, 9, 20, 0.35);
   border-radius: 16px;
-  padding: 24px 22px;
+  padding: 20px 20px;
   box-shadow: 0 16px 48px rgba(0, 0, 0, 0.9), 0 0 40px rgba(229, 9, 20, 0.15);
-  animation: authCardPop 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  animation: authCardPop 0.25s cubic-bezier(0.16, 1, 0.3, 1);
   box-sizing: border-box;
-}
-
-.auth-gate-card::-webkit-scrollbar {
-  width: 6px;
-}
-.auth-gate-card::-webkit-scrollbar-track {
-  background: rgba(0, 0, 0, 0.2);
-  border-radius: 4px;
-}
-.auth-gate-card::-webkit-scrollbar-thumb {
-  background: rgba(229, 9, 20, 0.4);
-  border-radius: 4px;
-}
-.auth-gate-card::-webkit-scrollbar-thumb:hover {
-  background: rgba(229, 9, 20, 0.7);
+  position: relative;
 }
 
 @keyframes authCardPop {
-  from { opacity: 0; transform: scale(0.95) translateY(10px); }
+  from { opacity: 0; transform: scale(0.96) translateY(8px); }
   to { opacity: 1; transform: scale(1) translateY(0); }
 }
 
 .auth-gate-header {
   text-align: center;
-  margin-bottom: 16px;
+  margin-bottom: 12px;
 }
 
 .auth-gate-logo {
-  height: 36px;
-  margin-bottom: 8px;
+  height: 32px;
+  margin-bottom: 4px;
+  display: inline-block;
 }
 
 .auth-gate-title {
-  margin: 0 0 4px 0;
-  font-size: 1.32rem;
+  margin: 0 0 2px 0;
+  font-size: 1.18rem;
   font-weight: 800;
   color: #fff;
+  letter-spacing: -0.2px;
 }
 
 .auth-gate-subtitle {
   margin: 0;
-  font-size: 0.82rem;
+  font-size: 0.76rem;
   color: #aaa;
-  line-height: 1.35;
+  line-height: 1.3;
 }
 
 .auth-gate-tabs {
   display: flex;
-  background: rgba(0, 0, 0, 0.45);
+  background: rgba(0, 0, 0, 0.5);
   border-radius: 10px;
-  padding: 4px;
-  margin-bottom: 16px;
+  padding: 3px;
+  margin-bottom: 12px;
   border: 1px solid rgba(255, 255, 255, 0.08);
 }
 
@@ -3518,8 +3521,8 @@ body {
   background: transparent;
   border: none;
   color: #888;
-  padding: 9px;
-  font-size: 0.86rem;
+  padding: 7px 10px;
+  font-size: 0.82rem;
   font-weight: 700;
   border-radius: 8px;
   cursor: pointer;
@@ -3535,19 +3538,20 @@ body {
 .auth-gate-form {
   display: flex;
   flex-direction: column;
-  gap: 13px;
+  gap: 9px;
 }
 
 .auth-form-group {
   display: flex;
   flex-direction: column;
-  gap: 5px;
+  gap: 4px;
 }
 
 .auth-form-group label {
-  font-size: 0.78rem;
+  font-size: 0.74rem;
   font-weight: 600;
-  color: #ccc;
+  color: #bbb;
+  letter-spacing: 0.2px;
 }
 
 .auth-input-wrap {
@@ -3558,20 +3562,21 @@ body {
 
 .auth-input-icon {
   position: absolute;
-  left: 12px;
-  font-size: 1rem;
+  left: 10px;
+  font-size: 0.95rem;
   pointer-events: none;
   opacity: 0.6;
 }
 
 .auth-input {
   width: 100%;
-  padding: 10px 40px 10px 36px;
-  background: rgba(12, 12, 18, 0.85);
+  height: 38px;
+  padding: 7px 36px 7px 32px;
+  background: rgba(12, 12, 18, 0.88);
   border: 1px solid rgba(255, 255, 255, 0.12);
   border-radius: 8px;
   color: #fff;
-  font-size: 0.9rem;
+  font-size: 0.86rem;
   outline: none;
   box-sizing: border-box;
   transition: border-color 0.2s ease, box-shadow 0.2s ease;
@@ -3579,28 +3584,28 @@ body {
 
 .auth-input:focus {
   border-color: #e50914;
-  box-shadow: 0 0 0 3px rgba(229, 9, 20, 0.2);
+  box-shadow: 0 0 0 2.5px rgba(229, 9, 20, 0.25);
 }
 
 .auth-eye-btn {
   position: absolute;
-  right: 10px;
+  right: 8px;
   background: none;
   border: none;
   color: #888;
   cursor: pointer;
   padding: 4px;
-  font-size: 1rem;
+  font-size: 0.95rem;
 }
 
 .auth-error-msg {
   background: rgba(229, 9, 20, 0.15);
   border: 1px solid #e50914;
   color: #ff8585;
-  padding: 9px 12px;
+  padding: 7px 10px;
   border-radius: 8px;
-  font-size: 0.8rem;
-  line-height: 1.35;
+  font-size: 0.78rem;
+  line-height: 1.3;
 }
 
 .auth-submit-btn,
@@ -3609,43 +3614,44 @@ body {
   color: #fff;
   border: none;
   border-radius: 8px;
-  padding: 12px;
-  font-size: 0.92rem;
+  padding: 10px 14px;
+  font-size: 0.88rem;
   font-weight: 700;
   cursor: pointer;
   transition: all 0.2s ease;
-  box-shadow: 0 4px 14px rgba(229, 9, 20, 0.35);
+  box-shadow: 0 3px 12px rgba(229, 9, 20, 0.35);
   display: flex;
   align-items: center;
   justify-content: center;
   gap: 8px;
+  margin-top: 2px;
 }
 
 .auth-submit-btn:hover,
 .btn-ziflix-primary:hover {
   background: #f40612;
   transform: translateY(-1px);
-  box-shadow: 0 6px 18px rgba(229, 9, 20, 0.5);
+  box-shadow: 0 5px 16px rgba(229, 9, 20, 0.5);
 }
 
 /* Grille des 10 Avatars */
 .avatar-selection-grid {
   display: grid;
   grid-template-columns: repeat(5, 1fr);
-  gap: 8px;
-  margin-top: 3px;
+  gap: 6px;
+  margin-top: 2px;
   justify-items: center;
-  padding: 2px;
+  padding: 1px;
 }
 
 .avatar-choice-item {
   position: relative;
-  width: 48px;
-  height: 48px;
+  width: 38px;
+  height: 38px;
   border-radius: 50%;
   aspect-ratio: 1;
   cursor: pointer;
-  border: 2.5px solid transparent;
+  border: 2px solid transparent;
   overflow: hidden;
   transition: all 0.2s ease;
   background: #1e1e28;
@@ -3659,7 +3665,7 @@ body {
 
 .avatar-choice-item.active {
   border-color: #e50914;
-  box-shadow: 0 0 12px rgba(229, 9, 20, 0.65);
+  box-shadow: 0 0 10px rgba(229, 9, 20, 0.65);
   transform: scale(1.1);
 }
 
@@ -3670,47 +3676,92 @@ body {
   display: block;
 }
 
+/* Toggle URL personnalisée */
+.auth-custom-url-group {
+  margin-top: 1px;
+}
+
+.auth-custom-toggle-btn {
+  background: none;
+  border: none;
+  color: #888;
+  font-size: 0.74rem;
+  cursor: pointer;
+  padding: 2px 0;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  transition: color 0.2s ease;
+}
+
+.auth-custom-toggle-btn:hover {
+  color: #ddd;
+}
+
+.auth-toggle-arrow {
+  font-size: 0.7rem;
+  transition: transform 0.2s ease;
+  display: inline-block;
+}
+
+.auth-toggle-arrow.open {
+  transform: rotate(180deg);
+}
+
+.auth-custom-url-wrap {
+  margin-top: 5px;
+  animation: authCardPop 0.2s ease;
+}
+
 @media (max-width: 480px) {
   .auth-gate-backdrop {
-    padding: 10px;
+    padding: 12px 10px;
   }
   .auth-gate-card {
-    padding: 18px 14px;
-    max-height: 96vh;
-    border-radius: 12px;
+    padding: 16px 14px;
+    border-radius: 14px;
+    max-width: 100%;
+  }
+  .auth-gate-header {
+    margin-bottom: 8px;
   }
   .auth-gate-logo {
-    height: 30px;
-    margin-bottom: 6px;
+    height: 26px;
+    margin-bottom: 3px;
   }
   .auth-gate-title {
-    font-size: 1.18rem;
+    font-size: 1.05rem;
   }
   .auth-gate-subtitle {
-    font-size: 0.76rem;
+    font-size: 0.72rem;
+  }
+  .auth-gate-tabs {
+    margin-bottom: 9px;
+    padding: 2px;
   }
   .auth-tab-btn {
-    padding: 8px;
-    font-size: 0.82rem;
+    padding: 6px;
+    font-size: 0.78rem;
   }
   .auth-gate-form {
-    gap: 10px;
+    gap: 7px;
   }
   .auth-input {
-    padding: 9px 34px 9px 32px;
-    font-size: 0.85rem;
+    height: 35px;
+    padding: 6px 32px 6px 30px;
+    font-size: 0.82rem;
   }
   .avatar-selection-grid {
-    gap: 6px;
+    gap: 5px;
   }
   .avatar-choice-item {
-    width: 40px;
-    height: 40px;
+    width: 32px;
+    height: 32px;
   }
   .auth-submit-btn,
   .btn-ziflix-primary {
-    padding: 11px;
-    font-size: 0.88rem;
+    padding: 9px 12px;
+    font-size: 0.84rem;
   }
 }
 

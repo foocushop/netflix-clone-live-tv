@@ -1039,17 +1039,22 @@
         </div>
 
         <div class="auth-form-group">
-          <label style="display: block; margin-bottom: 6px; font-weight: 600;">Choisissez votre avatar ZIFLIX :</label>
+          <label style="display: block; margin-bottom: 4px; font-weight: 600; font-size: 0.78rem;">Choisissez votre avatar ZIFLIX :</label>
           <div class="avatar-selection-grid" id="regAvatarGrid">
             <!-- 10 avatars injectés dynamiquement -->
           </div>
         </div>
 
-        <div class="auth-form-group">
-          <label for="regCustomAvatarUrl">Ou URL d'image personnalisée (optionnel) :</label>
-          <div class="auth-input-wrap">
-            <span class="auth-input-icon">🖼️</span>
-            <input type="url" id="regCustomAvatarUrl" class="auth-input" placeholder="https://exemple.com/photo.png">
+        <div class="auth-custom-url-group">
+          <button type="button" class="auth-custom-toggle-btn" id="regToggleCustomUrlBtn">
+            <span>🖼️ Ou photo personnalisée (URL)</span>
+            <span class="auth-toggle-arrow" id="regToggleArrow">▾</span>
+          </button>
+          <div class="auth-custom-url-wrap hidden" id="regCustomUrlContainer">
+            <div class="auth-input-wrap">
+              <span class="auth-input-icon">🔗</span>
+              <input type="url" id="regCustomAvatarUrl" class="auth-input" placeholder="https://exemple.com/photo.png">
+            </div>
           </div>
         </div>
 
