@@ -243,7 +243,9 @@ class NetflixPlayer {
       };
 
       this.video.addEventListener('waiting', () => {
-        this.showBuffering(true, 'Mise en mémoire tampon...');
+        if (this.video && !this.video.paused) {
+          this.showBuffering(true, 'Mise en mémoire tampon...');
+        }
         if (bufferTimeout) clearTimeout(bufferTimeout);
         if (slowStreamTimeout) clearTimeout(slowStreamTimeout);
 
@@ -251,11 +253,13 @@ class NetflixPlayer {
           if (this.video && !this.video.paused) {
             this.showStatusBanner('Flux ralenti. Patientez un instant ou essayez un autre serveur.');
           }
-        }, 8000);
+        }, 10000);
       });
 
       this.video.addEventListener('seeking', () => {
-        this.showBuffering(true, 'Chargement...');
+        if (this.video && !this.video.paused) {
+          this.showBuffering(true, 'Chargement...');
+        }
       });
 
       this.video.addEventListener('playing', clearBufferState);
@@ -1589,15 +1593,28 @@ class NetflixPlayer {
       if (this.backdrop) {
         this.backdrop.classList.add('fade-out');
         setTimeout(() => {
-          if (this.backdrop) this.backdrop.style.display = 'none';
-        }, 250);
+          if (this.backdrop) {
+            this.backdrop.style.display = 'none';
+            this.backdrop.classList.remove('fade-out');
+          }
+        }, 200);
       }
     };
 
     this.video.addEventListener('playing', () => onReady(), { signal });
+    this.video.addEventListener('loadeddata', () => onReady(), { signal });
+    this.video.addEventListener('canplay', () => onReady(), { signal });
     this.video.addEventListener('timeupdate', () => {
       if (this.video.currentTime > 0) onReady();
     }, { signal });
+
+    // Sécurité : masquer le loader et poster après max 4s si le média est prêt
+    const readySafetyTimer = setTimeout(() => {
+      if (!hasReadied) {
+        onReady();
+      }
+    }, 4000);
+    signal.addEventListener('abort', () => clearTimeout(readySafetyTimer));
 
     // Avertissement doux si le chargement dépasse 12s, sans jamais masquer prématurément le poster d'attente
     const slowLoadTimer = setTimeout(() => {
@@ -1751,14 +1768,13 @@ class NetflixPlayer {
         // Détection d'incompatibilité audio matérielle (ex: EC-3 Dolby / code non supporté)
         const isAudioIncompatibility = (
           (data.reason && (data.reason.includes('EC-3') || data.reason.includes('Unsupported audio'))) ||
-          data.details === 'bufferAddCodecError' ||
           (data.details === Hls.ErrorDetails.BUFFER_APPENDING_ERROR && data.mimeType && data.mimeType.includes('ec-3'))
         );
         if (isAudioIncompatibility) {
           console.warn('[HLS] Incompatibilité audio détectée (EC-3).');
           if (!this._audioTranscodeRecovery && this._currentHlsUrl && !this._currentHlsUrl.includes('transcode_audio=1')) {
             this._audioTranscodeRecovery = true;
-            this.showStatusBanner("Incompatibilité audio avec votre navigateur. Optimisation audio en cours...");
+            this.showStatusBanner("Optimisation audio en cours...");
             const sep = this._currentHlsUrl.includes('?') ? '&' : '?';
             const recoveredUrl = `${this._currentHlsUrl}${sep}transcode_audio=1`;
             console.log('[HLS Audio Recovery] Bascule automatique vers transcodage AAC serveur :', recoveredUrl);
@@ -1767,7 +1783,6 @@ class NetflixPlayer {
             }, 300);
             return;
           }
-          this.showStatusBanner("Incompatibilité audio avec votre navigateur.");
         }
 
         if (!data.fatal) {
@@ -1825,6 +1840,7 @@ class NetflixPlayer {
       const startPlay = () => {
         if (startTriggered) return;
         startTriggered = true;
+        onReady();
         const playPromise = this.video.play();
         if (playPromise !== undefined) {
           playPromise.catch(err => {
@@ -1895,7 +1911,6 @@ class NetflixPlayer {
     let hasReadied = false;
     const onReady = () => {
       if (hasReadied) return;
-      if (this.video.readyState < 2 && this.video.currentTime <= 0) return;
       hasReadied = true;
       this.setStep(4, 'done', `4. Épisode connecté • Lecture active 1080p FHD`);
       this.hideLoader();
@@ -1903,7 +1918,10 @@ class NetflixPlayer {
       if (this.backdrop) {
         this.backdrop.classList.add('fade-out');
         setTimeout(() => {
-          if (this.backdrop) this.backdrop.style.display = 'none';
+          if (this.backdrop) {
+            this.backdrop.style.display = 'none';
+            this.backdrop.classList.remove('fade-out');
+          }
         }, 200);
       }
     };
@@ -2077,6 +2095,10 @@ class NetflixPlayer {
       clearTimeout(this._bufferTimer);
       this._bufferTimer = null;
     }
+    if (this._hideLoaderTimeout) {
+      clearTimeout(this._hideLoaderTimeout);
+      this._hideLoaderTimeout = null;
+    }
     if (this.loader) {
       if (this.loaderTitle) {
         let cleanText = titleText || 'Connexion au flux...';
@@ -2092,14 +2114,18 @@ class NetflixPlayer {
       clearTimeout(this._bufferTimer);
       this._bufferTimer = null;
     }
-    if (this.loader && !this.loader.classList.contains('hidden')) {
+    if (this._hideLoaderTimeout) {
+      clearTimeout(this._hideLoaderTimeout);
+      this._hideLoaderTimeout = null;
+    }
+    if (this.loader) {
       this.loader.classList.add('fade-out');
-      setTimeout(() => {
-        if (this.loader && this.loader.classList.contains('fade-out')) {
+      this._hideLoaderTimeout = setTimeout(() => {
+        if (this.loader) {
           this.loader.classList.add('hidden');
           this.loader.classList.remove('fade-out', 'buffering-mode');
         }
-      }, 250);
+      }, 200);
     }
   }
 
@@ -2108,14 +2134,19 @@ class NetflixPlayer {
       clearTimeout(this._bufferTimer);
       this._bufferTimer = null;
     }
+    if (!this.overlay || !this.overlay.classList.contains('active')) return;
+    if (this.video && this.video.paused) {
+      this.hideLoader();
+      return;
+    }
     if (show) {
       this._bufferTimer = setTimeout(() => {
-        if (this.loader) {
+        if (this.loader && this.video && !this.video.paused) {
           if (this.loaderTitle) this.loaderTitle.textContent = text;
           this.loader.classList.remove('hidden', 'fade-out');
           this.loader.classList.add('buffering-mode');
         }
-      }, 100);
+      }, 350);
     } else {
       this.hideLoader();
     }

@@ -1952,8 +1952,8 @@ function resolveProxyUrl(base, relative) {
   }
 }
 
-function rewriteM3u8ForProxy(content, baseUrl, sessionKey = null) {
-  const sessionParam = sessionKey ? '&dm_session=' + encodeURIComponent(sessionKey) : '';
+function rewriteM3u8ForProxy(content, baseUrl, sessionKey = null, authToken = null) {
+  const sessionParam = (sessionKey ? '&dm_session=' + encodeURIComponent(sessionKey) : '') + (authToken ? '&auth_token=' + encodeURIComponent(authToken) : '');
   const lines = content.split(/\r?\n/);
 
   // Si c'est un Master Playlist HLS avec des variantes de résolution
@@ -5714,9 +5714,13 @@ const EC3_AUDIO_CHANNELS = new Set([
               absUrl = trimmed.startsWith('/') ? `${edgeOrigin}${trimmed}` : `${edgeBase}${trimmed}`;
             }
 
+            const tokenParam = (parsedUrl.query.auth_token || parsedUrl.query.token)
+              ? `&auth_token=${encodeURIComponent(parsedUrl.query.auth_token || parsedUrl.query.token)}`
+              : '';
+
             // Si c'est une sous-playlist (variant stream)
             if (trimmed.includes('.m3u8')) {
-              return `/api/stream/xtream?target=${encodeURIComponent(absUrl)}${shouldTranscodeAudio ? '&transcode_audio=1' : ''}`;
+              return `/api/stream/xtream?target=${encodeURIComponent(absUrl)}${shouldTranscodeAudio ? '&transcode_audio=1' : ''}${tokenParam}`;
             }
 
             // Segment média (.ts)
@@ -5874,6 +5878,7 @@ const EC3_AUDIO_CHANNELS = new Set([
 
           const ffmpeg = spawn('ffmpeg', [
             '-v', 'error',
+            '-copyts',
             '-i', 'pipe:0',
             '-c:v', 'copy',
             '-c:a', 'aac',
@@ -5884,6 +5889,9 @@ const EC3_AUDIO_CHANNELS = new Set([
           ], { stdio: ['pipe', 'pipe', 'ignore'] });
 
           activeFfmpeg = ffmpeg;
+
+          ffmpeg.stdin.on('error', () => {});
+          ffmpeg.stdout.on('error', () => {});
 
           ffmpeg.on('error', (err) => {
             console.warn('[Xtream Chunk Audio Transcode Error]:', err.message);
@@ -6266,9 +6274,10 @@ const EC3_AUDIO_CHANNELS = new Set([
             content = content.replace(/#EXT-X-ENDLIST\r?\n?/g, '');
           }
         }
-        const authToken = parsedUrl.query.auth_token || parsedUrl.query.token || req.headers['x-auth-token'];
+        const authCookie = req.headers.cookie?.match(/(?:^|;\s*)ziflix_session=([^;]+)/)?.[1];
+        const authToken = parsedUrl.query.auth_token || parsedUrl.query.token || req.headers['x-auth-token'] || (authCookie ? decodeURIComponent(authCookie) : '');
         if (authToken) {
-          content = content.replace(/^(seg_\d+\.ts)$/gm, `$1?auth_token=${encodeURIComponent(authToken)}`);
+          content = content.replace(/^(seg_\d+\.ts)\r?$/gm, (m, seg) => `${seg}?auth_token=${encodeURIComponent(authToken)}`);
         }
         res.writeHead(200, {
           'Content-Type': 'application/vnd.apple.mpegurl',
@@ -6443,7 +6452,8 @@ const EC3_AUDIO_CHANNELS = new Set([
 
         if (isMobileDevice || forceHls) {
           try { upstreamRes.destroy(); } catch (e) {}
-          const authToken = parsedUrl.query.auth_token || parsedUrl.query.token || req.headers['x-auth-token'];
+          const authCookie = req.headers.cookie?.match(/(?:^|;\s*)ziflix_session=([^;]+)/)?.[1];
+          const authToken = parsedUrl.query.auth_token || parsedUrl.query.token || req.headers['x-auth-token'] || (authCookie ? decodeURIComponent(authCookie) : '');
           const tokenParam = authToken ? `?auth_token=${encodeURIComponent(authToken)}` : '';
           const startTime = parseFloat(parsedUrl.query.start || parsedUrl.query.time || parsedUrl.query.t || 0) || 0;
           const startParam = startTime > 0 ? (tokenParam ? `&start=${startTime}` : `?start=${startTime}`) : '';
@@ -6745,11 +6755,13 @@ const EC3_AUDIO_CHANNELS = new Set([
         }
       });
 
+      const authToken = parsedUrl.query.auth_token || parsedUrl.query.token || req.headers['x-auth-token'] || '';
+
       // Suivre les redirections 3xx
       if (statusCode >= 300 && statusCode < 400 && proxyRes.headers.location) {
         try { proxyRes.destroy(); } catch (e) {}
         const redirected = resolveProxyUrl(targetUrl, proxyRes.headers.location);
-        const sessionSuffix = sessionKey ? '&dm_session=' + encodeURIComponent(sessionKey) : '';
+        const sessionSuffix = (sessionKey ? '&dm_session=' + encodeURIComponent(sessionKey) : '') + (authToken ? '&auth_token=' + encodeURIComponent(authToken) : '');
         res.writeHead(302, { 'Location': '/api/stream/proxy?url=' + encodeURIComponent(redirected) + sessionSuffix });
         res.end();
         return;
@@ -6762,8 +6774,8 @@ const EC3_AUDIO_CHANNELS = new Set([
         let body = '';
         proxyRes.on('data', chunk => body += chunk);
         proxyRes.on('end', () => {
-          // Passer sessionKey pour que les sous-playlists et segments héritent du cookie
-          const rewritten = rewriteM3u8ForProxy(body, targetUrl, sessionKey);
+          // Passer sessionKey et authToken pour que les sous-playlists et segments héritent du cookie et de la session
+          const rewritten = rewriteM3u8ForProxy(body, targetUrl, sessionKey, authToken);
           res.writeHead(200, {
             'Content-Type': 'application/vnd.apple.mpegurl',
             'Access-Control-Allow-Origin': '*',
