@@ -8,7 +8,7 @@
     "role": "admin",
     "banned": false,
     "created_at": "2026-09-12T00:18:32.081Z",
-    "last_login": "2026-09-13T10:01:09.665Z"
+    "last_login": "2026-09-13T10:54:32.996Z"
   },
   {
     "id": "u_1789172323622_733799e0",
@@ -911,5 +911,49 @@
     "banned": false,
     "created_at": "2026-09-13T09:22:13.689Z",
     "last_login": "2026-09-13T09:22:13.689Z"
+  },
+  {
+    "id": "u_1789297712747_ba02a946",
+    "username": "Babylau97",
+    "password_hash": "a128e3e20a942eccc86cdef87f09e4a425e9931da66f9e1222575562c66c4ce7d90f734c425db1fb18bfb053521762ae29632b7c950d71242b5e1fe8eb1e0187",
+    "salt": "ef8d69921f3871aa1017825a66dfa891",
+    "avatar": "assets/avatars/avatar-6.svg",
+    "role": "user",
+    "banned": false,
+    "created_at": "2026-09-13T11:08:32.747Z",
+    "last_login": "2026-09-13T11:28:12.178Z"
+  },
+  {
+    "id": "u_1789298901513_4ce33221",
+    "username": "Leooooox",
+    "password_hash": "30d2780bede670c55f5fcf3fdfa21d440ec19372361e091b1ee70812f9b1ba75a73605f7c987daaf1d14af175c331604e50fb95e7143dca5684fe380f389192c",
+    "salt": "3aa3e44deb129a2b11e0474f3b522aea",
+    "avatar": "assets/avatars/avatar-1.svg",
+    "role": "user",
+    "banned": false,
+    "created_at": "2026-09-13T11:28:21.513Z",
+    "last_login": "2026-09-13T11:28:21.513Z"
+  },
+  {
+    "id": "u_1789299660948_6296d288",
+    "username": "Lou",
+    "password_hash": "935534556e47778c32231593080f7dcf70f5105ab2190f7ff199556546c5e6b029ae80b3ad15f02c92156c766a7831cb18cef5789310c2e3f9678b997dd1d2d7",
+    "salt": "c94e0ae15601a3d4abadff6aae3ed567",
+    "avatar": "assets/avatars/avatar-7.svg",
+    "role": "user",
+    "banned": false,
+    "created_at": "2026-09-13T11:41:00.948Z",
+    "last_login": "2026-09-13T11:41:00.948Z"
+  },
+  {
+    "id": "u_1789299682734_9474d52d",
+    "username": "nelkitchner",
+    "password_hash": "c61a692c16f4bebdd5a6d004e0e51900ca3a9bf4c5503082b6051bbc480e6696197c5296ae20141b21385a8d3e8fb767d772079b3d67b4194e5c4fabfd915b74",
+    "salt": "db4cb39a9f46cab3cd80f6bc16753eb8",
+    "avatar": "assets/avatars/avatar-1.svg",
+    "role": "user",
+    "banned": false,
+    "created_at": "2026-09-13T11:41:22.735Z",
+    "last_login": "2026-09-13T11:41:22.735Z"
   }
 ]
