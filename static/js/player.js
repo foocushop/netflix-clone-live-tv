@@ -1659,23 +1659,27 @@ class NetflixPlayer {
         initialLiveManifestSize: 1,
         startFragPrefetch: true,
         progressive: false,
-        backBufferLength: 20,
-        maxBufferLength: 30,
-        maxMaxBufferLength: 60,
-        maxBufferSize: 50 * 1024 * 1024,
-        maxBufferHole: 0.9,
-        highBufferWatchdogPeriod: 1,
-        lowBufferWatchdogPeriod: 0.5,
-        nudgeOffset: 0.2,
-        nudgeMaxRetry: 5,
+        backBufferLength: 15,           // 15s historique pour économiser la RAM mobile
+        maxBufferLength: 25,            // 25s tampon stable pour 3G/4G
+        maxMaxBufferLength: 50,         // 50s max
+        maxBufferSize: 40 * 1024 * 1024,
+        maxBufferHole: 0.8,
+        highBufferWatchdogPeriod: 0.8,
+        lowBufferWatchdogPeriod: 0.4,
+        nudgeOffset: 0.15,
+        nudgeMaxRetry: 6,
         maxFragLookUpTolerance: 0.35,
-        fragLoadingTimeOut: 15000,
+        fragLoadingTimeOut: 12000,
         manifestLoadingTimeOut: 8000,
         levelLoadingTimeOut: 8000,
-        manifestLoadingMaxRetry: 3,
-        fragLoadingMaxRetry: 4,
-        fragLoadingRetryDelay: 500,
-        abrEwmaDefaultEstimate: 5000000
+        manifestLoadingMaxRetry: 4,
+        fragLoadingMaxRetry: 5,
+        fragLoadingRetryDelay: 400,
+        fragLoadingMaxRetryTimeout: 8000,
+        manifestLoadingMaxRetryTimeout: 6000,
+        abrEwmaFastLive: 2.0,           // Adaptation instantanée aux variations de signal 3G/4G
+        abrEwmaSlowLive: 7.0,
+        abrEwmaDefaultEstimate: 2500000 // 2.5 Mbps : démarrage immédiat sur réseaux mobiles
       } : {
         // === MODE VOD (Séries & Films : FrenchStream, Vidzy, Fsvid, Xtream VOD) ===
         enableWorker: true,
@@ -1685,23 +1689,27 @@ class NetflixPlayer {
         capLevelToPlayerSize: false,
         startFragPrefetch: true,
         progressive: false,
-        backBufferLength: 90,           // Garde 90s d'historique (évite les flushes intempestifs et permet le retour arrière instantané)
-        maxBufferLength: 120,           // Précharge 2 minutes d'avance (tampon généreux et stable)
-        maxMaxBufferLength: 240,        // Jusqu'à 4 minutes d'avance max
-        maxBufferSize: 120 * 1024 * 1024, // 120 Mo de RAM alloués pour flux 1080p FHD
-        maxBufferHole: 1.0,             // Enjambe automatiquement et instantanément les micro-décalages PTS entre segments de 10s
-        highBufferWatchdogPeriod: 0.8,  // Réagit en 800ms max (au lieu de 3s) si un micro-blocage survient
-        lowBufferWatchdogPeriod: 0.5,
-        nudgeOffset: 0.2,               // Décale de 200ms pour franchir le trou sans saccade
-        nudgeMaxRetry: 5,
+        backBufferLength: 25,           // 25s historique (évite la saturation mémoire sur iPhone/Android)
+        maxBufferLength: 35,            // 35s d'avance (tampon optimal sans saturer la bande passante mobile)
+        maxMaxBufferLength: 70,         // 70s max
+        maxBufferSize: 60 * 1024 * 1024,// 60 Mo de RAM alloués (léger et ultra-fluide)
+        maxBufferHole: 0.8,             // Enjambe les micro-décalages de paquets cellulaires
+        highBufferWatchdogPeriod: 0.8,  // Réagit en 800ms max si un creux survient
+        lowBufferWatchdogPeriod: 0.4,
+        nudgeOffset: 0.15,              // Franchit les trous sans freeze
+        nudgeMaxRetry: 6,
         maxFragLookUpTolerance: 0.35,
         fragLoadingTimeOut: 15000,
         manifestLoadingTimeOut: 8000,
         levelLoadingTimeOut: 8000,
-        manifestLoadingMaxRetry: 3,
-        fragLoadingMaxRetry: 4,
-        fragLoadingRetryDelay: 500,
-        abrEwmaDefaultEstimate: 6000000 // Estimation initiale 6 Mbps pour 1080p fluide sans sauts ABR au démarrage
+        manifestLoadingMaxRetry: 4,
+        fragLoadingMaxRetry: 5,
+        fragLoadingRetryDelay: 400,
+        fragLoadingMaxRetryTimeout: 8000,
+        manifestLoadingMaxRetryTimeout: 6000,
+        abrEwmaFastVoD: 2.0,            // Ajustement ultra-fluide au débit mobile
+        abrEwmaSlowVoD: 7.0,
+        abrEwmaDefaultEstimate: 2500000 // 2.5 Mbps : évite d'engorger la connexion 3G/4G au premier paquet
       };
 
       hlsConfig.xhrSetup = (xhr, url) => {

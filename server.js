@@ -5861,62 +5861,68 @@ const EC3_AUDIO_CHANNELS = new Set([
           return chunkRes.pipe(res);
         }
 
-        if (res.socket) {
-          try { res.socket.setNoDelay(true); } catch (e) {}
-        }
-
-        const needAudioTranscode = parsedUrl.query.transcode_audio === '1';
-
-        if (needAudioTranscode) {
-          res.writeHead(chunkRes.statusCode, {
-            'Content-Type': 'video/mp2t',
-            'Access-Control-Allow-Origin': '*',
-            'Access-Control-Allow-Headers': '*',
-            'Cache-Control': 'public, max-age=3600',
-            'Connection': 'keep-alive'
-          });
-
-          const ffmpeg = spawn('ffmpeg', [
-            '-v', 'error',
-            '-copyts',
-            '-i', 'pipe:0',
-            '-c:v', 'copy',
-            '-c:a', 'aac',
-            '-b:a', '192k',
-            '-muxdelay', '0',
-            '-f', 'mpegts',
-            'pipe:1'
-          ], { stdio: ['pipe', 'pipe', 'ignore'] });
-
-          activeFfmpeg = ffmpeg;
-
-          ffmpeg.stdin.on('error', () => {});
-          ffmpeg.stdout.on('error', () => {});
-
-          ffmpeg.on('error', (err) => {
-            console.warn('[Xtream Chunk Audio Transcode Error]:', err.message);
-            try { res.end(); } catch (e) {}
-          });
-
-          ffmpeg.on('close', () => {
-            if (activeFfmpeg === ffmpeg) activeFfmpeg = null;
-          });
-
-          chunkRes.pipe(ffmpeg.stdin);
-          ffmpeg.stdout.pipe(res);
-        } else {
-          res.writeHead(chunkRes.statusCode, {
-            'Content-Type': chunkRes.headers['content-type'] || 'video/mp2t',
-            'Content-Length': chunkRes.headers['content-length'],
-            'Access-Control-Allow-Origin': '*',
-            'Access-Control-Allow-Headers': '*',
-            'Cache-Control': 'public, max-age=3600',
-            'Connection': 'keep-alive'
-          });
-
-          chunkRes.pipe(res);
-        }
+      clientReq.on('socket', (sock) => {
+        try { sock.setNoDelay(true); } catch (e) {}
       });
+
+      if (res.socket) {
+        try { res.socket.setNoDelay(true); } catch (e) {}
+      }
+
+      const needAudioTranscode = parsedUrl.query.transcode_audio === '1';
+
+      if (needAudioTranscode) {
+        res.writeHead(chunkRes.statusCode, {
+          'Content-Type': 'video/mp2t',
+          'Access-Control-Allow-Origin': '*',
+          'Access-Control-Allow-Headers': '*',
+          'Cache-Control': 'public, max-age=86400, stale-while-revalidate=86400',
+          'Connection': 'keep-alive'
+        });
+        if (typeof res.flushHeaders === 'function') res.flushHeaders();
+
+        const ffmpeg = spawn('ffmpeg', [
+          '-v', 'error',
+          '-copyts',
+          '-i', 'pipe:0',
+          '-c:v', 'copy',
+          '-c:a', 'aac',
+          '-b:a', '192k',
+          '-muxdelay', '0',
+          '-f', 'mpegts',
+          'pipe:1'
+        ], { stdio: ['pipe', 'pipe', 'ignore'] });
+
+        activeFfmpeg = ffmpeg;
+
+        ffmpeg.stdin.on('error', () => {});
+        ffmpeg.stdout.on('error', () => {});
+
+        ffmpeg.on('error', (err) => {
+          console.warn('[Xtream Chunk Audio Transcode Error]:', err.message);
+          try { res.end(); } catch (e) {}
+        });
+
+        ffmpeg.on('close', () => {
+          if (activeFfmpeg === ffmpeg) activeFfmpeg = null;
+        });
+
+        chunkRes.pipe(ffmpeg.stdin);
+        ffmpeg.stdout.pipe(res);
+      } else {
+        res.writeHead(chunkRes.statusCode, {
+          'Content-Type': chunkRes.headers['content-type'] || 'video/mp2t',
+          'Content-Length': chunkRes.headers['content-length'],
+          'Access-Control-Allow-Origin': '*',
+          'Access-Control-Allow-Headers': '*',
+          'Cache-Control': 'public, max-age=86400, stale-while-revalidate=86400',
+          'Connection': 'keep-alive'
+        });
+        if (typeof res.flushHeaders === 'function') res.flushHeaders();
+
+        chunkRes.pipe(res);
+      }
+    });
 
       clientReq.on('error', (err) => {
         if (isAborted || req.destroyed || res.destroyed || res.writableEnded) {
@@ -6026,14 +6032,18 @@ const EC3_AUDIO_CHANNELS = new Set([
           try {
             const stat = fs.statSync(segFile);
             if (stat.size > 0) {
+              if (res.socket) {
+                try { res.socket.setNoDelay(true); } catch (e) {}
+              }
               res.writeHead(200, {
                 'Content-Type': 'video/mp2t',
                 'Content-Length': stat.size,
                 'Access-Control-Allow-Origin': '*',
                 'Access-Control-Allow-Headers': '*',
-                'Cache-Control': 'public, max-age=86400',
+                'Cache-Control': 'public, max-age=86400, stale-while-revalidate=86400',
                 'Accept-Ranges': 'bytes'
               });
+              if (typeof res.flushHeaders === 'function') res.flushHeaders();
               fs.createReadStream(segFile).pipe(res);
               return true;
             }
@@ -6792,7 +6802,7 @@ const EC3_AUDIO_CHANNELS = new Set([
           'Access-Control-Allow-Origin': '*',
           'Access-Control-Allow-Headers': '*',
           'Access-Control-Expose-Headers': 'Content-Length, Content-Range',
-          'Cache-Control': 'public, max-age=86400'
+          'Cache-Control': 'public, max-age=86400, stale-while-revalidate=86400'
         };
         if (proxyRes.headers['content-length']) {
           responseHeaders['Content-Length'] = proxyRes.headers['content-length'];
@@ -6800,7 +6810,11 @@ const EC3_AUDIO_CHANNELS = new Set([
         if (proxyRes.headers['content-range']) {
           responseHeaders['Content-Range'] = proxyRes.headers['content-range'];
         }
+        if (res.socket) {
+          try { res.socket.setNoDelay(true); } catch (e) {}
+        }
         res.writeHead(statusCode, responseHeaders);
+        if (typeof res.flushHeaders === 'function') res.flushHeaders();
         proxyRes.pipe(res);
       }
     });
