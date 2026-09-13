@@ -559,7 +559,7 @@
     "role": "user",
     "banned": false,
     "created_at": "2026-09-12T21:36:08.705Z",
-    "last_login": "2026-09-12T22:55:29.754Z"
+    "last_login": "2026-09-13T20:15:36.769Z"
   },
   {
     "id": "u_1789249046091_74bb4b75",
@@ -1508,5 +1508,38 @@
     "banned": false,
     "created_at": "2026-09-13T19:38:51.596Z",
     "last_login": "2026-09-13T19:38:51.596Z"
+  },
+  {
+    "id": "u_1789329126372_8fd3e762",
+    "username": "Sihembhz",
+    "password_hash": "c836ab8939e2837297bc7b80f64fb53399fcfee5a6147c72df0dd48b1b78f122b69e9737ce6d041787bb7d2d53f38bed5615d2a248cbe9a2449ee0c1ca188db2",
+    "salt": "438d82db94e3908635371039a3cf21aa",
+    "avatar": "assets/avatars/avatar-1.svg",
+    "role": "user",
+    "banned": false,
+    "created_at": "2026-09-13T19:52:06.372Z",
+    "last_login": "2026-09-13T19:52:06.372Z"
+  },
+  {
+    "id": "u_1789329775834_d18b4933",
+    "username": "Sassa",
+    "password_hash": "fcc7edbf1acd71094f06f6e933e4bcf373645fc242c6dc59575d8589cbacedf5eb13d83256f5f2878c8efa35cafd038231a18d2b395d9ffefcdc1673193b05fe",
+    "salt": "8109917268fa6d4dbf57e908e6f18607",
+    "avatar": "assets/avatars/avatar-1.svg",
+    "role": "user",
+    "banned": false,
+    "created_at": "2026-09-13T20:02:55.834Z",
+    "last_login": "2026-09-13T20:02:55.834Z"
+  },
+  {
+    "id": "u_1789329992480_4f5e20db",
+    "username": "hwbw",
+    "password_hash": "e3c39cfbbe2ad28ed70641b6c9573be6a5a88bf929dd4d2c89c264ef21c1ee5f6825ef24542356f923125a6c4fcebf410bd69fded720ccddbcd2adfcc0f107b5",
+    "salt": "4e567ff93dec4f7ef3de93c39be43c60",
+    "avatar": "assets/avatars/avatar-1.svg",
+    "role": "user",
+    "banned": false,
+    "created_at": "2026-09-13T20:06:32.480Z",
+    "last_login": "2026-09-13T20:06:32.480Z"
   }
 ]
