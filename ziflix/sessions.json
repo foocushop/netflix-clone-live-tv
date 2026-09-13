@@ -461,15 +461,6 @@
     "expires_at": 1791902892120
   },
   {
-    "token": "5f71fc46cd9139f6f0e0dd9df759dc049aef77d112f285fc7523a784afdee7ac",
-    "user_id": "u_1789312486704_ef09f3d8",
-    "username": "hfdhsj",
-    "role": "premium",
-    "avatar": "assets/avatars/avatar-1.svg",
-    "expires_at": 1791904486706,
-    "is_premium": true
-  },
-  {
     "token": "5271bbf62f5ed1c029b1f3821dab53530c8d2b4f54e7e605ef6f3935540d9851",
     "user_id": "u_1789314997984_fbcbd072",
     "username": "abba",
@@ -1037,5 +1028,85 @@
     "role": "user",
     "avatar": "assets/avatars/avatar-1.svg",
     "expires_at": 1791931188576
+  },
+  {
+    "token": "77d67e36c1567a92ffdb5e8c133ff42e39cbb9ff99f5928df03abef30da46e9f",
+    "user_id": "u_1789339188575_50d8ccad",
+    "username": "Louise03",
+    "role": "user",
+    "avatar": "assets/avatars/avatar-1.svg",
+    "expires_at": 1791931358279
+  },
+  {
+    "token": "dec116467e1891575a96d3eedd04fb297c68d209b8c18c4315a5da48d7699492",
+    "user_id": "u_1789340612841_3ed31ab5",
+    "username": "blablaaa",
+    "role": "user",
+    "avatar": "assets/avatars/avatar-1.svg",
+    "expires_at": 1791932612843
+  },
+  {
+    "token": "b99a9725792bf28e2f4176673e9e1feaf4054d37f349a4f3317174b9cc515dac",
+    "user_id": "u_admin",
+    "username": "admin",
+    "role": "admin",
+    "avatar": "assets/avatars/avatar-1.svg",
+    "expires_at": 1791933300050
+  },
+  {
+    "token": "28ee6b6de9e90eacbdac099eb9b238e46469dc21115689e2bdaf189afa456dc7",
+    "user_id": "u_admin",
+    "username": "admin",
+    "role": "admin",
+    "avatar": "assets/avatars/avatar-1.svg",
+    "expires_at": 1791933352001
+  },
+  {
+    "token": "41db6ff32a4e1338056876a266e5d401f4c01655055d4965f1cbe3f834b55d73",
+    "user_id": "u_1789341756222_97f3feb2",
+    "username": "Mel",
+    "role": "user",
+    "avatar": "assets/avatars/avatar-1.svg",
+    "expires_at": 1791933756223
+  },
+  {
+    "token": "d42462dd42448d1ea92acce8bc8fdd47cb37f10214708140ac1f4885cbf816aa",
+    "user_id": "u_1789342170311_3649ddfe",
+    "username": "pr0ph3t3",
+    "role": "user",
+    "avatar": "assets/avatars/avatar-1.svg",
+    "expires_at": 1791934170314
+  },
+  {
+    "token": "89df0e18e9cfc78c47e238df4981d80209779e3b2d05c10434e176e9fee81eab",
+    "user_id": "u_1789243715158_124f70bf",
+    "username": "melissa",
+    "role": "user",
+    "avatar": "assets/avatars/avatar-1.svg",
+    "expires_at": 1791934207491
+  },
+  {
+    "token": "de07ee25dce657cb59f68f50e1012c2567c090965e3fa0573ec90255c1b621aa",
+    "user_id": "u_1789342256392_404675d0",
+    "username": "lala92",
+    "role": "user",
+    "avatar": "assets/avatars/avatar-1.svg",
+    "expires_at": 1791934256394
+  },
+  {
+    "token": "5d9f341da77f7e3c25a9cade9b0d60144b53f1aaa5039b9499bffdfd5714c486",
+    "user_id": "u_1789342352669_e5227137",
+    "username": "Eléz",
+    "role": "user",
+    "avatar": "assets/avatars/avatar-1.svg",
+    "expires_at": 1791934352670
+  },
+  {
+    "token": "8a1a4136ec148009e22e443a9732c688cd1fe689af11724163436a54dd837fc6",
+    "user_id": "u_1789342637683_8c0933a6",
+    "username": "morlina",
+    "role": "user",
+    "avatar": "assets/avatars/avatar-1.svg",
+    "expires_at": 1791934637685
   }
 ]
