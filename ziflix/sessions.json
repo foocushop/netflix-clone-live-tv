@@ -252,15 +252,6 @@
     "is_premium": true
   },
   {
-    "token": "97a518e7cc95036391ca306d585648f8c4850aab58824ac8e0d8d6b9a3bfa870",
-    "user_id": "u_admin",
-    "username": "admin",
-    "role": "admin",
-    "avatar": "assets/avatars/avatar-1.svg",
-    "expires_at": 1791885669667,
-    "is_premium": true
-  },
-  {
     "token": "e697f2e29d1230210d48e1714ad7f07e9791af36ace7cf47f74e669a4953d128",
     "user_id": "u_1789236917941_969bb8f7",
     "username": "Grumpy23",
@@ -454,11 +445,46 @@
     "expires_at": 1791902474046
   },
   {
-    "token": "1a6df41752c8ff56d02bbc7134ebe10208ab7367a22c50ff870a80c6a882316b",
-    "user_id": "u_1789310530279_dac2cf43",
-    "username": "pola",
+    "token": "a4ed0a21c0bffb8f553938a14c524e0490ca322de1952b9175989a2c1c10f24b",
+    "user_id": "u_1789310816649_ab1a0514",
+    "username": "Van",
     "role": "user",
     "avatar": "assets/avatars/avatar-1.svg",
-    "expires_at": 1791902530280
+    "expires_at": 1791902816650
+  },
+  {
+    "token": "b73aab43ac05258f6d6897e60967305c36c5cbdd25c17b31549bf10b2f2757c8",
+    "user_id": "u_1789310892118_f9ca6e44",
+    "username": "Ceecee",
+    "role": "user",
+    "avatar": "assets/avatars/avatar-1.svg",
+    "expires_at": 1791902892120
+  },
+  {
+    "token": "8620ec745c427b8ef0e32a081680dc5f5b7ce5547fe12765f3e8526812eff2a1",
+    "user_id": "u_1789312400893_cc2c86c1",
+    "username": "ytfuy",
+    "role": "premium",
+    "avatar": "assets/avatars/avatar-1.svg",
+    "expires_at": 1791904400894,
+    "is_premium": true
+  },
+  {
+    "token": "5f71fc46cd9139f6f0e0dd9df759dc049aef77d112f285fc7523a784afdee7ac",
+    "user_id": "u_1789312486704_ef09f3d8",
+    "username": "hfdhsj",
+    "role": "premium",
+    "avatar": "assets/avatars/avatar-1.svg",
+    "expires_at": 1791904486706,
+    "is_premium": true
+  },
+  {
+    "token": "3a343816a10e49ac4db9bd2caebf9fbaa28e3d344c4564532dff374dc81a6ae0",
+    "user_id": "u_1789312546748_3e758ec1",
+    "username": "hdhdhs",
+    "role": "premium",
+    "avatar": "assets/avatars/avatar-1.svg",
+    "expires_at": 1791904546750,
+    "is_premium": true
   }
 ]
