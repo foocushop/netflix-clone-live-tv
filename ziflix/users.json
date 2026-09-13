@@ -1442,5 +1442,16 @@
     "banned": false,
     "created_at": "2026-09-13T18:03:51.992Z",
     "last_login": "2026-09-13T18:03:51.992Z"
+  },
+  {
+    "id": "u_1789323272412_4e85f5df",
+    "username": "Woodiy",
+    "password_hash": "411ace85c7986f9cb9a9179f464e7698e7b9f8fd95f576145a1dfe863ece8c49be6b35ee73882e63f6a52f36c9bef6cbbb4c4189ae81378369df4da535898819",
+    "salt": "99b0fe7c825f91334547bf680a031ec2",
+    "avatar": "assets/avatars/avatar-1.svg",
+    "role": "user",
+    "banned": false,
+    "created_at": "2026-09-13T18:14:32.412Z",
+    "last_login": "2026-09-13T18:17:43.320Z"
   }
 ]
