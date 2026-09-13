@@ -1740,15 +1740,28 @@ class NetflixPlayer {
           }
         }
 
-        const playPromise = this.video.play();
-        if (playPromise !== undefined) {
-          playPromise.catch(err => {
-            console.warn('[Player] Autoplay avec son restreint par le navigateur, démarrage en muet :', err.message);
-            this.video.muted = true;
-            this.syncVolumeUI();
-            this.video.play().catch(() => {});
-          });
-        }
+        let hasStartedPlay = false;
+        const startVideoPlayback = () => {
+          if (hasStartedPlay) return;
+          hasStartedPlay = true;
+          const playPromise = this.video.play();
+          if (playPromise !== undefined) {
+            playPromise.catch(err => {
+              console.warn('[Player] Autoplay avec son restreint par le navigateur, démarrage en muet :', err.message);
+              this.video.muted = true;
+              this.syncVolumeUI();
+              this.video.play().catch(() => {});
+            });
+          }
+        };
+
+        // Démarrer dès que le premier fragment est stocké en mémoire tampon matérielle
+        hls.once(Hls.Events.FRAG_BUFFERED, () => {
+          startVideoPlayback();
+        });
+
+        // Sécurité : démarrage au plus tard après 1.2s
+        setTimeout(startVideoPlayback, 1200);
       });
 
       this._mediaErrorCount = 0;
@@ -2154,7 +2167,7 @@ class NetflixPlayer {
           this.loader.classList.remove('hidden', 'fade-out');
           this.loader.classList.add('buffering-mode');
         }
-      }, 350);
+      }, 1000);
     } else {
       this.hideLoader();
     }

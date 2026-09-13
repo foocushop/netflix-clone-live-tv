@@ -6228,12 +6228,14 @@ const EC3_AUDIO_CHANNELS = new Set([
       if (fs.existsSync(playlistPath)) {
         try {
           const content = fs.readFileSync(playlistPath, 'utf8');
-          const firstSegMatch = content.match(/(seg_\d+\.ts)/);
-          if (firstSegMatch && firstSegMatch[1]) {
-            const firstSegPath = path.join(hlsDir, firstSegMatch[1]);
+          const segMatches = content.match(/seg_\d+\.ts/g);
+          if (segMatches && segMatches.length > 0) {
+            const firstSegPath = path.join(hlsDir, segMatches[0]);
             if (fs.existsSync(firstSegPath)) {
               const s = fs.statSync(firstSegPath);
-              if (s.size > 20000) return true;
+              // Coussin de sécurité : au moins 2 segments indexés, OU premier segment bien garni (> 800 Ko), OU timeout de sécurité 2.5s
+              const hasCushion = (segMatches.length >= 2 || s.size > 800000 || waited >= 2500 || (session && session.isDone) || isFullCompletePlaylist);
+              if (hasCushion && s.size > 20000) return true;
             }
           }
         } catch (e) {}
