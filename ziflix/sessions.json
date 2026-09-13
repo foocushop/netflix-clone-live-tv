@@ -5,7 +5,8 @@
     "username": "admin",
     "role": "admin",
     "avatar": "assets/avatars/avatar-1.svg",
-    "expires_at": 1791858539287
+    "expires_at": 1791858539287,
+    "is_premium": true
   },
   {
     "token": "39e27d2246b9a42a591224a76a964acb32cffd5fcf12ce848e48c41c8f6ba979",
@@ -13,7 +14,8 @@
     "username": "admin",
     "role": "admin",
     "avatar": "assets/avatars/avatar-1.svg",
-    "expires_at": 1791859111943
+    "expires_at": 1791859111943,
+    "is_premium": true
   },
   {
     "token": "ade01d9e722f22facfb867136fcd7be416e56cbae22b3a17d1297dceaf1dcf15",
@@ -21,7 +23,8 @@
     "username": "admin",
     "role": "admin",
     "avatar": "assets/avatars/avatar-1.svg",
-    "expires_at": 1791859163813
+    "expires_at": 1791859163813,
+    "is_premium": true
   },
   {
     "token": "301fe859e8ac9c634b881b2dbf8be29579c6445319dd0bd33969fcc5d87b9848",
@@ -245,7 +248,8 @@
     "username": "admin",
     "role": "admin",
     "avatar": "assets/avatars/avatar-1.svg",
-    "expires_at": 1791885402324
+    "expires_at": 1791885402324,
+    "is_premium": true
   },
   {
     "token": "97a518e7cc95036391ca306d585648f8c4850aab58824ac8e0d8d6b9a3bfa870",
@@ -253,7 +257,8 @@
     "username": "admin",
     "role": "admin",
     "avatar": "assets/avatars/avatar-1.svg",
-    "expires_at": 1791885669667
+    "expires_at": 1791885669667,
+    "is_premium": true
   },
   {
     "token": "e697f2e29d1230210d48e1714ad7f07e9791af36ace7cf47f74e669a4953d128",
@@ -277,7 +282,8 @@
     "username": "admin",
     "role": "admin",
     "avatar": "assets/avatars/avatar-1.svg",
-    "expires_at": 1791888872997
+    "expires_at": 1791888872997,
+    "is_premium": true
   },
   {
     "token": "ba9796a89d878508578f078773786f64a69afb8233e6b32731d701cdf54289b9",
@@ -382,5 +388,21 @@
     "role": "user",
     "avatar": "assets/avatars/avatar-1.svg",
     "expires_at": 1791894201817
+  },
+  {
+    "token": "330b822e17574d91a3cacfd2ccf3e172516a1871c1696b31faf35730f3448158",
+    "user_id": "u_1789304223758_1bd0456f",
+    "username": "Delphineg56440",
+    "role": "user",
+    "avatar": "assets/avatars/avatar-1.svg",
+    "expires_at": 1791896223759
+  },
+  {
+    "token": "5180108a3b8c2b87d4662133a1c304d5ed9b035382a5f21b25814ed1ef99cf60",
+    "user_id": "u_1789248472330_c9fd5c5d",
+    "username": "LoloFaya",
+    "role": "user",
+    "avatar": "assets/avatars/avatar-1.svg",
+    "expires_at": 1791897967163
   }
 ]
