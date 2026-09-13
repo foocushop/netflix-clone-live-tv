@@ -470,15 +470,6 @@
     "is_premium": true
   },
   {
-    "token": "3a343816a10e49ac4db9bd2caebf9fbaa28e3d344c4564532dff374dc81a6ae0",
-    "user_id": "u_1789312546748_3e758ec1",
-    "username": "hdhdhs",
-    "role": "premium",
-    "avatar": "assets/avatars/avatar-1.svg",
-    "expires_at": 1791904546750,
-    "is_premium": true
-  },
-  {
     "token": "5271bbf62f5ed1c029b1f3821dab53530c8d2b4f54e7e605ef6f3935540d9851",
     "user_id": "u_1789314997984_fbcbd072",
     "username": "abba",
@@ -646,5 +637,37 @@
     "role": "user",
     "avatar": "assets/avatars/avatar-1.svg",
     "expires_at": 1791913350629
+  },
+  {
+    "token": "0858c80afbcf410dc2a9f7166be158929723de7dfe3ded72fd1d77fe59882ae5",
+    "user_id": "u_1789321900083_22a0e374",
+    "username": "Ness",
+    "role": "user",
+    "avatar": "assets/avatars/avatar-7.svg",
+    "expires_at": 1791913900084
+  },
+  {
+    "token": "7cda288fece5d6ff657af7b3a6005d64229daa1e3ec0f09d4150c8659adc1c3f",
+    "user_id": "u_1789322153043_cdc3ff47",
+    "username": "Диана",
+    "role": "user",
+    "avatar": "assets/avatars/avatar-1.svg",
+    "expires_at": 1791914153045
+  },
+  {
+    "token": "f37ffd85f563d9918c9f8bac6859739cc8b99dbbdd86a167d8d89378854dcd43",
+    "user_id": "u_1789322517245_d379a2fc",
+    "username": "Rot",
+    "role": "user",
+    "avatar": "assets/avatars/avatar-1.svg",
+    "expires_at": 1791914517247
+  },
+  {
+    "token": "47a6ca9acf6dc4c247c132cfa4bfd7162df6cdaa0dc4cdb9168e43a750bb5225",
+    "user_id": "u_1789322631992_11299c01",
+    "username": "vxvd",
+    "role": "user",
+    "avatar": "assets/avatars/avatar-1.svg",
+    "expires_at": 1791914631993
   }
 ]
