@@ -74,7 +74,7 @@
     "role": "user",
     "banned": false,
     "created_at": "2026-09-12T16:51:11.823Z",
-    "last_login": "2026-09-13T00:56:40.941Z"
+    "last_login": "2026-09-13T05:25:09.763Z"
   },
   {
     "id": "u_1789232222831_901df7ea",
@@ -657,7 +657,7 @@
     "role": "user",
     "banned": false,
     "created_at": "2026-09-12T22:39:52.634Z",
-    "last_login": "2026-09-12T22:39:52.634Z"
+    "last_login": "2026-09-13T04:29:05.897Z"
   },
   {
     "id": "u_1789254943636_e8d76557",
@@ -790,5 +790,16 @@
     "banned": false,
     "created_at": "2026-09-13T02:28:15.435Z",
     "last_login": "2026-09-13T02:28:15.435Z"
+  },
+  {
+    "id": "u_1789274331550_bd8cfe6e",
+    "username": "Irilux",
+    "password_hash": "8407f094af869efd380872017453afce984fa6c21c3b22fb7991dcacd0de71ce0de6ae38e6a642336b9c54bfc02226867a0ac25044121e7a8fdc64f82105c4d8",
+    "salt": "ee4d42467c585ff177a2ccd72f4feb62",
+    "avatar": "assets/avatars/avatar-1.svg",
+    "role": "user",
+    "banned": false,
+    "created_at": "2026-09-13T04:38:51.550Z",
+    "last_login": "2026-09-13T04:38:51.550Z"
   }
 ]
