@@ -30,5 +30,13 @@
     "role": "admin",
     "avatar": "assets/avatars/avatar-1.svg",
     "expires_at": 1791942959285
+  },
+  {
+    "token": "e76e8d7daec91fbc429d0ffb931824f0bf2472b1c416863fd2892b8abd9be1fc",
+    "user_id": "u_1789358755452_67788c0f",
+    "username": "Sara2026",
+    "role": "user",
+    "avatar": "assets/avatars/avatar-3.svg",
+    "expires_at": 1791950755454
   }
 ]

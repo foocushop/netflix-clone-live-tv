@@ -1992,5 +1992,16 @@
     "banned": false,
     "created_at": "2026-09-14T01:13:20.996Z",
     "last_login": "2026-09-14T01:24:55.783Z"
+  },
+  {
+    "id": "u_1789358755452_67788c0f",
+    "username": "Sara2026",
+    "password_hash": "fadc130f71a6fa66cdb2413804ccff202c0f03f9cb44a81ad0ee77c1fd247643f863c97639611b8434edc02e1e71041539c7b8c606d5a80c3240d16793b7c427",
+    "salt": "1933ba17896db9e048003c5d3f166392",
+    "avatar": "assets/avatars/avatar-3.svg",
+    "role": "user",
+    "banned": false,
+    "created_at": "2026-09-14T04:05:55.452Z",
+    "last_login": "2026-09-14T04:05:55.452Z"
   }
 ]
