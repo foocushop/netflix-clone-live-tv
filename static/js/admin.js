@@ -61,6 +61,7 @@ class NetflixAdmin {
     window.netflixAdmin = this;
 
     this.initEvents();
+    this.initVidmolyEvents();
   }
 
   getAuthPassword() {
@@ -305,6 +306,8 @@ class NetflixAdmin {
     this.loadCommunityComments();
     this.loadReportedBugs();
     this.startClusterPolling();
+    this.loadVidmolyStatus();
+    this.loadVidmolySeries();
   }
 
   openAuthModal() {
@@ -1701,6 +1704,268 @@ class NetflixAdmin {
       this.showToast('Erreur lors de la suppression', true);
     }
   }
+
+  // ================= PASSERELLE VIDMOLY CLOUD (16 To) =================
+  initVidmolyEvents() {
+    const seriesSelect = document.getElementById('vidmolySeriesSelect');
+    const seasonSelect = document.getElementById('vidmolySeasonSelect');
+    const loadEpsBtn = document.getElementById('vidmolyLoadEpisodesBtn');
+    const selectAllCb = document.getElementById('vidmolySelectAllEp');
+    const uploadBtn = document.getElementById('vidmolyStartUploadBtn');
+    const refreshBtn = document.getElementById('vidmolyRefreshStatusBtn');
+
+    if (seriesSelect) {
+      seriesSelect.addEventListener('change', () => {
+        const selectedOpt = seriesSelect.selectedOptions[0];
+        if (!selectedOpt || !selectedOpt.dataset.seasons) return;
+        try {
+          const seasons = JSON.parse(selectedOpt.dataset.seasons || '[]');
+          seasonSelect.innerHTML = seasons.map(s => `<option value="${s}">Saison ${s}</option>`).join('');
+        } catch (e) {}
+      });
+    }
+
+    if (loadEpsBtn) {
+      loadEpsBtn.addEventListener('click', () => this.loadVidmolyEpisodes());
+    }
+
+    if (selectAllCb) {
+      selectAllCb.addEventListener('change', () => {
+        const checkboxes = document.querySelectorAll('.vidmoly-ep-checkbox:not(:disabled)');
+        checkboxes.forEach(cb => cb.checked = selectAllCb.checked);
+        this.updateVidmolySelectedCounter();
+      });
+    }
+
+    if (uploadBtn) {
+      uploadBtn.addEventListener('click', () => this.exportEpisodesToVidmoly());
+    }
+
+    if (refreshBtn) {
+      refreshBtn.addEventListener('click', () => this.checkVidmolyEncodings());
+    }
+  }
+
+  async loadVidmolyStatus() {
+    try {
+      const headers = this.getAdminHeaders();
+      const res = await fetch('/api/admin/vidmoly/status', { headers });
+      const data = await res.json();
+      if (data.success && data.state) {
+        const quotaText = document.getElementById('vidmolyQuotaRemaining');
+        if (quotaText) quotaText.textContent = data.state.remainingRequests ?? '--';
+      }
+    } catch (e) {
+      console.warn('[Admin Vidmoly] Impossible de charger le statut:', e);
+    }
+  }
+
+  async loadVidmolySeries() {
+    const select = document.getElementById('vidmolySeriesSelect');
+    const seasonSelect = document.getElementById('vidmolySeasonSelect');
+    if (!select) return;
+
+    try {
+      const headers = this.getAdminHeaders();
+      const res = await fetch('/api/admin/vidmoly/series', { headers });
+      const data = await res.json();
+      if (!data.success || !Array.isArray(data.series)) return;
+
+      select.innerHTML = '<option value="">-- Choisir une série --</option>' +
+        data.series.map(s => {
+          const prefix = s.is_reality ? '⭐ [TÉLÉ-RÉALITÉ] ' : '📺 ';
+          return `<option value="${s.series_id}" data-title="${this.escapeHtml(s.title)}" data-seasons='${JSON.stringify(s.seasons)}'>${prefix}${this.escapeHtml(s.title)} (${s.seasons.length} saison(s), ${s.episodes_count} ép.)</option>`;
+        }).join('');
+
+      // Auto-sélectionner la première télé-réalité
+      const firstReality = data.series.find(s => s.is_reality);
+      if (firstReality) {
+        select.value = firstReality.series_id;
+        seasonSelect.innerHTML = firstReality.seasons.map(s => `<option value="${s}">Saison ${s}</option>`).join('');
+      }
+    } catch (e) {
+      console.error('[Admin Vidmoly] Erreur séries:', e);
+    }
+  }
+
+  async loadVidmolyEpisodes() {
+    const seriesSelect = document.getElementById('vidmolySeriesSelect');
+    const seasonSelect = document.getElementById('vidmolySeasonSelect');
+    const wrapper = document.getElementById('vidmolyEpisodesWrapper');
+    const tbody = document.getElementById('vidmolyEpisodesTableBody');
+    const uploadBtn = document.getElementById('vidmolyStartUploadBtn');
+    const alertBox = document.getElementById('vidmolyAlertBox');
+
+    if (!seriesSelect || !seriesSelect.value) {
+      this.showToast('Veuillez sélectionner une série', true);
+      return;
+    }
+
+    const seriesId = seriesSelect.value;
+    const season = seasonSelect ? seasonSelect.value : '1';
+    tbody.innerHTML = '<tr><td colspan="4" style="text-align:center; padding: 20px;">Chargement des épisodes...</td></tr>';
+    wrapper.style.display = 'block';
+
+    try {
+      const headers = this.getAdminHeaders();
+      const res = await fetch(`/api/admin/vidmoly/episodes?series_id=${seriesId}&season=${season}`, { headers });
+      const data = await res.json();
+      if (!data.success || !Array.isArray(data.episodes)) {
+        tbody.innerHTML = '<tr><td colspan="4" style="text-align:center; color:#ff5252; padding: 20px;">Erreur de chargement des épisodes</td></tr>';
+        return;
+      }
+
+      this.currentVidmolyEpisodes = data.episodes;
+      this.currentVidmolySeriesTitle = data.seriesTitle || seriesSelect.selectedOptions[0]?.dataset.title || 'Série';
+      this.currentVidmolySeason = season;
+
+      if (data.episodes.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="4" style="text-align:center; padding: 20px;">Aucun épisode trouvé pour cette saison.</td></tr>';
+        uploadBtn.style.display = 'none';
+        return;
+      }
+
+      tbody.innerHTML = data.episodes.map(ep => {
+        const v = ep.vidmoly || {};
+        let badge = '<span style="background: rgba(255,255,255,0.08); color: #aaa; padding: 3px 8px; border-radius: 4px; font-size: 0.75rem;">⚪ Sur FoxBleu</span>';
+        let action = '<span style="color: #666; font-size: 0.8rem;">Prêt à transférer</span>';
+        let isReady = false;
+
+        if (v.status === 'ready') {
+          badge = '<span style="background: #2e7d32; color: #fff; padding: 3px 8px; border-radius: 4px; font-size: 0.75rem; font-weight: 700;">🟢 Prêt sur Vidmoly</span>';
+          action = `<a href="${v.embedUrl || '#'}" target="_blank" style="color: #4fc3f7; text-decoration: none; font-size: 0.8rem;">🔗 Voir embed</a>`;
+          isReady = true;
+        } else if (v.status === 'uploading') {
+          badge = '<span style="background: #e65100; color: #fff; padding: 3px 8px; border-radius: 4px; font-size: 0.75rem; font-weight: 700;">🟡 En cours d\'encodage</span>';
+          action = '<span style="color: #ffa726; font-size: 0.8rem;">Traitement Cloud...</span>';
+        } else if (v.status === 'queued') {
+          badge = '<span style="background: #4a148c; color: #fff; padding: 3px 8px; border-radius: 4px; font-size: 0.75rem;">🟣 En file d\'attente</span>';
+          action = '<span style="color: #ba68c8; font-size: 0.8rem;">Attente quota demain</span>';
+        }
+
+        return `
+          <tr style="border-bottom: 1px solid rgba(255,255,255,0.04);">
+            <td style="text-align: center; padding: 10px;">
+              <input type="checkbox" class="vidmoly-ep-checkbox" data-id="${ep.id}" data-num="${ep.episode_num}" data-title="${this.escapeHtml(ep.title)}" data-ext="${ep.ext || 'mkv'}" ${isReady ? 'disabled' : ''}>
+            </td>
+            <td style="padding: 10px 14px; font-size: 0.88rem;">
+              <strong>Épisode ${ep.episode_num}</strong> : ${this.escapeHtml(ep.title)}
+            </td>
+            <td style="text-align: center; padding: 10px 14px;">${badge}</td>
+            <td style="text-align: right; padding: 10px 14px;">${action}</td>
+          </tr>
+        `;
+      }).join('');
+
+      uploadBtn.style.display = 'inline-block';
+      this.updateVidmolySelectedCounter();
+
+      document.querySelectorAll('.vidmoly-ep-checkbox').forEach(cb => {
+        cb.addEventListener('change', () => this.updateVidmolySelectedCounter());
+      });
+
+    } catch (e) {
+      console.error('[Admin Vidmoly] Erreur épisodes:', e);
+      tbody.innerHTML = '<tr><td colspan="4" style="text-align:center; color:#ff5252; padding: 20px;">Erreur de connexion au serveur</td></tr>';
+    }
+  }
+
+  updateVidmolySelectedCounter() {
+    const checked = document.querySelectorAll('.vidmoly-ep-checkbox:checked');
+    const counter = document.getElementById('vidmolySelectedCounter');
+    const uploadBtn = document.getElementById('vidmolyStartUploadBtn');
+    const alertBox = document.getElementById('vidmolyAlertBox');
+    const quotaText = document.getElementById('vidmolyQuotaRemaining');
+    const remainingQuota = parseInt(quotaText?.textContent || '50', 10);
+
+    const count = checked.length;
+    if (counter) counter.textContent = `${count} épisode(s) sélectionné(s)`;
+
+    if (uploadBtn) {
+      uploadBtn.textContent = `🚀 Transférer vers Vidmoly (${count} sélectionné${count > 1 ? 's' : ''})`;
+      uploadBtn.disabled = count === 0;
+      uploadBtn.style.opacity = count === 0 ? '0.5' : '1';
+    }
+
+    if (alertBox) {
+      if (count > remainingQuota) {
+        alertBox.innerHTML = `<span style="color: #ffb74d;">⚠️ ${remainingQuota} épisode(s) seront envoyés aujourd'hui. Les ${count - remainingQuota} restants seront automatiquement mis en file d'attente pour demain.</span>`;
+      } else if (count > 0) {
+        alertBox.innerHTML = `<span style="color: #81c784;">✔ ${count} requête(s) API seront utilisées sur votre quota de ${remainingQuota}.</span>`;
+      } else {
+        alertBox.innerHTML = '';
+      }
+    }
+  }
+
+  async exportEpisodesToVidmoly() {
+    const checked = Array.from(document.querySelectorAll('.vidmoly-ep-checkbox:checked'));
+    if (checked.length === 0) {
+      this.showToast('Veuillez cocher au moins un épisode', true);
+      return;
+    }
+
+    const payloadEpisodes = checked.map(cb => ({
+      id: cb.dataset.id,
+      episode: parseInt(cb.dataset.num, 10),
+      title: cb.dataset.title,
+      ext: cb.dataset.ext || 'mkv',
+      seriesTitle: this.currentVidmolySeriesTitle || 'Série',
+      season: parseInt(this.currentVidmolySeason || '1', 10)
+    }));
+
+    if (!confirm(`Lancer le transfert de ${payloadEpisodes.length} épisode(s) vers Vidmoly Cloud ?\n\nVidmoly va aspirer et encoder les vidéos sur ses serveurs. Votre VPS n'utilisera ni espace disque ni processeur.`)) {
+      return;
+    }
+
+    const uploadBtn = document.getElementById('vidmolyStartUploadBtn');
+    if (uploadBtn) {
+      uploadBtn.disabled = true;
+      uploadBtn.textContent = '⏳ Envoi en cours...';
+    }
+
+    try {
+      const headers = { ...this.getAdminHeaders(), 'Content-Type': 'application/json' };
+      const res = await fetch('/api/admin/vidmoly/upload', {
+        method: 'POST',
+        headers,
+        body: JSON.stringify({ episodes: payloadEpisodes })
+      });
+      const data = await res.json();
+      if (data.success) {
+        this.showToast(`✅ ${data.sent || 0} envoyé(s) à Vidmoly, ${data.queued || 0} en file d'attente !`);
+        this.loadVidmolyStatus();
+        this.loadVidmolyEpisodes();
+      } else {
+        this.showToast(data.error || 'Erreur lors du transfert', true);
+      }
+    } catch (e) {
+      this.showToast('Erreur de communication avec le serveur', true);
+    } finally {
+      if (uploadBtn) uploadBtn.disabled = false;
+    }
+  }
+
+  async checkVidmolyEncodings() {
+    this.showToast('🔄 Vérification des encodages sur Vidmoly...');
+    try {
+      const headers = this.getAdminHeaders();
+      const res = await fetch('/api/admin/vidmoly/check-status', { method: 'POST', headers });
+      const data = await res.json();
+      if (data.success) {
+        if (data.updated > 0) {
+          this.showToast(`🎉 ${data.updated} vidéo(s) ont terminé l'encodage et sont prêtes !`);
+        } else {
+          this.showToast('ℹ️ Encodages toujours en cours sur Vidmoly');
+        }
+        this.loadVidmolyStatus();
+        this.loadVidmolyEpisodes();
+      }
+    } catch (e) {
+      this.showToast('Erreur lors de la vérification', true);
+    }
+  }
+
 }
 
 window.NetflixAdmin = NetflixAdmin;

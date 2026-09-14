@@ -132,6 +132,8 @@ class NetflixPlayer {
     this._isRemuxedMp4 = false;
     this._currentDirectVideoUrl = '';
     this._hlsStreamOffset = 0;
+    this._isUserPaused = false;
+    this._isQualitySwitching = false;
 
     // Initialisation
     this.initEvents();
@@ -242,33 +244,43 @@ class NetflixPlayer {
         this.hideStatusBanner();
       };
 
+      this.video.addEventListener('stalled', () => {
+        if (!this._isUserPaused) {
+          this.showBuffering(true, 'Mise en mémoire tampon...');
+        }
+      });
       this.video.addEventListener('waiting', () => {
-        if (this.video && !this.video.paused) {
+        if (!this._isUserPaused) {
           this.showBuffering(true, 'Mise en mémoire tampon...');
         }
         if (bufferTimeout) clearTimeout(bufferTimeout);
         if (slowStreamTimeout) clearTimeout(slowStreamTimeout);
 
         slowStreamTimeout = setTimeout(() => {
-          if (this.video && !this.video.paused) {
+          if (!this._isUserPaused) {
             this.showStatusBanner('Flux ralenti. Patientez un instant ou essayez un autre serveur.');
           }
         }, 10000);
       });
 
       this.video.addEventListener('seeking', () => {
-        if (this.video && !this.video.paused) {
+        if (!this._isUserPaused) {
           this.showBuffering(true, 'Chargement...');
         }
       });
 
-      this.video.addEventListener('playing', clearBufferState);
+      this.video.addEventListener('playing', () => {
+        this._isUserPaused = false;
+        clearBufferState();
+      });
       this.video.addEventListener('canplay', clearBufferState);
       this.video.addEventListener('seeked', clearBufferState);
       this.video.addEventListener('pause', () => {
         if (bufferTimeout) clearTimeout(bufferTimeout);
         if (slowStreamTimeout) clearTimeout(slowStreamTimeout);
-        this.showBuffering(false);
+        if (this._isUserPaused) {
+          this.showBuffering(false);
+        }
       });
     }
 
@@ -417,7 +429,7 @@ class NetflixPlayer {
           div.className = 'player-drawer-item';
           div.innerHTML = `
             <div class="player-drawer-meta">
-              <span class="player-drawer-author">${c.username}</span>
+              <span class="player-drawer-author">${c.username} ${(c.is_vip || c.role === "admin" || c.role === "premium") ? '<span class="vip-badge-tag">👑 VIP</span>' : ""}</span>
               <span>${new Date(c.createdAt).toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })}</span>
             </div>
             <div class="player-drawer-text">${c.text.replace(/</g, '&lt;').replace(/>/g, '&gt;')}</div>
@@ -829,6 +841,7 @@ class NetflixPlayer {
   // ================= 5. SÉLECTEUR DE QUALITÉ HLS =================
   initQualityEvents() {
     if (!this.ctrlQualityBtn || !this.qualityMenu) return;
+    this.currentQuality = 1080;
 
     this.ctrlQualityBtn.addEventListener('click', (e) => {
       e.stopPropagation();
@@ -838,10 +851,21 @@ class NetflixPlayer {
 
     this.qualityMenu.querySelectorAll('.quality-item').forEach(item => {
       item.addEventListener('click', () => {
-        const targetQ = parseInt(item.dataset.quality, 10);
+        const targetQ = parseInt(item.dataset.quality, 10) || 1080;
+        const isPremium = (window.netflixApp && typeof window.netflixApp.isUserPremium === 'function')
+          ? window.netflixApp.isUserPremium()
+          : false;
+
+        // 720p et 480p réservés aux membres VIP
+        if ((targetQ === 720 || targetQ === 480) && !isPremium) {
+          this.qualityMenu.classList.add('hidden');
+          if (window.netflixApp && typeof window.netflixApp.openPremiumModal === 'function') {
+            window.netflixApp.openPremiumModal('quality', targetQ);
+          }
+          return;
+        }
+
         this.currentQuality = targetQ;
-        this.qualityMenu.querySelectorAll('.quality-item').forEach(i => i.classList.remove('active'));
-        item.classList.add('active');
         this.applyQualityLevel();
         this.qualityMenu.classList.add('hidden');
       });
@@ -853,31 +877,165 @@ class NetflixPlayer {
   }
 
   applyQualityLevel() {
-    if (!this.hls || !this.hls.levels || this.hls.levels.length === 0) return;
-    if (this.currentQuality === -1) {
-      this.hls.currentLevel = -1; // Auto ABR
-      if (this.qualityCurrentText) this.qualityCurrentText.textContent = 'Auto';
+    const q = this.currentQuality || 1080;
+
+    // Mise à jour de la coche et des classes actives dans le menu
+    if (this.qualityMenu) {
+      this.qualityMenu.querySelectorAll('.quality-item').forEach(item => {
+        const itemQ = parseInt(item.dataset.quality, 10);
+        const isActive = (itemQ === q);
+        item.classList.toggle('active', isActive);
+        const check = item.querySelector('.q-check');
+        if (check) check.textContent = isActive ? '✓' : '';
+      });
+    }
+
+    const qualityLabel = (q >= 1080) ? '1080p FHD' : ((q >= 720) ? '720p HD' : '480p Éco-Data');
+
+    if (this.qualityCurrentText) {
+      this.qualityCurrentText.textContent = (q <= 480) ? '480p 🍃' : (q + 'p');
+    }
+    if (this.qualityBadge) {
+      this.qualityBadge.textContent = (q >= 1080) ? 'FHD' : ((q >= 720) ? 'HD' : 'ÉCO');
+    }
+
+    if (typeof this.triggerCenterRipple === 'function') {
+      this.triggerCenterRipple((q <= 480) ? '480p Éco-Data 🍃' : (q + 'p HD ⚡'));
+    }
+
+    const curTime = Math.floor(this.getCurrentPlaybackTime() || (this.video ? this.video.currentTime : 0) || 0);
+    const wasPaused = !this.video || this.video.paused;
+
+    // 1. Verrouillage absolu : geler la vidéo et couper le son sur-le-champ
+    if (this.video) {
+      try {
+        this.video.pause();
+        this.video.muted = true;
+      } catch (e) {}
+    }
+
+    // 2. Afficher instantanément le loader ZIFLIX
+    this.showQualitySwitchLoading(`Chargement ${qualityLabel}...`);
+
+    // CAS 0 : HLS MULTI-QUALITÉS NATIF VIDMOLY (0% CPU VPS, changement direct de variante)
+    if (this.hls && this.hls.levels && this.hls.levels.length > 1 && !this._currentHlsUrl?.includes('/playlist.m3u8')) {
+      const lvlIdx = this.hls.levels.findIndex(l => Math.abs((l.height || 0) - q) < 60);
+      if (lvlIdx !== -1) {
+        console.log(`[ZIFLIX Player] Bascule native Vidmoly vers niveau ${lvlIdx} (${q}p)`);
+        this.hls.currentLevel = lvlIdx;
+        setTimeout(() => {
+          this._isQualitySwitching = false;
+          this.hideQualitySwitchLoading();
+          if (this.video) {
+            this.video.muted = false;
+            if (!wasPaused) this.video.play().catch(() => {});
+          }
+        }, 250);
+        return;
+      }
+    }
+
+    // CAS 1 : SÉRIES XTREAM HLS (Télé-Réalité, Séries, La Villa, Les Apprentis Aventuriers)
+    const hlsSeriesMatch = this._currentHlsUrl ? this._currentHlsUrl.match(/\/api\/stream\/xtream-series-hls\/([^\/]+)/) : null;
+    if (hlsSeriesMatch && hlsSeriesMatch[1]) {
+      const epId = hlsSeriesMatch[1];
+      const baseUrl = window.API_BASE || '';
+      const authToken = localStorage.getItem('ziflix_auth_token') || '';
+      const tokenParam = authToken ? `&auth_token=${encodeURIComponent(authToken)}` : '';
+      const targetUrl = `${baseUrl}/api/stream/xtream-series-hls/${epId}/${q}/playlist.m3u8?start=${curTime}${tokenParam}`;
+
+      console.log(`[ZIFLIX Player] Transition qualité Xtream vers ${q}p à ${curTime}s :`, targetUrl);
+
+      this._hlsStreamOffset = curTime;
+      this.playDirectHls(targetUrl, { startPosition: curTime, keepPlayback: !wasPaused });
+
+      let unfreezeDone = false;
+      const unfreeze = () => {
+        if (unfreezeDone) return;
+        unfreezeDone = true;
+        this._isQualitySwitching = false;
+        if (this.video) {
+          this.video.muted = false;
+          if (!wasPaused) this.video.play().catch(() => {});
+        }
+        this.hideLoader();
+      };
+
+      if (this.video) {
+        this.video.addEventListener('playing', unfreeze, { once: true });
+        this.video.addEventListener('canplay', unfreeze, { once: true });
+      }
+      setTimeout(unfreeze, 6000);
       return;
     }
 
-    let bestIdx = -1;
-    let minDiff = Infinity;
-    this.hls.levels.forEach((lvl, idx) => {
-      const h = lvl.height || 720;
-      const diff = Math.abs(h - this.currentQuality);
-      if (diff < minDiff) {
-        minDiff = diff;
-        bestIdx = idx;
-      }
-    });
+    // CAS 2 : HLS Standard Multi-Qualités (FrenchStream, Vidzy, Live)
+    if (this.hls && this.hls.levels && this.hls.levels.length > 0) {
+      let bestIdx = 0;
+      let minDiff = Infinity;
+      this.hls.levels.forEach((lvl, idx) => {
+        const h = lvl.height || 1080;
+        const diff = Math.abs(h - q);
+        if (diff < minDiff) {
+          minDiff = diff;
+          bestIdx = idx;
+        }
+      });
 
-    if (bestIdx !== -1) {
-      this.hls.currentLevel = bestIdx;
-      const actualH = this.hls.levels[bestIdx].height || this.currentQuality;
-      if (this.qualityCurrentText) this.qualityCurrentText.textContent = `${actualH}p`;
-      if (this.qualityBadge) {
-        this.qualityBadge.textContent = (actualH >= 1080) ? 'FHD' : ((actualH >= 720) ? 'HD' : `${actualH}p`);
+      if (this.hls.currentLevel === bestIdx) {
+        this.hideLoader();
+        if (this.video) {
+          this.video.muted = false;
+          if (!wasPaused) this.video.play().catch(() => {});
+        }
+        return;
       }
+
+      this.hls.currentLevel = bestIdx;
+
+      let isDone = false;
+      const finishHls = () => {
+        if (isDone) return;
+        isDone = true;
+        this.hideLoader();
+        if (this.video) {
+          this.video.muted = false;
+          if (!wasPaused) this.video.play().catch(() => {});
+        }
+      };
+
+      const onFragBuffered = (event, data) => {
+        if (data && data.frag && data.frag.level === bestIdx) {
+          if (this.hls) this.hls.off(Hls.Events.FRAG_BUFFERED, onFragBuffered);
+          finishHls();
+        }
+      };
+      this.hls.on(Hls.Events.FRAG_BUFFERED, onFragBuffered);
+      setTimeout(finishHls, 3500);
+      return;
+    }
+
+    // CAS 3 : Lecture directe vidéo MP4
+    if (this.video && this.video.src && this.video.src.includes('/api/stream/xtream-series')) {
+      let src = this.video.src;
+      if (src.includes('quality=')) {
+        src = src.replace(/quality=\d+/, 'quality=' + q);
+      } else {
+        src += (src.includes('?') ? '&' : '?') + 'quality=' + q;
+      }
+      this.video.src = src;
+      this.video.currentTime = curTime;
+
+      const onCanPlay = () => {
+        this.video.removeEventListener('canplay', onCanPlay);
+        this.hideLoader();
+        if (this.video) {
+          this.video.muted = false;
+          if (!wasPaused) this.video.play().catch(() => {});
+        }
+      };
+      this.video.addEventListener('canplay', onCanPlay, { once: true });
+      setTimeout(onCanPlay, 4000);
     }
   }
 
@@ -886,6 +1044,32 @@ class NetflixPlayer {
     const isChannel = (this.currentMovie?.media_type === 'channel' || this.currentMovie?.is_live);
     if (isChannel && this.qualityBadge) {
       this.qualityBadge.textContent = 'FHD';
+    }
+
+    // Détection automatique des résolutions réellement présentes (Vidmoly Cloud / HLS Multi-qualités)
+    if (this.hls.levels.length > 1) {
+      const heights = this.hls.levels.map(l => l.height || 0);
+      const has1080 = heights.some(h => h >= 1000);
+      const has720 = heights.some(h => h >= 650 && h < 1000);
+      const has480 = heights.some(h => h >= 400 && h < 650);
+
+      this.qualityMenu.querySelectorAll('.quality-item').forEach(item => {
+        const itemQ = parseInt(item.dataset.quality, 10);
+        let isAvailable = true;
+        if (itemQ >= 1080 && !has1080) isAvailable = false;
+        if (itemQ >= 700 && itemQ < 1080 && !has720) isAvailable = false;
+        if (itemQ < 700 && !has480) isAvailable = false;
+
+        if (!isAvailable) {
+          item.style.opacity = '0.35';
+          item.style.pointerEvents = 'none';
+          item.setAttribute('title', 'Non disponible pour cette vidéo');
+        } else {
+          item.style.opacity = '1';
+          item.style.pointerEvents = 'auto';
+          item.removeAttribute('title');
+        }
+      });
     }
   }
 
@@ -1177,8 +1361,20 @@ class NetflixPlayer {
     if (this.titleDisplay) this.titleDisplay.textContent = movie.title || 'Lecture';
     if (this.ctrlMediaTitle) this.ctrlMediaTitle.textContent = movie.title || 'Lecture';
 
-    const isXtreamSeries = (movie.is_xtream_series || movie.id === '68628' || movie.tmdb_id === '68628' || String(movie.id).startsWith('xtream_series_') || !!movie.series_id);
-    const isSeries = (movie.media_type === 'series' || isXtreamSeries || (Array.isArray(movie.seasons) && movie.seasons.length > 0));
+    const isChannel = !!(movie.media_type === 'channel' || movie.is_live);
+    const isXtreamSeries = !isChannel && (movie.is_xtream_series || movie.id === '68628' || movie.tmdb_id === '68628' || String(movie.id).startsWith('xtream_series_') || !!movie.series_id);
+    const isSeries = !isChannel && (movie.media_type === 'series' || isXtreamSeries || (Array.isArray(movie.seasons) && movie.seasons.length > 0));
+
+    if (isChannel) {
+      if (this.episodeBox) {
+        this.episodeBox.classList.add('hidden');
+        this.episodeBox.style.display = 'none';
+      }
+      if (this.ctrlNextEpBtn) {
+        this.ctrlNextEpBtn.classList.add('hidden');
+        this.ctrlNextEpBtn.style.display = 'none';
+      }
+    }
 
     // 1. Pré-chargement immédiat et bloquant des saisons Xtream si absentes (évite le démarrage à vide)
     if (isSeries && (!movie.seasons || movie.seasons.length === 0) && isXtreamSeries) {
@@ -1440,15 +1636,15 @@ class NetflixPlayer {
         let targetStreamUrl = epStreamUrl;
         if (targetStreamUrl.startsWith('/')) targetStreamUrl = baseUrl + targetStreamUrl;
 
-        // Safari / iOS : redirection instantanée vers HLS
-        if (needsHls && targetStreamUrl.includes('/api/stream/xtream-series')) {
+        // Séries Xtream : Moteur HLS multi-qualités (1080p FHD, 720p HD, 480p Éco) universel (PC & mobile)
+        if (targetStreamUrl.includes('/api/stream/xtream-series')) {
           const epId = epObj.id || epObj.episode_id || (targetStreamUrl.match(/episode_id=([^&]+)/)?.[1]);
           if (epId) {
-            const hlsUrl = `${baseUrl}/api/stream/xtream-series-hls/${epId}/playlist.m3u8`;
+            const hlsUrl = `${baseUrl}/api/stream/xtream-series-hls/${epId}/master.m3u8`;
             this.showLoader(`⚡ Connexion au flux direct HLS ${this.currentMovie.title} S${this.currentSeason}:E${this.currentEpisode}...`);
             this.resetSteps();
             this.setStep(1, 'done', `1. Épisode validé (${this.currentMovie.title} S${this.currentSeason}:E${this.currentEpisode})`);
-            this.setStep(2, 'done', `2. Flux direct obtenu (1080p FHD • Apple HLS)`);
+            this.setStep(2, 'done', `2. Flux direct obtenu (1080p FHD • ZIFLIX HLS Ultra-Fluide)`);
             this.setStep(3, 'done', `3. Déchiffrement direct & Proxy local anti-pub`);
             this.setStep(4, 'active', `4. Injection dans le lecteur ZIFLIX...`);
             this.playDirectHls(hlsUrl);
@@ -1558,7 +1754,7 @@ class NetflixPlayer {
   }
 
   // ================= 11. MOTEUR LIVE HLS & VOD (Hls.js) =================
-  playDirectHls(streamUrl) {
+  playDirectHls(streamUrl, options = {}) {
     const baseUrl = window.API_BASE || '';
     if (streamUrl && streamUrl.startsWith('/')) streamUrl = baseUrl + streamUrl;
 
@@ -1567,12 +1763,16 @@ class NetflixPlayer {
       const sep = streamUrl.includes('?') ? '&' : '?';
       streamUrl = `${streamUrl}${sep}auth_token=${encodeURIComponent(authToken)}`;
     }
+    if (streamUrl && streamUrl.includes('/api/stream/xtream-series-hls/') && streamUrl.includes('master.m3u8') && !streamUrl.includes('/1080/') && !streamUrl.includes('/720/') && !streamUrl.includes('/480/')) {
+      streamUrl = streamUrl.replace('playlist.m3u8', 'master.m3u8');
+    }
     this._currentHlsUrl = streamUrl;
     if (!streamUrl.includes('transcode_audio=1')) {
       this._audioTranscodeRecovery = false;
     }
     const startMatch = streamUrl.match(/[?&]start=(\d+)/);
-    this._hlsStreamOffset = startMatch ? parseInt(startMatch[1], 10) : 0;
+    const startSec = (options.startPosition !== undefined) ? options.startPosition : (startMatch ? parseInt(startMatch[1], 10) : 0);
+    this._hlsStreamOffset = startSec;
 
     this.cleanupActivePlayback();
     this.streamAbortController = new AbortController();
@@ -1646,7 +1846,9 @@ class NetflixPlayer {
     }
 
     if (window.Hls && Hls.isSupported()) {
-      // Configuration étanche et séparée : Live TV vs VOD
+      const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+
+      // Configuration étanche et séparée : Live TV vs VOD avec réglages optimisés PC vs Mobile
       const hlsConfig = isChannel ? {
         // === MODE LIVE TV (Chaînes Xtream Live & Serveurs 1-8) ===
         enableWorker: true,
@@ -1659,10 +1861,10 @@ class NetflixPlayer {
         initialLiveManifestSize: 1,
         startFragPrefetch: true,
         progressive: false,
-        backBufferLength: 15,           // 15s historique pour économiser la RAM mobile
-        maxBufferLength: 25,            // 25s tampon stable pour 3G/4G
-        maxMaxBufferLength: 50,         // 50s max
-        maxBufferSize: 40 * 1024 * 1024,
+        backBufferLength: isMobile ? 15 : 30,           // 15s mobile / 30s PC
+        maxBufferLength: isMobile ? 25 : 40,            // 25s mobile / 40s PC (tampon solide)
+        maxMaxBufferLength: isMobile ? 50 : 80,         // 50s mobile / 80s PC
+        maxBufferSize: (isMobile ? 40 : 80) * 1024 * 1024,
         maxBufferHole: 0.8,
         highBufferWatchdogPeriod: 0.8,
         lowBufferWatchdogPeriod: 0.4,
@@ -1677,9 +1879,9 @@ class NetflixPlayer {
         fragLoadingRetryDelay: 400,
         fragLoadingMaxRetryTimeout: 8000,
         manifestLoadingMaxRetryTimeout: 6000,
-        abrEwmaFastLive: 2.0,           // Adaptation instantanée aux variations de signal 3G/4G
+        abrEwmaFastLive: 2.0,
         abrEwmaSlowLive: 7.0,
-        abrEwmaDefaultEstimate: 2500000 // 2.5 Mbps : démarrage immédiat sur réseaux mobiles
+        abrEwmaDefaultEstimate: isMobile ? 2500000 : 6000000 // 6 Mbps sur PC pour qualité maximale
       } : {
         // === MODE VOD (Séries & Films : FrenchStream, Vidzy, Fsvid, Xtream VOD) ===
         enableWorker: true,
@@ -1689,14 +1891,14 @@ class NetflixPlayer {
         capLevelToPlayerSize: false,
         startFragPrefetch: true,
         progressive: false,
-        backBufferLength: 25,           // 25s historique (évite la saturation mémoire sur iPhone/Android)
-        maxBufferLength: 35,            // 35s d'avance (tampon optimal sans saturer la bande passante mobile)
-        maxMaxBufferLength: 70,         // 70s max
-        maxBufferSize: 60 * 1024 * 1024,// 60 Mo de RAM alloués (léger et ultra-fluide)
-        maxBufferHole: 0.8,             // Enjambe les micro-décalages de paquets cellulaires
-        highBufferWatchdogPeriod: 0.8,  // Réagit en 800ms max si un creux survient
+        backBufferLength: isMobile ? 20 : 60,           // 20s mobile / 60s PC (retour arrière instantané)
+        maxBufferLength: isMobile ? 35 : 90,            // 35s mobile / 90s PC (coussin profond anti-coupure)
+        maxMaxBufferLength: isMobile ? 70 : 180,        // 70s mobile / 180s (3 min) PC
+        maxBufferSize: (isMobile ? 50 : 128) * 1024 * 1024, // 50 Mo mobile / 128 Mo PC
+        maxBufferHole: 0.9,                             // Enjambe les micro-décalages
+        highBufferWatchdogPeriod: 0.8,                  // Réagit en 800ms
         lowBufferWatchdogPeriod: 0.4,
-        nudgeOffset: 0.15,              // Franchit les trous sans freeze
+        nudgeOffset: 0.2,                               // Franchit les trous sans freeze
         nudgeMaxRetry: 6,
         maxFragLookUpTolerance: 0.35,
         fragLoadingTimeOut: 15000,
@@ -1707,9 +1909,9 @@ class NetflixPlayer {
         fragLoadingRetryDelay: 400,
         fragLoadingMaxRetryTimeout: 8000,
         manifestLoadingMaxRetryTimeout: 6000,
-        abrEwmaFastVoD: 2.0,            // Ajustement ultra-fluide au débit mobile
-        abrEwmaSlowVoD: 7.0,
-        abrEwmaDefaultEstimate: 2500000 // 2.5 Mbps : évite d'engorger la connexion 3G/4G au premier paquet
+        abrEwmaFastVoD: 2.0,
+        abrEwmaSlowVoD: 6.0,
+        abrEwmaDefaultEstimate: isMobile ? 2500000 : 8000000 // 8 Mbps sur PC pour 1080p FHD net dès la 1ère seconde
       };
 
       hlsConfig.xhrSetup = (xhr, url) => {
@@ -1728,10 +1930,16 @@ class NetflixPlayer {
       hls.loadSource(streamUrl);
       hls.attachMedia(this.video);
 
+      if (startSec > 0) {
+        hlsConfig.startPosition = startSec;
+      }
+
       hls.on(Hls.Events.MANIFEST_PARSED, () => {
         this.setStep(3, 'done', `3. Playlist & fragments HLS initialisés`);
         this.setStep(4, 'active', `4. Démarrage fluide du flux vidéo...`);
-        if (hls.levels && hls.levels.length > 0) {
+        
+        const isTargetedStream = streamUrl.includes('/720/') || streamUrl.includes('/480/') || streamUrl.includes('/1080/');
+        if (!this._isQualitySwitching && !isTargetedStream && hls.levels && hls.levels.length > 0) {
           this.updateQualityMenuOptions();
           if (this.currentQuality === -1) {
             hls.currentLevel = -1;
@@ -1744,14 +1952,21 @@ class NetflixPlayer {
         const startVideoPlayback = () => {
           if (hasStartedPlay) return;
           hasStartedPlay = true;
-          const playPromise = this.video.play();
-          if (playPromise !== undefined) {
-            playPromise.catch(err => {
-              console.warn('[Player] Autoplay avec son restreint par le navigateur, démarrage en muet :', err.message);
-              this.video.muted = true;
-              this.syncVolumeUI();
-              this.video.play().catch(() => {});
-            });
+
+          if (startSec > 0 && Math.abs(this.video.currentTime - startSec) > 2) {
+            this.video.currentTime = startSec;
+          }
+
+          if (options.keepPlayback !== false && !this._isUserPaused) {
+            const playPromise = this.video.play();
+            if (playPromise !== undefined) {
+              playPromise.catch(err => {
+                console.warn('[Player] Autoplay avec son restreint par le navigateur, démarrage en muet :', err.message);
+                this.video.muted = true;
+                this.syncVolumeUI();
+                this.video.play().catch(() => {});
+              });
+            }
           }
         };
 
@@ -1810,6 +2025,7 @@ class NetflixPlayer {
           // Gestion proactive des micro-trous de buffer à la jonction des segments de 10s (VOD UNIQUEMENT)
           const isChannel = (this.currentMovie?.media_type === 'channel' || this.currentMovie?.is_live);
           if (!isChannel && (data.details === Hls.ErrorDetails.BUFFER_STALLED_ERROR || data.details === Hls.ErrorDetails.BUFFER_SEEK_OVER_HOLE)) {
+            this.showBuffering(true, 'Mise en mémoire tampon...');
             const cur = this.video.currentTime;
             if (this.video.buffered && this.video.buffered.length > 0) {
               for (let i = 0; i < this.video.buffered.length; i++) {
@@ -1907,12 +2123,12 @@ class NetflixPlayer {
     const isSafari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent) || isApple || (navigator.platform === 'MacIntel' && !/Chrome|CriOS/i.test(navigator.userAgent));
     const canPlayMkv = (this.video.canPlayType('video/x-matroska') !== '' || this.video.canPlayType('video/mkv') !== '');
 
-    // Mobile (Android / iOS), Safari ou navigateurs sans support MKV : basculement direct et transparent vers le moteur HLS
-    if ((isMobile || !canPlayMkv || isSafari || isApple) && videoUrl.includes('/api/stream/xtream-series')) {
+    // Séries Xtream : Basculement universel direct et transparent vers le moteur HLS Master multi-qualités
+    if (videoUrl.includes('/api/stream/xtream-series')) {
       const epMatch = videoUrl.match(/episode_id=([^&]+)/);
       if (epMatch && epMatch[1]) {
         const epId = epMatch[1];
-        const hlsUrl = `${baseUrl}/api/stream/xtream-series-hls/${epId}/playlist.m3u8`;
+        const hlsUrl = `${baseUrl}/api/stream/xtream-series-hls/${epId}/master.m3u8`;
         return this.playDirectHls(hlsUrl);
       }
     }
@@ -2043,6 +2259,7 @@ class NetflixPlayer {
       return;
     }
     if (this.video.paused) {
+      this._isUserPaused = false;
       this.video.play().catch(() => {
         this.video.muted = true;
         this.syncVolumeUI();
@@ -2050,6 +2267,7 @@ class NetflixPlayer {
       });
       this.triggerCenterRipple('▶');
     } else {
+      this._isUserPaused = true;
       this.video.pause();
       this.triggerCenterRipple('⏸');
     }
@@ -2150,26 +2368,44 @@ class NetflixPlayer {
     }
   }
 
-  showBuffering(show, text = 'Chargement...') {
+  
+  showQualitySwitchLoading(text = 'Chargement de la qualité...') {
+    this._isQualitySwitching = true;
+    if (this._bufferTimer) {
+      clearTimeout(this._bufferTimer);
+      this._bufferTimer = null;
+    }
+    if (this._hideLoaderTimeout) {
+      clearTimeout(this._hideLoaderTimeout);
+      this._hideLoaderTimeout = null;
+    }
+    if (!this.overlay || !this.overlay.classList.contains('active')) return;
+    if (this.loader) {
+      if (this.loaderTitle) this.loaderTitle.textContent = text;
+      this.loader.classList.remove('hidden', 'fade-out');
+      this.loader.classList.add('buffering-mode');
+    }
+  }
+
+  showBuffering(show, text = 'Mise en mémoire tampon...') {
     if (this._bufferTimer) {
       clearTimeout(this._bufferTimer);
       this._bufferTimer = null;
     }
     if (!this.overlay || !this.overlay.classList.contains('active')) return;
-    if (this.video && this.video.paused) {
-      this.hideLoader();
-      return;
-    }
     if (show) {
+      if (this._isUserPaused) return;
       this._bufferTimer = setTimeout(() => {
-        if (this.loader && this.video && !this.video.paused) {
+        if (this.loader && !this._isUserPaused) {
           if (this.loaderTitle) this.loaderTitle.textContent = text;
           this.loader.classList.remove('hidden', 'fade-out');
           this.loader.classList.add('buffering-mode');
         }
-      }, 1000);
+      }, 150);
     } else {
-      this.hideLoader();
+      if (!this._isQualitySwitching) {
+        this.hideLoader();
+      }
     }
   }
 

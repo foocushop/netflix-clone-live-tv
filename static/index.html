@@ -6,8 +6,8 @@
   <title>ZIFLIX - Streaming & Télévision en Direct</title>
   <link rel="icon" type="image/svg+xml" href="assets/logos/ziflix-icon.svg">
   <link rel="preload" href="assets/logos/ziflix-logo.svg?v=4" as="image" type="image/svg+xml">
-  <link rel="stylesheet" href="css/netflix.css?v=11">
-  <link rel="stylesheet" href="css/admin.css?v=11">
+  <link rel="stylesheet" href="css/netflix.css?v=27">
+  <link rel="stylesheet" href="css/admin.css?v=27">
   <!-- Critical Zero-FOUC & Splash early styles -->
   <style>
     .auth-gate-backdrop.hidden { display: none !important; }
@@ -65,11 +65,25 @@
         <span class="search-icon">🔍</span>
         <input type="text" id="searchInput" class="search-input" placeholder="Titres, personnes, genres...">
       </div>
+            <button class="nav-premium-btn" id="navPremiumBtn" title="Abonnement VIP ZIFLIX">
+        <span class="vip-crown-icon">👑</span>
+        <span class="vip-btn-text" id="navVipBtnText">Passer VIP</span>
+      </button>
       <div class="profile-container" id="profileContainer" tabindex="0" aria-label="Menu Profil">
         <div class="profile-avatar" id="profileAvatarBtn" title="Mon Profil ZIFLIX">
           <img id="headerProfileImg" src="assets/avatars/avatar-1.svg" alt="Profil" style="width: 100%; height: 100%; border-radius: 50%; object-fit: cover;">
         </div>
         <div class="profile-dropdown" id="profileDropdown">
+                    <div class="dropdown-item dropdown-vip-item" id="openPremiumDropdownBtn">
+            <span style="font-size: 1.3rem;">👑</span>
+            <div style="flex: 1;">
+              <div style="font-weight: 700; color: #fbbf24; display: flex; align-items: center; justify-content: space-between;">
+                <span id="dropdownVipTitle">Passer VIP</span>
+                <span class="vip-badge-pill hidden" id="dropdownVipBadge">ACTIF</span>
+              </div>
+              <div style="font-size: 0.72rem; color: #d1d5db;" id="dropdownVipSub">Multi-qualité & Éco-Data Mobile</div>
+            </div>
+          </div>
           <div class="dropdown-item" id="openProfileModalBtn">
             <span style="font-size: 1.2rem;">👤</span>
             <div>
@@ -98,6 +112,7 @@
   <!-- ================= BARRE DE SOUS-NAVIGATION MOBILE (CATÉGORIES DÉFILANTES) ================= -->
   <nav class="mobile-sub-nav" id="mobileSubNav">
     <div class="mobile-sub-nav-scroll">
+      <a href="#" class="mobile-sub-pill nav-premium-pill" id="mobilePremiumBtn">👑 Passer VIP</a>
       <a href="#" class="mobile-sub-pill nav-link active" data-filter="all">🍿 Tout</a>
       <a href="#" class="mobile-sub-pill nav-link" data-filter="series">📺 Séries</a>
       <a href="#" class="mobile-sub-pill nav-link" data-filter="movie">🎬 Films</a>
@@ -442,25 +457,30 @@
             <div class="quality-control-wrapper" id="qualityControlWrapper">
               <button class="ctrl-btn quality-btn" id="ctrlQualityBtn" title="Qualité vidéo (Résolution)">
                 <span class="quality-badge" id="qualityBadge">HD</span>
-                <span class="quality-label" id="qualityCurrentText">Auto</span>
+                <span class="quality-label" id="qualityCurrentText">1080p</span>
               </button>
               <div class="quality-menu hidden" id="qualityMenu">
                 <div class="quality-menu-header">Résolution Vidéo</div>
-                <div class="quality-item active" data-quality="-1">
-                  <span class="quality-name">Auto (Recommandé)</span>
-                  <span class="quality-sub">Haute Définition</span>
-                </div>
-                <div class="quality-item" data-quality="1080">
-                  <span class="quality-name">1080p Full HD</span>
-                  <span class="quality-sub">Qualité Maximale</span>
+                <div class="quality-item active" data-quality="1080">
+                  <span class="q-check">✓</span>
+                  <div class="q-info">
+                    <span class="q-title">1080p Full HD</span>
+                    <span class="q-desc">Qualité maximale ultra-nette</span>
+                  </div>
                 </div>
                 <div class="quality-item" data-quality="720">
-                  <span class="quality-name">720p HD</span>
-                  <span class="quality-sub">Haute Définition</span>
+                  <span class="q-check"></span>
+                  <div class="q-info">
+                    <span class="q-title">720p HD</span>
+                    <span class="q-desc">Haute définition fluide</span>
+                  </div>
                 </div>
                 <div class="quality-item" data-quality="480">
-                  <span class="quality-name">480p SD</span>
-                  <span class="quality-sub">Économie de bande passante</span>
+                  <span class="q-check"></span>
+                  <div class="q-info">
+                    <span class="q-title">480p Éco-Data 🍃</span>
+                    <span class="q-desc">Économise 70% de forfait 4G</span>
+                  </div>
                 </div>
               </div>
             </div>
@@ -770,6 +790,83 @@
               </tbody>
             </table>
           </div>
+        </div>
+      </div>
+
+      <!-- ================= SECTION PASSERELLE VIDMOLY CLOUD (16 To) ================= -->
+      <div class="admin-cluster-container" id="adminVidmolySection" style="margin-bottom: 28px; border: 1px solid rgba(229, 9, 20, 0.4); background: linear-gradient(145deg, rgba(20,20,32,0.95), rgba(12,12,20,0.98));">
+        <div class="cluster-header" style="border-bottom: 1px solid rgba(255,255,255,0.08); padding-bottom: 14px; margin-bottom: 16px;">
+          <div class="cluster-title-wrap">
+            <span class="cluster-icon" style="font-size: 1.8rem;">☁️</span>
+            <div class="cluster-title-group">
+              <h2 class="cluster-title" style="display: flex; align-items: center; gap: 10px;">
+                PASSERELLE VIDMOLY CLOUD & TÉLÉ-RÉALITÉ
+                <span class="badge-status-active" style="background: #2e7d32; font-size: 0.75rem; padding: 3px 8px; border-radius: 4px;">16 To ILLIMITÉ</span>
+              </h2>
+              <p class="cluster-subtitle">Déportez le stockage, l'encodage et la bande passante de vos séries phares pour libérer 100 % du processeur VPS.</p>
+            </div>
+          </div>
+          <div class="cluster-header-actions" style="display: flex; align-items: center; gap: 12px;">
+            <div id="vidmolyQuotaBadge" style="background: rgba(229,9,20,0.15); border: 1px solid rgba(229,9,20,0.4); padding: 6px 14px; border-radius: 20px; font-size: 0.85rem; font-weight: 700; color: #ff5252;">
+              ⚡ Quota restant : <span id="vidmolyQuotaRemaining">50</span> / 50 requêtes aujourd'hui
+            </div>
+            <button type="button" class="btn-admin btn-admin-secondary btn-sm" id="vidmolyRefreshStatusBtn" title="Vérifier les encodages terminés">
+              🔄 Actualiser
+            </button>
+          </div>
+        </div>
+
+        <div style="display: grid; grid-template-columns: 2fr 1fr auto; gap: 14px; margin-bottom: 18px; align-items: end;">
+          <div>
+            <label style="display: block; font-size: 0.8rem; color: var(--admin-text-secondary); margin-bottom: 6px; font-weight: 600;">1. SÉRIE À EXPORTER (TÉLÉ-RÉALITÉS EN PREMIER) :</label>
+            <select id="vidmolySeriesSelect" class="admin-form-select" style="width: 100%; height: 42px; background: #1a1a24; color: #fff;">
+              <option value="">-- Choisir une série --</option>
+            </select>
+          </div>
+          <div>
+            <label style="display: block; font-size: 0.8rem; color: var(--admin-text-secondary); margin-bottom: 6px; font-weight: 600;">2. SAISON :</label>
+            <select id="vidmolySeasonSelect" class="admin-form-select" style="width: 100%; height: 42px; background: #1a1a24; color: #fff;">
+              <option value="">--</option>
+            </select>
+          </div>
+          <div>
+            <button type="button" class="btn-admin btn-admin-blue" id="vidmolyLoadEpisodesBtn" style="height: 42px; font-weight: 700;">
+              📂 Charger les épisodes
+            </button>
+          </div>
+        </div>
+
+        <!-- Tableau interactif des épisodes -->
+        <div id="vidmolyEpisodesWrapper" style="display: none; background: rgba(0,0,0,0.35); border: 1px solid rgba(255,255,255,0.08); border-radius: 8px; overflow: hidden; margin-bottom: 18px;">
+          <div style="padding: 10px 16px; background: rgba(255,255,255,0.03); display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(255,255,255,0.08);">
+            <label style="cursor: pointer; display: flex; align-items: center; gap: 8px; font-size: 0.85rem; font-weight: 600;">
+              <input type="checkbox" id="vidmolySelectAllEp"> Tout cocher / Décocher
+            </label>
+            <span id="vidmolySelectedCounter" style="font-size: 0.85rem; color: var(--admin-text-muted);">0 sélectionné(s)</span>
+          </div>
+          <div style="max-height: 280px; overflow-y: auto;">
+            <table class="admin-table" style="width: 100%; margin: 0; border-collapse: collapse;">
+              <thead>
+                <tr style="background: rgba(0,0,0,0.5); border-bottom: 1px solid rgba(255,255,255,0.06);">
+                  <th style="width: 44px; text-align: center;"></th>
+                  <th style="text-align: left; padding: 10px 14px;">Numéro & Titre</th>
+                  <th style="text-align: center; padding: 10px 14px;">Statut Vidmoly</th>
+                  <th style="text-align: right; padding: 10px 14px;">Action / Lien</th>
+                </tr>
+              </thead>
+              <tbody id="vidmolyEpisodesTableBody">
+                <!-- Rempli par admin.js -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Barre d'action et bouton transfert -->
+        <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px;">
+          <div id="vidmolyAlertBox" style="font-size: 0.85rem; color: #a0a0a0;"></div>
+          <button type="button" class="btn-admin btn-admin-red" id="vidmolyStartUploadBtn" style="display: none; height: 42px; padding: 0 24px; font-weight: 800; font-size: 0.95rem; box-shadow: 0 4px 15px rgba(229,9,20,0.4);">
+            🚀 Transférer vers Vidmoly Cloud
+          </button>
         </div>
       </div>
 
@@ -1183,6 +1280,185 @@
     </div>
   </div>
 
+  
+  <!-- ================= MODAL ABONNEMENT PREMIUM VIP & PAIEMENT MOBILE MONEY ================= -->
+  <div class="modal-backdrop premium-modal-backdrop hidden" id="premiumModal">
+    <div class="premium-modal-card">
+      <button class="modal-close-btn" id="closePremiumModalBtn" title="Fermer">✕</button>
+
+      <!-- ================= 1. VUE STATUT VIP ACTIF (AFFICHÉE SI DÉJÀ MEMBRE VIP) ================= -->
+      <div id="premiumActiveStatusSection" class="premium-active-status-view hidden">
+        <div class="vip-status-hero">
+          <div class="vip-status-badge" id="vipStatusBadge">👑 MEMBRE VIP ACTIF</div>
+          <h2 class="vip-status-title" id="vipStatusTitle">Votre statut VIP est actif</h2>
+          <p class="vip-status-validity" id="vipStatusValidityText">
+            Vous bénéficiez de l'ensemble des privilèges et fonctionnalités VIP ZIFLIX.
+          </p>
+        </div>
+
+        <div class="vip-perks-container">
+          <div class="vip-perk-item">
+            <div class="vip-perk-icon">⚡</div>
+            <div class="vip-perk-content">
+              <h4>Streaming Full HD 1080p & 720p</h4>
+              <p>Résolution maximale débloquée avec bande passante prioritaire.</p>
+            </div>
+            <div class="vip-perk-check">✓ ACTIF</div>
+          </div>
+
+          <div class="vip-perk-item">
+            <div class="vip-perk-icon">🍃</div>
+            <div class="vip-perk-content">
+              <h4>Mode Éco-Data Mobile 4G</h4>
+              <p>Économisez jusqu'à 70% de vos données internet sur smartphone.</p>
+            </div>
+            <div class="vip-perk-check">✓ ACTIF</div>
+          </div>
+
+          <div class="vip-perk-item">
+            <div class="vip-perk-icon">🎬</div>
+            <div class="vip-perk-content">
+              <h4>Avant-Premières & Inédits</h4>
+              <p>Accès exclusif et prioritaire à tous les nouveaux films et séries.</p>
+            </div>
+            <div class="vip-perk-check">✓ ACTIF</div>
+          </div>
+
+          <div class="vip-perk-item">
+            <div class="vip-perk-icon">🚀</div>
+            <div class="vip-perk-content">
+              <h4>Bande Passante Dédiée VIP</h4>
+              <p>Démarrage instantané du flux sans mise en mémoire tampon.</p>
+            </div>
+            <div class="vip-perk-check">✓ ACTIF</div>
+          </div>
+        </div>
+
+        <div class="vip-status-actions">
+          <button type="button" class="btn-vip-continue" id="vipStatusContinueBtn">
+            <span>Continuer le visionnage</span>
+            <span>▶</span>
+          </button>
+          <button type="button" class="btn-vip-extend-toggle" id="vipExtendToggleBtn">
+            Prolonger mon abonnement ou utiliser un code recharge ▾
+          </button>
+        </div>
+      </div>
+
+      <!-- ================= 2. VUE SOUSCRIPTION & PAIEMENT (AFFICHÉE SI NON-VIP) ================= -->
+      <div id="premiumSubscribeSection" class="premium-subscribe-section">
+      <!-- En-tête Netflix Pur -->
+      <div class="premium-netflix-header">
+        <div class="premium-step-tag">FORFAITS ZIFLIX VIP</div>
+        <h2 class="premium-netflix-title">Sélectionnez votre forfait.</h2>
+        <p class="premium-netflix-subtitle" id="premiumModalSubtitle">
+          Profitez du sélecteur multi-qualité 1080p & 720p, activez le mode Éco-Data Mobile pour préserver vos données 4G et accédez aux avant-premières exclusives.
+        </p>
+      </div>
+
+      
+
+      <!-- Grille des 3 Plans Minimalistes Netflix -->
+      <div class="premium-plans-grid-netflix">
+        <!-- Pass 48H -->
+        <div class="netflix-plan-card" data-plan="weekend" data-price="300 FCFA">
+          <div class="netflix-plan-name">Pass 48H</div>
+          <div class="netflix-plan-price">300 <span class="curr">FCFA</span></div>
+          <div class="netflix-plan-equiv">~0,45 € • Accès Week-end</div>
+          <ul class="netflix-plan-features">
+            <li><span>✓</span> Qualité 720p HD & 480p Éco</li>
+            <li><span>✓</span> Économie de forfait 4G</li>
+            <li><span>✓</span> Zéro engagement</li>
+          </ul>
+        </div>
+
+        <!-- Pass 1 Mois (Populaire & Recommandé) -->
+        <div class="netflix-plan-card active" data-plan="monthly" data-price="1 000 FCFA">
+          <div class="netflix-plan-tag">Populaire</div>
+          <div class="netflix-plan-name">Pass 1 Mois VIP</div>
+          <div class="netflix-plan-price">1 000 <span class="curr">FCFA</span></div>
+          <div class="netflix-plan-equiv">~1,50 € / mois</div>
+          <ul class="netflix-plan-features">
+            <li><span>✓</span> Toutes les qualités (1080p, 720p, 480p)</li>
+            <li><span>✓</span> Mode Éco-Data Mobile</li>
+            <li><span>✓</span> Avant-premières & Inédits</li>
+            <li><span>✓</span> Bande passante prioritaire</li>
+          </ul>
+        </div>
+
+        <!-- Pass 3 Mois -->
+        <div class="netflix-plan-card" data-plan="vip3m" data-price="2 500 FCFA">
+          <div class="netflix-plan-tag">-17% RÉDUC</div>
+          <div class="netflix-plan-name">Pass 3 Mois Élite</div>
+          <div class="netflix-plan-price">2 500 <span class="curr">FCFA</span></div>
+          <div class="netflix-plan-equiv">~3,80 € • 90 jours</div>
+          <ul class="netflix-plan-features">
+            <li><span>✓</span> Tous les avantages du Pass 1 Mois</li>
+            <li><span>✓</span> Économisez 17% sur le tarif</li>
+            <li><span>✓</span> Statut VIP garanti 90 jours</li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- Résumé compact mobile des fonctionnalités VIP -->
+      <div class="premium-mobile-features-summary">
+        <span>✓ 1080p FHD & Éco-Data</span>
+        <span>✓ Avant-premières VIP</span>
+        <span>✓ Sans engagement</span>
+      </div>
+
+      <!-- Passerelle de Paiement PayDunya Sécurisée -->
+      <div class="paydunya-checkout-box">
+        <div class="paydunya-gateways-row">
+          <div class="gateway-badge" title="Wave Mobile Money">
+            <img src="assets/payment/wave.svg" alt="Wave" class="gw-logo">
+            <span>Wave</span>
+          </div>
+          <div class="gateway-badge" title="Orange Money">
+            <img src="assets/payment/orange_money.svg" alt="Orange Money" class="gw-logo">
+            <span>Orange Money</span>
+          </div>
+          <div class="gateway-badge" title="MTN Mobile Money">
+            <img src="assets/payment/mtn_momo.svg" alt="MTN MoMo" class="gw-logo">
+            <span>MTN MoMo</span>
+          </div>
+          <div class="gateway-badge" title="Moov Money">
+            <img src="assets/payment/moov.svg" alt="Moov" class="gw-logo">
+            <span>Moov</span>
+          </div>
+          <div class="gateway-badge" title="Carte Bancaire Visa & Mastercard">
+            <img src="assets/payment/card.svg" alt="Carte" class="gw-logo">
+            <span>Carte</span>
+          </div>
+        </div>
+        <button type="button" class="btn-paydunya-pay" id="paydunyaPayBtn">
+          <span class="btn-pay-text">Payer maintenant</span>
+          <span class="btn-pay-badge" id="paydunyaSelectedPrice">1000 FCFA</span>
+          <span class="btn-pay-arrow">⚡</span>
+        </button>
+        <div class="paydunya-security-note">
+          🔒 Passerelle de paiement sécurisée PayDunya • Activation instantanée
+        </div>
+      </div>
+
+      <!-- Accordéon Repliable pour Code Recharge / Voucher -->
+      <button type="button" class="voucher-collapse-toggle" id="toggleVoucherAccordion">
+        Vous avez un code VIP / carte cadeau ? Cliquez ici
+      </button>
+      <div class="voucher-collapse-card hidden" id="voucherAccordionContent">
+        <form id="voucherRedeemForm">
+          <div class="voucher-input-row">
+            <input type="text" id="voucherCodeInput" class="voucher-clean-input" placeholder="Ex: ZIFLIX-VIP-MONTH..." required>
+            <button type="submit" class="voucher-clean-btn" id="voucherSubmitBtn">Activer 👑</button>
+          </div>
+          <div class="voucher-status-msg hidden" id="voucherStatusMsg" style="margin-top: 8px;"></div>
+        </form>
+      </div>
+      </div><!-- fin premiumSubscribeSection -->
+
+    </div>
+  </div>
+
   <!-- ================= MODALE SIGNALEMENT DE BUGS ZIFLIX ================= -->
   <div class="bug-modal-backdrop" id="bugReportModal" style="display: none;">
     <div class="bug-modal-card">
@@ -1334,8 +1610,8 @@
 
   <!-- Scripts -->
   <script src="js/hls.min.js"></script>
-  <script src="js/player.js?v=11"></script>
-  <script src="js/admin.js?v=11"></script>
-  <script src="js/app.js?v=11"></script>
+  <script src="js/player.js?v=31"></script>
+  <script src="js/admin.js?v=31"></script>
+  <script src="js/app.js?v=31"></script>
 </body>
 </html>
