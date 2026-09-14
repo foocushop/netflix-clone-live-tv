@@ -1,5 +1,24 @@
 [
   {
+    "id": "bug_1789385316318_259d6f",
+    "user_id": "u_1789380774102_bb9a8099",
+    "username": "Marina",
+    "avatar": "assets/avatars/avatar-1.svg",
+    "category": "playback",
+    "title": "Signalement : La Villa des cœurs brisés (2015) S11E17",
+    "description": "",
+    "media_id": "xtream_series_6715",
+    "media_title": "La Villa des cœurs brisés (2015)",
+    "season": 11,
+    "episode": 17,
+    "episode_id": null,
+    "device_info": "iPhone (iOS) • Safari",
+    "user_agent": "Mozilla/5.0 (iPhone; CPU iPhone OS 18_7 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/26.5 Mobile/15E148 Safari/604.1",
+    "url": "https://ziablo.xyz/",
+    "status": "open",
+    "created_at": "2026-09-14T11:28:36.318Z"
+  },
+  {
     "id": "bug_1789346186288_ac724a",
     "user_id": "u_1789345855398_6fa84fbe",
     "username": "Aby",
