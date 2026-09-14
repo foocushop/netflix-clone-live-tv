@@ -75,7 +75,7 @@
     "role": "user",
     "banned": false,
     "created_at": "2026-09-12T16:51:11.823Z",
-    "last_login": "2026-09-14T00:54:53.162Z"
+    "last_login": "2026-09-14T09:09:16.313Z"
   },
   {
     "id": "u_1789232222831_901df7ea",
@@ -999,7 +999,7 @@
     "role": "user",
     "banned": false,
     "created_at": "2026-09-13T11:53:32.099Z",
-    "last_login": "2026-09-14T05:48:18.972Z"
+    "last_login": "2026-09-14T08:48:41.947Z"
   },
   {
     "id": "u_1789300959602_159e2c1d",
@@ -1529,7 +1529,7 @@
     "role": "user",
     "banned": false,
     "created_at": "2026-09-13T20:02:55.834Z",
-    "last_login": "2026-09-14T01:12:19.628Z"
+    "last_login": "2026-09-14T08:32:14.706Z"
   },
   {
     "id": "u_1789329992480_4f5e20db",
@@ -2058,5 +2058,38 @@
     "banned": false,
     "created_at": "2026-09-14T07:44:28.674Z",
     "last_login": "2026-09-14T07:44:28.674Z"
+  },
+  {
+    "id": "u_1789376012786_4431a640",
+    "username": "jade3",
+    "password_hash": "ff910e50eddff978369fad8c314a451049b7e28335011db0a516be328029c0072805df380af60703d3f1ac36bcf12f87fc821304d6f99a3011b9306ae4c2309a",
+    "salt": "5f725e34ed2cf359821809ef0697cf27",
+    "avatar": "assets/avatars/avatar-1.svg",
+    "role": "user",
+    "banned": false,
+    "created_at": "2026-09-14T08:53:32.786Z",
+    "last_login": "2026-09-14T08:53:32.786Z"
+  },
+  {
+    "id": "u_1789377254521_aefa4a2a",
+    "username": "Ladane",
+    "password_hash": "a9724117b26235852496107d56dfb369a28101f2b635a13a75e35c73af38be1ed366f7a4c600f47c1f026b352704aad03d06eaeef65d55f7554fc7ed383446e9",
+    "salt": "f1eef9c6680051260c4e0436a33ce1db",
+    "avatar": "assets/avatars/avatar-10.svg",
+    "role": "user",
+    "banned": false,
+    "created_at": "2026-09-14T09:14:14.521Z",
+    "last_login": "2026-09-14T09:14:14.521Z"
+  },
+  {
+    "id": "u_1789378056753_5e147350",
+    "username": "Ness69",
+    "password_hash": "c8818f9b4228cfa3fbf5caa33e6c73561610def9b2917213c0ccfc0e8046a59bc595403b2b4431bc07b4995a9f7b716a81a78584dbcb8a159520c33f3a0e6ef3",
+    "salt": "14f8f9b516079350edf71e7ba69617e6",
+    "avatar": "assets/avatars/avatar-7.svg",
+    "role": "user",
+    "banned": false,
+    "created_at": "2026-09-14T09:27:36.753Z",
+    "last_login": "2026-09-14T09:27:36.753Z"
   }
 ]
