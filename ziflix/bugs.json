@@ -1,5 +1,24 @@
 [
   {
+    "id": "bug_1789407378540_c7bfec",
+    "user_id": "u_admin",
+    "username": "admin",
+    "avatar": "assets/avatars/avatar-1.svg",
+    "category": "playback",
+    "title": "Signalement : Canal+ Foot S1E1",
+    "description": "",
+    "media_id": "tv_canal_foot",
+    "media_title": "Canal+ Foot",
+    "season": 1,
+    "episode": 1,
+    "episode_id": null,
+    "device_info": "PC Windows • Chrome",
+    "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/153.0.0.0 Safari/537.36",
+    "url": "https://ziablo.xyz/chaines",
+    "status": "open",
+    "created_at": "2026-09-14T17:36:18.540Z"
+  },
+  {
     "id": "bug_1789405932162_872003",
     "user_id": "u_1789397795804_8c67375d",
     "username": "mamadouyayadiao16@gmail.com",

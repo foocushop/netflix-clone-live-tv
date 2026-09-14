@@ -130,7 +130,7 @@
     "role": "user",
     "banned": false,
     "created_at": "2026-09-12T17:18:03.304Z",
-    "last_login": "2026-09-13T08:47:58.421Z"
+    "last_login": "2026-09-14T18:03:14.560Z"
   },
   {
     "id": "u_1789233514993_98347a56",
@@ -559,7 +559,7 @@
     "role": "user",
     "banned": false,
     "created_at": "2026-09-12T21:36:08.705Z",
-    "last_login": "2026-09-14T12:24:42.845Z"
+    "last_login": "2026-09-14T17:52:33.782Z"
   },
   {
     "id": "u_1789249046091_74bb4b75",
@@ -1021,7 +1021,7 @@
     "role": "user",
     "banned": false,
     "created_at": "2026-09-13T12:07:28.952Z",
-    "last_login": "2026-09-13T12:07:28.952Z"
+    "last_login": "2026-09-14T17:49:01.627Z"
   },
   {
     "id": "u_1789304223758_1bd0456f",
@@ -2575,5 +2575,82 @@
     "banned": false,
     "created_at": "2026-09-14T17:21:36.168Z",
     "last_login": "2026-09-14T17:21:36.168Z"
+  },
+  {
+    "id": "u_1789407574461_d351e438",
+    "username": "Dylanstg",
+    "password_hash": "7abc3bc4528b8c429a5eb2384ba853c951b5ee5312403fd4ab34978099d81e3937002e4992c9bbd3077536bbcd990d841f9737304fada3cf5bde01b0f82a613a",
+    "salt": "789e1c8527dafc7f9eb4e0ed6d006ed8",
+    "avatar": "assets/avatars/avatar-2.svg",
+    "role": "user",
+    "banned": false,
+    "created_at": "2026-09-14T17:39:34.461Z",
+    "last_login": "2026-09-14T17:39:34.461Z"
+  },
+  {
+    "id": "u_1789407806047_02c55b7a",
+    "username": "Doudou",
+    "password_hash": "46a697334f4d6afb86466915cf2aa974415cc35e72ce2e72ac8c5d611913394604b390c5fee0d2205f484fda1137bc4a9ca881ce67324ad10fd8a6d21edd29ae",
+    "salt": "0ac6b169eb586fee0b2436fed608c786",
+    "avatar": "assets/avatars/avatar-5.svg",
+    "role": "user",
+    "banned": false,
+    "created_at": "2026-09-14T17:43:26.047Z",
+    "last_login": "2026-09-14T17:43:26.047Z"
+  },
+  {
+    "id": "u_1789408016065_267aaa08",
+    "username": "dijq,i",
+    "password_hash": "745ac3389aa323c3295c8bd907792d36a2afa1c612aa443916e8f6630aa0a40a9617da305cdbf3b60d6c9625a826dae959f1ea3a3889d51024086256a84e8e9a",
+    "salt": "1b9167e275fb4fef577e73df42402d92",
+    "avatar": "assets/avatars/avatar-1.svg",
+    "role": "user",
+    "banned": false,
+    "created_at": "2026-09-14T17:46:56.065Z",
+    "last_login": "2026-09-14T17:46:56.065Z"
+  },
+  {
+    "id": "u_1789409496750_f41ac2af",
+    "username": "A 3589",
+    "password_hash": "2e4219a85923869697a93c28e0f566272b90e5a6ee1edf74bd3d10dc231b7d63abe709599510e663bcfea32125966958d95c284f68195996319ebd4eaa822bd5",
+    "salt": "e992d881ddaf7fcb189453bc3ad93ab4",
+    "avatar": "assets/avatars/avatar-1.svg",
+    "role": "user",
+    "banned": false,
+    "created_at": "2026-09-14T18:11:36.750Z",
+    "last_login": "2026-09-14T18:13:09.182Z"
+  },
+  {
+    "id": "u_1789409673754_a73e6679",
+    "username": "megh",
+    "password_hash": "d311b08400d88cf2aeb831eb4b78df0f048f89f5525c002e1068acf5ea992afb9f106f6ec5bc8e60f643a73681c6964a7895ca3774963b036fd7c6839269d50e",
+    "salt": "4022bd1575d1df1675bfc403b9399a0d",
+    "avatar": "assets/avatars/avatar-1.svg",
+    "role": "user",
+    "banned": false,
+    "created_at": "2026-09-14T18:14:33.754Z",
+    "last_login": "2026-09-14T18:14:33.754Z"
+  },
+  {
+    "id": "u_1789410238839_a018b17a",
+    "username": "Miss D",
+    "password_hash": "811aacc048bfa03780cf1fd61979d7201b28a82c6412abea20d1f780fd8d63ee4e64180f0381fa47157179e96e4c06183011886bdf376a8028a1425c0b1eed48",
+    "salt": "fa0e5a8c87ab16438b71bdbe79b13cb3",
+    "avatar": "assets/avatars/avatar-2.svg",
+    "role": "user",
+    "banned": false,
+    "created_at": "2026-09-14T18:23:58.839Z",
+    "last_login": "2026-09-14T18:23:58.839Z"
+  },
+  {
+    "id": "u_1789410248318_7f0dd579",
+    "username": "Lawrie",
+    "password_hash": "8293361a942ea736aa8c12ef23aad3719f1c82b22e4aeedaf7e85b3b3c9c07616abe1de7c425e33bbea6998ce1c1c0ced5a5a46de6169667d6ce3c89be3e3c79",
+    "salt": "82d08e8832986dcb7bd58d4f2d145ed4",
+    "avatar": "assets/avatars/avatar-1.svg",
+    "role": "user",
+    "banned": false,
+    "created_at": "2026-09-14T18:24:08.318Z",
+    "last_login": "2026-09-14T18:24:08.318Z"
   }
 ]
