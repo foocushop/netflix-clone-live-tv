@@ -832,7 +832,7 @@ const xtreamManifestCache = new Map();
 const xtreamSeriesEdgeCache = new Map();
 const vidmoly = require('./lib/vidmoly');
 const crypto = require('crypto');
-const VIDMOLY_EXPORT_SECRET = 'vmol_' + crypto.createHash('sha256').update((vidmoly.CONFIG.apiKey || '632450vyz8luxvvelat48b') + '_export').digest('hex').slice(0, 16);
+const VIDMOLY_EXPORT_SECRET = 'vmol_' + crypto.createHash('sha256').update((vidmoly.CONFIG.apiKey || '632459kennwde6h7ungb6n') + '_export').digest('hex').slice(0, 16);
 // Sessions actives de remuxage HLS pour séries Xtream (Apple Safari & Web HLS)
 const xtreamHlsSessions = new Map();
 
