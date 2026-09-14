@@ -453,33 +453,19 @@
               <span class="next-ep-label">Ép. suivant</span>
             </button>
 
-            <!-- Sélecteur de Qualité Vidéo (Auto, 1080p, 720p, 480p) -->
+            <!-- Sélecteur de Qualité Vidéo (Auto pour Xtream direct, 720p pour Vidmoly Cloud) -->
             <div class="quality-control-wrapper" id="qualityControlWrapper">
-              <button class="ctrl-btn quality-btn" id="ctrlQualityBtn" title="Qualité vidéo (Résolution)">
-                <span class="quality-badge" id="qualityBadge">HD</span>
-                <span class="quality-label" id="qualityCurrentText">1080p</span>
+              <button class="ctrl-btn quality-btn" id="ctrlQualityBtn" title="Qualité vidéo">
+                <span class="quality-badge" id="qualityBadge">AUTO</span>
+                <span class="quality-label" id="qualityCurrentText">Auto</span>
               </button>
               <div class="quality-menu hidden" id="qualityMenu">
                 <div class="quality-menu-header">Résolution Vidéo</div>
-                <div class="quality-item active" data-quality="1080">
+                <div class="quality-item active" data-quality="auto" style="cursor: default;">
                   <span class="q-check">✓</span>
                   <div class="q-info">
-                    <span class="q-title">1080p Full HD</span>
-                    <span class="q-desc">Qualité maximale ultra-nette</span>
-                  </div>
-                </div>
-                <div class="quality-item" data-quality="720">
-                  <span class="q-check"></span>
-                  <div class="q-info">
-                    <span class="q-title">720p HD</span>
-                    <span class="q-desc">Haute définition fluide</span>
-                  </div>
-                </div>
-                <div class="quality-item" data-quality="480">
-                  <span class="q-check"></span>
-                  <div class="q-info">
-                    <span class="q-title">480p Éco-Data 🍃</span>
-                    <span class="q-desc">Économise 70% de forfait 4G</span>
+                    <span class="q-title">Auto (Source Originale 1080p)</span>
+                    <span class="q-desc">Débit maximal adaptatif direct</span>
                   </div>
                 </div>
               </div>
@@ -1366,7 +1352,7 @@
           <div class="netflix-plan-price">300 <span class="curr">FCFA</span></div>
           <div class="netflix-plan-equiv">~0,45 € • Accès Week-end</div>
           <ul class="netflix-plan-features">
-            <li><span>✓</span> Qualité 720p HD & 480p Éco</li>
+            <li><span>✓</span> Qualité 720p HD Optimisée</li>
             <li><span>✓</span> Économie de forfait 4G</li>
             <li><span>✓</span> Zéro engagement</li>
           </ul>
@@ -1379,7 +1365,7 @@
           <div class="netflix-plan-price">1 000 <span class="curr">FCFA</span></div>
           <div class="netflix-plan-equiv">~1,50 € / mois</div>
           <ul class="netflix-plan-features">
-            <li><span>✓</span> Toutes les qualités (1080p, 720p, 480p)</li>
+            <li><span>✓</span> Qualité maximale 1080p FHD & 720p HD</li>
             <li><span>✓</span> Mode Éco-Data Mobile</li>
             <li><span>✓</span> Avant-premières & Inédits</li>
             <li><span>✓</span> Bande passante prioritaire</li>
@@ -1610,8 +1596,8 @@
 
   <!-- Scripts -->
   <script src="js/hls.min.js"></script>
-  <script src="js/player.js?v=31"></script>
+  <script src="js/player.js?v=34"></script>
   <script src="js/admin.js?v=31"></script>
-  <script src="js/app.js?v=31"></script>
+  <script src="js/app.js?v=32"></script>
 </body>
 </html>

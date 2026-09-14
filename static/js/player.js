@@ -2036,11 +2036,16 @@ playDirectHls(streamUrl, options = {}) {
     const isSafari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent) || isApple || (navigator.platform === 'MacIntel' && !/Chrome|CriOS/i.test(navigator.userAgent));
     const canPlayMkv = (this.video.canPlayType('video/x-matroska') !== '' || this.video.canPlayType('video/mkv') !== '');
 
-    // Séries Xtream : Basculement universel direct et transparent vers le moteur HLS Master multi-qualités
+    // Séries Xtream : Basculement universel direct et transparent avec priorité Vidmoly Cloud
     if (videoUrl.includes('/api/stream/xtream-series')) {
       const epMatch = videoUrl.match(/episode_id=([^&]+)/);
       if (epMatch && epMatch[1]) {
         const epId = epMatch[1];
+        const vCode = (this.currentEpisodeObj && this.currentEpisodeObj.vidmoly_file_code) || (window.vidmolyMap && window.vidmolyMap[epId]);
+        if (vCode) {
+          const vidmolyStreamUrl = `${baseUrl}/api/stream/vidmoly/${vCode}/playlist.m3u8`;
+          return this.playDirectHls(vidmolyStreamUrl, { isVidmoly: true });
+        }
         const hlsUrl = `${baseUrl}/api/stream/xtream-series-hls/${epId}/master.m3u8`;
         return this.playDirectHls(hlsUrl);
       }
