@@ -838,10 +838,43 @@ class NetflixPlayer {
     });
   }
 
-  // ================= 5. SÉLECTEUR DE QUALITÉ HLS =================
+  // ================= 5. SÉLECTEUR DE QUALITÉ HLS & CLOUD =================
+  setPlayerQualityMode(isVidmoly) {
+    this._isVidmolyStream = !!isVidmoly;
+    if (!this.qualityBadge || !this.qualityCurrentText || !this.qualityMenu) return;
+
+    if (this._isVidmolyStream) {
+      this.qualityBadge.textContent = 'HD';
+      this.qualityCurrentText.textContent = '720p';
+      this.qualityMenu.innerHTML = `
+        <div class="quality-menu-header">Résolution Vidéo</div>
+        <div class="quality-item active" data-quality="720" style="cursor: default;">
+          <span class="q-check">✓</span>
+          <div class="q-info">
+            <span class="q-title">720p HD (Vidmoly Cloud)</span>
+            <span class="q-desc">Flux encodé optimisé • Zéro coupure</span>
+          </div>
+        </div>
+      `;
+    } else {
+      this.qualityBadge.textContent = 'AUTO';
+      this.qualityCurrentText.textContent = 'Auto';
+      this.qualityMenu.innerHTML = `
+        <div class="quality-menu-header">Résolution Vidéo</div>
+        <div class="quality-item active" data-quality="auto" style="cursor: default;">
+          <span class="q-check">✓</span>
+          <div class="q-info">
+            <span class="q-title">Auto (Source Originale 1080p)</span>
+            <span class="q-desc">Débit maximal adaptatif direct</span>
+          </div>
+        </div>
+      `;
+    }
+  }
+
   initQualityEvents() {
     if (!this.ctrlQualityBtn || !this.qualityMenu) return;
-    this.currentQuality = 1080;
+    this.setPlayerQualityMode(false);
 
     this.ctrlQualityBtn.addEventListener('click', (e) => {
       e.stopPropagation();
@@ -849,26 +882,13 @@ class NetflixPlayer {
       if (this.speedMenu) this.speedMenu.classList.add('hidden');
     });
 
-    this.qualityMenu.querySelectorAll('.quality-item').forEach(item => {
-      item.addEventListener('click', () => {
-        const targetQ = parseInt(item.dataset.quality, 10) || 1080;
-        const isPremium = (window.netflixApp && typeof window.netflixApp.isUserPremium === 'function')
-          ? window.netflixApp.isUserPremium()
-          : false;
-
-        // 720p et 480p réservés aux membres VIP
-        if ((targetQ === 720 || targetQ === 480) && !isPremium) {
-          this.qualityMenu.classList.add('hidden');
-          if (window.netflixApp && typeof window.netflixApp.openPremiumModal === 'function') {
-            window.netflixApp.openPremiumModal('quality', targetQ);
-          }
-          return;
-        }
-
-        this.currentQuality = targetQ;
-        this.applyQualityLevel();
-        this.qualityMenu.classList.add('hidden');
-      });
+    this.qualityMenu.addEventListener('click', (e) => {
+      e.stopPropagation();
+      this.qualityMenu.classList.add('hidden');
+      if (typeof this.triggerCenterRipple === 'function') {
+        const msg = this._isVidmolyStream ? '720p HD (Vidmoly Cloud) ⚡' : 'Auto (Qualité Adaptative 1080p) ⚡';
+        this.triggerCenterRipple(msg);
+      }
     });
 
     document.addEventListener('click', () => {
@@ -877,200 +897,11 @@ class NetflixPlayer {
   }
 
   applyQualityLevel() {
-    const q = this.currentQuality || 1080;
-
-    // Mise à jour de la coche et des classes actives dans le menu
-    if (this.qualityMenu) {
-      this.qualityMenu.querySelectorAll('.quality-item').forEach(item => {
-        const itemQ = parseInt(item.dataset.quality, 10);
-        const isActive = (itemQ === q);
-        item.classList.toggle('active', isActive);
-        const check = item.querySelector('.q-check');
-        if (check) check.textContent = isActive ? '✓' : '';
-      });
-    }
-
-    const qualityLabel = (q >= 1080) ? '1080p FHD' : ((q >= 720) ? '720p HD' : '480p Éco-Data');
-
-    if (this.qualityCurrentText) {
-      this.qualityCurrentText.textContent = (q <= 480) ? '480p 🍃' : (q + 'p');
-    }
-    if (this.qualityBadge) {
-      this.qualityBadge.textContent = (q >= 1080) ? 'FHD' : ((q >= 720) ? 'HD' : 'ÉCO');
-    }
-
-    if (typeof this.triggerCenterRipple === 'function') {
-      this.triggerCenterRipple((q <= 480) ? '480p Éco-Data 🍃' : (q + 'p HD ⚡'));
-    }
-
-    const curTime = Math.floor(this.getCurrentPlaybackTime() || (this.video ? this.video.currentTime : 0) || 0);
-    const wasPaused = !this.video || this.video.paused;
-
-    // 1. Verrouillage absolu : geler la vidéo et couper le son sur-le-champ
-    if (this.video) {
-      try {
-        this.video.pause();
-        this.video.muted = true;
-      } catch (e) {}
-    }
-
-    // 2. Afficher instantanément le loader ZIFLIX
-    this.showQualitySwitchLoading(`Chargement ${qualityLabel}...`);
-
-    // CAS 0 : HLS MULTI-QUALITÉS NATIF VIDMOLY (0% CPU VPS, changement direct de variante)
-    if (this.hls && this.hls.levels && this.hls.levels.length > 1 && !this._currentHlsUrl?.includes('/playlist.m3u8')) {
-      const lvlIdx = this.hls.levels.findIndex(l => Math.abs((l.height || 0) - q) < 60);
-      if (lvlIdx !== -1) {
-        console.log(`[ZIFLIX Player] Bascule native Vidmoly vers niveau ${lvlIdx} (${q}p)`);
-        this.hls.currentLevel = lvlIdx;
-        setTimeout(() => {
-          this._isQualitySwitching = false;
-          this.hideQualitySwitchLoading();
-          if (this.video) {
-            this.video.muted = false;
-            if (!wasPaused) this.video.play().catch(() => {});
-          }
-        }, 250);
-        return;
-      }
-    }
-
-    // CAS 1 : SÉRIES XTREAM HLS (Télé-Réalité, Séries, La Villa, Les Apprentis Aventuriers)
-    const hlsSeriesMatch = this._currentHlsUrl ? this._currentHlsUrl.match(/\/api\/stream\/xtream-series-hls\/([^\/]+)/) : null;
-    if (hlsSeriesMatch && hlsSeriesMatch[1]) {
-      const epId = hlsSeriesMatch[1];
-      const baseUrl = window.API_BASE || '';
-      const authToken = localStorage.getItem('ziflix_auth_token') || '';
-      const tokenParam = authToken ? `&auth_token=${encodeURIComponent(authToken)}` : '';
-      const targetUrl = `${baseUrl}/api/stream/xtream-series-hls/${epId}/${q}/playlist.m3u8?start=${curTime}${tokenParam}`;
-
-      console.log(`[ZIFLIX Player] Transition qualité Xtream vers ${q}p à ${curTime}s :`, targetUrl);
-
-      this._hlsStreamOffset = curTime;
-      this.playDirectHls(targetUrl, { startPosition: curTime, keepPlayback: !wasPaused });
-
-      let unfreezeDone = false;
-      const unfreeze = () => {
-        if (unfreezeDone) return;
-        unfreezeDone = true;
-        this._isQualitySwitching = false;
-        if (this.video) {
-          this.video.muted = false;
-          if (!wasPaused) this.video.play().catch(() => {});
-        }
-        this.hideLoader();
-      };
-
-      if (this.video) {
-        this.video.addEventListener('playing', unfreeze, { once: true });
-        this.video.addEventListener('canplay', unfreeze, { once: true });
-      }
-      setTimeout(unfreeze, 6000);
-      return;
-    }
-
-    // CAS 2 : HLS Standard Multi-Qualités (FrenchStream, Vidzy, Live)
-    if (this.hls && this.hls.levels && this.hls.levels.length > 0) {
-      let bestIdx = 0;
-      let minDiff = Infinity;
-      this.hls.levels.forEach((lvl, idx) => {
-        const h = lvl.height || 1080;
-        const diff = Math.abs(h - q);
-        if (diff < minDiff) {
-          minDiff = diff;
-          bestIdx = idx;
-        }
-      });
-
-      if (this.hls.currentLevel === bestIdx) {
-        this.hideLoader();
-        if (this.video) {
-          this.video.muted = false;
-          if (!wasPaused) this.video.play().catch(() => {});
-        }
-        return;
-      }
-
-      this.hls.currentLevel = bestIdx;
-
-      let isDone = false;
-      const finishHls = () => {
-        if (isDone) return;
-        isDone = true;
-        this.hideLoader();
-        if (this.video) {
-          this.video.muted = false;
-          if (!wasPaused) this.video.play().catch(() => {});
-        }
-      };
-
-      const onFragBuffered = (event, data) => {
-        if (data && data.frag && data.frag.level === bestIdx) {
-          if (this.hls) this.hls.off(Hls.Events.FRAG_BUFFERED, onFragBuffered);
-          finishHls();
-        }
-      };
-      this.hls.on(Hls.Events.FRAG_BUFFERED, onFragBuffered);
-      setTimeout(finishHls, 3500);
-      return;
-    }
-
-    // CAS 3 : Lecture directe vidéo MP4
-    if (this.video && this.video.src && this.video.src.includes('/api/stream/xtream-series')) {
-      let src = this.video.src;
-      if (src.includes('quality=')) {
-        src = src.replace(/quality=\d+/, 'quality=' + q);
-      } else {
-        src += (src.includes('?') ? '&' : '?') + 'quality=' + q;
-      }
-      this.video.src = src;
-      this.video.currentTime = curTime;
-
-      const onCanPlay = () => {
-        this.video.removeEventListener('canplay', onCanPlay);
-        this.hideLoader();
-        if (this.video) {
-          this.video.muted = false;
-          if (!wasPaused) this.video.play().catch(() => {});
-        }
-      };
-      this.video.addEventListener('canplay', onCanPlay, { once: true });
-      setTimeout(onCanPlay, 4000);
-    }
+    this.setPlayerQualityMode(this._isVidmolyStream);
   }
 
   updateQualityMenuOptions() {
-    if (!this.hls || !this.hls.levels || !this.qualityMenu) return;
-    const isChannel = (this.currentMovie?.media_type === 'channel' || this.currentMovie?.is_live);
-    if (isChannel && this.qualityBadge) {
-      this.qualityBadge.textContent = 'FHD';
-    }
-
-    // Détection automatique des résolutions réellement présentes (Vidmoly Cloud / HLS Multi-qualités)
-    if (this.hls.levels.length > 1) {
-      const heights = this.hls.levels.map(l => l.height || 0);
-      const has1080 = heights.some(h => h >= 1000);
-      const has720 = heights.some(h => h >= 650 && h < 1000);
-      const has480 = heights.some(h => h >= 400 && h < 650);
-
-      this.qualityMenu.querySelectorAll('.quality-item').forEach(item => {
-        const itemQ = parseInt(item.dataset.quality, 10);
-        let isAvailable = true;
-        if (itemQ >= 1080 && !has1080) isAvailable = false;
-        if (itemQ >= 700 && itemQ < 1080 && !has720) isAvailable = false;
-        if (itemQ < 700 && !has480) isAvailable = false;
-
-        if (!isAvailable) {
-          item.style.opacity = '0.35';
-          item.style.pointerEvents = 'none';
-          item.setAttribute('title', 'Non disponible pour cette vidéo');
-        } else {
-          item.style.opacity = '1';
-          item.style.pointerEvents = 'auto';
-          item.removeAttribute('title');
-        }
-      });
-    }
+    this.setPlayerQualityMode(this._isVidmolyStream);
   }
 
   // ================= 6. NAVIGATION SERVEURS 1-8 =================
@@ -1636,11 +1467,27 @@ class NetflixPlayer {
         let targetStreamUrl = epStreamUrl;
         if (targetStreamUrl.startsWith('/')) targetStreamUrl = baseUrl + targetStreamUrl;
 
-        // Séries Xtream : Moteur HLS multi-qualités (1080p FHD, 720p HD, 480p Éco) universel (PC & mobile)
+        // Séries Xtream : Moteur HLS multi-qualités universel (PC & mobile) avec PRIORITÉ VIDMOLY CLOUD
         if (targetStreamUrl.includes('/api/stream/xtream-series')) {
           const epId = epObj.id || epObj.episode_id || (targetStreamUrl.match(/episode_id=([^&]+)/)?.[1]);
           if (epId) {
             const hlsUrl = `${baseUrl}/api/stream/xtream-series-hls/${epId}/master.m3u8`;
+
+            // Priorité Vidmoly Cloud : Injection directe HLS dans le lecteur Netflix ZIFLIX (0 pub, 0 iframe)
+            const vCode = epObj.vidmoly_file_code || (window.vidmolyMap && epId && window.vidmolyMap[epId]);
+            if (vCode) {
+              this.showLoader(`⚡ Connexion Vidmoly Cloud ${this.currentMovie.title} S${this.currentSeason}:E${this.currentEpisode}...`);
+              this.resetSteps();
+              this.setStep(1, 'done', `1. Épisode validé (${this.currentMovie.title} S${this.currentSeason}:E${this.currentEpisode})`);
+              this.setStep(2, 'done', `2. Source Vidmoly Cloud sélectionnée (720p HD)`);
+              this.setStep(3, 'done', `3. Déportation CDN Cloud (0% CPU VPS)`);
+              this.setStep(4, 'active', `4. Injection dans le lecteur ZIFLIX...`);
+
+              const vidmolyStreamUrl = `${baseUrl}/api/stream/vidmoly/${vCode}/playlist.m3u8`;
+              this.playDirectHls(vidmolyStreamUrl, { isVidmoly: true });
+              return;
+            }
+
             this.showLoader(`⚡ Connexion au flux direct HLS ${this.currentMovie.title} S${this.currentSeason}:E${this.currentEpisode}...`);
             this.resetSteps();
             this.setStep(1, 'done', `1. Épisode validé (${this.currentMovie.title} S${this.currentSeason}:E${this.currentEpisode})`);
@@ -1725,6 +1572,16 @@ class NetflixPlayer {
       this.setStep(3, 'done', `3. Déchiffrement direct validé`);
       this.setStep(4, 'active', `4. Injection dans le lecteur ZIFLIX...`);
 
+      if (data.vidmoly_file_code) {
+        this.setStep(2, 'active', `2. Connexion Vidmoly Cloud (720p HD)...`);
+        const vidmolyStreamUrl = `${baseUrl}/api/stream/vidmoly/${data.vidmoly_file_code}/playlist.m3u8`;
+        this.setStep(2, 'done', `2. Flux Vidmoly Cloud obtenu (720p HD)`);
+        this.setStep(3, 'done', `3. Déportation CDN Cloud (0% CPU VPS)`);
+        this.setStep(4, 'active', `4. Injection dans le lecteur ZIFLIX...`);
+        this.playDirectHls(vidmolyStreamUrl, { isVidmoly: true });
+        return;
+      }
+
       let targetStreamUrl = data.stream_url || data.embed_url;
       if (targetStreamUrl && targetStreamUrl.startsWith('/')) {
         targetStreamUrl = baseUrl + targetStreamUrl;
@@ -1754,7 +1611,54 @@ class NetflixPlayer {
   }
 
   // ================= 11. MOTEUR LIVE HLS & VOD (Hls.js) =================
-  playDirectHls(streamUrl, options = {}) {
+    async extractVidmolyDirectStream(fileCode) {
+    if (!fileCode) return null;
+    try {
+      console.log(`[ZIFLIX Player] Tentative d'extraction Vidmoly Cloud pour ${fileCode}...`);
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 6000);
+      const res = await fetch(`https://vidmoly.org/embed-${fileCode}.html`, {
+        signal: controller.signal,
+        headers: {
+          'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8'
+        }
+      });
+      clearTimeout(timeoutId);
+      if (!res.ok) return null;
+      let html = await res.text();
+
+      if (html.includes('eval(function(p,a,c,k,e,d)')) {
+        const regex = /\}\('(.*)',\s*(\d+),\s*(\d+),\s*'(.*)'\.split\('\|'\),\s*(\d+),\s*(\{.*\}|\{\}\))/;
+        const m = html.match(regex);
+        if (m) {
+          let [ , p, a, c, k ] = m;
+          a = parseInt(a, 10);
+          c = parseInt(c, 10);
+          k = k.split('|');
+          const e = (x) => (x < a ? '' : e(Math.floor(x / a))) + ((x = x % a) > 35 ? String.fromCharCode(x + 29) : x.toString(36));
+          while (c--) {
+            if (k[c]) p = p.replace(new RegExp('\\b' + e(c) + '\\b', 'g'), k[c]);
+          }
+          html = p;
+        }
+      }
+
+      const match = html.match(/sources\s*:\s*\[\s*\{\s*file\s*:\s*['"]([^'"]+\.m3u8[^'"]*)['"]/i)
+                 || html.match(/file\s*:\s*['"]([^'"]+\.m3u8[^'"]*)['"]/i)
+                 || html.match(/(https?:\/\/[^'"]+\.m3u8[^'"]*)/i);
+      if (match && match[1]) {
+        console.log('[ZIFLIX Player] Flux Vidmoly Cloud extrait avec succès:', match[1]);
+        return match[1];
+      }
+    } catch (err) {
+      console.warn('[ZIFLIX Player] Erreur extraction Vidmoly client:', err.message);
+    }
+    return null;
+  }
+
+playDirectHls(streamUrl, options = {}) {
+    const isVidmoly = !!(streamUrl && (streamUrl.includes('vmnow') || streamUrl.includes('vidmoly') || options.isVidmoly));
+    this.setPlayerQualityMode(isVidmoly);
     const baseUrl = window.API_BASE || '';
     if (streamUrl && streamUrl.startsWith('/')) streamUrl = baseUrl + streamUrl;
 
@@ -1887,6 +1791,7 @@ class NetflixPlayer {
         enableWorker: true,
         lowLatencyMode: false,
         liveDurationInfinity: false,
+        startPosition: (startSec > 0 ? startSec : 0),
         startLevel: -1,
         capLevelToPlayerSize: false,
         startFragPrefetch: true,
@@ -1915,12 +1820,17 @@ class NetflixPlayer {
       };
 
       hlsConfig.xhrSetup = (xhr, url) => {
-        xhr.withCredentials = true;
-        if (authToken) {
-          try {
-            xhr.setRequestHeader('Authorization', `Bearer ${authToken}`);
-            xhr.setRequestHeader('x-auth-token', authToken);
-          } catch (e) {}
+        const isInternal = !url.startsWith('http') || url.includes('ziablo.xyz') || url.includes('127.0.0.1');
+        if (isInternal) {
+          xhr.withCredentials = true;
+          if (authToken) {
+            try {
+              xhr.setRequestHeader('Authorization', `Bearer ${authToken}`);
+              xhr.setRequestHeader('x-auth-token', authToken);
+            } catch (e) {}
+          }
+        } else {
+          xhr.withCredentials = false;
         }
       };
 
@@ -1953,8 +1863,9 @@ class NetflixPlayer {
           if (hasStartedPlay) return;
           hasStartedPlay = true;
 
-          if (startSec > 0 && Math.abs(this.video.currentTime - startSec) > 2) {
-            this.video.currentTime = startSec;
+          const targetStart = (startSec > 0) ? startSec : 0;
+          if (!isChannel && Math.abs(this.video.currentTime - targetStart) > 1) {
+            this.video.currentTime = targetStart;
           }
 
           if (options.keepPlayback !== false && !this._isUserPaused) {
@@ -2108,6 +2019,8 @@ class NetflixPlayer {
 
   // ================= 12. MOTEUR SÉRIES VOD (Range 206) =================
   playDirectVideo(videoUrl) {
+    const isVidmoly = !!(videoUrl && (videoUrl.includes('vmnow') || videoUrl.includes('vidmoly')));
+    this.setPlayerQualityMode(isVidmoly);
     const baseUrl = window.API_BASE || '';
     if (videoUrl && videoUrl.startsWith('/')) videoUrl = baseUrl + videoUrl;
 
@@ -2232,6 +2145,7 @@ class NetflixPlayer {
 
   // ================= 13. MOTEUR IFRAME DE SECOURS =================
   playEmbedIframe(embedUrl) {
+    this.setPlayerQualityMode(true);
     if (this.hls) {
       try {
         this.hls.stopLoad();
@@ -2244,6 +2158,13 @@ class NetflixPlayer {
     this.video.src = '';
     this.video.classList.add('hidden');
     this.iframe.classList.remove('hidden');
+
+    if (embedUrl.includes('vidmoly')) {
+      this.iframe.removeAttribute('sandbox');
+    } else {
+      this.iframe.setAttribute('sandbox', 'allow-scripts allow-forms allow-presentation allow-popups');
+    }
+
     this.iframe.src = embedUrl;
 
     if (this.bottomControls) this.bottomControls.classList.add('iframe-mode');
