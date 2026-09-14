@@ -791,28 +791,33 @@ try {
   } catch (e2) {}
 }
 
-const xtreamSocksAgent = SocksProxyAgent ? new SocksProxyAgent('socks5h://127.0.0.1:40000', {
+const XTREAM_SOCKS_URL = process.env.XTREAM_SOCKS_URL || 'socks5h://127.0.0.1:9050';
+
+const xtreamSocksAgent = SocksProxyAgent ? new SocksProxyAgent(XTREAM_SOCKS_URL, {
   keepAlive: false,
   maxSockets: 50,
-  timeout: 8000
+  timeout: 10000
 }) : null;
 
 function getFreshXtreamSocksAgent() {
-  return SocksProxyAgent ? new SocksProxyAgent('socks5h://127.0.0.1:40000', {
+  return SocksProxyAgent ? new SocksProxyAgent(XTREAM_SOCKS_URL, {
     keepAlive: false,
-    timeout: 8000
+    timeout: 10000
   }) : null;
 }
 
-// Le nouveau VPS (162.35.186.177) n'est PAS bloqué par FoxBleu en direct (contrairement à l'ancien 74.50.66.196).
-// La connexion directe évite les blocages / timeouts de WARP. SOCKS ne sert qu'en fallback si besoin.
-const USE_SOCKS_PROXY = false;
+const USE_SOCKS_PROXY = true;
+
+function isFoxBleuHost(urlStr) {
+  if (!urlStr) return false;
+  return urlStr.includes(XTREAM_CONFIG.host) || urlStr.includes('foxbleu.org') || urlStr.includes('192.142.27.91');
+}
 
 function getXtreamAgent(urlStr, isSeries = false, forceSocks = false) {
-  if (forceSocks && xtreamSocksAgent) {
+  if (forceSocks || isFoxBleuHost(urlStr)) {
     return getFreshXtreamSocksAgent() || xtreamSocksAgent;
   }
-  const isHttps = urlStr.startsWith('https:');
+  const isHttps = typeof urlStr === 'string' && urlStr.startsWith('https:');
   if (isSeries) {
     return isHttps ? xtreamSeriesHttpsAgent : xtreamSeriesHttpAgent;
   }
@@ -827,6 +832,73 @@ const xtreamManifestCache = new Map();
 const xtreamSeriesEdgeCache = new Map();
 // Sessions actives de remuxage HLS pour séries Xtream (Apple Safari & Web HLS)
 const xtreamHlsSessions = new Map();
+
+function fetchXtreamJson(targetUrl, timeoutMs = 12000) {
+  return new Promise((resolve, reject) => {
+    const isFoxBleu = isFoxBleuHost(targetUrl);
+    const agent = getXtreamAgent(targetUrl, false, isFoxBleu && USE_SOCKS_PROXY);
+    const req = http.get(targetUrl, {
+      agent,
+      headers: { 'User-Agent': 'IPTVSmartersPro/1.0', 'Accept': 'application/json, */*' },
+      timeout: timeoutMs
+    }, (res) => {
+      if (res.statusCode !== 200) {
+        return reject(new Error(`HTTP ${res.statusCode}`));
+      }
+      let body = '';
+      res.on('data', chunk => body += chunk);
+      res.on('end', () => {
+        try {
+          resolve(JSON.parse(body));
+        } catch (e) {
+          reject(e);
+        }
+      });
+    });
+    req.on('error', reject);
+    req.on('timeout', () => {
+      req.destroy();
+      reject(new Error('Timeout fetchXtreamJson'));
+    });
+  });
+}
+
+function resolveXtreamSeriesEdgeUrl(episodeId, ext = 'mkv') {
+  const cacheKey = `${episodeId}_${ext}`;
+  const cached = xtreamSeriesEdgeCache.get(cacheKey);
+  if (cached && cached.expiresAt > Date.now()) {
+    return Promise.resolve(cached.url);
+  }
+  const originUrl = `http://${XTREAM_CONFIG.host}:${XTREAM_CONFIG.port}/series/${XTREAM_CONFIG.username}/${XTREAM_CONFIG.password}/${episodeId}.${ext}`;
+  return new Promise((resolve) => {
+    const agent = getXtreamAgent(originUrl, true, true);
+    const req = http.get(originUrl, {
+      agent,
+      headers: {
+        'User-Agent': 'IPTVSmartersPro/1.0',
+        'Range': 'bytes=0-100'
+      },
+      timeout: 10000
+    }, (res) => {
+      try { res.destroy(); } catch (e) {}
+      const loc = res.headers.location;
+      if (loc) {
+        const nextUrl = loc.startsWith('http') ? loc : new URL(loc, originUrl).href;
+        xtreamSeriesEdgeCache.set(cacheKey, { url: nextUrl, expiresAt: Date.now() + 60 * 60 * 1000 });
+        return resolve(nextUrl);
+      }
+      resolve(originUrl);
+    });
+    req.on('error', (err) => {
+      console.warn('[Resolve Series Edge Error]:', err.message);
+      resolve(originUrl);
+    });
+    req.on('timeout', () => {
+      req.destroy();
+      resolve(originUrl);
+    });
+  });
+}
 
 // Cache des images pour contourner le Mixed-Content (HTTP sur HTTPS Render) et port 443 manquant
 const imageProxyCache = new Map();
@@ -881,21 +953,21 @@ process.on('exit', () => {
 process.on('SIGTERM', () => process.exit(0));
 process.on('SIGINT', () => process.exit(0));
 
-// Préchauffage automatique des flux et connexions Keep-Alive au démarrage (supprime la lenteur du cold-start <1min)
+// Préchauffage progressif des flux clés (1 par 1) pour respecter max_connections: 1
 async function prewarmXtreamConnections() {
-  console.log('[Xtream Pre-Warm] ⚡ Préchauffage automatique des connexions et des caches Edge au démarrage...');
-  const keyStreams = ['13917', '13738', '14003', '13973', '13696', '14167', '14170', '13839', '14020', '481112', '479049', '479050'];
+  console.log('[Xtream Pre-Warm] ⚡ Préchauffage des caches Edge au démarrage...');
+  const keyStreams = ['13917', '14003', '14167'];
   for (const sId of keyStreams) {
     try {
       const url = `http://${XTREAM_CONFIG.host}:${XTREAM_CONFIG.port}/live/${XTREAM_CONFIG.username}/${XTREAM_CONFIG.password}/${sId}.m3u8`;
-      fetchXtreamPlaylist(url).then(res => {
-        if (res?.finalUrl && res.finalUrl !== url) {
-          xtreamEdgeCache.set(sId, { edgeUrl: res.finalUrl, expiresAt: Date.now() + 300000 });
-        }
-      }).catch(() => {});
+      const res = await fetchXtreamPlaylist(url).catch(() => null);
+      if (res?.finalUrl && res.finalUrl !== url) {
+        xtreamEdgeCache.set(sId, { edgeUrl: res.finalUrl, expiresAt: Date.now() + 300000 });
+      }
+      await new Promise(r => setTimeout(r, 1500));
     } catch (e) {}
   }
-  console.log(`[Xtream Pre-Warm] ✅ ${keyStreams.length} flux prioritaires préchauffés (lecture instantanée dès la 1ère minute)`);
+  console.log(`[Xtream Pre-Warm] ✅ ${keyStreams.length} flux prioritaires préchauffés.`);
 }
 
 function fetchXtreamPlaylist(targetUrl, headers = {}, hops = 0, retry = 0) {
@@ -907,7 +979,7 @@ function fetchXtreamPlaylist(targetUrl, headers = {}, hops = 0, retry = 0) {
     } catch (e) {
       return reject(new Error('URL Xtream invalide: ' + targetUrl));
     }
-    const isFoxBleu = targetUrl.includes(XTREAM_CONFIG.host) || targetUrl.includes('foxbleu.org');
+    const isFoxBleu = isFoxBleuHost(targetUrl);
     const client = (isFoxBleu && USE_SOCKS_PROXY && xtreamSocksAgent) ? http : (parsed.protocol === 'https:' ? https : http);
     const agent = getXtreamAgent(targetUrl, false, isFoxBleu && USE_SOCKS_PROXY);
     let settled = false;
@@ -4858,9 +4930,11 @@ const server = http.createServer((req, res) => {
             try {
               console.log(`[extract] Cache absent pour série ${realSeriesId}, appel live Xtream...`);
               const xtreamUrl = `http://${XTREAM_CONFIG.host}:${XTREAM_CONFIG.port}/player_api.php?username=${XTREAM_CONFIG.username}&password=${XTREAM_CONFIG.password}&action=get_series_info&series_id=${realSeriesId}`;
-              const xtRes = await fetch(xtreamUrl, { signal: AbortSignal.timeout(8000) });
-              if (xtRes.ok) {
-                const rawData = await xtRes.json();
+              const rawData = await fetchXtreamJson(xtreamUrl, 10000).catch(e => {
+                console.warn('[extract] fetchXtreamJson error:', e.message);
+                return null;
+              });
+              if (rawData) {
                 // Sauvegarder le cache pour les prochaines fois
                 try {
                   const cacheDir = path.join(__dirname, 'data', 'cache');
@@ -5802,7 +5876,7 @@ const EC3_AUDIO_CHANNELS = new Set([
         return;
       }
 
-      const isFoxBleu = urlToFetch.includes(XTREAM_CONFIG.host) || urlToFetch.includes('foxbleu.org');
+      const isFoxBleu = isFoxBleuHost(urlToFetch);
       const client = (isFoxBleu && USE_SOCKS_PROXY && xtreamSocksAgent) ? http : (parsed.protocol === 'https:' ? https : http);
       const agent = getXtreamAgent(urlToFetch, false, isFoxBleu && USE_SOCKS_PROXY);
       let isAborted = false;
@@ -6214,14 +6288,26 @@ const EC3_AUDIO_CHANNELS = new Set([
     }
 
     if (!session && !isFullCompletePlaylist) {
-      spawnHlsProc(originUrl);
+      if (hasCachedEdge) {
+        spawnHlsProc(cachedEdge.url);
+      } else {
+        resolveXtreamSeriesEdgeUrl(episodeId, ext).then(edgeUrl => {
+          if (!session && !isFullCompletePlaylist) {
+            spawnHlsProc(edgeUrl);
+          }
+        }).catch(() => {
+          if (!session && !isFullCompletePlaylist) {
+            spawnHlsProc(originUrl);
+          }
+        });
+      }
     } else if (session) {
       session.lastAccess = Date.now();
     }
 
     // Attendre que la playlist et le premier segment soient prêts
     let waited = 0;
-    const maxWait = 7000;
+    const maxWait = 9000;
     const pollInterval = 150;
 
     const checkReady = () => {
@@ -6249,10 +6335,11 @@ const EC3_AUDIO_CHANNELS = new Set([
 
     const waitTimer = setInterval(() => {
       waited += pollInterval;
+      session = session || xtreamHlsSessions.get(String(episodeId));
       if (checkReady()) {
         clearInterval(waitTimer);
         sendPlaylist();
-      } else if (session.isDone && !fs.existsSync(playlistPath)) {
+      } else if (session && session.isDone && !fs.existsSync(playlistPath)) {
         clearInterval(waitTimer);
         if (!res.headersSent) {
           res.writeHead(502, { 'Content-Type': 'text/plain; charset=utf-8', 'Access-Control-Allow-Origin': '*' });
@@ -6359,7 +6446,7 @@ const EC3_AUDIO_CHANNELS = new Set([
         return;
       }
 
-      const isFoxBleu = targetUrl.includes(XTREAM_CONFIG.host) || targetUrl.includes('foxbleu.org');
+      const isFoxBleu = isFoxBleuHost(targetUrl);
       const client = (isFoxBleu && USE_SOCKS_PROXY && xtreamSocksAgent) ? http : (parsed.protocol === 'https:' ? https : http);
       const agent = (isFoxBleu && USE_SOCKS_PROXY && xtreamSocksAgent) ? getXtreamAgent(targetUrl, true, true) : (parsed.protocol === 'https:' ? xtreamSeriesHttpsAgent : xtreamSeriesHttpAgent);
       const headersToForward = {
