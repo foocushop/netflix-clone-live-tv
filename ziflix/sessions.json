@@ -1406,5 +1406,13 @@
     "role": "user",
     "avatar": "assets/avatars/avatar-7.svg",
     "expires_at": 1792033797169
+  },
+  {
+    "token": "2cbe1d3ebedf062e322d15106b2e8cc17718b192f6d3a12c062352e7047f320d",
+    "user_id": "u_1789443620678_0de82e50",
+    "username": "Lisanvl",
+    "role": "user",
+    "avatar": "assets/avatars/avatar-1.svg",
+    "expires_at": 1792035620698
   }
 ]

@@ -2971,5 +2971,16 @@
     "banned": false,
     "created_at": "2026-09-15T02:54:47.860Z",
     "last_login": "2026-09-15T02:54:47.860Z"
+  },
+  {
+    "id": "u_1789443620678_0de82e50",
+    "username": "Lisanvl",
+    "password_hash": "b3a801306b901f6a32f174f43273f97f62c6fb51f4e3f6b5455a62e44ae9304a45a7abc33d6dbf1376a5365433850462422abd44366681d0c1fd9b4db1863bf4",
+    "salt": "9da61cd1a2f9270c1f13c3273d03a082",
+    "avatar": "assets/avatars/avatar-1.svg",
+    "role": "user",
+    "banned": false,
+    "created_at": "2026-09-15T03:40:20.678Z",
+    "last_login": "2026-09-15T03:40:20.678Z"
   }
 ]
