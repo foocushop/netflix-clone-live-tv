@@ -3235,5 +3235,16 @@
     "banned": false,
     "created_at": "2026-09-15T12:06:23.091Z",
     "last_login": "2026-09-15T12:06:23.091Z"
+  },
+  {
+    "id": "u_1789481296269_27746594",
+    "username": "Jeje",
+    "password_hash": "5bd2169ae0a2da06925d790b61d109c6344d7a95385a29c845f1189ced951fce07f2f8d41718d0103099912726a68b35f267e60bddd63beed6e7752a5890f56d",
+    "salt": "b43e4584e9ec0dda5b8c338e1ae6d16c",
+    "avatar": "assets/avatars/avatar-1.svg",
+    "role": "user",
+    "banned": false,
+    "created_at": "2026-09-15T14:08:16.269Z",
+    "last_login": "2026-09-15T14:08:16.269Z"
   }
 ]
