@@ -133,5 +133,84 @@
       "published_at": "2026-09-14T21:16:32.564Z",
       "telegram_msg_id": 181
     }
+  ],
+  "series_9066_s9": [
+    {
+      "id": "manual_skip_9066_1",
+      "episode_num": 1,
+      "title": "Épisode 1",
+      "published_at": "2026-09-15T19:39:12.993Z",
+      "telegram_msg_id": "pre-existing"
+    },
+    {
+      "id": "manual_skip_9066_2",
+      "episode_num": 2,
+      "title": "Épisode 2",
+      "published_at": "2026-09-15T19:39:12.993Z",
+      "telegram_msg_id": "pre-existing"
+    },
+    {
+      "id": "manual_skip_9066_3",
+      "episode_num": 3,
+      "title": "Épisode 3",
+      "published_at": "2026-09-15T19:39:12.993Z",
+      "telegram_msg_id": "pre-existing"
+    },
+    {
+      "id": "manual_skip_9066_4",
+      "episode_num": 4,
+      "title": "Épisode 4",
+      "published_at": "2026-09-15T19:39:12.993Z",
+      "telegram_msg_id": "pre-existing"
+    },
+    {
+      "id": "manual_skip_9066_5",
+      "episode_num": 5,
+      "title": "Épisode 5",
+      "published_at": "2026-09-15T19:39:12.993Z",
+      "telegram_msg_id": "pre-existing"
+    },
+    {
+      "id": "manual_skip_9066_6",
+      "episode_num": 6,
+      "title": "Épisode 6",
+      "published_at": "2026-09-15T19:39:12.993Z",
+      "telegram_msg_id": "pre-existing"
+    },
+    {
+      "id": "manual_skip_9066_7",
+      "episode_num": 7,
+      "title": "Épisode 7",
+      "published_at": "2026-09-15T19:39:12.993Z",
+      "telegram_msg_id": "pre-existing"
+    },
+    {
+      "id": "manual_skip_9066_8",
+      "episode_num": 8,
+      "title": "Épisode 8",
+      "published_at": "2026-09-15T19:39:12.993Z",
+      "telegram_msg_id": "pre-existing"
+    },
+    {
+      "id": "manual_skip_9066_9",
+      "episode_num": 9,
+      "title": "Épisode 9",
+      "published_at": "2026-09-15T19:39:12.993Z",
+      "telegram_msg_id": "pre-existing"
+    },
+    {
+      "id": "manual_skip_9066_10",
+      "episode_num": 10,
+      "title": "Épisode 10",
+      "published_at": "2026-09-15T19:39:12.993Z",
+      "telegram_msg_id": "pre-existing"
+    },
+    {
+      "id": "483407",
+      "episode_num": 11,
+      "title": "Les Apprentis Aventuriers (2016) - S09E11 - Episode 11",
+      "published_at": "2026-09-15T19:46:08.223Z",
+      "telegram_msg_id": 185
+    }
   ]
 }

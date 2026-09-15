@@ -8,5 +8,15 @@
     "template": "<b>{titre}</b> {emoji} Saison {saison}\n\nÉpisode {episode}",
     "channel_id": "-1002615244456",
     "enabled": true
+  },
+  {
+    "id": "series_9066_s9",
+    "series_id": 9066,
+    "season": 9,
+    "name": "Les Apprentis Aventuriers",
+    "emoji": "**👹**",
+    "template": "<b>{titre}</b> {emoji} Saison {saison}\n\nÉpisode {episode}",
+    "channel_id": "-1002615244456",
+    "enabled": true
   }
 ]
