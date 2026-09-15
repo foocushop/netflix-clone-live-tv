@@ -3113,7 +3113,7 @@
     "role": "user",
     "banned": false,
     "created_at": "2026-09-15T07:54:29.824Z",
-    "last_login": "2026-09-15T08:01:35.852Z"
+    "last_login": "2026-09-15T08:43:49.572Z"
   },
   {
     "id": "u_1789458871928_f79a6798",
@@ -3125,5 +3125,16 @@
     "banned": false,
     "created_at": "2026-09-15T07:54:31.942Z",
     "last_login": "2026-09-15T07:54:31.942Z"
+  },
+  {
+    "id": "u_1789463530195_ac041dcf",
+    "username": "Bibi",
+    "password_hash": "f53e7cdaaa5ae906765e4fd4866ff04b1988a9d853039c3a61c1f598b0726238315fe5266bfba9e96f6a8871813be798710104a04124470bf2540f27abeb7df4",
+    "salt": "8841ad175ee57a165a3d6de6bfa72e68",
+    "avatar": "assets/avatars/avatar-6.svg",
+    "role": "user",
+    "banned": false,
+    "created_at": "2026-09-15T09:12:10.195Z",
+    "last_login": "2026-09-15T09:12:10.195Z"
   }
 ]
