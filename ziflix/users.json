@@ -3246,5 +3246,60 @@
     "banned": false,
     "created_at": "2026-09-15T14:08:16.269Z",
     "last_login": "2026-09-15T14:08:16.269Z"
+  },
+  {
+    "id": "u_1789482566769_a630c39c",
+    "username": "sam",
+    "password_hash": "06c01c182b607eefe29b2de2fc3ec85d1cad3cbe3ff4996070316ccae161c4da20b09ceb635b4d0893886c64210131040bb4a6446199cffff5bedbd1c2d417c8",
+    "salt": "0cca3533c9bc5d5e233a90ccb879ae27",
+    "avatar": "assets/avatars/avatar-9.svg",
+    "role": "user",
+    "banned": false,
+    "created_at": "2026-09-15T14:29:26.769Z",
+    "last_login": "2026-09-15T14:29:26.769Z"
+  },
+  {
+    "id": "u_1789484608227_3caa82c4",
+    "username": "Mina",
+    "password_hash": "c6f8377bc07bff30d4ff0a5d87ac2bfcca017f0f13fd5fe60dfd03b38d5824dacc68668b509e127851a70a394c700f8bb1d991f655edbee6537d2c5d317aa0a7",
+    "salt": "6cd3369f52cc137efbf562ab1ae54ee6",
+    "avatar": "assets/avatars/avatar-4.svg",
+    "role": "user",
+    "banned": false,
+    "created_at": "2026-09-15T15:03:28.227Z",
+    "last_login": "2026-09-15T15:06:26.717Z"
+  },
+  {
+    "id": "u_1789484684268_3019afba",
+    "username": "ghitsss",
+    "password_hash": "f9f6a804a0de2c3a0f141b9c45f501d80f4c213bb66dfd3b4a6f31813c4f08686b960dbaa1760d30b39c0febf2fb7886f5348e1f1eeb10e5d58f50bebd4e51e1",
+    "salt": "1765c2d1ae751a6f36d40a8e03c86140",
+    "avatar": "assets/avatars/avatar-1.svg",
+    "role": "user",
+    "banned": false,
+    "created_at": "2026-09-15T15:04:44.268Z",
+    "last_login": "2026-09-15T15:04:44.268Z"
+  },
+  {
+    "id": "u_1789484837084_3c43f18c",
+    "username": "Julie",
+    "password_hash": "5dec29d29166057d1dfd4fa7e9245d6b005e53973c83d61b4c2c51e13358d437717cf6b68b5e1a4656292ca0c57d71149e3fa9a41043bf106b8dbd19c0d96985",
+    "salt": "1d2371326107885a233475a73ccbfc6d",
+    "avatar": "assets/avatars/avatar-3.svg",
+    "role": "user",
+    "banned": false,
+    "created_at": "2026-09-15T15:07:17.084Z",
+    "last_login": "2026-09-15T15:07:17.084Z"
+  },
+  {
+    "id": "u_1789484840009_086c79b6",
+    "username": "Kendra",
+    "password_hash": "69efc3e34aab675b19783aa2cb20109c01fa097727c2656d4e8f7839a60512a8bc90c201a68337827da3f74d4a534b8eaad837d14fbd32710ed5ff69c4b75b9c",
+    "salt": "33b2018d464528bf52f2aa2b49bf7fce",
+    "avatar": "assets/avatars/avatar-7.svg",
+    "role": "user",
+    "banned": false,
+    "created_at": "2026-09-15T15:07:20.009Z",
+    "last_login": "2026-09-15T15:07:20.009Z"
   }
 ]
