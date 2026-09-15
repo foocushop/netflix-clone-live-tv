@@ -1738,7 +1738,7 @@
     "role": "user",
     "banned": false,
     "created_at": "2026-09-13T22:23:31.455Z",
-    "last_login": "2026-09-13T22:23:31.455Z"
+    "last_login": "2026-09-15T03:09:57.167Z"
   },
   {
     "id": "u_1789338490275_98bf81bd",
@@ -2959,6 +2959,17 @@
     "role": "user",
     "banned": false,
     "created_at": "2026-09-15T02:23:44.085Z",
-    "last_login": "2026-09-15T02:23:44.085Z"
+    "last_login": "2026-09-15T02:25:43.559Z"
+  },
+  {
+    "id": "u_1789440887860_cb1d1d5b",
+    "username": "22h12",
+    "password_hash": "6bb81781a2e92cbe2e4e494006b411d535b46ee78806e872cda747d614e9c457f30178fae2438c46215615bd6230ed704f40d4a3e4fe32e6f16ea74cc0f00a64",
+    "salt": "cd628e99e91c1d2623dddbd312bb9948",
+    "avatar": "assets/avatars/avatar-4.svg",
+    "role": "user",
+    "banned": false,
+    "created_at": "2026-09-15T02:54:47.860Z",
+    "last_login": "2026-09-15T02:54:47.860Z"
   }
 ]
