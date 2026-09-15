@@ -8,7 +8,7 @@
     "role": "admin",
     "banned": false,
     "created_at": "2026-09-12T00:18:32.081Z",
-    "last_login": "2026-09-14T01:55:59.281Z",
+    "last_login": "2026-09-15T02:15:00.919Z",
     "is_premium": true
   },
   {
@@ -1991,7 +1991,7 @@
     "role": "user",
     "banned": false,
     "created_at": "2026-09-14T01:13:20.996Z",
-    "last_login": "2026-09-14T21:47:14.789Z"
+    "last_login": "2026-09-15T01:37:21.973Z"
   },
   {
     "id": "u_1789358755452_67788c0f",
@@ -2949,5 +2949,16 @@
     "banned": false,
     "created_at": "2026-09-15T00:50:47.603Z",
     "last_login": "2026-09-15T00:50:47.603Z"
+  },
+  {
+    "id": "u_1789439024085_b3a08a5c",
+    "username": "Alex.alex",
+    "password_hash": "80259c97e18159661bba8a8204bf24b164e7b4cc71c57752b28b881fe837dca1ddf44f7b44158cd95491e2989ef55b385087181434fc0bb6a68bcfcd9c3feb5c",
+    "salt": "1db66c7b8a2dafa5c16ce6ed2bf58b52",
+    "avatar": "assets/avatars/avatar-1.svg",
+    "role": "user",
+    "banned": false,
+    "created_at": "2026-09-15T02:23:44.085Z",
+    "last_login": "2026-09-15T02:23:44.085Z"
   }
 ]
