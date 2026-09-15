@@ -1452,7 +1452,7 @@
     "role": "user",
     "banned": false,
     "created_at": "2026-09-13T18:14:32.412Z",
-    "last_login": "2026-09-14T20:50:21.921Z"
+    "last_login": "2026-09-15T23:19:56.342Z"
   },
   {
     "id": "u_1789324391746_805bcbd5",
@@ -3135,7 +3135,7 @@
     "role": "user",
     "banned": false,
     "created_at": "2026-09-15T09:12:10.195Z",
-    "last_login": "2026-09-15T09:12:10.195Z"
+    "last_login": "2026-09-15T22:59:30.624Z"
   },
   {
     "id": "u_1789468031805_1963dad3",
@@ -4566,5 +4566,27 @@
     "banned": false,
     "created_at": "2026-09-15T22:35:58.356Z",
     "last_login": "2026-09-15T22:35:58.356Z"
+  },
+  {
+    "id": "u_1789513603365_4ca7dcce",
+    "username": "Lily",
+    "password_hash": "eee58c44657702c2d43a014c2a2700647ffee47369ccc557104260da9bd63f7be54a487021ebb0baeb16ab2d56278f947aefed5406ab977329f9edd8c33716dc",
+    "salt": "76bd61a5893c1b78f24ff7525dc54692",
+    "avatar": "assets/avatars/avatar-10.svg",
+    "role": "user",
+    "banned": false,
+    "created_at": "2026-09-15T23:06:43.365Z",
+    "last_login": "2026-09-15T23:06:43.365Z"
+  },
+  {
+    "id": "u_1789515142776_b56f1fd0",
+    "username": "Belveder3806 six",
+    "password_hash": "8d28d46ea3de40798faa4f7cd77db86323f2332433219563a14ba504625678cd3a1ce74395d27fbb02fce6db8fb70d56aed0ad3d96a4a9c8948a463c861dd91f",
+    "salt": "9d36609154da031b93d70ac8ae85abd1",
+    "avatar": "assets/avatars/avatar-9.svg",
+    "role": "user",
+    "banned": false,
+    "created_at": "2026-09-15T23:32:22.776Z",
+    "last_login": "2026-09-15T23:32:22.776Z"
   }
 ]
