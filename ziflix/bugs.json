@@ -1,5 +1,24 @@
 [
   {
+    "id": "bug_1789458588534_4bb422",
+    "user_id": "u_1789458446798_10701e58",
+    "username": "Gracejolie",
+    "avatar": "assets/avatars/avatar-1.svg",
+    "category": "audio",
+    "title": "Signalement : ‎Avatar Aang, le dernier maître de l'air S1E1",
+    "description": "",
+    "media_id": "980431",
+    "media_title": "‎Avatar Aang, le dernier maître de l'air",
+    "season": 1,
+    "episode": 1,
+    "episode_id": null,
+    "device_info": "iPhone (iOS) • Safari",
+    "user_agent": "Mozilla/5.0 (iPhone; CPU iPhone OS 18_2_1 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/18.2.1 Mobile/22C161 Safari/604.1",
+    "url": "https://ziablo.xyz/",
+    "status": "open",
+    "created_at": "2026-09-15T07:49:48.534Z"
+  },
+  {
     "id": "bug_1789430609097_59cc1f",
     "user_id": "u_1789429455130_c8eaba65",
     "username": "Safia",
