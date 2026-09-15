@@ -3004,5 +3004,27 @@
     "banned": false,
     "created_at": "2026-09-15T05:11:06.088Z",
     "last_login": "2026-09-15T05:11:06.088Z"
+  },
+  {
+    "id": "u_1789450600462_2690e557",
+    "username": "Kantesokhnamai7@gmail.com",
+    "password_hash": "6cc0d3d681ccb7bc1ccefeb37d269b39693b1807a26b8c2cf8ad3d6d65d963ebd7fb55b79873253fb44b1a20990ed681510e38a07fdd6e00acf57022f87a0ece",
+    "salt": "b017f00930df0540922bcca7a8d0d80a",
+    "avatar": "assets/avatars/avatar-1.svg",
+    "role": "user",
+    "banned": false,
+    "created_at": "2026-09-15T05:36:40.462Z",
+    "last_login": "2026-09-15T05:36:40.462Z"
+  },
+  {
+    "id": "u_1789451323886_9371428e",
+    "username": "Mlk8",
+    "password_hash": "d6950be3e7b3eab90ecc68aa2ee73843db07ccfce7598e4e19183b9930ed49fc0c938fb7c4ab0de06237ad627848611ec9ae5e26c1d1e931306b58c3b8d20134",
+    "salt": "40497eb9b05df70b93d9a9ac6537d946",
+    "avatar": "assets/avatars/avatar-1.svg",
+    "role": "user",
+    "banned": false,
+    "created_at": "2026-09-15T05:48:43.886Z",
+    "last_login": "2026-09-15T05:48:43.886Z"
   }
 ]
