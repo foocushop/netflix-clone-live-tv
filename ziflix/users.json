@@ -3026,5 +3026,27 @@
     "banned": false,
     "created_at": "2026-09-15T05:48:43.886Z",
     "last_login": "2026-09-15T05:48:43.886Z"
+  },
+  {
+    "id": "u_1789454400725_a24c9e68",
+    "username": "Miss kem’s18",
+    "password_hash": "e42276e6ea6d5ce54f035f81c74aa379f805969bfe7775878c51c67e3b42e9dbdc7c05f0fe83c806eb43ad12bd94f5b75b7fa967623fe09cd19f5dac1bead6d7",
+    "salt": "2ea0cfea6db45f322602d740244c2a2b",
+    "avatar": "assets/avatars/avatar-4.svg",
+    "role": "user",
+    "banned": false,
+    "created_at": "2026-09-15T06:40:00.725Z",
+    "last_login": "2026-09-15T06:44:59.943Z"
+  },
+  {
+    "id": "u_1789456298616_515851a6",
+    "username": "Grace kouassi",
+    "password_hash": "689b16ff54014de4a728706366534732a814b5b94af723356246e251c555924ee215490bedd74c5ef7b1baf2241bcb2f76b41af314da38383ac75ab126245038",
+    "salt": "12cdd5ddfb46a48930497f121eb15fcd",
+    "avatar": "assets/avatars/avatar-4.svg",
+    "role": "user",
+    "banned": false,
+    "created_at": "2026-09-15T07:11:38.616Z",
+    "last_login": "2026-09-15T07:11:38.616Z"
   }
 ]
