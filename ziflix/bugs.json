@@ -1,5 +1,24 @@
 [
   {
+    "id": "bug_1789471135890_63aba0",
+    "user_id": "u_1789387345808_d8c2a72f",
+    "username": "andi",
+    "avatar": "assets/avatars/avatar-1.svg",
+    "category": "playback",
+    "title": "Signalement : La Villa des cœurs brisés (2015) S10E1",
+    "description": "",
+    "media_id": "xtream_series_6715",
+    "media_title": "La Villa des cœurs brisés (2015)",
+    "season": 10,
+    "episode": 1,
+    "episode_id": null,
+    "device_info": "Android • Chrome",
+    "user_agent": "Mozilla/5.0 (Linux; Android 10; K) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Mobile Safari/537.36",
+    "url": "https://ziablo.xyz/",
+    "status": "open",
+    "created_at": "2026-09-15T11:18:55.890Z"
+  },
+  {
     "id": "bug_1789458588534_4bb422",
     "user_id": "u_1789458446798_10701e58",
     "username": "Gracejolie",
