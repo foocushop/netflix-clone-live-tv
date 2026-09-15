@@ -3949,7 +3949,7 @@
     "role": "user",
     "banned": false,
     "created_at": "2026-09-15T18:24:27.437Z",
-    "last_login": "2026-09-15T18:24:27.437Z"
+    "last_login": "2026-09-15T21:52:08.343Z"
   },
   {
     "id": "u_1789496899416_5c6a66c7",
@@ -4466,7 +4466,7 @@
     "role": "user",
     "banned": false,
     "created_at": "2026-09-15T20:54:15.862Z",
-    "last_login": "2026-09-15T20:57:59.090Z"
+    "last_login": "2026-09-15T21:54:58.962Z"
   },
   {
     "id": "u_1789505716568_8ca0082a",
@@ -4510,7 +4510,7 @@
     "role": "user",
     "banned": false,
     "created_at": "2026-09-15T21:18:07.184Z",
-    "last_login": "2026-09-15T21:35:16.106Z"
+    "last_login": "2026-09-15T22:03:48.501Z"
   },
   {
     "id": "u_1789508249336_c04a00a4",
@@ -4533,5 +4533,38 @@
     "banned": false,
     "created_at": "2026-09-15T21:41:46.624Z",
     "last_login": "2026-09-15T21:44:32.541Z"
+  },
+  {
+    "id": "u_1789509285656_fd103fb8",
+    "username": "Xoxo",
+    "password_hash": "78b5b177e3eca62e0aac0081e2c6467bd82a0077831f112824e92e8253180d8ccb8820608305775d76047508fad3e4ae46db8c2f3a543cbdbaffb996a7438bdc",
+    "salt": "2e61bad8f973fa028a475b8b49451ceb",
+    "avatar": "assets/avatars/avatar-1.svg",
+    "role": "user",
+    "banned": false,
+    "created_at": "2026-09-15T21:54:45.656Z",
+    "last_login": "2026-09-15T21:54:45.656Z"
+  },
+  {
+    "id": "u_1789510820582_c446eb39",
+    "username": "ValKofi",
+    "password_hash": "ec01d3c6264d7c024539ee2b7906f84af6837be3c3e278781aebe4f0d8c4df39c9cd22b66ac65585839110115141cc93ee1eee5bf349fb104c66247285e1ef54",
+    "salt": "1781918dff4f8e0cfb5191d0b4bc5c00",
+    "avatar": "assets/avatars/avatar-10.svg",
+    "role": "user",
+    "banned": false,
+    "created_at": "2026-09-15T22:20:20.582Z",
+    "last_login": "2026-09-15T22:20:20.582Z"
+  },
+  {
+    "id": "u_1789511758356_362fb729",
+    "username": "Fc@telegram.com",
+    "password_hash": "9feae973cb8c8c6a9d457b1f50d3913ba609e44e4cb0a20f3c73865ba0dab829f3ebb7a5a3674496733828de62f51146c847f6eb8886a46ca933d1f95990a998",
+    "salt": "5ce30303ccd5e3120a4e9d9d69f6d80d",
+    "avatar": "assets/avatars/avatar-1.svg",
+    "role": "user",
+    "banned": false,
+    "created_at": "2026-09-15T22:35:58.356Z",
+    "last_login": "2026-09-15T22:35:58.356Z"
   }
 ]

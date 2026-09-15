@@ -1,5 +1,43 @@
 [
   {
+    "id": "bug_1789511804917_82f95d",
+    "user_id": "u_1789506765958_bc209179",
+    "username": "j.tressy",
+    "avatar": "assets/avatars/avatar-1.svg",
+    "category": "audio",
+    "title": "Signalement : La Villa des cœurs brisés (2015) S11E16",
+    "description": "",
+    "media_id": "xtream_series_6715",
+    "media_title": "La Villa des cœurs brisés (2015)",
+    "season": 11,
+    "episode": 16,
+    "episode_id": null,
+    "device_info": "Android • Chrome",
+    "user_agent": "Mozilla/5.0 (Linux; Android 10; K) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Mobile Safari/537.36",
+    "url": "https://ziablo.xyz/series",
+    "status": "open",
+    "created_at": "2026-09-15T22:36:44.918Z"
+  },
+  {
+    "id": "bug_1789508991284_090b94",
+    "user_id": "u_1789504038405_3aa4b548",
+    "username": "davidgboko786@gmail.com",
+    "avatar": "assets/avatars/avatar-1.svg",
+    "category": "playback",
+    "title": "Signalement : La Villa des cœurs brisés (2015) S11E18",
+    "description": "",
+    "media_id": "xtream_series_6715",
+    "media_title": "La Villa des cœurs brisés (2015)",
+    "season": 11,
+    "episode": 18,
+    "episode_id": null,
+    "device_info": "iPhone (iOS) • Safari",
+    "user_agent": "Mozilla/5.0 (iPhone; CPU iPhone OS 18_7 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/26.6 Mobile/15E148 Safari/604.1",
+    "url": "https://ziablo.xyz/",
+    "status": "open",
+    "created_at": "2026-09-15T21:49:51.285Z"
+  },
+  {
     "id": "bug_1789507174903_70f91c",
     "user_id": "u_1789506765958_bc209179",
     "username": "j.tressy",
@@ -224,8 +262,9 @@
     "device_info": "Android • Chrome",
     "user_agent": "Mozilla/5.0 (Linux; Android 10; K) AppleWebKit/537.36 (KHTML, like Gecko) SamsungBrowser/30.0 Chrome/143.0.0.0 Mobile Safari/537.36",
     "url": "https://ziablo.xyz/",
-    "status": "open",
-    "created_at": "2026-09-15T16:34:09.728Z"
+    "status": "resolved",
+    "created_at": "2026-09-15T16:34:09.728Z",
+    "updated_at": "2026-09-15T22:36:10.335Z"
   },
   {
     "id": "bug_1789489980015_9a39fd",
@@ -262,8 +301,9 @@
     "device_info": "PC Windows • Chrome",
     "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36",
     "url": "https://ziablo.xyz/telerealite",
-    "status": "open",
-    "created_at": "2026-09-15T16:01:00.487Z"
+    "status": "resolved",
+    "created_at": "2026-09-15T16:01:00.487Z",
+    "updated_at": "2026-09-15T22:36:04.569Z"
   },
   {
     "id": "bug_1789481692066_c4cee0",
