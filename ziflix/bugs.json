@@ -1,5 +1,24 @@
 [
   {
+    "id": "bug_1789488060486_e65e57",
+    "user_id": "u_1789484840009_086c79b6",
+    "username": "Kendra",
+    "avatar": "assets/avatars/avatar-7.svg",
+    "category": "playback",
+    "title": "Signalement : La Villa des cœurs brisés (2015) S11E16",
+    "description": "ça refuse de s'ouvrire pour que je visionne",
+    "media_id": "xtream_series_6715",
+    "media_title": "La Villa des cœurs brisés (2015)",
+    "season": 11,
+    "episode": 16,
+    "episode_id": null,
+    "device_info": "PC Windows • Chrome",
+    "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36",
+    "url": "https://ziablo.xyz/telerealite",
+    "status": "open",
+    "created_at": "2026-09-15T16:01:00.487Z"
+  },
+  {
     "id": "bug_1789481692066_c4cee0",
     "user_id": "u_1789380774102_bb9a8099",
     "username": "Marina",
