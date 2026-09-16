@@ -482,7 +482,7 @@
     "role": "user",
     "banned": false,
     "created_at": "2026-09-12T21:18:39.944Z",
-    "last_login": "2026-09-14T21:11:05.962Z"
+    "last_login": "2026-09-16T10:54:06.942Z"
   },
   {
     "id": "u_1789247952263_f353b843",
@@ -4764,5 +4764,27 @@
     "banned": false,
     "created_at": "2026-09-16T10:38:20.991Z",
     "last_login": "2026-09-16T10:38:20.991Z"
+  },
+  {
+    "id": "u_1789557224991_050de820",
+    "username": "Ziza jallo99",
+    "password_hash": "8ec58cd2ac502ade29e3f1c0a07e93e5845f17056cbb250243bec9f2f9fb3a00be0c967cbf34ff447d2b160d7767a5586522a44c7e49bd971b2ed7e87fa38154",
+    "salt": "782c9abe8bb2151a41ab2606a2f2cd4f",
+    "avatar": "assets/avatars/avatar-4.svg",
+    "role": "user",
+    "banned": false,
+    "created_at": "2026-09-16T11:13:44.991Z",
+    "last_login": "2026-09-16T11:13:44.991Z"
+  },
+  {
+    "id": "u_1789557995611_a97b519a",
+    "username": "christi",
+    "password_hash": "7446591193d5964816ba0d96bd1fba490ea278a3cf014c666d3d0b547bf82d4004c0ca7ff51fbd62cc4b75d138d73daa2e2dab2788cfa4b341fab58a76c955e5",
+    "salt": "53aab42203d6aea4bf08a34d998b236d",
+    "avatar": "assets/avatars/avatar-9.svg",
+    "role": "user",
+    "banned": false,
+    "created_at": "2026-09-16T11:26:35.612Z",
+    "last_login": "2026-09-16T11:26:35.612Z"
   }
 ]
