@@ -139,6 +139,13 @@
       "title": "La Villa des cœurs brisés (2015) - S11E19 - Episode 19",
       "published_at": "2026-09-15T20:29:57.293Z",
       "telegram_msg_id": 186
+    },
+    {
+      "id": "483564",
+      "episode_num": 20,
+      "title": "La Villa des cœurs brisés (2015) - S11E20 - Episode 20",
+      "published_at": "2026-09-16T19:21:36.315Z",
+      "telegram_msg_id": 189
     }
   ],
   "series_9066_s9": [
@@ -218,6 +225,13 @@
       "title": "Les Apprentis Aventuriers (2016) - S09E11 - Episode 11",
       "published_at": "2026-09-15T19:46:08.223Z",
       "telegram_msg_id": 185
+    },
+    {
+      "id": "483565",
+      "episode_num": 12,
+      "title": "Les Apprentis Aventuriers (2016) - S09E12 - Episode 12",
+      "published_at": "2026-09-16T19:35:01.660Z",
+      "telegram_msg_id": 24
     }
   ]
 }
