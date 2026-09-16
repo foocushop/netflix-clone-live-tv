@@ -4698,5 +4698,16 @@
     "banned": false,
     "created_at": "2026-09-16T03:52:35.367Z",
     "last_login": "2026-09-16T03:58:57.131Z"
+  },
+  {
+    "id": "u_1789539421314_2df9c65b",
+    "username": "Lalou",
+    "password_hash": "0a56ed3e19633eab8a3382839af86e5ef8e069d1cf9c41923377f15609598a7e5dd924b58b095175b367120de11518db506acc91043fbcd0cf49f8d2e963ef59",
+    "salt": "b3a7504d54e07521d2d8ee649016c841",
+    "avatar": "assets/avatars/avatar-2.svg",
+    "role": "user",
+    "banned": false,
+    "created_at": "2026-09-16T06:17:01.314Z",
+    "last_login": "2026-09-16T06:17:38.899Z"
   }
 ]

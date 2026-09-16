@@ -3374,5 +3374,21 @@
     "role": "user",
     "avatar": "assets/avatars/avatar-2.svg",
     "expires_at": 1792123137135
+  },
+  {
+    "token": "129e1c5430379883cf500703593e1dd025fa91c48bf4bad9b3c3899f9acf571e",
+    "user_id": "u_1789539421314_2df9c65b",
+    "username": "Lalou",
+    "role": "user",
+    "avatar": "assets/avatars/avatar-2.svg",
+    "expires_at": 1792131421318
+  },
+  {
+    "token": "8b760d27851e9033abaaaea9d1236355fcbe3e141bbea7c705815563db955064",
+    "user_id": "u_1789539421314_2df9c65b",
+    "username": "Lalou",
+    "role": "user",
+    "avatar": "assets/avatars/avatar-2.svg",
+    "expires_at": 1792131458903
   }
 ]
