@@ -3622,5 +3622,13 @@
     "role": "user",
     "avatar": "assets/avatars/avatar-1.svg",
     "expires_at": 1792160089890
+  },
+  {
+    "token": "db714a2cab9bbd6849310d507bb86cf897400158a07c03f920f593cb5687710f",
+    "user_id": "u_1789571707899_7e6eb42a",
+    "username": "Rosi",
+    "role": "user",
+    "avatar": "assets/avatars/avatar-1.svg",
+    "expires_at": 1792163707909
   }
 ]
