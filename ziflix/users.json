@@ -4654,5 +4654,27 @@
     "banned": false,
     "created_at": "2026-09-16T01:07:14.311Z",
     "last_login": "2026-09-16T01:07:14.311Z"
+  },
+  {
+    "id": "u_1789523925867_43212130",
+    "username": "attivisisi2",
+    "password_hash": "f3c03a0f7ee015eecf81e965a602fb27f27a503578f8eb8afb9c82294b11717f0f97d740c1f8d01a57a20095533e9d99cac5ccf6514acb27f6208db0decbe27a",
+    "salt": "65bb6e0c8332ae7b45fbe223fd9f8a16",
+    "avatar": "assets/avatars/avatar-1.svg",
+    "role": "user",
+    "banned": false,
+    "created_at": "2026-09-16T01:58:45.867Z",
+    "last_login": "2026-09-16T01:58:45.867Z"
+  },
+  {
+    "id": "u_1789526458614_d076db8c",
+    "username": "Lmukalay",
+    "password_hash": "b998bfc8d31e7a9868b0dee9d9fd7a806e18ca0b3d2455f0153a04a6ad7b0f35b8bae9403df9d8a4a37a5fa2a251deb4008e3136e0e58e283e2c5e3524c60c49",
+    "salt": "c9a41157f5e75318fc96c787a4f9060b",
+    "avatar": "assets/avatars/avatar-3.svg",
+    "role": "user",
+    "banned": false,
+    "created_at": "2026-09-16T02:40:58.614Z",
+    "last_login": "2026-09-16T02:40:58.614Z"
   }
 ]
