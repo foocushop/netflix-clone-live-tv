@@ -3390,5 +3390,13 @@
     "role": "user",
     "avatar": "assets/avatars/avatar-2.svg",
     "expires_at": 1792131458903
+  },
+  {
+    "token": "5c428ef6e1f637dce5639a01a95880e6223da45395053353a7d1a96169717ac4",
+    "user_id": "u_1789545774384_42b26ac1",
+    "username": "melmomojojo",
+    "role": "user",
+    "avatar": "assets/avatars/avatar-4.svg",
+    "expires_at": 1792137774388
   }
 ]
