@@ -3358,5 +3358,21 @@
     "role": "user",
     "avatar": "assets/avatars/avatar-7.svg",
     "expires_at": 1792120550171
+  },
+  {
+    "token": "25b1627e011a5f7693fdc403de09a6b245ca3dfba217f3590d114734e78b4072",
+    "user_id": "u_1789530755367_b0d6fb88",
+    "username": "Alexy",
+    "role": "user",
+    "avatar": "assets/avatars/avatar-2.svg",
+    "expires_at": 1792122755371
+  },
+  {
+    "token": "fbf1da9ae9c51a2d05f3e9a439cb79c262a9d19fcdd03263e5a8cc96bcf6d3a8",
+    "user_id": "u_1789530755367_b0d6fb88",
+    "username": "Alexy",
+    "role": "user",
+    "avatar": "assets/avatars/avatar-2.svg",
+    "expires_at": 1792123137135
   }
 ]

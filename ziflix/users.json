@@ -4687,5 +4687,16 @@
     "banned": false,
     "created_at": "2026-09-16T03:15:50.167Z",
     "last_login": "2026-09-16T03:15:50.167Z"
+  },
+  {
+    "id": "u_1789530755367_b0d6fb88",
+    "username": "Alexy",
+    "password_hash": "2bae53470d2560ddaa50a5e063061e0811ab0aaca94385a1b93305a5135e212a9da48cd61ac90c5b65ec0d4d67e4266147c8a4e087929a8d8e9206f1f1c02eb3",
+    "salt": "3df90e0ab25b320906d5046bdcdb1a64",
+    "avatar": "assets/avatars/avatar-2.svg",
+    "role": "user",
+    "banned": false,
+    "created_at": "2026-09-16T03:52:35.367Z",
+    "last_login": "2026-09-16T03:58:57.131Z"
   }
 ]
