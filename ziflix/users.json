@@ -471,7 +471,7 @@
     "role": "user",
     "banned": false,
     "created_at": "2026-09-12T21:07:03.438Z",
-    "last_login": "2026-09-14T20:29:12.582Z"
+    "last_login": "2026-09-16T22:01:21.678Z"
   },
   {
     "id": "u_1789247919944_85191a1e",
@@ -5083,5 +5083,27 @@
     "banned": false,
     "created_at": "2026-09-16T21:01:28.800Z",
     "last_login": "2026-09-16T21:01:28.801Z"
+  },
+  {
+    "id": "u_1789595362600_ea968009",
+    "username": "lili09",
+    "password_hash": "e1c47bf8921fd05336f3b5dda8b6511df14dad81393de7c698f555821292baa5c1425115b61cfd4d5ec35d2b37dc3642b7c3fe48b9a8deb3eb6ecfa6aac7ca64",
+    "salt": "1d07687e69a9961aea1a10cc4af5a6ad",
+    "avatar": "assets/avatars/avatar-1.svg",
+    "role": "user",
+    "banned": false,
+    "created_at": "2026-09-16T21:49:22.602Z",
+    "last_login": "2026-09-16T21:49:22.602Z"
+  },
+  {
+    "id": "u_1789595982020_f64fc25c",
+    "username": "rachelmukasa08@gmail.com",
+    "password_hash": "b0cd911291f6a22782707c4dd02d5649a5befdc33f34c7cbdc3be9e872e42e21015a92e290cc4fa1be9d4f775c611e94aed845ccf037e61948d0bc6c9221cea5",
+    "salt": "00bd64f20080c1d207a7fbdbcc85fc57",
+    "avatar": "assets/avatars/avatar-1.svg",
+    "role": "user",
+    "banned": false,
+    "created_at": "2026-09-16T21:59:42.020Z",
+    "last_login": "2026-09-16T21:59:42.020Z"
   }
 ]
