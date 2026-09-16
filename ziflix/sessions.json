@@ -3350,5 +3350,13 @@
     "role": "user",
     "avatar": "assets/avatars/avatar-3.svg",
     "expires_at": 1792118458618
+  },
+  {
+    "token": "d9da22fd66d0b6806974a3f7338d125ca8f9a1794ea8c56174392353aa346878",
+    "user_id": "u_1789528550167_23a964be",
+    "username": "Mustang",
+    "role": "user",
+    "avatar": "assets/avatars/avatar-7.svg",
+    "expires_at": 1792120550171
   }
 ]
