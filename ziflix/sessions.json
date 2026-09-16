@@ -3918,5 +3918,13 @@
     "role": "user",
     "avatar": "assets/avatars/avatar-1.svg",
     "expires_at": 1792190765574
+  },
+  {
+    "token": "2980e3a85145359943dc2fbd2cfc044e942b54f4bcc16bf2349b9cfcb44f3ea0",
+    "user_id": "u_1789509285656_fd103fb8",
+    "username": "Xoxo",
+    "role": "user",
+    "avatar": "assets/avatars/avatar-1.svg",
+    "expires_at": 1792191417972
   }
 ]
