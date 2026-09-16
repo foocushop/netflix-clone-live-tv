@@ -779,7 +779,7 @@
     "role": "user",
     "banned": false,
     "created_at": "2026-09-13T01:45:33.008Z",
-    "last_login": "2026-09-13T07:15:24.873Z"
+    "last_login": "2026-09-16T13:05:39.849Z"
   },
   {
     "id": "u_1789266495435_dc00e6a0",
@@ -1936,7 +1936,7 @@
     "role": "user",
     "banned": false,
     "created_at": "2026-09-14T00:30:55.398Z",
-    "last_login": "2026-09-14T12:04:32.907Z"
+    "last_login": "2026-09-16T13:25:58.403Z"
   },
   {
     "id": "u_1789346405655_e2147494",
@@ -4829,7 +4829,7 @@
     "role": "user",
     "banned": false,
     "created_at": "2026-09-16T12:26:57.784Z",
-    "last_login": "2026-09-16T12:26:57.784Z"
+    "last_login": "2026-09-16T13:01:59.831Z"
   },
   {
     "id": "u_1789562210396_c84f30bd",
@@ -4841,5 +4841,49 @@
     "banned": false,
     "created_at": "2026-09-16T12:36:50.396Z",
     "last_login": "2026-09-16T12:36:50.396Z"
+  },
+  {
+    "id": "u_1789562989508_c8dfb568",
+    "username": "audediabate0@gmail.com",
+    "password_hash": "6ece17fff6a2d8e2070a499c815a2d51b4c27ba4e0d1ff16b68abb9912d7f7012d0e827b5f1f9bb9168b5b1fb937d6caabc872d824d52c4eca2be3be6400038f",
+    "salt": "b9ee540d4f537ddd25f7c849f1675ee1",
+    "avatar": "https://ziablo.xyz",
+    "role": "user",
+    "banned": false,
+    "created_at": "2026-09-16T12:49:49.508Z",
+    "last_login": "2026-09-16T12:49:49.508Z"
+  },
+  {
+    "id": "u_1789563076552_88371954",
+    "username": "Lakare sylla",
+    "password_hash": "d6c9f13886de604985749e2e68b532fdb479f8375dd1cd55facfe947e3ac97648656d0730fd77b8941f084980c33d5b46a0ef980d049ebde91de9f888bca0fc0",
+    "salt": "54358fc9058e84491872ccf063e2dbad",
+    "avatar": "assets/avatars/avatar-1.svg",
+    "role": "user",
+    "banned": false,
+    "created_at": "2026-09-16T12:51:16.552Z",
+    "last_login": "2026-09-16T12:51:16.552Z"
+  },
+  {
+    "id": "u_1789563160463_7b953cd3",
+    "username": "Biba",
+    "password_hash": "4730a61b19d37f2c81e1103b8ee41a83e8dcdef75987912885ec7a1fcc068d2b2f6ace8d1ec433e80044aeef427681ac85c3d692759d9ee3bdec888c9b5b2e38",
+    "salt": "70ab4f75432f324ba97c7de17252f901",
+    "avatar": "assets/avatars/avatar-1.svg",
+    "role": "user",
+    "banned": false,
+    "created_at": "2026-09-16T12:52:40.463Z",
+    "last_login": "2026-09-16T12:52:40.463Z"
+  },
+  {
+    "id": "u_1789564003577_72b11664",
+    "username": "Ticha36",
+    "password_hash": "b75ad80ac01f2e9b990e4afa47b96a95bbce3702be4404b9a11545350189a89f1906950d78866f8c01e5ad754edae4ef676f3e347566109ba5187b51128e5f54",
+    "salt": "ced6ea09b07494239e41f36ea7cc42e2",
+    "avatar": "assets/avatars/avatar-9.svg",
+    "role": "user",
+    "banned": false,
+    "created_at": "2026-09-16T13:06:43.577Z",
+    "last_login": "2026-09-16T13:06:43.577Z"
   }
 ]
