@@ -205,8 +205,9 @@
     "device_info": "iPhone (iOS) • Safari",
     "user_agent": "Mozilla/5.0 (iPhone; CPU iPhone OS 18_7 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/26.6.1 Mobile/15E148 Safari/604.1",
     "url": "https://ziablo.xyz/",
-    "status": "open",
-    "created_at": "2026-09-15T19:35:29.921Z"
+    "status": "resolved",
+    "created_at": "2026-09-15T19:35:29.921Z",
+    "updated_at": "2026-09-16T13:57:27.892Z"
   },
   {
     "id": "bug_1789500874790_973a51",
