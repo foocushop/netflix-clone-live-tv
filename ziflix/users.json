@@ -4511,7 +4511,7 @@
     "role": "user",
     "banned": false,
     "created_at": "2026-09-15T21:18:07.184Z",
-    "last_login": "2026-09-16T00:51:08.165Z"
+    "last_login": "2026-09-17T12:58:25.414Z"
   },
   {
     "id": "u_1789508249336_c04a00a4",
@@ -5095,7 +5095,7 @@
     "role": "user",
     "banned": false,
     "created_at": "2026-09-16T21:49:22.602Z",
-    "last_login": "2026-09-16T21:49:22.602Z"
+    "last_login": "2026-09-17T12:35:29.406Z"
   },
   {
     "id": "u_1789595982020_f64fc25c",
@@ -5106,7 +5106,7 @@
     "role": "user",
     "banned": false,
     "created_at": "2026-09-16T21:59:42.020Z",
-    "last_login": "2026-09-16T23:36:56.972Z"
+    "last_login": "2026-09-17T12:36:53.139Z"
   },
   {
     "id": "u_1789598750554_63bbb87e",
@@ -5339,5 +5339,27 @@
     "banned": false,
     "created_at": "2026-09-17T11:22:57.151Z",
     "last_login": "2026-09-17T11:22:57.151Z"
+  },
+  {
+    "id": "u_1789646650318_78c29d26",
+    "username": "lenadlanda89@gmail.com",
+    "password_hash": "cd56662db0723c3fa63749084d7d4768daeef7a1bb78dcba8576f28a4bdf0b0346c7e4067748694ff0a3808698e3116ef210b3176d55073d754669f9c92043b6",
+    "salt": "8eb5501f1fa71df523405b7655c8531d",
+    "avatar": "assets/avatars/avatar-1.svg",
+    "role": "user",
+    "banned": false,
+    "created_at": "2026-09-17T12:04:10.318Z",
+    "last_login": "2026-09-17T12:04:10.318Z"
+  },
+  {
+    "id": "u_1789646662165_a4441920",
+    "username": "Oulala",
+    "password_hash": "71216683865ef38267d9ffcbe272a7be3f2973d98ccc0abd234ce1abda300d9a3bfb28c28831769fa42fafb87a15da4f4b02ccf46c8a003a2f42b82582554dd3",
+    "salt": "3d3b1c9406e321fd38d7f0dc1755dbfa",
+    "avatar": "assets/avatars/avatar-1.svg",
+    "role": "user",
+    "banned": false,
+    "created_at": "2026-09-17T12:04:22.165Z",
+    "last_login": "2026-09-17T12:04:22.166Z"
   }
 ]
