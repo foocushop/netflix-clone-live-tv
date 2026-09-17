@@ -2070,25 +2070,48 @@ class NetflixApp {
 
   setCurrentUser(user) {
     this.currentUser = user;
+    try {
+      localStorage.setItem('ziflix_user', JSON.stringify(user));
+      const isVipUser = !!(user && (user.role === 'vip' || user.is_vip));
+      localStorage.setItem('ziflix_is_vip', isVipUser ? 'true' : 'false');
+      localStorage.setItem('ziflix_is_admin', (user && user.role === 'admin') ? 'true' : 'false');
+    } catch (e) {}
+
     const headerProfileImg = document.getElementById('headerProfileImg');
     const headerUsernameDisplay = document.getElementById('headerUsernameDisplay');
     const commentCurrentUserAvatar = document.getElementById('commentCurrentUserAvatar');
 
     if (headerProfileImg && user.avatar) headerProfileImg.src = user.avatar;
-    if (headerUsernameDisplay && user.username) headerUsernameDisplay.textContent = user.username;
     if (commentCurrentUserAvatar && user.avatar) commentCurrentUserAvatar.src = user.avatar;
+
+    const isVip = !!(user && (user.role === 'vip' || user.is_vip));
+    const isAdmin = (user.role === 'admin' || user.is_admin || user.isAdmin);
+    const isVipOrAdmin = this.isVipOrAdmin(user);
+
+    if (headerUsernameDisplay && user.username) {
+      if (isVip && !isAdmin) {
+        headerUsernameDisplay.innerHTML = `${this.escapeHtml(user.username)} <span class="badge-vip" style="background: linear-gradient(135deg, #ffd700, #ffaa00); color: #000; font-weight: 800; font-size: 0.65rem; padding: 2px 5px; border-radius: 4px; margin-left: 5px; vertical-align: middle; box-shadow: 0 0 8px rgba(255,215,0,0.35);">⭐ VIP</span>`;
+      } else {
+        headerUsernameDisplay.textContent = user.username;
+      }
+    }
 
     const openAdminBtn = document.getElementById('openAdminBtn');
     if (openAdminBtn) {
-      openAdminBtn.style.display = (user.role === 'admin') ? 'flex' : 'none';
+      openAdminBtn.style.display = isAdmin ? 'flex' : 'none';
     }
 
-    const isAdmin = (user.role === 'admin' || user.is_admin || user.isAdmin);
     const welcomeModal = document.getElementById('welcomeTimerModal');
     const navTimer = document.getElementById('navWatchTimer');
-    if (isAdmin) {
-      if (welcomeModal) welcomeModal.style.display = 'none';
+    const zeroModal = document.getElementById('zeroCreditHomeModal');
+
+    if (isVipOrAdmin) {
+      if (welcomeModal) {
+        welcomeModal.classList.add('hidden');
+        welcomeModal.style.display = 'none';
+      }
       if (navTimer) navTimer.style.display = 'none';
+      if (zeroModal) zeroModal.classList.add('hidden');
     } else {
       if (welcomeModal) welcomeModal.style.display = '';
       if (navTimer) navTimer.style.display = 'inline-flex';
@@ -2216,6 +2239,9 @@ class NetflixApp {
       } catch (e) {}
     }
     localStorage.removeItem('ziflix_auth_token');
+    localStorage.removeItem('ziflix_user');
+    localStorage.removeItem('ziflix_is_vip');
+    localStorage.removeItem('ziflix_is_admin');
     this.currentUser = null;
     this.catalogData = null;
     if (this.catalogRowsContainer) this.catalogRowsContainer.innerHTML = '';
@@ -2232,7 +2258,15 @@ class NetflixApp {
       const modalRole = document.getElementById('profileModalRole');
       if (modalAvatar) modalAvatar.src = this.currentUser.avatar || 'assets/avatars/avatar-1.svg';
       if (modalUsername) modalUsername.textContent = this.currentUser.username || 'Membre';
-      if (modalRole) modalRole.textContent = (this.currentUser.role === 'admin') ? '👑 Administrateur' : 'Membre ZIFLIX';
+      if (modalRole) {
+        if (this.currentUser.role === 'admin') {
+          modalRole.textContent = '👑 Administrateur';
+        } else if (this.currentUser.role === 'vip' || this.currentUser.is_vip) {
+          modalRole.innerHTML = '<span style="color: #ffd700; font-weight: bold;">⭐ VIP (Illimité & Sans pub)</span>';
+        } else {
+          modalRole.textContent = 'Membre ZIFLIX';
+        }
+      }
       this.selectedProfileAvatar = this.currentUser.avatar || this.avatarsList[0];
       this.renderAvatarSelectionGrids();
     }
@@ -2571,6 +2605,21 @@ class NetflixApp {
     return false;
   }
 
+  isVipOrAdmin(user = null) {
+    if (this.isAdmin()) return true;
+    const u = user || this.currentUser;
+    if (u && (u.role === 'vip' || u.role === 'admin' || u.is_vip || u.is_premium)) return true;
+    try {
+      const raw = localStorage.getItem('ziflix_user');
+      if (raw) {
+        const parsed = JSON.parse(raw);
+        if (parsed && (parsed.role === 'vip' || parsed.role === 'admin' || parsed.is_vip || parsed.is_premium)) return true;
+      }
+      if (localStorage.getItem('ziflix_is_vip') === 'true') return true;
+    } catch (e) {}
+    return false;
+  }
+
   getContinueWatchingList() {
     try {
       const raw = localStorage.getItem('ziflix_continue_watching');
@@ -2733,7 +2782,7 @@ class NetflixApp {
   }
 
   getWatchCredit() {
-    if (this.isAdmin()) return 999999;
+    if (this.isVipOrAdmin()) return 999999;
     if (this.player && typeof this.player.getWatchCredit === 'function') {
       return this.player.getWatchCredit();
     }
@@ -2765,10 +2814,12 @@ class NetflixApp {
     this.navWatchTimerVal = document.getElementById('navWatchTimerVal');
     this.navWatchTimerBtn = document.getElementById('navWatchTimerBtn');
 
-    if (this.isAdmin()) {
+    if (this.isVipOrAdmin()) {
       if (this.navWatchTimer) this.navWatchTimer.style.display = 'none';
       const zeroModal = document.getElementById('zeroCreditHomeModal');
       if (zeroModal) zeroModal.classList.add('hidden');
+      const welcomeModal = document.getElementById('welcomeTimerModal');
+      if (welcomeModal) welcomeModal.classList.add('hidden');
       return;
     }
 
@@ -2796,7 +2847,7 @@ class NetflixApp {
       this.homeTimerInterval = null;
     }
     this.homeTimerInterval = setInterval(() => {
-      if (this.isAdmin()) {
+      if (this.isVipOrAdmin()) {
         if (this.navWatchTimer) this.navWatchTimer.style.display = 'none';
         return;
       }
@@ -2816,10 +2867,12 @@ class NetflixApp {
   }
 
   updateHomeTimerDisplay(credit) {
-    if (this.isAdmin()) {
+    if (this.isVipOrAdmin()) {
       if (this.navWatchTimer) this.navWatchTimer.style.display = 'none';
       const zeroModal = document.getElementById('zeroCreditHomeModal');
       if (zeroModal) zeroModal.classList.add('hidden');
+      const welcomeModal = document.getElementById('welcomeTimerModal');
+      if (welcomeModal) welcomeModal.classList.add('hidden');
       return;
     }
     if (!this.navWatchTimer) this.navWatchTimer = document.getElementById('navWatchTimer');
@@ -2865,7 +2918,7 @@ class NetflixApp {
   }
 
   checkZeroCreditModal() {
-    if (this.isAdmin()) {
+    if (this.isVipOrAdmin()) {
       const modal = document.getElementById('zeroCreditHomeModal');
       if (modal) modal.classList.add('hidden');
       return;
@@ -2912,7 +2965,7 @@ class NetflixApp {
   }
 
   checkWelcomeTimerModal() {
-    if (this.isAdmin()) {
+    if (this.isVipOrAdmin()) {
       const modal = document.getElementById('welcomeTimerModal');
       if (modal) modal.classList.add('hidden');
       return;

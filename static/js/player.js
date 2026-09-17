@@ -239,7 +239,7 @@ class NetflixPlayer {
       });
 
       this.video.addEventListener('play', () => {
-        if (!this.isAdmin() && this.getWatchCredit() <= 0) {
+        if (!this.isVipOrAdmin() && this.getWatchCredit() <= 0) {
           try { this.video.pause(); } catch (e) {}
           if (!this.timerExpiredModal) this.timerExpiredModal = document.getElementById('timerExpiredModal');
           if (this.timerExpiredModal) this.timerExpiredModal.classList.remove('hidden');
@@ -1369,7 +1369,7 @@ class NetflixPlayer {
     this.startWatchTimer();
 
     // Verrouillage strict si le crédit est épuisé (0 min)
-    if (!this.isAdmin() && this.getWatchCredit() <= 0) {
+    if (!this.isVipOrAdmin() && this.getWatchCredit() <= 0) {
       this.currentServer = 1;
       this.updateMetaDisplay();
       this.stopWatchTimer();
@@ -1485,7 +1485,7 @@ class NetflixPlayer {
     } catch (e) {}
 
     // Verrouillage strict si crédit épuisé (0s)
-    if (!this.isAdmin() && this.getWatchCredit() <= 0) {
+    if (!this.isVipOrAdmin() && this.getWatchCredit() <= 0) {
       this.hideLoader();
       if (!this.timerExpiredModal) this.timerExpiredModal = document.getElementById('timerExpiredModal');
       if (this.timerExpiredModal) this.timerExpiredModal.classList.remove('hidden');
@@ -2298,7 +2298,7 @@ playDirectHls(streamUrl, options = {}) {
 
   // ================= 14. UTILITAIRES D'AFFICHAGE & LOADER =================
   togglePlay() {
-    if (!this.isAdmin() && this.getWatchCredit() <= 0) {
+    if (!this.isVipOrAdmin() && this.getWatchCredit() <= 0) {
       if (this.video) {
         try { this.video.pause(); } catch (e) {}
       }
@@ -2611,8 +2611,22 @@ playDirectHls(streamUrl, options = {}) {
     return false;
   }
 
+  isVipOrAdmin() {
+    if (this.isAdmin()) return true;
+    try {
+      if (window.netflixApp && typeof window.netflixApp.isVipOrAdmin === 'function' && window.netflixApp.isVipOrAdmin()) return true;
+      const raw = localStorage.getItem('ziflix_user');
+      if (raw) {
+        const u = JSON.parse(raw);
+        if (u && (u.role === 'vip' || u.role === 'admin' || u.is_vip || u.is_premium)) return true;
+      }
+      if (localStorage.getItem('ziflix_is_vip') === 'true') return true;
+    } catch (e) {}
+    return false;
+  }
+
   getWatchCredit() {
-    if (this.isAdmin()) return 999999;
+    if (this.isVipOrAdmin()) return 999999;
     try {
       const expStr = localStorage.getItem('ziflix_watch_expires_at');
       const now = Date.now();
@@ -2681,6 +2695,11 @@ playDirectHls(streamUrl, options = {}) {
   }
 
   rechargeWatchCredit(fromModal = false) {
+    if (this.isVipOrAdmin()) {
+      this.showToast('⭐ Statut VIP actif : visionnage 100% illimité et sans aucune publicité !');
+      return;
+    }
+
     if (this.isRechargePending) {
       this.showToast('⏳ Validation en cours... Veuillez patienter quelques secondes.');
       return;
@@ -2729,7 +2748,7 @@ playDirectHls(streamUrl, options = {}) {
         const newCredit = this.addWatchCredit(this.BONUS_CREDIT);
         this.updateTimerDisplays(newCredit);
 
-        if (this.playerWatchTimer && !this.isAdmin()) {
+        if (this.playerWatchTimer && !this.isVipOrAdmin()) {
           this.playerWatchTimer.style.display = 'inline-flex';
           this.playerWatchTimer.classList.remove('timer-low');
         }
@@ -2808,7 +2827,7 @@ playDirectHls(streamUrl, options = {}) {
 
     const navTimer = document.getElementById('navWatchTimer');
     if (navTimer) {
-      if (this.isAdmin()) {
+      if (this.isVipOrAdmin()) {
         navTimer.style.display = 'none';
       } else {
         navTimer.style.display = 'inline-flex';
@@ -2855,8 +2874,9 @@ playDirectHls(streamUrl, options = {}) {
 
   startWatchTimer() {
     this.stopWatchTimer();
-    if (this.isAdmin()) {
+    if (this.isVipOrAdmin()) {
       if (this.playerWatchTimer) this.playerWatchTimer.style.display = 'none';
+      if (this.timerExpiredModal) this.timerExpiredModal.classList.add('hidden');
       return;
     }
 
@@ -2870,7 +2890,7 @@ playDirectHls(streamUrl, options = {}) {
     this.updateTimerDisplays(initialCredit);
 
     this.watchTimerInterval = setInterval(() => {
-      if (this.isAdmin()) {
+      if (this.isVipOrAdmin()) {
         this.stopWatchTimer();
         return;
       }

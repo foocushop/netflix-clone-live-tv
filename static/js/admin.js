@@ -1457,16 +1457,27 @@ class NetflixAdmin {
           tr.style.borderBottom = '1px solid var(--admin-border)';
           const isBanned = !!u.banned;
           const isAdmin = (u.role === 'admin');
+          const isVip = (u.role === 'vip' || !!u.is_vip);
+
+          let roleBadgeHtml = '';
+          if (isAdmin) {
+            roleBadgeHtml = `<span style="font-size: 0.72rem; padding: 2px 7px; border-radius: 4px; font-weight: 700; background: rgba(229, 9, 20, 0.25); color: #ff6b6b; border: 1px solid rgba(229, 9, 20, 0.4);">👑 Admin</span>`;
+          } else if (isVip) {
+            roleBadgeHtml = `<span style="font-size: 0.72rem; padding: 2px 7px; border-radius: 4px; font-weight: 700; background: rgba(255, 215, 0, 0.16); color: #ffd700; border: 1px solid rgba(255, 215, 0, 0.45); box-shadow: 0 0 8px rgba(255, 215, 0, 0.2);">⭐ VIP</span>`;
+          } else {
+            roleBadgeHtml = `<span style="font-size: 0.72rem; padding: 2px 7px; border-radius: 4px; font-weight: 700; background: rgba(255,255,255,0.08); color: #aaa;">Membre</span>`;
+          }
 
           tr.innerHTML = `
             <td style="padding: 10px 8px; display: flex; align-items: center; gap: 8px;">
               <img src="${u.avatar || 'assets/avatars/avatar-1.svg'}" alt="${u.username}" style="width: 28px; height: 28px; border-radius: 50%; object-fit: cover;">
-              <strong style="color: #fff; font-size: 0.82rem;">${u.username}</strong>
+              <div>
+                <strong style="color: #fff; font-size: 0.82rem; display: block;">${u.username}</strong>
+                ${isVip && !isAdmin ? '<span style="color: #ffd700; font-size: 0.65rem; font-weight: 600;">Sans pub • Illimité</span>' : ''}
+              </div>
             </td>
             <td style="padding: 10px 8px; text-align: center;">
-              <span style="font-size: 0.72rem; padding: 2px 6px; border-radius: 4px; font-weight: 700; ${isAdmin ? 'background: rgba(229, 9, 20, 0.25); color: #ff6b6b;' : 'background: rgba(255,255,255,0.08); color: #aaa;'}">
-                ${isAdmin ? '👑 Admin' : 'Membre'}
-              </span>
+              ${roleBadgeHtml}
             </td>
             <td style="padding: 10px 8px; text-align: center;">
               <span style="font-size: 0.72rem; font-weight: 700; color: ${isBanned ? '#ff4d4d' : '#46d369'};">
@@ -1474,18 +1485,34 @@ class NetflixAdmin {
               </span>
             </td>
             <td style="padding: 10px 8px; text-align: right; white-space: nowrap;">
-              <button type="button" class="btn-admin btn-admin-secondary btn-sm toggle-role-btn" style="font-size: 0.7rem; padding: 3px 6px;">
-                ${isAdmin ? 'Rétrograder' : 'Promouvoir'}
-              </button>
-              <button type="button" class="btn-admin ${isBanned ? 'btn-admin-green' : 'btn-admin-red'} btn-sm toggle-ban-btn" style="font-size: 0.7rem; padding: 3px 6px; margin-left: 4px;">
+              <!-- Menu déroulant rapide de rôle -->
+              <select class="btn-admin btn-admin-secondary btn-sm role-select" style="font-size: 0.7rem; padding: 3px 5px; background: #18181b; color: #fff; border: 1px solid var(--admin-border); border-radius: 4px; margin-right: 4px; cursor: pointer;" title="Changer le rôle du compte">
+                <option value="user" ${!isAdmin && !isVip ? 'selected' : ''}>Membre</option>
+                <option value="vip" ${isVip && !isAdmin ? 'selected' : ''}>⭐ VIP (Sans pub)</option>
+                <option value="admin" ${isAdmin ? 'selected' : ''}>👑 Admin</option>
+              </select>
+
+              <!-- Bouton 1-clic VIP -->
+              ${!isAdmin ? `
+                <button type="button" class="btn-admin btn-sm toggle-vip-btn" style="font-size: 0.7rem; padding: 3px 7px; margin-right: 4px; font-weight: 700; ${isVip ? 'background: rgba(255, 215, 0, 0.15); color: #ffd700; border: 1px solid rgba(255, 215, 0, 0.4);' : 'background: linear-gradient(135deg, #ffd700, #ffaa00); color: #000; border: none;'}" title="${isVip ? 'Retirer le statut VIP' : 'Passer ce compte en VIP (sans pub)'}">
+                  ${isVip ? '✕ Retirer VIP' : '⭐ VIP'}
+                </button>
+              ` : ''}
+
+              <!-- Bouton Bannir / Débannir -->
+              <button type="button" class="btn-admin ${isBanned ? 'btn-admin-green' : 'btn-admin-red'} btn-sm toggle-ban-btn" style="font-size: 0.7rem; padding: 3px 6px;">
                 ${isBanned ? 'Débannir' : 'Bannir'}
               </button>
             </td>
           `;
 
-          tr.querySelector('.toggle-role-btn')?.addEventListener('click', async () => {
-            const newRole = isAdmin ? 'user' : 'admin';
-            await this.changeUserRole(u.id, newRole);
+          tr.querySelector('.role-select')?.addEventListener('change', async (e) => {
+            await this.changeUserRole(u.id, e.target.value);
+          });
+
+          tr.querySelector('.toggle-vip-btn')?.addEventListener('click', async () => {
+            const nextRole = isVip ? 'user' : 'vip';
+            await this.changeUserRole(u.id, nextRole);
           });
 
           tr.querySelector('.toggle-ban-btn')?.addEventListener('click', async () => {
@@ -1528,7 +1555,11 @@ class NetflixAdmin {
       });
       const json = await res.json();
       if (json.success) {
-        this.showToast(`Rôle mis à jour : ${role}`);
+        let label = role;
+        if (role === 'vip') label = '⭐ VIP (Visionnage illimité & Sans publicité)';
+        else if (role === 'admin') label = '👑 Administrateur';
+        else label = 'Membre Standard';
+        this.showToast(`Rôle mis à jour : ${label}`);
         this.loadCommunityUsers();
       } else {
         this.showToast(json.error || 'Erreur lors de la mise à jour du rôle', true);

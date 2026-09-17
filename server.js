@@ -3971,6 +3971,7 @@ const server = http.createServer(async (req, res) => {
             username: user.username,
             avatar: user.avatar,
             role: user.role,
+            is_vip: !!(user.is_vip || user.role === 'vip' || user.role === 'admin'),
             created_at: user.created_at
           }
         }));
@@ -4000,6 +4001,7 @@ const server = http.createServer(async (req, res) => {
         username: user.username,
         avatar: user.avatar,
         role: user.role,
+        is_vip: !!(user.is_vip || user.role === 'vip' || user.role === 'admin'),
         created_at: user.created_at,
         last_login: user.last_login
       }
@@ -4336,6 +4338,7 @@ const server = http.createServer(async (req, res) => {
         username: u.username,
         avatar: u.avatar,
         role: u.role,
+        is_vip: !!(u.is_vip || u.role === 'vip' || u.role === 'admin'),
         banned: !!u.banned,
         created_at: u.created_at,
         last_login: u.last_login
@@ -4380,14 +4383,28 @@ const server = http.createServer(async (req, res) => {
             res.writeHead(404, { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' });
             return res.end(JSON.stringify({ success: false, error: 'Utilisateur introuvable' }));
           }
-          target.role = payload.role === 'admin' ? 'admin' : 'user';
+          const validRoles = ['admin', 'vip', 'user'];
+          const reqRole = String(payload.role || '').toLowerCase();
+          target.role = validRoles.includes(reqRole) ? reqRole : 'user';
+          target.is_vip = (target.role === 'vip' || target.role === 'admin');
           for (const [t, s] of ZIFLIX_SESSIONS.entries()) {
-            if (s.user_id === target.id) s.role = target.role;
+            if (s.user_id === target.id) {
+              s.role = target.role;
+              s.is_vip = target.is_vip;
+            }
           }
           saveZiflixSessions();
           saveZiflixUsers();
           res.writeHead(200, { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' });
-          return res.end(JSON.stringify({ success: true, user: { id: target.id, username: target.username, role: target.role } }));
+          return res.end(JSON.stringify({
+            success: true,
+            user: {
+              id: target.id,
+              username: target.username,
+              role: target.role,
+              is_vip: target.is_vip
+            }
+          }));
         } catch (e) {
           res.writeHead(400, { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' });
           return res.end(JSON.stringify({ success: false, error: 'Corps JSON invalide' }));
