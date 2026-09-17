@@ -162,8 +162,8 @@ class NetflixPlayer {
       'https://www.profitableratecpmnetwork.com/kwnxcx7a2s?key=d43d0890cc6512eb65c08a022e42f264'
     ];
     this.MONETAG_LINK = this.DIRECT_LINKS[0];
-    this.INITIAL_CREDIT = 1800; // 30 minutes
-    this.BONUS_CREDIT = 1800;   // +30 minutes de recharge
+    this.INITIAL_CREDIT = 900;  // 15 minutes offertes
+    this.BONUS_CREDIT = 1200;   // +20 minutes de recharge
     this.MAX_CREDIT = 3600;     // Plafond strict 60 minutes (3600s)
     this.COOLDOWN_SECONDS = 5;  // 5 secondes de délai non atomique
     this.isRechargePending = false;
@@ -1379,7 +1379,7 @@ class NetflixPlayer {
       this.hideLoader();
       if (!this.timerExpiredModal) this.timerExpiredModal = document.getElementById('timerExpiredModal');
       if (this.timerExpiredModal) this.timerExpiredModal.classList.remove('hidden');
-      this.showToast('⏱ Votre temps gratuit est écoulé. Rechargez +30m pour regarder.');
+      this.showToast('⏱ Votre temps gratuit est écoulé. Rechargez +20m pour regarder.');
       return;
     }
 
@@ -1489,7 +1489,7 @@ class NetflixPlayer {
       this.hideLoader();
       if (!this.timerExpiredModal) this.timerExpiredModal = document.getElementById('timerExpiredModal');
       if (this.timerExpiredModal) this.timerExpiredModal.classList.remove('hidden');
-      this.showToast('⏱ Votre temps gratuit est écoulé. Rechargez +30m pour regarder.');
+      this.showToast('⏱ Votre temps gratuit est écoulé. Rechargez +20m pour regarder.');
       return;
     }
 
@@ -2304,7 +2304,7 @@ playDirectHls(streamUrl, options = {}) {
       }
       if (!this.timerExpiredModal) this.timerExpiredModal = document.getElementById('timerExpiredModal');
       if (this.timerExpiredModal) this.timerExpiredModal.classList.remove('hidden');
-      this.showToast('⏱ Votre temps gratuit est écoulé. Rechargez +30m pour regarder.');
+      this.showToast('⏱ Votre temps gratuit est écoulé. Rechargez +20m pour regarder.');
       return;
     }
     if (this.video && this.video.error) {
@@ -2725,7 +2725,7 @@ playDirectHls(streamUrl, options = {}) {
         this.rechargeCooldownInterval = null;
         this.isRechargePending = false;
 
-        // 3. Attribution effective du crédit après 5 secondes sur l'horloge réelle (+30 min)
+        // 3. Attribution effective du crédit après 5 secondes sur l'horloge réelle (+20 min)
         const newCredit = this.addWatchCredit(this.BONUS_CREDIT);
         this.updateTimerDisplays(newCredit);
 
@@ -2739,7 +2739,7 @@ playDirectHls(streamUrl, options = {}) {
           if (this.timerExpiredModal) {
             this.timerExpiredModal.classList.add('hidden');
           }
-          this.showToast('🎉 +30 minutes offertes débloquées ! Bon visionnage.');
+          this.showToast('🎉 +20 minutes offertes débloquées ! Bon visionnage.');
           if (this.currentMovie && (!this.video.src || this.video.src === 'about:blank' || this.video.ended)) {
             this.loadStream();
           } else {
@@ -2748,7 +2748,7 @@ playDirectHls(streamUrl, options = {}) {
             } catch (e) {}
           }
         } else {
-          this.showToast(`🎉 +30 minutes offertes ajoutées ! (${Math.round(newCredit / 60)} min au total)`);
+          this.showToast(`🎉 +20 minutes offertes ajoutées ! (${Math.round(newCredit / 60)} min au total)`);
         }
 
         // Fermer également la modale d'accueil 0 minute si ouverte
@@ -2830,21 +2830,21 @@ playDirectHls(streamUrl, options = {}) {
 
       if (navBtn) {
         navBtn.disabled = isMax;
-        navBtn.textContent = isMax ? 'Max 60m' : '+30';
-        navBtn.title = isMax ? 'Limite de 60 minutes atteinte' : 'Recharger +30 min gratuites';
+        navBtn.textContent = isMax ? 'Max 60m' : '+20';
+        navBtn.title = isMax ? 'Limite de 60 minutes atteinte' : 'Recharger +20 min gratuites';
       }
       if (playerBtn) {
         playerBtn.disabled = isMax;
-        playerBtn.textContent = isMax ? 'Max 60m' : '+30m';
-        playerBtn.title = isMax ? 'Limite de 60 minutes atteinte' : 'Recharger +30 min gratuites';
+        playerBtn.textContent = isMax ? 'Max 60m' : '+20m';
+        playerBtn.title = isMax ? 'Limite de 60 minutes atteinte' : 'Recharger +20 min gratuites';
       }
       if (modalBtn) {
         modalBtn.disabled = isMax;
-        modalBtn.textContent = isMax ? 'MAX 60 MIN ATTEINT' : '⚡ RECHARGER +30 MIN GRATUITES';
+        modalBtn.textContent = isMax ? 'MAX 60 MIN ATTEINT' : '⚡ RECHARGER +20 MIN GRATUITES';
       }
       if (zeroBtn) {
         zeroBtn.disabled = isMax;
-        zeroBtn.textContent = isMax ? 'MAX 60 MIN ATTEINT' : '⚡ RECHARGER +30 MIN GRATUITES';
+        zeroBtn.textContent = isMax ? 'MAX 60 MIN ATTEINT' : '⚡ RECHARGER +20 MIN GRATUITES';
       }
     }
 

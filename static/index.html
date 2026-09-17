@@ -6,8 +6,8 @@
   <title>ZIFLIX - Streaming & Télévision en Direct</title>
   <link rel="icon" type="image/svg+xml" href="assets/logos/ziflix-icon.svg">
   <link rel="preload" href="assets/logos/ziflix-logo.svg?v=4" as="image" type="image/svg+xml">
-  <link rel="stylesheet" href="css/netflix.css?v=1789640400">
-  <link rel="stylesheet" href="css/admin.css?v=1789640400">
+  <link rel="stylesheet" href="css/netflix.css?v=1789640500">
+  <link rel="stylesheet" href="css/admin.css?v=1789640500">
   <!-- Critical Zero-FOUC & Splash early styles -->
   <style>
     .auth-gate-backdrop.hidden { display: none !important; }
@@ -79,8 +79,8 @@
         <span class="nav-watch-timer-dot" aria-hidden="true">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
         </span>
-        <span class="nav-watch-timer-val" id="navWatchTimerVal">30:00</span>
-        <button type="button" class="nav-watch-timer-btn" id="navWatchTimerBtn" title="Recharger +30 min gratuites">+30</button>
+        <span class="nav-watch-timer-val" id="navWatchTimerVal">15:00</span>
+        <button type="button" class="nav-watch-timer-btn" id="navWatchTimerBtn" title="Recharger +20 min gratuites">+20</button>
       </div>
       <div class="search-box">
         <span class="search-icon">🔍</span>
@@ -452,12 +452,12 @@
           <div class="controls-center">
             <span class="ctrl-media-title" id="ctrlMediaTitle">Lecture en cours</span>
             <!-- Timer Netflix ZIFLIX (Entre le nom de la série et le 1x) -->
-            <div class="player-watch-timer" id="playerWatchTimer" title="Temps gratuit restant (Recharger +30 min)" style="display:none;">
+            <div class="player-watch-timer" id="playerWatchTimer" title="Temps gratuit restant (Recharger +20 min)" style="display:none;">
               <span class="player-watch-timer-dot" aria-hidden="true">
                 <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
               </span>
-              <span class="player-watch-timer-val" id="playerWatchTimerVal">30:00</span>
-              <button type="button" class="player-watch-timer-btn" id="playerWatchTimerBtn" title="Recharger +30 min gratuites">+30m</button>
+              <span class="player-watch-timer-val" id="playerWatchTimerVal">15:00</span>
+              <button type="button" class="player-watch-timer-btn" id="playerWatchTimerBtn" title="Recharger +20 min gratuites">+20m</button>
             </div>
           </div>
 
@@ -537,7 +537,7 @@
         </div>
       </div>
 
-      <!-- ================= MODAL EXPIRATION TIMER (+30 MIN RECHARGE) ================= -->
+      <!-- ================= MODAL EXPIRATION TIMER (+20 MIN RECHARGE) ================= -->
       <div class="timer-expired-modal hidden" id="timerExpiredModal">
         <div class="timer-modal-card">
           <button type="button" class="timer-modal-close-btn" id="timerModalCloseBtn" title="Fermer et retourner au catalogue">✕</button>
@@ -546,11 +546,11 @@
           </div>
           <h3 class="timer-modal-title">Temps de visionnage écoulé</h3>
           <p class="timer-modal-desc">
-            Vos 30 minutes offertes sont terminées.<br>
-            Rechargez <b>+30 minutes gratuites</b> en 1 clic pour reprendre la lecture immédiatement.
+            Votre temps de visionnage offert est terminé.<br>
+            Rechargez <b>+20 minutes gratuites</b> en 1 clic pour reprendre la lecture immédiatement.
           </p>
           <button type="button" class="timer-recharge-cta-btn" id="timerModalRechargeBtn">
-            ⚡ RECHARGER +30 MIN GRATUITES
+            ⚡ RECHARGER +20 MIN GRATUITES
           </button>
           <div class="timer-modal-footer">
             <span class="timer-modal-subtext">Gratuit & illimité • Reprise immédiate du flux</span>
@@ -1691,10 +1691,10 @@
       <h3 class="zero-credit-title">Temps de visionnage épuisé</h3>
       <p class="zero-credit-desc">
         Vous n'avez plus de minutes de visionnage disponibles.<br>
-        Cliquez sur <strong>+30 min</strong> pour recharger gratuitement et continuer à profiter de ZIFLIX sans interruption.
+        Cliquez sur <strong>+20 min</strong> pour recharger gratuitement et continuer à profiter de ZIFLIX sans interruption.
       </p>
       <button type="button" class="zero-credit-cta-btn" id="zeroCreditRechargeBtn">
-        ⚡ RECHARGER +30 MIN GRATUITES
+        ⚡ RECHARGER +20 MIN GRATUITES
       </button>
       <div class="zero-credit-footer">
         Gratuit, rapide et illimité • Pas d'inscription requise
@@ -1702,26 +1702,34 @@
     </div>
   </div>
 
-  <!-- ================= NOTIFICATION D'ACCUEIL NETFLIX : 30 MIN SANS PUB ================= -->
-  <div class="welcome-toast-overlay hidden" id="welcomeTimerModal">
-    <div class="welcome-netflix-box">
-      <div class="welcome-netflix-icon-wrap" aria-hidden="true">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#e50914" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+  <!-- ================= POP-UP D'ACCUEIL NETFLIX : 15 MIN DE VISIONNAGE OFFERTES SANS PUB ================= -->
+  <div class="zero-credit-modal-overlay hidden" id="welcomeTimerModal">
+    <div class="zero-credit-modal-card">
+      <button type="button" class="zero-credit-close-btn" id="welcomeTimerDismissBtn" title="Fermer">✕</button>
+      <div class="zero-credit-icon-wrap" aria-hidden="true">
+        <svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="#e50914" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="9"></circle>
+          <polyline points="12 6 12 12 16 14"></polyline>
+        </svg>
       </div>
-      <div class="welcome-netflix-text">
-        Vous avez <strong>30 minutes offertes</strong> sans publicité.
-      </div>
-      <button type="button" class="welcome-netflix-btn" id="welcomeTimerAcceptBtn">
-        J'accepte
+      <h3 class="zero-credit-title">15 MINUTES OFFERTES</h3>
+      <p class="zero-credit-desc">
+        Bienvenue sur <strong>ZIFLIX</strong> !<br>
+        Vous bénéficiez de <b>15 minutes de visionnage gratuit sans publicité</b> et sans aucune interruption.
+      </p>
+      <button type="button" class="zero-credit-cta-btn" id="welcomeTimerAcceptBtn">
+        ▶ COMMENCER À REGARDER (15 MIN)
       </button>
-      <button type="button" class="welcome-netflix-close" id="welcomeTimerDismissBtn" title="Fermer">✕</button>
+      <div class="zero-credit-footer">
+        100% gratuit sans publicité • Rechargeable +20 min par la suite
+      </div>
     </div>
   </div>
 
   <!-- Scripts -->
   <script src="js/hls.min.js"></script>
-  <script src="js/player.js?v=1789640400"></script>
-  <script src="js/admin.js?v=1789640400"></script>
-  <script src="js/app.js?v=1789640400"></script>
+  <script src="js/player.js?v=1789640500"></script>
+  <script src="js/admin.js?v=1789640500"></script>
+  <script src="js/app.js?v=1789640500"></script>
 </body>
 </html>

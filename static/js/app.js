@@ -2749,7 +2749,7 @@ class NetflixApp {
           return Math.min(3600, legacy);
         }
         const accepted = localStorage.getItem('ziflix_welcome_accepted');
-        if (!accepted) return 1800;
+        if (!accepted) return 900;
         return 0;
       }
       const exp = parseInt(expStr, 10);
@@ -2858,8 +2858,8 @@ class NetflixApp {
         this.navWatchTimerBtn.title = 'Crédit maximum de 60 minutes atteint';
       } else {
         this.navWatchTimerBtn.disabled = false;
-        this.navWatchTimerBtn.textContent = '+30';
-        this.navWatchTimerBtn.title = 'Recharger +30 min gratuites';
+        this.navWatchTimerBtn.textContent = '+20';
+        this.navWatchTimerBtn.title = 'Recharger +20 min gratuites';
       }
     }
   }
@@ -2874,6 +2874,10 @@ class NetflixApp {
     if (!modal) return;
     if (this.authGateModal && !this.authGateModal.classList.contains('hidden')) return;
     if (document.getElementById('netflixPlayer')?.classList.contains('active')) return;
+
+    // Si l'utilisateur n'a pas encore validé l'offre de bienvenue, lui laisser voir le welcome modal
+    const accepted = localStorage.getItem('ziflix_welcome_accepted');
+    if (!accepted) return;
 
     const credit = this.getWatchCredit();
 
@@ -2924,6 +2928,10 @@ class NetflixApp {
 
     const accepted = localStorage.getItem('ziflix_welcome_accepted');
     if (!accepted) {
+      // S'assurer que le modal zéro crédit est masqué tant que l'offre 15 min est présentée
+      const zeroModal = document.getElementById('zeroCreditHomeModal');
+      if (zeroModal) zeroModal.classList.add('hidden');
+
       modal.classList.remove('hidden');
 
       const dismiss = () => {
@@ -2934,19 +2942,27 @@ class NetflixApp {
       acceptBtn.addEventListener('click', () => {
         dismiss();
         const now = Date.now();
-        const exp = now + 1800 * 1000;
+        const exp = now + 900 * 1000; // 15 minutes offertes (900s)
         localStorage.setItem('ziflix_watch_expires_at', String(exp));
-        localStorage.setItem('ziflix_watch_credit', '1800');
+        localStorage.setItem('ziflix_watch_credit', '900');
         if (this.player && typeof this.player.updateTimerDisplays === 'function') {
-          this.player.updateTimerDisplays(1800);
+          this.player.updateTimerDisplays(900);
         }
-        this.updateHomeTimerDisplay(1800);
-        this.showToast('⏱ 30 minutes offertes activées. Bon visionnage !');
+        this.updateHomeTimerDisplay(900);
+        this.showToast('⏱ 15 minutes offertes activées. Bon visionnage !');
       }, { once: true });
 
       if (dismissBtn) {
         dismissBtn.addEventListener('click', () => {
           dismiss();
+          const now = Date.now();
+          const exp = now + 900 * 1000; // 15 minutes offertes (900s)
+          localStorage.setItem('ziflix_watch_expires_at', String(exp));
+          localStorage.setItem('ziflix_watch_credit', '900');
+          if (this.player && typeof this.player.updateTimerDisplays === 'function') {
+            this.player.updateTimerDisplays(900);
+          }
+          this.updateHomeTimerDisplay(900);
         }, { once: true });
       }
     } else {
