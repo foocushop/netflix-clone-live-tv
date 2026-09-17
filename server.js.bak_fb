@@ -1674,23 +1674,6 @@ async function extractChannelMultiProvider(channelId, serverNum) {
   const srvNum = Math.max(1, Math.min(8, parseInt(serverNum) || 1));
 
   // Support direct des chaînes ayant un stream_id Xtream préconfiguré (ex: beIN SPORTS Arab)
-  if (channel && channel.sources && channel.sources.hd_stream_id && srvNum === 2) {
-    return {
-      success: true,
-      server: 2,
-      server_name: 'Serveur 2 (HD 720p Stable H.264)',
-      hoster: `💎 Direct Xtream HD • ${title}`,
-      quality: 'HD 720p Direct VIP',
-      title: `${title} • 🔴 EN DIRECT`,
-      stream_url: `/api/stream/xtream?stream_id=${channel.sources.hd_stream_id}`,
-      player_type: 'direct_hls',
-      is_embed: false,
-      is_live: true,
-      sources_count: 8,
-      lang: 'ar'
-    };
-  }
-
   if (channel && channel.stream_id && srvNum === 1) {
     return {
       success: true,
@@ -2840,11 +2823,6 @@ function loadZiflixUsers() {
   if (Array.isArray(backupData)) {
     backupData.forEach(u => {
       if (u && u.username) {
-        const existing = usersMap.get(u.username.toLowerCase());
-        if (existing) {
-          if (!u.ip && existing.ip) u.ip = existing.ip;
-          if (!u.last_ip && existing.last_ip) u.last_ip = existing.last_ip;
-        }
         usersMap.set(u.username.toLowerCase(), u);
       }
     });
@@ -2952,136 +2930,6 @@ let ZIFLIX_BUGS = [];
 const BUGS_LOCAL = path.join(__dirname, 'data', 'bugs.json');
 const BUGS_BACKUP = path.join(SYSTEM_PERSISTENT_DIR, 'bugs.json');
 
-// ================= MODULE LISTE NOIRE IP ZIFLIX (ANTI-RECRÉATION DE COMPTE) =================
-let ZIFLIX_BANNED_IPS = [];
-const BANNED_IPS_LOCAL = path.join(__dirname, 'data', 'banned_ips.json');
-const BANNED_IPS_BACKUP = path.join(SYSTEM_PERSISTENT_DIR, 'banned_ips.json');
-
-function normalizeIp(ip) {
-  if (!ip) return '';
-  let clean = String(ip).trim();
-  if (clean.startsWith('::ffff:')) {
-    clean = clean.replace('::ffff:', '');
-  }
-  return clean;
-}
-
-function getIpv6Subnet64(ipv6) {
-  const norm = normalizeIp(ipv6);
-  if (!norm.includes(':')) return null;
-  const parts = norm.split(':');
-  if (parts.length >= 4) {
-    return parts.slice(0, 4).join(':').toLowerCase();
-  }
-  return null;
-}
-
-function loadZiflixBannedIps() {
-  let localData = [];
-  let backupData = [];
-  if (fs.existsSync(BANNED_IPS_LOCAL)) {
-    try { localData = JSON.parse(fs.readFileSync(BANNED_IPS_LOCAL, 'utf8')) || []; } catch (e) {}
-  }
-  if (fs.existsSync(BANNED_IPS_BACKUP)) {
-    try { backupData = JSON.parse(fs.readFileSync(BANNED_IPS_BACKUP, 'utf8')) || []; } catch (e) {}
-  }
-  const ipsMap = new Map();
-  if (Array.isArray(localData)) {
-    localData.forEach(item => {
-      if (item && item.ip) ipsMap.set(item.ip.toLowerCase(), item);
-    });
-  }
-  if (Array.isArray(backupData)) {
-    backupData.forEach(item => {
-      if (item && item.ip) ipsMap.set(item.ip.toLowerCase(), item);
-    });
-  }
-  ZIFLIX_BANNED_IPS = Array.from(ipsMap.values());
-  saveZiflixBannedIps();
-}
-
-function saveZiflixBannedIps() {
-  try {
-    const dir = path.dirname(BANNED_IPS_LOCAL);
-    if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
-    fs.writeFileSync(BANNED_IPS_LOCAL, JSON.stringify(ZIFLIX_BANNED_IPS, null, 2), 'utf8');
-  } catch (e) {
-    console.error('[ZIFLIX Banned IPs] Erreur sauvegarde locale:', e.message);
-  }
-  try {
-    const bDir = path.dirname(BANNED_IPS_BACKUP);
-    if (!fs.existsSync(bDir)) fs.mkdirSync(bDir, { recursive: true });
-    fs.writeFileSync(BANNED_IPS_BACKUP, JSON.stringify(ZIFLIX_BANNED_IPS, null, 2), 'utf8');
-  } catch (e) {}
-}
-
-function isIpBanned(clientIp) {
-  const norm = normalizeIp(clientIp).toLowerCase();
-  if (!norm) return false;
-
-  const clientSubnet = getIpv6Subnet64(norm);
-
-  for (const entry of ZIFLIX_BANNED_IPS) {
-    const bannedNorm = normalizeIp(entry.ip).toLowerCase();
-    // 1. Correspondance exacte d'IP
-    if (bannedNorm === norm) {
-      return { banned: true, entry };
-    }
-    // 2. Correspondance sous-réseau IPv6 /64
-    if (entry.subnet && clientSubnet && entry.subnet.toLowerCase() === clientSubnet) {
-      return { banned: true, entry, subnetMatch: true };
-    }
-    if (clientSubnet && (bannedNorm.startsWith(clientSubnet) || (entry.subnet && clientSubnet.startsWith(entry.subnet.toLowerCase())))) {
-      return { banned: true, entry, subnetMatch: true };
-    }
-  }
-  return false;
-}
-
-function banIpAddress(ip, username, userId, reason = 'Bannissement administrateur') {
-  const norm = normalizeIp(ip);
-  if (!norm || norm === '127.0.0.1' || norm === '::1') return;
-
-  const subnet = getIpv6Subnet64(norm);
-  const exists = ZIFLIX_BANNED_IPS.some(b => normalizeIp(b.ip).toLowerCase() === norm.toLowerCase());
-  if (!exists) {
-    ZIFLIX_BANNED_IPS.push({
-      ip: norm,
-      subnet: subnet,
-      reason: reason,
-      user_id: userId || null,
-      username: username || 'Inconnu',
-      banned_at: new Date().toISOString()
-    });
-  }
-  if (subnet) {
-    const subnetEntry = subnet + '::/64';
-    if (!ZIFLIX_BANNED_IPS.some(b => b.subnet && b.subnet.toLowerCase() === subnet.toLowerCase())) {
-      ZIFLIX_BANNED_IPS.push({
-        ip: subnetEntry,
-        subnet: subnet,
-        reason: reason + ' (Sous-réseau IPv6 /64)',
-        user_id: userId || null,
-        username: username || 'Inconnu',
-        banned_at: new Date().toISOString()
-      });
-    }
-  }
-  saveZiflixBannedIps();
-}
-
-function unbanIpAddress(ip) {
-  const norm = normalizeIp(ip).toLowerCase();
-  const subnet = getIpv6Subnet64(norm);
-  ZIFLIX_BANNED_IPS = ZIFLIX_BANNED_IPS.filter(b => {
-    const bNorm = normalizeIp(b.ip).toLowerCase();
-    if (bNorm === norm) return false;
-    if (subnet && b.subnet && b.subnet.toLowerCase() === subnet) return false;
-    return true;
-  });
-  saveZiflixBannedIps();
-}
-
 function loadZiflixBugs() {
   let localData = null;
   let backupData = null;
@@ -3126,7 +2974,6 @@ loadZiflixUsers();
 loadZiflixComments();
 loadZiflixSessions();
 loadZiflixBugs();
-loadZiflixBannedIps();
 
 function getAuthUser(req) {
   const authHeader = req.headers['authorization'] || '';
@@ -3153,10 +3000,6 @@ function getAuthUser(req) {
   }
   const user = ZIFLIX_USERS.find(u => u.id === session.user_id);
   if (!user) return null;
-  const clientIp = typeof getClientIp === 'function' ? getClientIp(req) : '';
-  if (isIpBanned(clientIp)) {
-    return { ...user, is_banned: true, is_ip_banned: true };
-  }
   if (user.banned) return { ...user, is_banned: true };
   return user;
 }
@@ -3970,15 +3813,6 @@ const server = http.createServer(async (req, res) => {
 
   // ================= AUTHENTIFICATION & PROFILS UTILISATEURS ZIFLIX =================
   if (pathname === '/api/auth/register' && req.method === 'POST') {
-    const clientIp = getClientIp(req);
-    const ipCheck = isIpBanned(clientIp);
-    if (ipCheck) {
-      res.writeHead(403, { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' });
-      return res.end(JSON.stringify({
-        success: false,
-        error: 'Impossible de créer un compte : votre adresse IP a été suspendue pour non-respect des règles de la plateforme.'
-      }));
-    }
     let body = '';
     req.on('data', chunk => body += chunk);
     req.on('end', () => {
@@ -4015,8 +3849,6 @@ const server = http.createServer(async (req, res) => {
           avatar,
           role,
           banned: false,
-          ip: clientIp,
-          last_ip: clientIp,
           created_at: new Date().toISOString(),
           last_login: new Date().toISOString()
         };
@@ -4062,15 +3894,6 @@ const server = http.createServer(async (req, res) => {
   }
 
   if (pathname === '/api/auth/login' && req.method === 'POST') {
-    const clientIp = getClientIp(req);
-    const ipCheck = isIpBanned(clientIp);
-    if (ipCheck) {
-      res.writeHead(403, { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' });
-      return res.end(JSON.stringify({
-        success: false,
-        error: 'Accès refusé : votre adresse IP a été suspendue par un administrateur.'
-      }));
-    }
     let body = '';
     req.on('data', chunk => body += chunk);
     req.on('end', () => {
@@ -4103,8 +3926,6 @@ const server = http.createServer(async (req, res) => {
         }
 
         user.last_login = new Date().toISOString();
-        user.last_ip = clientIp;
-        if (!user.ip) user.ip = clientIp;
         saveZiflixUsers();
 
         const token = cryptoModule.randomBytes(32).toString('hex');
@@ -4133,7 +3954,6 @@ const server = http.createServer(async (req, res) => {
             username: user.username,
             avatar: user.avatar,
             role: user.role,
-            is_vip: !!(user.is_vip || user.role === 'vip' || user.role === 'admin'),
             created_at: user.created_at
           }
         }));
@@ -4163,7 +3983,6 @@ const server = http.createServer(async (req, res) => {
         username: user.username,
         avatar: user.avatar,
         role: user.role,
-        is_vip: !!(user.is_vip || user.role === 'vip' || user.role === 'admin'),
         created_at: user.created_at,
         last_login: user.last_login
       }
@@ -4271,23 +4090,11 @@ const server = http.createServer(async (req, res) => {
       results = ZIFLIX_COMMENTS.slice(0, 60);
     }
 
-    const reqUser = typeof getAuthUser === 'function' ? getAuthUser(req) : null;
-    const isReqAdmin = (reqUser && reqUser.role === 'admin') || (req.headers['x-admin-password'] === '1965');
-    const sanitized = results.map(c => {
-      const copy = { ...c };
-      if (!isReqAdmin) delete copy.ip;
-      return copy;
-    });
     res.writeHead(200, { 'Content-Type': 'application/json; charset=utf-8', 'Access-Control-Allow-Origin': '*' });
-    return res.end(JSON.stringify({ success: true, count: sanitized.length, data: sanitized, comments: sanitized }));
+    return res.end(JSON.stringify({ success: true, count: results.length, data: results, comments: results }));
   }
 
   if (pathname === '/api/comments' && req.method === 'POST') {
-    const clientIp = getClientIp(req);
-    if (isIpBanned(clientIp)) {
-      res.writeHead(403, { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' });
-      return res.end(JSON.stringify({ success: false, error: 'Votre adresse IP a été suspendue. Vous ne pouvez plus publier de commentaires.' }));
-    }
     const user = getAuthUser(req);
     if (!user || user.is_banned) {
       res.writeHead(401, { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' });
@@ -4318,13 +4125,9 @@ const server = http.createServer(async (req, res) => {
           username: user.username,
           avatar: user.avatar,
           text,
-          ip: clientIp,
           created_at: new Date().toISOString(),
           createdAt: new Date().toISOString()
         };
-        user.last_ip = clientIp;
-        if (!user.ip) user.ip = clientIp;
-        saveZiflixUsers();
 
         ZIFLIX_COMMENTS.unshift(comment);
         if (ZIFLIX_COMMENTS.length > 2000) ZIFLIX_COMMENTS.pop();
@@ -4516,9 +4319,7 @@ const server = http.createServer(async (req, res) => {
         username: u.username,
         avatar: u.avatar,
         role: u.role,
-        is_vip: !!(u.is_vip || u.role === 'vip' || u.role === 'admin'),
         banned: !!u.banned,
-        ip: u.ip || u.last_ip || 'Non enregistrée',
         created_at: u.created_at,
         last_login: u.last_login
       }));
@@ -4533,149 +4334,21 @@ const server = http.createServer(async (req, res) => {
         try {
           const payload = JSON.parse(body || '{}');
           const targetId = payload.userId || payload.user_id;
-          const target = ZIFLIX_USERS.find(u => u.id === targetId || (payload.username && u.username.toLowerCase() === String(payload.username).toLowerCase()));
+          const target = ZIFLIX_USERS.find(u => u.id === targetId);
           if (!target) {
             res.writeHead(404, { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' });
             return res.end(JSON.stringify({ success: false, error: 'Utilisateur introuvable' }));
           }
-          const shouldBan = !!payload.banned;
-          target.banned = shouldBan;
-
-          if (shouldBan) {
-            // 1. Révoquer immédiatement toutes les sessions actives
-            for (const [token, sess] of ZIFLIX_SESSIONS.entries()) {
-              if (sess && (sess.user_id === target.id || sess.username === target.username)) {
-                ZIFLIX_SESSIONS.delete(token);
-              }
-            }
-            saveZiflixSessions();
-
-            // 2. Bannir toutes les IPs connues de l'utilisateur
-            const ipsToBan = new Set();
-            if (target.ip) ipsToBan.add(target.ip);
-            if (target.last_ip) ipsToBan.add(target.last_ip);
-            if (payload.ip) ipsToBan.add(payload.ip);
-
-            // Ajouter les IPs de ses commentaires
-            ZIFLIX_COMMENTS.forEach(c => {
-              if ((c.user_id === target.id || c.userId === target.id) && c.ip) {
-                ipsToBan.add(c.ip);
-              }
-            });
-
-            ipsToBan.forEach(ip => {
-              banIpAddress(ip, target.username, target.id, 'Bannissement compte par administrateur');
-            });
-          } else {
-            // Débannissement : débloquer ses IPs
-            if (target.ip) unbanIpAddress(target.ip);
-            if (target.last_ip) unbanIpAddress(target.last_ip);
-          }
-
+          target.banned = !!payload.banned;
           saveZiflixUsers();
           res.writeHead(200, { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' });
-          return res.end(JSON.stringify({
-            success: true,
-            user: { id: target.id, username: target.username, banned: target.banned, ip: target.ip || target.last_ip }
-          }));
+          return res.end(JSON.stringify({ success: true, user: { id: target.id, username: target.username, banned: target.banned } }));
         } catch (e) {
           res.writeHead(400, { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' });
           return res.end(JSON.stringify({ success: false, error: 'Corps JSON invalide' }));
         }
       });
       return;
-    }
-
-    // ================= 9. /api/admin/comments/ban-user : MODÉRATION RAPIDE DEPUIS LES COMMENTAIRES =================
-    if (pathname === '/api/admin/comments/ban-user' && req.method === 'POST') {
-      let body = '';
-      req.on('data', chunk => body += chunk);
-      req.on('end', () => {
-        try {
-          const payload = JSON.parse(body || '{}');
-          const commentId = payload.commentId || payload.id;
-          const userId = payload.userId || payload.user_id;
-
-          let targetUser = null;
-          let commentToDelete = null;
-
-          if (commentId) {
-            commentToDelete = ZIFLIX_COMMENTS.find(c => c.id === commentId);
-            if (commentToDelete) {
-              const uId = commentToDelete.user_id || commentToDelete.userId;
-              targetUser = ZIFLIX_USERS.find(u => u.id === uId || u.username.toLowerCase() === (commentToDelete.username || '').toLowerCase());
-            }
-          }
-
-          if (!targetUser && userId) {
-            targetUser = ZIFLIX_USERS.find(u => u.id === userId);
-          }
-
-          if (!targetUser) {
-            res.writeHead(404, { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' });
-            return res.end(JSON.stringify({ success: false, error: 'Auteur du commentaire introuvable' }));
-          }
-
-          // 1. Bannir l'utilisateur
-          targetUser.banned = true;
-
-          // 2. Révoquer ses sessions
-          for (const [token, sess] of ZIFLIX_SESSIONS.entries()) {
-            if (sess && (sess.user_id === targetUser.id || sess.username === targetUser.username)) {
-              ZIFLIX_SESSIONS.delete(token);
-            }
-          }
-          saveZiflixSessions();
-
-          // 3. Bannir l'IP
-          const ipsToBan = new Set();
-          if (targetUser.ip) ipsToBan.add(targetUser.ip);
-          if (targetUser.last_ip) ipsToBan.add(targetUser.last_ip);
-          if (commentToDelete && commentToDelete.ip) ipsToBan.add(commentToDelete.ip);
-
-          ZIFLIX_COMMENTS.forEach(c => {
-            if ((c.user_id === targetUser.id || c.userId === targetUser.id) && c.ip) {
-              ipsToBan.add(c.ip);
-            }
-          });
-
-          ipsToBan.forEach(ip => {
-            banIpAddress(ip, targetUser.username, targetUser.id, 'Bannissement depuis modération commentaires');
-          });
-
-          // 4. Supprimer le commentaire incriminé
-          if (commentId) {
-            const idx = ZIFLIX_COMMENTS.findIndex(c => c.id === commentId);
-            if (idx !== -1) {
-              ZIFLIX_COMMENTS.splice(idx, 1);
-            }
-          }
-          // Nettoyer tous les commentaires si demandé
-          if (payload.deleteAll) {
-            ZIFLIX_COMMENTS = ZIFLIX_COMMENTS.filter(c => c.user_id !== targetUser.id && c.userId !== targetUser.id);
-          }
-
-          saveZiflixComments();
-          saveZiflixUsers();
-
-          res.writeHead(200, { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' });
-          return res.end(JSON.stringify({
-            success: true,
-            message: 'Utilisateur "' + targetUser.username + '" et son adresse IP ont été bannis avec succès.',
-            user: { id: targetUser.id, username: targetUser.username, banned: true, ip: targetUser.ip || targetUser.last_ip }
-          }));
-        } catch (e) {
-          res.writeHead(400, { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' });
-          return res.end(JSON.stringify({ success: false, error: 'Erreur lors du bannissement: ' + e.message }));
-        }
-      });
-      return;
-    }
-
-    // ================= 10. /api/admin/banned-ips : GESTION DES IPS BANserver =================
-    if (pathname === '/api/admin/banned-ips' && req.method === 'GET') {
-      res.writeHead(200, { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' });
-      return res.end(JSON.stringify({ success: true, banned_ips: ZIFLIX_BANNED_IPS }));
     }
 
     if (pathname === '/api/admin/users/role' && req.method === 'POST') {
@@ -4690,28 +4363,14 @@ const server = http.createServer(async (req, res) => {
             res.writeHead(404, { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' });
             return res.end(JSON.stringify({ success: false, error: 'Utilisateur introuvable' }));
           }
-          const validRoles = ['admin', 'vip', 'user'];
-          const reqRole = String(payload.role || '').toLowerCase();
-          target.role = validRoles.includes(reqRole) ? reqRole : 'user';
-          target.is_vip = (target.role === 'vip' || target.role === 'admin');
+          target.role = payload.role === 'admin' ? 'admin' : 'user';
           for (const [t, s] of ZIFLIX_SESSIONS.entries()) {
-            if (s.user_id === target.id) {
-              s.role = target.role;
-              s.is_vip = target.is_vip;
-            }
+            if (s.user_id === target.id) s.role = target.role;
           }
           saveZiflixSessions();
           saveZiflixUsers();
           res.writeHead(200, { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' });
-          return res.end(JSON.stringify({
-            success: true,
-            user: {
-              id: target.id,
-              username: target.username,
-              role: target.role,
-              is_vip: target.is_vip
-            }
-          }));
+          return res.end(JSON.stringify({ success: true, user: { id: target.id, username: target.username, role: target.role } }));
         } catch (e) {
           res.writeHead(400, { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' });
           return res.end(JSON.stringify({ success: false, error: 'Corps JSON invalide' }));
@@ -6544,39 +6203,7 @@ const EC3_AUDIO_CHANNELS = new Set([
         '479032': '479031', // Ligue 1+ 10 FHD -> HD (H.264)
         // DAZN streams
         '481112': '481111', // DAZN 1 FR FHD -> HD (H.264)
-        '481109': '481108', // DAZN 2 FR FHD -> HD (H.264)
-        // beIN SPORTS MAX FR (FHD cluster instable -> HD H.264 vérifié 200 OK)
-        '151958': '95',     // beIN Max 4 FHD -> HD
-        '151961': '39882',  // beIN Max 5 FHD -> HD
-        '151964': '1089',   // beIN Max 6 FHD -> HD
-        '151967': '1113',   // beIN Max 7 FHD -> HD
-        '151970': '1468',   // beIN Max 8 FHD -> HD
-        '151973': '1469',   // beIN Max 9 FHD -> HD
-        '151976': '1470',   // beIN Max 10 FHD -> HD
-        // beIN SPORTS Arab streams (FHD est HEVC -> bascule automatique en HD H.264 pour navigateurs web)
-        '13608': '13682',   // beIN 1 Arab FHD (HEVC) -> HD (H.264)
-        '13607': '13680',   // beIN 2 Arab FHD (HEVC) -> HD (H.264)
-        '13606': '13678',   // beIN 3 Arab FHD (HEVC) -> HD (H.264)
-        '13605': '13676',   // beIN 4 Arab FHD (HEVC) -> HD (H.264)
-        '13604': '13674',   // beIN 5 Arab FHD (HEVC) -> HD (H.264)
-        '13603': '13672',   // beIN 6 Arab FHD (HEVC) -> HD (H.264)
-        '13602': '13576',   // beIN 7 Arab FHD (HEVC) -> HD (H.264)
-        '13611': '13688',   // beIN 8 Arab FHD (HEVC) -> HD (H.264)
-        '13610': '13686',   // beIN 9 Arab FHD (HEVC) -> HD (H.264)
-        '24979': '78372',   // beIN News Arab -> HD (H.264)
-        '24980': '409586',  // beIN Global Arab -> HD (H.264)
-        '21197': '21198',   // beIN NBA Arab -> HD (H.264)
-        '165458': '165454', // beIN AFC 1 Arab -> HD (H.264)
-        '165459': '165455', // beIN AFC 2 Arab -> HD (H.264)
-        '165460': '165456', // beIN AFC 3 Arab -> HD (H.264)
-        '129996': '129997', // beIN XTRA 1 Arab -> HD (H.264)
-        '423814': '129999', // beIN XTRA 2 Arab -> HD (H.264)
-        '129998': '423816', // beIN XTRA 3 Arab -> HD (H.264)
-        '423822': '423821', // beIN XTRA 4 Arab -> HD (H.264)
-        '423826': '423825', // beIN XTRA 5 Arab -> HD (H.264)
-        '423830': '423829', // beIN XTRA 6 Arab -> HD (H.264)
-        '423834': '423833', // beIN XTRA 7 Arab -> HD (H.264)
-        '423838': '423837'  // beIN XTRA 8 Arab -> HD (H.264)
+        '481109': '481108'  // DAZN 2 FR FHD -> HD (H.264)
       };
 
       const candidates = [];
@@ -7437,23 +7064,6 @@ if (!isValidToken) {
     const subPath = pathname.replace(/^\/api\/stream\/vidmoly\/?/, '');
     const parts = subPath.split('/');
     const fileCode = parts[0];
-    const resourcePart = parts[parts.length - 1];
-
-    // Redirection directe pour les segments .ts relatifs
-    if (resourcePart && resourcePart.endsWith('.ts')) {
-      const epMap = vidmoly ? vidmoly.getEpisodesMap() : {};
-      let fallbackEpId = null;
-      for (const [eId, eData] of Object.entries(epMap)) {
-        if (eData && eData.fileCode === fileCode) { fallbackEpId = eId; break; }
-      }
-      if (fallbackEpId) {
-        res.writeHead(302, {
-          'Location': `/api/stream/xtream-series-hls/${fallbackEpId}/${resourcePart}${parsedUrl.search || ''}`,
-          'Access-Control-Allow-Origin': '*'
-        });
-        return res.end();
-      }
-    }
 
     if (!fileCode) {
       res.writeHead(400, { 'Content-Type': 'text/plain; charset=utf-8', 'Access-Control-Allow-Origin': '*' });
@@ -7484,31 +7094,7 @@ if (!isValidToken) {
       });
       return res.end(result.playlist);
     } catch (err) {
-      console.warn(`[Vidmoly Stream Proxy Error] ${fileCode}:`, err.message);
-      // Fallback automatique vers Xtream HLS si cet épisode est connu dans vidmoly_episodes.json
-      try {
-        const epMap = vidmoly ? vidmoly.getEpisodesMap() : {};
-        let fallbackEpId = null;
-        for (const [eId, eData] of Object.entries(epMap)) {
-          if (eData && eData.fileCode === fileCode) {
-            fallbackEpId = eId;
-            break;
-          }
-        }
-        if (fallbackEpId) {
-          const qs = parsedUrl.search || '';
-          console.log(`[Vidmoly Fallback 302] Bascule automatique vers flux Xtream HLS pour epId=${fallbackEpId} (${fileCode})`);
-          res.writeHead(302, {
-            'Location': `/api/stream/xtream-series-hls/${fallbackEpId}/master.m3u8${qs}`,
-            'Access-Control-Allow-Origin': '*',
-            'Access-Control-Allow-Headers': '*'
-          });
-          return res.end();
-        }
-      } catch (fbErr) {
-        console.error('[Vidmoly Fallback Error]:', fbErr.message);
-      }
-
+      console.error(`[Vidmoly Stream Proxy Error] ${fileCode}:`, err.message);
       res.writeHead(502, { 'Content-Type': 'text/plain; charset=utf-8', 'Access-Control-Allow-Origin': '*' });
       return res.end('Erreur de flux Vidmoly : ' + err.message);
     }

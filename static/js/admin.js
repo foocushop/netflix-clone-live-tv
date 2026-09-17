@@ -1593,14 +1593,21 @@ class NetflixAdmin {
         json.comments.forEach(c => {
           const item = document.createElement('div');
           item.style.cssText = 'background: rgba(255,255,255,0.03); border: 1px solid var(--admin-border); border-radius: 8px; padding: 10px; margin-bottom: 8px; font-size: 0.8rem;';
+          const userIpBadge = c.ip ? `<span style="font-size: 0.72rem; color: #888; font-weight: normal; margin-left: 6px; font-family: monospace; background: rgba(255,255,255,0.06); padding: 1px 5px; border-radius: 3px;" title="Adresse IP enregistrée">IP: ${c.ip}</span>` : '<span style="font-size: 0.72rem; color: #666; font-weight: normal; margin-left: 6px;">(IP non liée)</span>';
           item.innerHTML = `
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
-              <strong style="color: #fff;">${c.username} <span style="font-size: 0.72rem; color: #888; font-weight: 400;">(${c.mediaId})</span></strong>
-              <button type="button" class="btn-admin btn-admin-red btn-sm delete-comment-btn" style="padding: 2px 6px; font-size: 0.68rem;">Supprimer</button>
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; gap: 8px;">
+              <strong style="color: #fff; word-break: break-all;">${c.username || 'Anonyme'} ${userIpBadge} <span style="font-size: 0.72rem; color: #777; font-weight: 400;">(${c.mediaId || 'Général'})</span></strong>
+              <div style="display: flex; gap: 6px; flex-shrink: 0;">
+                <button type="button" class="btn-admin btn-admin-red btn-sm ban-comment-user-btn" style="padding: 3px 8px; font-size: 0.68rem; background: #e50914; color: #fff; font-weight: 600; border: none; border-radius: 4px; cursor: pointer; display: flex; align-items: center; gap: 3px;" title="Bannir l'utilisateur et son adresse IP">🚫 Bannir IP</button>
+                <button type="button" class="btn-admin btn-sm delete-comment-btn" style="padding: 3px 8px; font-size: 0.68rem; background: rgba(255,255,255,0.1); color: #ccc; border: none; border-radius: 4px; cursor: pointer;" title="Supprimer uniquement ce message">🗑️</button>
+              </div>
             </div>
-            <div style="color: #ccc; margin-bottom: 4px;">${c.text.replace(/</g, '&lt;').replace(/>/g, '&gt;')}</div>
-            <div style="font-size: 0.68rem; color: #666;">${new Date(c.createdAt).toLocaleString('fr-FR')}</div>
+            <div style="color: #e6e6e6; margin-bottom: 4px; word-break: break-word; line-height: 1.35;">${(c.text || '').replace(/</g, '&lt;').replace(/>/g, '&gt;')}</div>
+            <div style="font-size: 0.68rem; color: #666;">${c.createdAt ? new Date(c.createdAt).toLocaleString('fr-FR') : ''}</div>
           `;
+          item.querySelector('.ban-comment-user-btn')?.addEventListener('click', async () => {
+            await this.banCommentUserAdmin(c.id, c.userId || c.user_id, c.username, c.ip);
+          });
           item.querySelector('.delete-comment-btn')?.addEventListener('click', async () => {
             await this.deleteCommentAdmin(c.id);
           });

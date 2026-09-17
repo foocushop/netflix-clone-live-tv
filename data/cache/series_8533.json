@@ -1,0 +1,169 @@
+{
+  "seasons": [
+    {
+      "name": "Saison 1",
+      "episode_count": "2",
+      "overview": "images/noposter.jpg",
+      "air_date": "2026-05-19",
+      "cover": "images/noposter.jpg",
+      "cover_tmdb": "images/noposter.jpg",
+      "season_number": 1,
+      "cover_big": "images/noposter.jpg",
+      "releaseDate": "2026-05-19",
+      "duration": "0"
+    }
+  ],
+  "info": {
+    "name": "On connaît la chanson (2026)",
+    "cover": "https://image.tmdb.org/t/p/w600_and_h900_bestv2/8gMXKRwbn9rGv6WKgY3uPUQmKDJ.jpg",
+    "plot": "Laurence Boccolini fait son grand retour en prime time avec un nouveau divertissement musical. Pour cette première édition, place à une spéciale années 90. L’occasion de (re)découvrir les titres qui ont marqué toute une génération, à travers des jeux à la fois surprenants et divertissants. Autour de l’animatrice, 12 personnalités venues d’horizons et de générations variés s’affrontent dans une série de jeux mêlant quiz, épreuves musicales et défis décalés. Au fil des manches, performances live, surprises et moments de complicité s’enchaînent. Entre nostalgie, rires et compétition, On connaît la chanson célèbre la musique pendant une soirée où chacun pourra tester ses souvenirs… et peut-être prouver qu’il connaît vraiment la chanson ! Alors quelle personnalité tirera son épingle du jeu et décrochera le trophée de cette spéciale années 90 ?",
+    "cast": "Laurence Boccolini",
+    "director": "",
+    "genre": "Familial",
+    "releaseDate": "2026-05-19",
+    "release_date": "2026-05-19",
+    "last_modified": "1779371437",
+    "rating": "0",
+    "rating_5based": "0",
+    "backdrop_path": [
+      "https://image.tmdb.org/t/p/w1280/8nkLKpaWwffXaUPXmX6G6tkHZGE.jpg",
+      "https://image.tmdb.org/t/p/w1280/bNoNy9H7jr331FT89cQBg1cRZLD.jpg"
+    ],
+    "tmdb": "321899",
+    "youtube_trailer": "",
+    "episode_run_time": "0",
+    "category_id": "947",
+    "category_ids": [
+      947
+    ]
+  },
+  "episodes": {
+    "1": [
+      {
+        "id": "461436",
+        "episode_num": 1,
+        "title": "On connaît la chanson (2026) - S01E01 - Années 90 (1)",
+        "container_extension": "mkv",
+        "info": {
+          "air_date": "2026-05-19",
+          "rating": 0,
+          "id": 321899,
+          "movie_image": "https://image.tmdb.org/t/p/w185/3l2isUZgDuyDUpGDoQ6BlRL7x6t.jpg",
+          "duration_secs": 6341,
+          "duration": "01:45:41",
+          "video": {
+            "index": 8,
+            "codec_name": "mjpeg",
+            "codec_long_name": "unknown",
+            "profile": "192",
+            "codec_type": "video",
+            "codec_tag_string": "[0][0][0][0]",
+            "codec_tag": "0x0000",
+            "width": 1920,
+            "height": 1080,
+            "coded_width": 1920,
+            "coded_height": 1080,
+            "closed_captions": 0,
+            "film_grain": 0,
+            "has_b_frames": 0,
+            "sample_aspect_ratio": "1:1",
+            "display_aspect_ratio": "16:9",
+            "pix_fmt": "yuvj420p",
+            "level": -99,
+            "color_range": "pc",
+            "color_space": "bt470bg",
+            "chroma_location": "center",
+            "refs": 1,
+            "r_frame_rate": "90000/1",
+            "avg_frame_rate": "0/0",
+            "time_base": "1/90000",
+            "start_pts": 0,
+            "start_time": "0.000000",
+            "duration_ts": 570702690,
+            "duration": "6341.141000",
+            "bits_per_raw_sample": "8",
+            "disposition": {
+              "default": 0,
+              "dub": 0,
+              "original": 0,
+              "comment": 0,
+              "lyrics": 0,
+              "karaoke": 0,
+              "forced": 0,
+              "hearing_impaired": 0,
+              "visual_impaired": 0,
+              "clean_effects": 0,
+              "attached_pic": 1,
+              "timed_thumbnails": 0,
+              "captions": 0,
+              "descriptions": 0,
+              "metadata": 0,
+              "dependent": 0,
+              "still_image": 0
+            },
+            "tags": {
+              "filename": "media.jpeg",
+              "mimetype": "image/jpeg",
+              "title": "Media"
+            }
+          },
+          "audio": {
+            "index": 1,
+            "codec_name": "aac",
+            "codec_long_name": "unknown",
+            "profile": "1",
+            "codec_type": "audio",
+            "codec_tag_string": "[0][0][0][0]",
+            "codec_tag": "0x0000",
+            "sample_fmt": "fltp",
+            "sample_rate": "48000",
+            "channels": 2,
+            "channel_layout": "stereo",
+            "bits_per_sample": 0,
+            "r_frame_rate": "0/0",
+            "avg_frame_rate": "0/0",
+            "time_base": "1/1000",
+            "start_pts": 0,
+            "start_time": "0.000000",
+            "extradata_size": 2,
+            "disposition": {
+              "default": 1,
+              "dub": 0,
+              "original": 0,
+              "comment": 0,
+              "lyrics": 0,
+              "karaoke": 0,
+              "forced": 0,
+              "hearing_impaired": 0,
+              "visual_impaired": 0,
+              "clean_effects": 0,
+              "attached_pic": 0,
+              "timed_thumbnails": 0,
+              "captions": 0,
+              "descriptions": 0,
+              "metadata": 0,
+              "dependent": 0,
+              "still_image": 0
+            },
+            "tags": {
+              "language": "fre",
+              "title": "French - AAC LC 2.0 @ 96 kb/s",
+              "BPS": "96000",
+              "DURATION": "01:45:41.141000000",
+              "NUMBER_OF_FRAMES": "297241",
+              "NUMBER_OF_BYTES": "76094200",
+              "_STATISTICS_WRITING_APP": "mkvmerge v98.0 ('Chonks') 64-bit",
+              "_STATISTICS_WRITING_DATE_UTC": "2026-05-20 18:19:21",
+              "_STATISTICS_TAGS": "BPS DURATION NUMBER_OF_FRAMES NUMBER_OF_BYTES"
+            }
+          },
+          "bitrate": 4636
+        },
+        "custom_sid": null,
+        "added": "1779371436",
+        "season": 1,
+        "direct_source": ""
+      }
+    ]
+  }
+}

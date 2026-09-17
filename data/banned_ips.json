@@ -1,0 +1,50 @@
+[
+  {
+    "ip": "86.210.198.190",
+    "subnet": null,
+    "reason": "Banni par admin (Troll insulte - IPv4)",
+    "user_id": "u_1789651890714_73dbe3dc",
+    "username": "Mouhamad Diedhiou / byebyelesite / Gakolapute",
+    "banned_at": "2026-09-17T19:59:50.094Z"
+  },
+  {
+    "ip": "2a01:cb19:9f5b:5d00::/64",
+    "subnet": "2a01:cb19:9f5b:5d00",
+    "reason": "Banni par admin (Troll insulte - Sous-reseau IPv6 /64)",
+    "user_id": "u_1789651890714_73dbe3dc",
+    "username": "Mouhamad Diedhiou / byebyelesite / Gakolapute",
+    "banned_at": "2026-09-17T19:59:50.095Z"
+  },
+  {
+    "ip": "2a01:cb19:9f5b:5d00:462d:f3:359c:772f",
+    "subnet": "2a01:cb19:9f5b:5d00",
+    "reason": "Banni par admin (Gakolapute)",
+    "user_id": "u_1789233659557_3281c451",
+    "username": "Gakolapute",
+    "banned_at": "2026-09-17T19:59:50.095Z"
+  },
+  {
+    "ip": "2a01:cb19:9f5b:5d00:3cbc:941b:c9ea:db9f",
+    "subnet": "2a01:cb19:9f5b:5d00",
+    "reason": "Banni par admin (byebyelesite)",
+    "user_id": "u_1789300412099_51abf3af",
+    "username": "byebyelesite",
+    "banned_at": "2026-09-17T19:59:50.095Z"
+  },
+  {
+    "ip": "2a01:cb19:9f5b:5d00:5e91:d78e:9ac6:f1ba",
+    "subnet": "2a01:cb19:9f5b:5d00",
+    "reason": "Banni par admin (byebyelesite session 2)",
+    "user_id": "u_1789300412099_51abf3af",
+    "username": "byebyelesite",
+    "banned_at": "2026-09-17T19:59:50.095Z"
+  },
+  {
+    "ip": "2a01:cb19:9f5b:5d00:e8b1:733c:3100:2b23",
+    "subnet": "2a01:cb19:9f5b:5d00",
+    "reason": "Banni par admin (Mouhamad Diedhiou IPv6)",
+    "user_id": "u_1789651890714_73dbe3dc",
+    "username": "Mouhamad Diedhiou",
+    "banned_at": "2026-09-17T19:59:50.095Z"
+  }
+]

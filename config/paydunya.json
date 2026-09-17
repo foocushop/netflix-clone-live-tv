@@ -1,0 +1,16 @@
+{
+  "master_key": "hHBPmGm6-n9OF-4YSq-CJTd-xA61PNLmXV4f",
+  "private_key": "live_private_DCnWsvl0u5Ruke4xbu4U3RmroW3",
+  "public_key": "live_public_qquoHQIFFwl7qu1tBFkzXHNBIOB",
+  "token": "npDtm84vBt4q7OUI5KAP",
+  "environment": "live",
+  "currency": "XOF",
+  "store": {
+    "name": "ZIFLIX Streaming",
+    "tagline": "Plateforme de streaming haute performance",
+    "postal_address": "Dakar, Sénégal",
+    "phone_number": "+221770000000",
+    "logo_url": "https://ziablo.xyz/assets/icons/icon-192.png",
+    "website_url": "https://ziablo.xyz"
+  }
+}

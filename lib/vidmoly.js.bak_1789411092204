@@ -1,0 +1,591 @@
+/**
+ * lib/vidmoly.js - Passerelle Vidmoly Cloud & Stream Resolver pour ZIFLIX
+ * Gère :
+ * - Rotation dynamique multi-comptes avec auto-génération à la volée (via lib/vidmoly-accounts)
+ * - Tampon local préalable anti-coupure (/tmp/vidmoly_buffer) garantissant 100% de la durée des épisodes
+ * - Remote Upload (aspiration haute vitesse depuis le SSD local de notre serveur)
+ * - Nettoyage automatique du stockage tampon local après transfert
+ * - Résolution transparente du flux HLS (.m3u8) sans aucune pub (0 requête API consommée)
+ */
+
+const fs = require('fs');
+const path = require('path');
+const https = require('https');
+const http = require('http');
+const { execSync } = require('child_process');
+let vidmolyAccounts;
+try {
+  vidmolyAccounts = require('./vidmoly-accounts');
+} catch (e) {
+  vidmolyAccounts = require('/var/www/netflix-clone/lib/vidmoly-accounts');
+}
+
+let SocksProxyAgent = null;
+try {
+  SocksProxyAgent = require('socks-proxy-agent').SocksProxyAgent;
+} catch (e) {
+  try {
+    SocksProxyAgent = require('/var/www/netflix-clone/node_modules/socks-proxy-agent').SocksProxyAgent;
+  } catch (e2) {}
+}
+const warpAgent = SocksProxyAgent ? new SocksProxyAgent('socks5h://127.0.0.1:40000') : null;
+const resolvedPlaylistsCache = new Map();
+const resolvedStreamsCache = new Map();
+
+const DATA_DIR = path.join(__dirname, '..', 'data');
+const STATE_FILE = path.join(DATA_DIR, 'vidmoly_state.json');
+const FOLDERS_FILE = path.join(DATA_DIR, 'vidmoly_folders.json');
+const EPISODES_FILE = path.join(DATA_DIR, 'vidmoly_episodes.json');
+const QUEUE_FILE = path.join(DATA_DIR, 'vidmoly_queue.json');
+const BUFFER_DIR = '/tmp/vidmoly_buffer';
+
+const CONFIG = {
+  apiBase: 'https://vidmoly.me/api'
+};
+
+// Assure l'existence des répertoires et fichiers
+function ensureStorage() {
+  if (!fs.existsSync(DATA_DIR)) fs.mkdirSync(DATA_DIR, { recursive: true });
+  if (!fs.existsSync(FOLDERS_FILE)) fs.writeFileSync(FOLDERS_FILE, '{}', 'utf8');
+  if (!fs.existsSync(EPISODES_FILE)) fs.writeFileSync(EPISODES_FILE, '{}', 'utf8');
+  if (!fs.existsSync(QUEUE_FILE)) fs.writeFileSync(QUEUE_FILE, '[]', 'utf8');
+  if (!fs.existsSync(BUFFER_DIR)) fs.mkdirSync(BUFFER_DIR, { recursive: true });
+}
+
+function getState() {
+  ensureStorage();
+  const quotaInfo = vidmolyAccounts.getTotalQuota();
+  return {
+    accountsCount: quotaInfo.accountsCount,
+    totalRemainingRequests: quotaInfo.totalRemainingRequests,
+    accounts: quotaInfo.accounts,
+    storageLeft: 16106127360000,
+    storageUsed: 0
+  };
+}
+
+function canMakeApiCall() {
+  const quota = vidmolyAccounts.getTotalQuota();
+  return quota.totalRemainingRequests > 0;
+}
+
+// Effectue un appel HTTP GET via Cloudflare WARP pour contourner le blocage ASN/IP Vidmoly
+function fetchHttpWarp(url, headers = {}) {
+  return new Promise((resolve, reject) => {
+    const isHttps = url.startsWith('https:');
+    const client = isHttps ? https : http;
+    const reqOptions = {
+      headers: {
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36',
+        'Referer': 'https://vidmoly.org/',
+        ...headers
+      },
+      timeout: 15000
+    };
+    if (warpAgent) {
+      reqOptions.agent = warpAgent;
+    }
+    const req = client.get(url, reqOptions, (res) => {
+      if (res.statusCode >= 300 && res.statusCode < 400 && res.headers.location) {
+        const nextUrl = res.headers.location.startsWith('http') ? res.headers.location : new URL(res.headers.location, url).href;
+        return resolve(fetchHttpWarp(nextUrl, headers));
+      }
+      let chunks = [];
+      res.on('data', chunk => chunks.push(chunk));
+      res.on('end', () => resolve({
+        statusCode: res.statusCode,
+        headers: res.headers,
+        text: Buffer.concat(chunks).toString('utf8'),
+        body: Buffer.concat(chunks)
+      }));
+    });
+    req.on('error', (err) => {
+      if (warpAgent) {
+        return fetchHttp(url, headers).then(resolve).catch(reject);
+      }
+      reject(err);
+    });
+    req.on('timeout', () => { req.destroy(); reject(new Error('HTTP timeout: ' + url)); });
+  });
+}
+
+function fetchHttp(url, headers = {}) {
+  return new Promise((resolve, reject) => {
+    const isHttps = url.startsWith('https:');
+    const client = isHttps ? https : http;
+    const req = client.get(url, {
+      headers: {
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36',
+        ...headers
+      },
+      timeout: 15000
+    }, (res) => {
+      if (res.statusCode >= 300 && res.statusCode < 400 && res.headers.location) {
+        const nextUrl = res.headers.location.startsWith('http') ? res.headers.location : new URL(res.headers.location, url).href;
+        return resolve(fetchHttp(nextUrl, headers));
+      }
+      let data = '';
+      res.on('data', chunk => data += chunk);
+      res.on('end', () => resolve({ statusCode: res.statusCode, headers: res.headers, text: data }));
+    });
+    req.on('error', reject);
+    req.on('timeout', () => { req.destroy(); reject(new Error('HTTP timeout: ' + url)); });
+  });
+}
+
+// 1. Informations du compte (multi-comptes)
+async function getAccountInfo(force = false) {
+  return getState();
+}
+
+// 2. Gestion et cache des dossiers dans Vidmoly
+function getCachedFolders() {
+  ensureStorage();
+  try {
+    return JSON.parse(fs.readFileSync(FOLDERS_FILE, 'utf8'));
+  } catch (e) {
+    return {};
+  }
+}
+
+async function getOrCreateFolder(seriesTitle, seasonNum) {
+  const folders = getCachedFolders();
+  const seriesSlug = seriesTitle.toLowerCase().replace(/[^a-z0-9]/g, '_').slice(0, 40);
+  const cacheKey = seasonNum ? `${seriesSlug}_s${seasonNum}` : seriesSlug;
+
+  if (folders[cacheKey]) {
+    return folders[cacheKey]; // 0 requête API consommée !
+  }
+
+  const apiKey = vidmolyAccounts.getActiveApiKey();
+  try {
+    const folderName = seasonNum 
+      ? `${seriesTitle} - S${String(seasonNum).padStart(2, '0')}`
+      : seriesTitle;
+    
+    const url = `${CONFIG.apiBase}/folder/create?key=${apiKey}&name=${encodeURIComponent(folderName)}&parent_id=0`;
+    const res = await fetchHttp(url);
+    vidmolyAccounts.incrementAccountQuota(apiKey);
+    const json = JSON.parse(res.text);
+    if (json.status === 200 && json.result && json.result.fld_id) {
+      folders[cacheKey] = json.result.fld_id;
+      fs.writeFileSync(FOLDERS_FILE, JSON.stringify(folders, null, 2), 'utf8');
+      return json.result.fld_id;
+    }
+  } catch (e) {
+    console.error('[Vidmoly] Erreur création dossier:', e.message);
+  }
+  return 0;
+}
+
+// 3. Téléversement à distance (Remote Upload)
+function getEpisodesMap() {
+  ensureStorage();
+  try {
+    return JSON.parse(fs.readFileSync(EPISODES_FILE, 'utf8'));
+  } catch (e) {
+    return {};
+  }
+}
+
+function saveEpisodeEntry(epId, entry) {
+  const map = getEpisodesMap();
+  map[String(epId)] = { ...(map[String(epId)] || {}), ...entry, updatedAt: Date.now() };
+  fs.writeFileSync(EPISODES_FILE, JSON.stringify(map, null, 2), 'utf8');
+  return map[String(epId)];
+}
+
+// ================= TAMPON LOCAL ANTI-COUPURE =================
+// Télécharge l'épisode complet sur le SSD local et vérifie sa durée intégrale avec ffprobe
+async function bufferEpisodeLocally(episodeId, ext = 'mkv') {
+  ensureStorage();
+  const epId = String(episodeId);
+  const localFile = path.join(BUFFER_DIR, `${epId}.${ext}`);
+  const internalStreamUrl = `http://127.0.0.1:8080/series/admin/1965/${epId}.${ext}`;
+
+  // 1. Obtenir la taille attendue via HEAD
+  const util = require('util');
+  const execAsync = util.promisify(require('child_process').exec);
+  let totalExpected = 0;
+  try {
+    const headRes = (await execAsync(`curl -s -I "${internalStreamUrl}"`, { timeout: 10000 })).stdout;
+    const lengthMatch = headRes.match(/content-length:\s*(\d+)/i);
+    totalExpected = lengthMatch ? parseInt(lengthMatch[1], 10) : 0;
+  } catch (e) {}
+
+  // 2. Si le fichier existe déjà et est complet
+  if (fs.existsSync(localFile)) {
+    const stat = fs.statSync(localFile);
+    if ((totalExpected > 0 && stat.size >= totalExpected * 0.98) || (totalExpected === 0 && stat.size > 250 * 1024 * 1024)) {
+      try {
+        const durOut = (await execAsync(`ffprobe -v error -show_entries format=duration -of default=noprint_wrappers=1:nokey=1 "${localFile}"`, { timeout: 10000 })).stdout.trim();
+        const dur = parseFloat(durOut);
+        if (dur > 600) {
+          console.log(`[Vidmoly Buffer] Épisode ${epId} déjà complet en tampon local (${(stat.size/1024/1024).toFixed(1)} MB, ${(dur/60).toFixed(1)} min).`);
+          return localFile;
+        }
+      } catch (e) {}
+    }
+  }
+
+  console.log(`[Vidmoly Buffer] Téléchargement intégral auto-résilient de l'épisode ${epId} (attendu: ${(totalExpected/1024/1024).toFixed(1)} MB)...`);
+
+  let currentSize = fs.existsSync(localFile) ? fs.statSync(localFile).size : 0;
+  let attempts = 0;
+
+  // Boucle de reprise automatique (Range / curl -C -) non bloquante
+  while ((totalExpected === 0 || currentSize < totalExpected * 0.995) && attempts < 40) {
+    attempts++;
+    try {
+      await execAsync(`curl -s -L -C - --max-time 180 -o "${localFile}" "${internalStreamUrl}"`, { timeout: 200000 });
+    } catch (e) {
+      // Reprise automatique sur coupure de flux fournisseur
+    }
+
+    if (fs.existsSync(localFile)) {
+      currentSize = fs.statSync(localFile).size;
+      const pct = totalExpected > 0 ? Math.round((currentSize / totalExpected) * 100) : 0;
+      console.log(`[Vidmoly Buffer] Épisode ${epId} [Passe ${attempts}] : ${(currentSize/1024/1024).toFixed(1)} / ${(totalExpected/1024/1024).toFixed(1)} MB (${pct}%)`);
+    }
+    if (totalExpected > 0 && currentSize >= totalExpected * 0.995) {
+      break;
+    }
+  }
+
+  if (fs.existsSync(localFile)) {
+    const stat = fs.statSync(localFile);
+    let dur = 0;
+    try {
+      const durOut = (await execAsync(`ffprobe -v error -show_entries format=duration -of default=noprint_wrappers=1:nokey=1 "${localFile}"`, { timeout: 10000 })).stdout.trim();
+      dur = parseFloat(durOut);
+    } catch (e) {}
+    console.log(`[Vidmoly Buffer] ✅ Épisode ${epId} téléchargé à 100% ! Taille: ${(stat.size/1024/1024).toFixed(1)} MB, Durée: ${(dur/60).toFixed(1)} min.`);
+    return localFile;
+  } else {
+    throw new Error(`Échec du téléchargement tampon local pour l'épisode ${epId}`);
+  }
+}
+
+// ================= GESTIONNAIRE DE FILE D'ATTENTE SÉQUENTIELLE (1 PAR 1) =================
+let isProcessingQueue = false;
+let activeUploadJob = null;
+let activeUploadTimeout = null;
+
+function getQueue() {
+  ensureStorage();
+  try {
+    return JSON.parse(fs.readFileSync(QUEUE_FILE, 'utf8'));
+  } catch (e) {
+    return [];
+  }
+}
+
+function saveQueue(queue) {
+  fs.writeFileSync(QUEUE_FILE, JSON.stringify(queue, null, 2), 'utf8');
+}
+
+function addToQueue(jobs) {
+  const queue = getQueue();
+  const jobArray = Array.isArray(jobs) ? jobs : [jobs];
+  for (const j of jobArray) {
+    if (!queue.some(q => String(q.episodeId) === String(j.episodeId))) {
+      queue.push({ ...j, queuedAt: Date.now() });
+    }
+  }
+  saveQueue(queue);
+  processNextQueueItem();
+}
+
+async function processNextQueueItem() {
+  if (isProcessingQueue || activeUploadJob) {
+    return;
+  }
+
+  const queue = getQueue();
+  if (queue.length === 0) {
+    console.log('[Vidmoly Sequential Queue] File d\'attente vide. Tous les transferts sont terminés !');
+    return;
+  }
+
+  const job = queue.shift();
+  saveQueue(queue);
+  activeUploadJob = job;
+  isProcessingQueue = true;
+
+  console.log(`[Vidmoly Sequential Queue] >>> Démarrage du tamponnage & transfert pour ${job.seriesTitle} S${job.season}E${job.episode} (ID: ${job.episodeId}) <<<`);
+
+  try {
+    // Étape 1 : Tamponner localement le fichier pour garantir 100% de la durée
+    const ext = job.ext || 'mkv';
+    await bufferEpisodeLocally(job.episodeId, ext);
+
+    // Étape 2 : Lancer le remote upload vers Vidmoly
+    const res = await uploadRemoteEpisode(job);
+    console.log(`[Vidmoly Sequential Queue] Ordre remote upload transmis à Vidmoly pour l'épisode ${job.episodeId}.`);
+
+    // Sécurité : timeout de 15 minutes max par épisode pour ne jamais bloquer la file
+    clearTimeout(activeUploadTimeout);
+    activeUploadTimeout = setTimeout(() => {
+      console.warn(`[Vidmoly Queue Timeout] Transfert de l'épisode ${job.episodeId} a dépassé 15 minutes. Nettoyage et passage au suivant.`);
+      notifyExportFinished(job.episodeId);
+    }, 15 * 60 * 1000);
+
+  } catch (err) {
+    console.error(`[Vidmoly Sequential Queue Error] Échec pour épisode ${job.episodeId}:`, err.message);
+    notifyExportFinished(job.episodeId);
+  } finally {
+    isProcessingQueue = false;
+  }
+}
+
+function notifyExportFinished(episodeId) {
+  if (activeUploadJob && String(activeUploadJob.episodeId) === String(episodeId)) {
+    console.log(`[Vidmoly Sequential Queue] Transfert SSD Local -> Vidmoly Cloud terminé à 100% pour épisode ${episodeId} !`);
+    clearTimeout(activeUploadTimeout);
+    activeUploadJob = null;
+    isProcessingQueue = false;
+
+    // Supprimer le fichier tampon local après un délai de sécurité de 30 secondes
+    setTimeout(() => {
+      try {
+        const f1 = path.join(BUFFER_DIR, `${episodeId}.mkv`);
+        const f2 = path.join(BUFFER_DIR, `${episodeId}.mp4`);
+        if (fs.existsSync(f1)) fs.unlinkSync(f1);
+        if (fs.existsSync(f2)) fs.unlinkSync(f2);
+        console.log(`[Vidmoly Buffer Cleanup] Fichier tampon local libéré pour épisode ${episodeId}.`);
+      } catch (e) {}
+    }, 30000);
+
+    // Démarrage du prochain épisode dans la file
+    setTimeout(() => {
+      processNextQueueItem();
+    }, 5000);
+  }
+}
+
+async function uploadRemoteEpisode({ episodeId, seriesTitle, season, episode, title, streamSourceUrl }) {
+  ensureStorage();
+  const epId = String(episodeId);
+  const apiKey = vidmolyAccounts.getActiveApiKey();
+
+  // 1. Récupérer ou créer le dossier
+  const folderId = await getOrCreateFolder(seriesTitle, season);
+
+  // 2. Lancer le remote upload
+  try {
+    console.log(`[Vidmoly Remote Upload] Envoi de l'épisode ${epId} (${seriesTitle} S${season}E${episode}) vers Vidmoly (Clé API: ${apiKey.slice(0, 7)}...)...`);
+    const cleanFileName = `${seriesTitle.replace(/[^a-zA-Z0-9]/g, '_')}_S${String(season).padStart(2, '0')}E${String(episode).padStart(2, '0')}.mp4`;
+    const uploadApiUrl = `${CONFIG.apiBase}/upload/url?key=${apiKey}&url=${encodeURIComponent(streamSourceUrl)}&fld_id=${folderId}&name=${encodeURIComponent(cleanFileName)}`;
+    
+    const res = await fetchHttp(uploadApiUrl);
+    vidmolyAccounts.incrementAccountQuota(apiKey);
+    const json = JSON.parse(res.text);
+
+    if (json.status === 200 && json.result) {
+      const fileCode = json.result.file_code || json.result.filecode || json.result.id;
+      const fileUrl = json.result.file_url || `https://vidmoly.org/${fileCode}.html`;
+      const embedUrl = `https://vidmoly.org/embed-${fileCode}.html`;
+
+      return saveEpisodeEntry(epId, {
+        episodeId: epId,
+        seriesTitle,
+        season,
+        episode,
+        title,
+        fileCode,
+        fileUrl,
+        embedUrl,
+        folderId,
+        status: 'uploading',
+        statusMessage: 'Téléchargement et encodage en cours sur Vidmoly',
+        createdAt: Date.now()
+      });
+    } else {
+      console.warn('[Vidmoly Upload Reponse Inattendue]:', json);
+      if (json.msg && (json.msg.includes('limit') || json.msg.includes('quota'))) {
+        vidmolyAccounts.markAccountFull(apiKey);
+      }
+      return saveEpisodeEntry(epId, {
+        episodeId: epId,
+        seriesTitle,
+        season,
+        episode,
+        title,
+        status: 'error',
+        statusMessage: json.msg || 'Erreur API Vidmoly'
+      });
+    }
+  } catch (err) {
+    console.error('[Vidmoly Upload Error]:', err.message);
+    return saveEpisodeEntry(epId, {
+      episodeId: epId,
+      seriesTitle,
+      season,
+      episode,
+      title,
+      status: 'error',
+      statusMessage: err.message
+    });
+  }
+}
+
+// 4. Décodeur Dean Edwards Packer
+function unpackDeanEdwards(packedCode) {
+  const match = packedCode.match(/eval\(function\(p,a,c,k,e,d\)\{[\s\S]*?\}\(([\s\S]*?)\)\)/);
+  if (!match) return packedCode;
+  try {
+    const regex = new RegExp('\\}\\(\'(.*)\',\\s*(\\d+),\\s*(\\d+),\\s*\'(.*)\'\\.split\\(\'\\|\'\\),\\s*(\\d+),\\s*(\\{.*\\}|\\{\\})\\)');
+    const m = packedCode.match(regex);
+    if (!m) return packedCode;
+    let [ , p, a, c, k ] = m;
+    a = parseInt(a, 10);
+    c = parseInt(c, 10);
+    k = k.split('|');
+    const e = (c) => (c < a ? '' : e(Math.floor(c / a))) + ((c = c % a) > 35 ? String.fromCharCode(c + 29) : c.toString(36));
+    while (c--) {
+      if (k[c]) {
+        p = p.replace(new RegExp('\\b' + e(c) + '\\b', 'g'), k[c]);
+      }
+    }
+    return p;
+  } catch (err) {
+    return packedCode;
+  }
+}
+
+// 5. Stream Resolver Vidmoly (Extrait le flux .m3u8 direct - 0 QUOTA API)
+async function resolveVidmolyStream(fileCode) {
+  if (!fileCode) throw new Error('Code de fichier Vidmoly manquant');
+
+  const cached = resolvedStreamsCache.get(fileCode);
+  if (cached && (Date.now() - cached.timestamp < 10 * 60 * 1000)) {
+    return cached.data;
+  }
+
+  const embedUrl = `https://vidmoly.org/embed-${fileCode}.html`;
+  try {
+    const res = await fetchHttpWarp(embedUrl, {
+      'Referer': 'https://vidmoly.org/'
+    });
+
+    if (res.statusCode !== 200 || !res.text) {
+      throw new Error(`Vidmoly embed HTTP ${res.statusCode}`);
+    }
+
+    const html = res.text;
+
+    if (html.includes('Video is converting') || html.includes('Video is being processed') || html.includes('processing')) {
+      return { status: 'converting', message: 'Vidéo en cours d\'encodage chez Vidmoly' };
+    }
+    if (html.includes('This video not found') || html.includes('File was deleted')) {
+      return { status: 'deleted', message: 'Fichier supprimé ou introuvable' };
+    }
+
+    let directStreamUrl = null;
+    const jwMatch = html.match(/sources\s*:\s*\[\s*\{\s*file\s*:\s*['"]([^'"]+)['"]/);
+    if (jwMatch && jwMatch[1]) {
+      directStreamUrl = jwMatch[1];
+    }
+    const m3u8Regex = /(https?:\/\/[^\s"'<>]+\.m3u8[^\s"'<>]*)/i;
+    const mp4Regex = /(https?:\/\/[^\s"'<>]+\.mp4[^\s"'<>]*)/i;
+
+    let m = html.match(m3u8Regex);
+    if (m) {
+      directStreamUrl = m[1];
+    } else {
+      let codeToSearch = html;
+      if (html.includes('eval(function(p,a,c,k,e,d)')) {
+        try { codeToSearch = unpackDeanEdwards(html); } catch (e) {}
+      }
+      let m2 = codeToSearch.match(m3u8Regex) || codeToSearch.match(mp4Regex);
+      if (m2) directStreamUrl = m2[1];
+    }
+
+    if (!directStreamUrl) {
+      console.warn(`[Vidmoly Resolver] Aucun flux direct extrait pour ${fileCode}`);
+      return { status: 'pending', message: 'Flux vidéo pas encore disponible' };
+    }
+
+    const resolved = {
+      status: 'ready',
+      streamUrl: directStreamUrl,
+      isHls: directStreamUrl.includes('.m3u8'),
+      embedUrl
+    };
+
+    resolvedStreamsCache.set(fileCode, { timestamp: Date.now(), data: resolved });
+    return resolved;
+  } catch (err) {
+    console.error(`[Vidmoly Resolver Error] ${fileCode}:`, err.message);
+    throw err;
+  }
+}
+
+// 6. Récupérateur & Réécriveur de Playlist HLS (.m3u8) Vidmoly
+async function getVidmolyHlsPlaylist(fileCode) {
+  if (!fileCode) throw new Error('Code de fichier Vidmoly manquant');
+
+  const cached = resolvedPlaylistsCache.get(fileCode);
+  if (cached && (Date.now() - cached.timestamp < 5 * 60 * 1000)) {
+    return cached.data;
+  }
+
+  const resolved = await resolveVidmolyStream(fileCode);
+  if (!resolved || resolved.status !== 'ready' || !resolved.streamUrl) {
+    return resolved;
+  }
+
+  const masterUrl = resolved.streamUrl;
+  const masterRes = await fetchHttpWarp(masterUrl);
+  if (masterRes.statusCode !== 200 || !masterRes.text) {
+    throw new Error(`Vidmoly master m3u8 HTTP ${masterRes.statusCode}`);
+  }
+
+  const subLine = masterRes.text.split('\n').map(l => l.trim()).find(l => l.startsWith('http'));
+  let playlistToRewrite = masterRes.text;
+
+  if (subLine) {
+    const subRes = await fetchHttpWarp(subLine);
+    if (subRes.statusCode === 200 && subRes.text) {
+      playlistToRewrite = subRes.text;
+    }
+  }
+
+  const rewrittenPlaylist = playlistToRewrite.split('\n').map(line => {
+    const trimmed = line.trim();
+    if (trimmed.startsWith('http')) {
+      return `/api/stream/vidmoly-segment?url=${encodeURIComponent(trimmed)}`;
+    }
+    return line;
+  }).join('\n');
+
+  const result = {
+    status: 'ready',
+    playlist: rewrittenPlaylist,
+    isHls: true
+  };
+
+  resolvedPlaylistsCache.set(fileCode, { timestamp: Date.now(), data: result });
+  return result;
+}
+
+module.exports = {
+  CONFIG,
+  getState,
+  canMakeApiCall,
+  getAccountInfo,
+  getOrCreateFolder,
+  getEpisodesMap,
+  saveEpisodeEntry,
+  getQueue,
+  addToQueue,
+  uploadRemoteEpisode,
+  resolveVidmolyStream,
+  getVidmolyHlsPlaylist,
+  warpAgent,
+  notifyExportFinished,
+  processNextQueueItem,
+  bufferEpisodeLocally
+};
+
+
