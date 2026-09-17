@@ -5404,7 +5404,7 @@
     "role": "user",
     "banned": false,
     "created_at": "2026-09-17T15:10:16.627Z",
-    "last_login": "2026-09-17T15:54:36.118Z"
+    "last_login": "2026-09-17T17:41:39.834Z"
   },
   {
     "id": "u_1789658760646_2912a820",
@@ -5438,5 +5438,27 @@
     "banned": false,
     "created_at": "2026-09-17T16:20:32.633Z",
     "last_login": "2026-09-17T16:20:32.633Z"
+  },
+  {
+    "id": "u_1789667920285_4411d5a5",
+    "username": "popi",
+    "password_hash": "8ea96915c56843ce19815c3420bce94e411167576e716fed4a00a569f52fe1874f50fcf541c934e1ab9cee97abe67c5a4e19e4a12f8ab32002abebb243ae944f",
+    "salt": "1e0c5963eb0620f650c198f2f83c78ad",
+    "avatar": "assets/avatars/avatar-1.svg",
+    "role": "user",
+    "banned": false,
+    "created_at": "2026-09-17T17:58:40.285Z",
+    "last_login": "2026-09-17T17:58:40.285Z"
+  },
+  {
+    "id": "u_1789668025908_0210752b",
+    "username": "pololo",
+    "password_hash": "57a41ee8a5e4e5f8bf70e3ba331e9d1e2cd0d958ed2bb2ce71763e77121e7147988c2cb406c12c113fbbe89101e6a375abb01b4061616e529b363df430238f75",
+    "salt": "b03b25d97fff033a41a7244f50f34de2",
+    "avatar": "assets/avatars/avatar-1.svg",
+    "role": "user",
+    "banned": false,
+    "created_at": "2026-09-17T18:00:25.909Z",
+    "last_login": "2026-09-17T18:00:25.909Z"
   }
 ]
