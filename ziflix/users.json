@@ -8,7 +8,7 @@
     "role": "admin",
     "banned": false,
     "created_at": "2026-09-12T00:18:32.081Z",
-    "last_login": "2026-09-17T11:05:22.192Z",
+    "last_login": "2026-09-17T14:58:41.558Z",
     "is_premium": true
   },
   {
@@ -3070,7 +3070,7 @@
     "role": "user",
     "banned": false,
     "created_at": "2026-09-15T07:43:06.976Z",
-    "last_login": "2026-09-16T12:36:03.928Z"
+    "last_login": "2026-09-17T14:48:30.276Z"
   },
   {
     "id": "u_1789458201541_f764c32b",
@@ -3224,7 +3224,7 @@
     "role": "user",
     "banned": false,
     "created_at": "2026-09-15T11:49:46.099Z",
-    "last_login": "2026-09-15T11:49:46.099Z"
+    "last_login": "2026-09-17T14:37:27.583Z"
   },
   {
     "id": "u_1789473983090_1572b072",
@@ -4467,7 +4467,7 @@
     "role": "user",
     "banned": false,
     "created_at": "2026-09-15T20:54:15.862Z",
-    "last_login": "2026-09-15T21:54:58.962Z"
+    "last_login": "2026-09-17T14:58:36.055Z"
   },
   {
     "id": "u_1789505716568_8ca0082a",
@@ -5369,7 +5369,7 @@
     "salt": "b1316a8ae7a0b1dbe5d350934b28bd67",
     "avatar": "assets/avatars/avatar-1.svg",
     "role": "user",
-    "banned": false,
+    "banned": true,
     "created_at": "2026-09-17T13:31:30.714Z",
     "last_login": "2026-09-17T13:59:07.971Z"
   }
