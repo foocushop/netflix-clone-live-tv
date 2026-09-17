@@ -16,7 +16,7 @@
     "name": "Les Apprentis Aventuriers",
     "emoji": "**👹**",
     "template": "<b>{titre}</b> {emoji} Saison {saison}\n\nÉpisode {episode}",
-    "channel_id": "-1004408112113",
+    "channel_id": "-1003839408616",
     "enabled": true
   }
 ]

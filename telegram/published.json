@@ -161,7 +161,29 @@
       "episode_num": 1,
       "title": "Épisode 1",
       "published_at": "2026-09-15T19:39:12.993Z",
-      "telegram_msg_id": "pre-existing"
+      "telegram_msg_id": 4,
+      "hd_published": true,
+      "telegram_msg_id_hd": 4,
+      "published_at_hd": "2026-09-17T22:20:08.578Z",
+      "file_ref_hd": {
+        "id": "5866004558362189641",
+        "access_hash": "5756686681964173938",
+        "file_reference": "BgAAAADk2LnoAAAABGqsZ5haze425htnozj8S8ZBGm/S",
+        "mime_type": "video/mp4",
+        "size": 1865335922,
+        "dc_id": 4
+      },
+      "sd_published": true,
+      "telegram_msg_id_sd": 5,
+      "published_at_sd": "2026-09-17T23:08:24.508Z",
+      "file_ref_sd": {
+        "id": "5866004558362189650",
+        "access_hash": "-4649026641343128861",
+        "file_reference": "BgAAAADk2LnoAAAABWqscujgHYmFZAL4cNRj5u1FdoxX",
+        "mime_type": "video/mp4",
+        "size": 531147595,
+        "dc_id": 4
+      }
     },
     {
       "id": "manual_skip_9066_2",
