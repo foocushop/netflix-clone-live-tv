@@ -535,6 +535,18 @@ try {
   console.warn('[Xtream] Impossible de charger xtream_telerealite_catalog.json:', e.message);
 }
 
+// Catalogue complet des séries Animés & Animation Xtream (Catégories 881 & 854)
+let XTREAM_ANIME_CATALOG = [];
+try {
+  const animePath = path.join(__dirname, 'data', 'xtream_anime_catalog.json');
+  if (fs.existsSync(animePath)) {
+    XTREAM_ANIME_CATALOG = JSON.parse(fs.readFileSync(animePath, 'utf8'));
+    console.log(`[Xtream] ${XTREAM_ANIME_CATALOG.length} séries Animés chargées depuis xtream_anime_catalog.json`);
+  }
+} catch (e) {
+  console.warn('[Xtream] Impossible de charger xtream_anime_catalog.json:', e.message);
+}
+
 
 
 // ================= SYSTÈME DE TÉLÉMÉTRIE EN DIRECT DES SESSIONS XTREAM =================
@@ -571,7 +583,7 @@ function resolveStreamMediaInfo(streamId, type = 'channel', customName = '') {
     }
   } else if (type === 'series') {
     if (streamId) {
-      const show = XTREAM_TELEREALITE_CATALOG.find(s => String(s.series_id) === String(streamId));
+      const show = XTREAM_TELEREALITE_CATALOG.find(s => String(s.series_id) === String(streamId)) || (Array.isArray(XTREAM_ANIME_CATALOG) ? XTREAM_ANIME_CATALOG.find(s => String(s.series_id) === String(streamId)) : null);
       if (show) {
         return {
           id: String(show.series_id),
@@ -784,7 +796,7 @@ const xtreamSeriesHttpsAgent = new https.Agent({
 // Agent SOCKS5 Haute Disponibilité via XtreamProxyManager (Cloudflare WARP + Auto-Rotation + Watchdog)
 const { xtreamProxyManager } = require('./lib/xtream-proxy-manager');
 // Démarrage du Watchdog d'auto-guérison (vérifie la santé toutes les 60s et déclenche la rotation si FoxBleu bloque)
-xtreamProxyManager.startWatchdog(60);
+xtreamProxyManager.startWatchdog(90);
 
 const USE_SOCKS_PROXY = true;
 
@@ -816,52 +828,55 @@ const xtreamManifestCache = new Map();
 // Cache d'adresses Edge directes pour les épisodes séries Xtream VOD (TTL 10 min pour éviter les re-redirections après pause)
 const xtreamSeriesEdgeCache = new Map();
 const vidmoly = require('./lib/vidmoly');
+const vidmolyKeepAlive = require('./lib/vidmoly-keepalive');
 const crypto = require('crypto');
 const VIDMOLY_EXPORT_SECRET = 'vmol_' + crypto.createHash('sha256').update((vidmoly.CONFIG.apiKey || '632459kennwde6h7ungb6n') + '_export').digest('hex').slice(0, 16);
 // Sessions actives de remuxage HLS pour séries Xtream (Apple Safari & Web HLS)
 const xtreamHlsSessions = new Map();
 
 function fetchXtreamJson(targetUrl, timeoutMs = 12000, retry = 0) {
-  return new Promise((resolve, reject) => {
-    const isFoxBleu = isFoxBleuHost(targetUrl);
-    const agent = getXtreamAgent(targetUrl, false, isFoxBleu && USE_SOCKS_PROXY);
-    const req = http.get(targetUrl, {
-      agent,
-      headers: { 'User-Agent': 'IPTVSmartersPro/1.0', 'Accept': 'application/json, */*' },
-      timeout: timeoutMs
-    }, (res) => {
-      if (res.statusCode !== 200) {
-        if (isFoxBleu) xtreamProxyManager.reportFailure(`HTTP ${res.statusCode}`);
-        if (retry < 2 && isFoxBleu && (res.statusCode === 502 || res.statusCode === 503 || res.statusCode === 403)) {
+  return xtreamProxyManager.deduplicate('json_' + targetUrl, () => {
+    return new Promise((resolve, reject) => {
+      const isFoxBleu = isFoxBleuHost(targetUrl);
+      const agent = getXtreamAgent(targetUrl, false, isFoxBleu && USE_SOCKS_PROXY);
+      const req = http.get(targetUrl, {
+        agent,
+        headers: { 'User-Agent': 'IPTVSmartersPro/1.0', 'Accept': 'application/json, */*' },
+        timeout: timeoutMs
+      }, (res) => {
+        if (res.statusCode !== 200) {
+          if (isFoxBleu) xtreamProxyManager.reportFailure(`HTTP ${res.statusCode}`);
+          if (retry < 2 && isFoxBleu && (res.statusCode === 502 || res.statusCode === 503 || res.statusCode === 403)) {
+            return setTimeout(() => resolve(fetchXtreamJson(targetUrl, timeoutMs, retry + 1)), 500 * (retry + 1));
+          }
+          return reject(new Error(`HTTP ${res.statusCode}`));
+        }
+        let body = '';
+        res.on('data', chunk => body += chunk);
+        res.on('end', () => {
+          try {
+            if (isFoxBleu) xtreamProxyManager.reportSuccess();
+            resolve(JSON.parse(body));
+          } catch (e) {
+            reject(e);
+          }
+        });
+      });
+      req.on('error', (err) => {
+        if (isFoxBleu) xtreamProxyManager.reportFailure(err.message);
+        if (retry < 2 && isFoxBleu) {
           return setTimeout(() => resolve(fetchXtreamJson(targetUrl, timeoutMs, retry + 1)), 500 * (retry + 1));
         }
-        return reject(new Error(`HTTP ${res.statusCode}`));
-      }
-      let body = '';
-      res.on('data', chunk => body += chunk);
-      res.on('end', () => {
-        try {
-          if (isFoxBleu) xtreamProxyManager.reportSuccess();
-          resolve(JSON.parse(body));
-        } catch (e) {
-          reject(e);
-        }
+        reject(err);
       });
-    });
-    req.on('error', (err) => {
-      if (isFoxBleu) xtreamProxyManager.reportFailure(err.message);
-      if (retry < 2 && isFoxBleu) {
-        return setTimeout(() => resolve(fetchXtreamJson(targetUrl, timeoutMs, retry + 1)), 500 * (retry + 1));
-      }
-      reject(err);
-    });
-    req.on('timeout', () => {
-      req.destroy();
-      if (isFoxBleu) xtreamProxyManager.reportFailure('Timeout');
-      if (retry < 2 && isFoxBleu) {
-        return setTimeout(() => resolve(fetchXtreamJson(targetUrl, timeoutMs, retry + 1)), 500 * (retry + 1));
-      }
-      reject(new Error('Timeout fetchXtreamJson'));
+      req.on('timeout', () => {
+        req.destroy();
+        if (isFoxBleu) xtreamProxyManager.reportFailure('Timeout');
+        if (retry < 2 && isFoxBleu) {
+          return setTimeout(() => resolve(fetchXtreamJson(targetUrl, timeoutMs, retry + 1)), 500 * (retry + 1));
+        }
+        reject(new Error('Timeout fetchXtreamJson'));
+      });
     });
   });
 }
@@ -872,33 +887,38 @@ function resolveXtreamSeriesEdgeUrl(episodeId, ext = 'mkv') {
   if (cached && cached.expiresAt > Date.now()) {
     return Promise.resolve(cached.url);
   }
-  const originUrl = `http://${XTREAM_CONFIG.host}:${XTREAM_CONFIG.port}/series/${XTREAM_CONFIG.username}/${XTREAM_CONFIG.password}/${episodeId}.${ext}`;
-  return new Promise((resolve) => {
-    const agent = getXtreamAgent(originUrl, true, true);
-    const req = http.get(originUrl, {
-      agent,
-      headers: {
-        'User-Agent': 'IPTVSmartersPro/1.0',
-        'Range': 'bytes=0-100'
-      },
-      timeout: 10000
-    }, (res) => {
-      try { res.destroy(); } catch (e) {}
-      const loc = res.headers.location;
-      if (loc) {
-        const nextUrl = loc.startsWith('http') ? loc : new URL(loc, originUrl).href;
-        xtreamSeriesEdgeCache.set(cacheKey, { url: nextUrl, expiresAt: Date.now() + 60 * 60 * 1000 });
-        return resolve(nextUrl);
-      }
-      resolve(originUrl);
-    });
-    req.on('error', (err) => {
-      console.warn('[Resolve Series Edge Error]:', err.message);
-      resolve(originUrl);
-    });
-    req.on('timeout', () => {
-      req.destroy();
-      resolve(originUrl);
+  return xtreamProxyManager.deduplicate('edge_' + cacheKey, () => {
+    const originUrl = `http://${XTREAM_CONFIG.host}:${XTREAM_CONFIG.port}/series/${XTREAM_CONFIG.username}/${XTREAM_CONFIG.password}/${episodeId}.${ext}`;
+    return new Promise((resolve) => {
+      const agent = getXtreamAgent(originUrl, true, true);
+      const req = http.get(originUrl, {
+        agent,
+        headers: {
+          'User-Agent': 'IPTVSmartersPro/1.0',
+          'Range': 'bytes=0-100'
+        },
+        timeout: 10000
+      }, (res) => {
+        try { res.destroy(); } catch (e) {}
+        const loc = res.headers.location;
+        if (loc) {
+          const nextUrl = loc.startsWith('http') ? loc : new URL(loc, originUrl).href;
+          xtreamSeriesEdgeCache.set(cacheKey, { url: nextUrl, expiresAt: Date.now() + 60 * 60 * 1000 });
+          xtreamProxyManager.reportSuccess();
+          return resolve(nextUrl);
+        }
+        resolve(originUrl);
+      });
+      req.on('error', (err) => {
+        console.warn('[Resolve Series Edge Error]:', err.message);
+        xtreamProxyManager.reportFailure(err.message);
+        resolve(originUrl);
+      });
+      req.on('timeout', () => {
+        req.destroy();
+        xtreamProxyManager.reportFailure('Timeout');
+        resolve(originUrl);
+      });
     });
   });
 }
@@ -934,6 +954,26 @@ setInterval(() => {
       xtreamHlsSessions.delete(epId);
     }
   }
+
+  // Nettoyage automatique de TOUS les dossiers orphelins dans /tmp/ziflix_hls (> 5 min)
+  try {
+    const hlsBase = path.join('/tmp', 'ziflix_hls');
+    if (fs.existsSync(hlsBase)) {
+      const dirs = fs.readdirSync(hlsBase);
+      for (const d of dirs) {
+        if (!xtreamHlsSessions.has(d)) {
+          const dirPath = path.join(hlsBase, d);
+          try {
+            const st = fs.statSync(dirPath);
+            if (now - st.mtimeMs > 5 * 60 * 1000) {
+              fs.rmSync(dirPath, { recursive: true, force: true });
+              console.log(`[HLS Cleanup] Purge dossier HLS orphelin : ${d}`);
+            }
+          } catch (e) {}
+        }
+      }
+    }
+  } catch (e) {}
   if (imageProxyCache.size > MAX_IMAGE_CACHE_ITEMS) {
     const keys = Array.from(imageProxyCache.keys());
     for (let i = 0; i < 100; i++) imageProxyCache.delete(keys[i]);
@@ -1623,6 +1663,8 @@ async function extractChannelMultiProvider(channelId, serverNum) {
 
   const channel = catalog.movies.find(m => m.id === channelId || m.tmdb_id === channelId || String(m.daddy_id) === String(channelId));
   const title = channel ? channel.title : 'Chaîne Sport Direct';
+
+
   let daddyId = channel?.daddy_id || channel?.sources?.daddylive_id;
   if (!daddyId && channelId && channelId.startsWith('tv_')) {
     const raw = channelId.replace('tv_', '');
@@ -1630,6 +1672,41 @@ async function extractChannelMultiProvider(channelId, serverNum) {
   }
 
   const srvNum = Math.max(1, Math.min(8, parseInt(serverNum) || 1));
+
+  // Support direct des chaînes ayant un stream_id Xtream préconfiguré (ex: beIN SPORTS Arab)
+  if (channel && channel.sources && channel.sources.hd_stream_id && srvNum === 2) {
+    return {
+      success: true,
+      server: 2,
+      server_name: 'Serveur 2 (HD 720p Stable H.264)',
+      hoster: `💎 Direct Xtream HD • ${title}`,
+      quality: 'HD 720p Direct VIP',
+      title: `${title} • 🔴 EN DIRECT`,
+      stream_url: `/api/stream/xtream?stream_id=${channel.sources.hd_stream_id}`,
+      player_type: 'direct_hls',
+      is_embed: false,
+      is_live: true,
+      sources_count: 8,
+      lang: 'ar'
+    };
+  }
+
+  if (channel && channel.stream_id && srvNum === 1) {
+    return {
+      success: true,
+      server: 1,
+      server_name: 'Serveur 1 (💎 Direct Xtream VIP 1080p)',
+      hoster: `💎 Direct Xtream VIP • ${title}`,
+      quality: '1080p FHD Direct VIP',
+      title: `${title} • 🔴 EN DIRECT`,
+      stream_url: `/api/stream/xtream?stream_id=${channel.stream_id}`,
+      player_type: 'direct_hls',
+      is_embed: false,
+      is_live: true,
+      sources_count: 8,
+      lang: 'ar'
+    };
+  }
 
   const serverNames = {
     1: 'Serveur 1 (💎 Direct Xtream VIP 1080p)',
@@ -1658,11 +1735,13 @@ async function extractChannelMultiProvider(channelId, serverNum) {
   // ── PRIORITÉ ABSOLUE N°1 : SERVEUR 1 = DIRECT XTREAM VIP (H.264/AAC) ──
   if (srvNum === 1) {
     const rawChan = (channelId || '').toString().toLowerCase().trim();
-    const hasXtream = XTREAM_CHANNELS[rawChan] 
+    const resolvedStreamId = (daddyId && XTREAM_CHANNELS[String(daddyId)])
+      || (channel?.daddy_id && XTREAM_CHANNELS[String(channel.daddy_id)])
+      || XTREAM_CHANNELS[rawChan] 
       || XTREAM_CHANNELS[rawChan.replace(/^tv_/, '')] 
       || XTREAM_CHANNELS[rawChan.replace(/_/g, ' ')];
 
-    if (hasXtream) {
+    if (resolvedStreamId) {
       return {
         success: true,
         server: 1,
@@ -1670,7 +1749,7 @@ async function extractChannelMultiProvider(channelId, serverNum) {
         hoster: `${mirrorMap[1].hoster} • ${title}`,
         quality: '1080p FHD Direct VIP',
         title: `${title} • 🔴 EN DIRECT`,
-        stream_url: `/api/stream/xtream?channel=${liveChannelParam}`,
+        stream_url: `/api/stream/xtream?stream_id=${resolvedStreamId}`,
         player_type: 'direct_hls',
         is_embed: false,
         is_live: true,
@@ -2499,6 +2578,76 @@ function formatXtreamSeasonsList(rawData) {
   return seasonsList;
 }
 
+// ================= VIDMOLY AUTO-PUBLISH SYSTEM =================
+const AUTOPUBLISH_FILE = path.join(__dirname, 'data', 'vidmoly_autopublish.json');
+
+function getAutoPublishRules() {
+  try {
+    if (!fs.existsSync(AUTOPUBLISH_FILE)) return {};
+    return JSON.parse(fs.readFileSync(AUTOPUBLISH_FILE, 'utf8') || '{}');
+  } catch (e) {
+    return {};
+  }
+}
+
+function saveAutoPublishRules(rules) {
+  try {
+    fs.writeFileSync(AUTOPUBLISH_FILE, JSON.stringify(rules, null, 2), 'utf8');
+  } catch (e) {
+    console.error('[Vidmoly AutoPublish] Erreur sauvegarde:', e.message);
+  }
+}
+
+function checkAndAutoPublishEpisodes(seriesId, freshData) {
+  if (!freshData || !freshData.episodes) return;
+  const rules = getAutoPublishRules();
+  const seriesTitle = freshData.info?.name || freshData.info?.title || 'Série';
+  const vidMap = vidmoly.getEpisodesMap();
+  const currentQueue = vidmoly.getQueue ? vidmoly.getQueue() : [];
+  const queuedIds = new Set(currentQueue.map(q => String(q.episodeId)));
+  const host = 'ziablo.xyz';
+
+  let addedJobs = [];
+
+  for (const [seasonStr, eps] of Object.entries(freshData.episodes)) {
+    const seasonNum = parseInt(seasonStr, 10);
+    const ruleKey = `${seriesId}_${seasonNum}`;
+    const allRuleKey = `${seriesId}_all`;
+    const rule = rules[ruleKey] || rules[allRuleKey];
+
+    if (rule && rule.enabled) {
+      if (Array.isArray(eps)) {
+        for (const ep of eps) {
+          const epId = String(ep.id);
+          const vEntry = vidMap[epId];
+          const isReady = vEntry && vEntry.status === 'ready';
+          const isUploading = vEntry && vEntry.status === 'uploading';
+          const isQueued = queuedIds.has(epId);
+
+          if (!isReady && !isUploading && !isQueued) {
+            const job = {
+              episodeId: epId,
+              seriesTitle: seriesTitle,
+              season: seasonNum,
+              episode: ep.episode_num || 1,
+              title: ep.title || `Épisode ${ep.episode_num || 1}`,
+              streamSourceUrl: `https://${host}/api/stream/vidmoly-export/${VIDMOLY_EXPORT_SECRET}/${epId}.${ep.container_extension || ep.ext || 'mkv'}`
+            };
+            addedJobs.push(job);
+            queuedIds.add(epId);
+            console.log(`[Vidmoly Auto-Publish] 🚀 Nouvel épisode détecté pour auto-publication : ${seriesTitle} S${seasonNum}E${job.episode} (ID: ${epId})`);
+          }
+        }
+      }
+    }
+  }
+
+  if (addedJobs.length > 0) {
+    console.log(`[Vidmoly Auto-Publish] Ajout automatique de ${addedJobs.length} épisode(s) dans la file Vidmoly séquentielle.`);
+    vidmoly.addToQueue(addedJobs);
+  }
+}
+
 function updateCatalogSeriesSeasons(seriesId, rawXtreamData) {
   try {
     const sList = formatXtreamSeasonsList(rawXtreamData);
@@ -2530,30 +2679,40 @@ function updateCatalogSeriesSeasons(seriesId, rawXtreamData) {
 
 function fetchFreshSeriesFromXtream(seriesId, onDone) {
   const apiUrl = `http://${XTREAM_CONFIG.host}:${XTREAM_CONFIG.port}/player_api.php?username=${XTREAM_CONFIG.username}&password=${XTREAM_CONFIG.password}&action=get_series_info&series_id=${seriesId}`;
-  const apiAgent = getXtreamAgent(apiUrl);
-  http.get(apiUrl, { agent: apiAgent, timeout: 12000 }, (apiRes) => {
-    let data = '';
-    apiRes.on('data', chunk => data += chunk);
-    apiRes.on('end', () => {
-      try {
-        const parsed = JSON.parse(data);
-        if (parsed && (parsed.info || parsed.episodes)) {
-          const cacheDir = path.join(__dirname, 'data', 'cache');
-          if (!fs.existsSync(cacheDir)) fs.mkdirSync(cacheDir, { recursive: true });
-          const cacheFile = path.join(cacheDir, `series_${seriesId}.json`);
-          fs.writeFileSync(cacheFile, JSON.stringify(parsed, null, 2), 'utf8');
-          updateCatalogSeriesSeasons(seriesId, parsed);
-          console.log(`[Xtream Auto-Sync] Série ${seriesId} mise à jour avec les derniers épisodes.`);
-          if (onDone) onDone(null, parsed);
-        } else if (onDone) {
-          onDone(new Error('Données Xtream incomplètes'));
-        }
-      } catch (e) {
-        if (onDone) onDone(e);
-      }
+  return xtreamProxyManager.deduplicate('series_' + seriesId, () => {
+    return new Promise((resolve, reject) => {
+      const apiAgent = getXtreamAgent(apiUrl);
+      http.get(apiUrl, { agent: apiAgent, timeout: 12000 }, (apiRes) => {
+        let data = '';
+        apiRes.on('data', chunk => data += chunk);
+        apiRes.on('end', () => {
+          try {
+            const parsed = JSON.parse(data);
+            if (parsed && (parsed.info || parsed.episodes)) {
+              const cacheDir = path.join(__dirname, 'data', 'cache');
+              if (!fs.existsSync(cacheDir)) fs.mkdirSync(cacheDir, { recursive: true });
+              const cacheFile = path.join(cacheDir, `series_${seriesId}.json`);
+              fs.writeFileSync(cacheFile, JSON.stringify(parsed, null, 2), 'utf8');
+              updateCatalogSeriesSeasons(seriesId, parsed);
+              console.log(`[Xtream Auto-Sync] Série ${seriesId} mise à jour avec les derniers épisodes.`);
+              if (typeof checkAndAutoPublishEpisodes === "function") { try { checkAndAutoPublishEpisodes(seriesId, parsed); } catch(e) { console.warn("[AutoPublish Error]:", e.message); } }
+              resolve(parsed);
+              if (onDone) onDone(null, parsed);
+            } else {
+              const err = new Error('Données Xtream incomplètes');
+              reject(err);
+              if (onDone) onDone(err);
+            }
+          } catch (e) {
+            reject(e);
+            if (onDone) onDone(e);
+          }
+        });
+      }).on('error', (err) => {
+        reject(err);
+        if (onDone) onDone(err);
+      });
     });
-  }).on('error', (err) => {
-    if (onDone) onDone(err);
   });
 }
 
@@ -3041,6 +3200,27 @@ async function handlePlayerApi(req, res, q) {
   }
 
   // CAS 8 : Détails d'une Série (Saisons et Épisodes)
+  
+function enrichSeriesWithVidmoly(seriesData) {
+  if (!seriesData || !seriesData.episodes) return seriesData;
+  try {
+    const vidmolyMap = vidmoly ? vidmoly.getEpisodesMap() : {};
+    for (const sKey of Object.keys(seriesData.episodes)) {
+      const epList = seriesData.episodes[sKey];
+      if (Array.isArray(epList)) {
+        for (const ep of epList) {
+          const vEntry = vidmolyMap[String(ep.id)];
+          if (vEntry && vEntry.fileCode && vEntry.status === 'ready') {
+            ep.vidmoly_file_code = vEntry.fileCode;
+            ep.vidmoly_embed_url = `https://vidmoly.org/embed-${vEntry.fileCode}.html`;
+          }
+        }
+      }
+    }
+  } catch (e) {}
+  return seriesData;
+}
+
   if (action === 'get_series_info') {
     const seriesId = String(q.series_id || '');
     if (!seriesId) {
@@ -3054,9 +3234,7 @@ async function handlePlayerApi(req, res, q) {
         const stats = fs.statSync(cacheFile);
         // TTL de 3 minutes pour garantir des données fraîches
         if (Date.now() - stats.mtimeMs < 180000) {
-          const cachedJson = fs.readFileSync(cacheFile, 'utf8');
-          res.writeHead(200, { 'Content-Type': 'application/json; charset=utf-8', 'Access-Control-Allow-Origin': '*' });
-          return res.end(cachedJson);
+          try { const cObj = JSON.parse(fs.readFileSync(cacheFile, 'utf8')); res.writeHead(200, { 'Content-Type': 'application/json; charset=utf-8', 'Access-Control-Allow-Origin': '*' }); return res.end(JSON.stringify(enrichSeriesWithVidmoly(cObj))); } catch (e) { const cachedJson = fs.readFileSync(cacheFile, 'utf8'); res.writeHead(200, { 'Content-Type': 'application/json; charset=utf-8', 'Access-Control-Allow-Origin': '*' }); return res.end(cachedJson); }
         }
       } catch (e) {}
     }
@@ -3065,7 +3243,7 @@ async function handlePlayerApi(req, res, q) {
     fetchFreshSeriesFromXtream(seriesId, (err, fresh) => {
       if (!err && fresh) {
         res.writeHead(200, { 'Content-Type': 'application/json; charset=utf-8', 'Access-Control-Allow-Origin': '*' });
-        return res.end(JSON.stringify(fresh));
+        return res.end(JSON.stringify(enrichSeriesWithVidmoly(fresh)));
       }
       // Fallback sur cache existant si indisponible
       if (fs.existsSync(cacheFile)) {
@@ -3248,14 +3426,17 @@ const server = http.createServer(async (req, res) => {
       const pass = parts[2];
       const fileWithExt = parts[3];
 
+      // Les requêtes loopback (FFmpeg, HLS transcoder) sont autorisées sans auth Xtream
+      const remoteIp = req.socket?.remoteAddress || '';
+      const isLoopbackReq = remoteIp === '127.0.0.1' || remoteIp === '::1' || remoteIp === '::ffff:127.0.0.1';
       const xtreamUser = authenticateXtreamClient(user, pass);
-      if (!xtreamUser) {
+      if (!xtreamUser && !isLoopbackReq) {
         res.writeHead(403, { 'Content-Type': 'text/plain; charset=utf-8', 'Access-Control-Allow-Origin': '*' });
         return res.end('Accès refusé : Identifiants Xtream incorrects');
       }
 
       req.isXtreamAuthenticated = true;
-      req.xtreamUser = xtreamUser;
+      req.xtreamUser = xtreamUser || { username: 'system_transcoder', role: 'admin' };
 
       if (type === 'live') {
         const streamId = fileWithExt.replace(/\.(m3u8|ts)$/i, '');
@@ -3429,7 +3610,10 @@ const server = http.createServer(async (req, res) => {
     let movie = catalog.movies.find(m => m.id === id);
     if (!movie && id.startsWith('xtream_series_')) {
       const sId = parseInt(id.replace('xtream_series_', ''), 10);
-      const sShow = Array.isArray(XTREAM_TELEREALITE_CATALOG) ? XTREAM_TELEREALITE_CATALOG.find(s => s.series_id === sId) : null;
+      let sShow = Array.isArray(XTREAM_TELEREALITE_CATALOG) ? XTREAM_TELEREALITE_CATALOG.find(s => s.series_id === sId) : null;
+      if (!sShow && Array.isArray(XTREAM_ANIME_CATALOG)) {
+        sShow = XTREAM_ANIME_CATALOG.find(s => s.series_id === sId);
+      }
       if (sShow) {
         movie = {
           id: `xtream_series_${sId}`,
@@ -3441,7 +3625,7 @@ const server = http.createServer(async (req, res) => {
           media_type: 'series',
           is_xtream_series: true,
           release_year: sShow.year || 2025,
-          genres: ['Télé-Réalité'],
+          genres: (sShow && sShow.genre) ? sShow.genre.split(/[,/]/).map(g => g.trim()) : (Array.isArray(XTREAM_ANIME_CATALOG) && XTREAM_ANIME_CATALOG.some(a => a.series_id === sId) ? ['Animation', 'Manga / Animé'] : ['Télé-Réalité']),
           seasons: []
         };
       }
@@ -3555,7 +3739,7 @@ const server = http.createServer(async (req, res) => {
                 poster_url: raw.info?.cover || 'assets/hero/live-tv-banner.webp',
                 backdrop_url: (Array.isArray(raw.info?.backdrop_path) && raw.info.backdrop_path[0]) || raw.info?.cover || 'assets/hero/live-tv-banner.webp',
                 video_url: `/api/stream/xtream-series?series_id=${sId}`,
-                categories: ['Séries Tendances', 'Xtream VIP'],
+                categories: /anime|manga|animation/i.test((raw.info?.genre || '') + ' ' + name) ? ['Animation', 'Manga / Animé'] : ['Séries Tendances', 'Xtream VIP'],
                 release_year: parseInt(raw.info?.releaseDate || 2025, 10) || 2025,
                 match_score: 90,
                 age_rating: '16+',
@@ -3574,6 +3758,39 @@ const server = http.createServer(async (req, res) => {
         }
       }
     } catch (e) {}
+
+    // 2b. Recherche dans XTREAM_ANIME_CATALOG (1 298 Séries Animés & Manga)
+    if (Array.isArray(XTREAM_ANIME_CATALOG)) {
+      for (const show of XTREAM_ANIME_CATALOG) {
+        const showTitleLower = (show.name || '').toLowerCase();
+        if (seenTitles.has(showTitleLower)) continue;
+        const target = `${show.name || ''} ${show.raw_name || ''} ${show.plot || ''} ${show.genre || ''} ${show.cast || ''} ${show.year || ''}`.toLowerCase();
+        if (terms.every(t => target.includes(t))) {
+          results.push({
+            id: `xtream_series_${show.series_id}`,
+            title: show.name,
+            original_title: show.raw_name || show.name,
+            overview: show.plot || 'Série animé en streaming HD.',
+            media_type: 'series',
+            poster_url: show.cover || 'assets/hero/live-tv-banner.webp',
+            backdrop_url: show.backdrop || show.cover || 'assets/hero/live-tv-banner.webp',
+            video_url: `/api/stream/xtream-series?series_id=${show.series_id}`,
+            categories: ['Animation', 'Manga / Animé'],
+            release_year: show.year || 2025,
+            match_score: Math.round(parseFloat(show.rating || '8.5') * 10) || 85,
+            age_rating: '12+',
+            duration: 'Saisons intégrales',
+            cast: show.cast ? show.cast.split(', ') : ['Animation'],
+            director: show.director || 'Animation Studio',
+            quality_badges: ['1080p FHD', 'Son 5.1'],
+            is_hero: false,
+            is_xtream_series: true,
+            series_id: show.series_id
+          });
+          seenTitles.add(showTitleLower);
+        }
+      }
+    }
 
     // 3. Recherche dans XTREAM_FR_CATALOG (1 268 Chaînes Françaises Direct)
     if (results.length < 60) {
@@ -4714,6 +4931,14 @@ const server = http.createServer(async (req, res) => {
   }
 
   // ================= API ADMIN VIDMOLY CLOUD & EXPORT =================
+  if (pathname === '/api/admin/vidmoly/accounts' && req.method === 'GET') {
+    const accsLib = require('./lib/vidmoly-accounts');
+    const pool = accsLib.getAccounts();
+    const quota = accsLib.getTotalQuota();
+    res.writeHead(200, { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' });
+    return res.end(JSON.stringify({ success: true, quota, accounts: pool }));
+  }
+
   if (pathname === '/api/admin/vidmoly/status' && req.method === 'GET') {
     const state = vidmoly.getState();
     const episodesMap = vidmoly.getEpisodesMap();
@@ -4782,20 +5007,28 @@ const server = http.createServer(async (req, res) => {
         seriesTitle = raw.info?.name || raw.info?.title || '';
         const rawEps = (raw.episodes && (raw.episodes[seasonNum] || raw.episodes[String(seasonNum)])) || [];
         const vidMap = vidmoly.getEpisodesMap();
+        const queuedList = vidmoly.getQueue();
+        const queuedSet = new Set(queuedList.map(q => String(q.episodeId)));
+
         episodes = rawEps.map(e => {
           const epId = String(e.id);
           const vEntry = vidMap[epId];
+          let status = (vEntry && vEntry.status) ? vEntry.status : (queuedSet.has(epId) ? 'queued' : 'none');
+          let statusMessage = (vEntry && vEntry.statusMessage) ? vEntry.statusMessage : (queuedSet.has(epId) ? "En file d'attente" : '');
+
           return {
             id: epId,
             episode_num: e.episode_num || 1,
             title: e.title || `Épisode ${e.episode_num || 1}`,
             ext: e.container_extension || 'mkv',
-            vidmoly: vEntry ? {
-              status: vEntry.status,
-              fileCode: vEntry.fileCode,
-              embedUrl: vEntry.embedUrl,
-              statusMessage: vEntry.statusMessage
-            } : { status: 'none' }
+            vidmoly: {
+              status,
+              fileCode: vEntry?.fileCode,
+              embedUrl: vEntry?.fileCode ? `https://vidmoly.org/embed-${vEntry.fileCode}.html` : (vEntry?.embedUrl ? vEntry.embedUrl.replace(/vidmoly\.(me|biz|net|to)/g, 'vidmoly.org').replace(/embed-embed-/g, 'embed-') : null),
+              lastKeepAliveAt: vEntry?.lastKeepAliveAt || null,
+              statusMessage,
+              downloadProgress: vEntry?.downloadProgress || null
+            }
           };
         });
       } catch (e) {}
@@ -4810,7 +5043,7 @@ const server = http.createServer(async (req, res) => {
     req.on('end', async () => {
       try {
         const data = JSON.parse(body || '{}');
-        const { episodes } = data;
+        const { episodes, allowDuplicates } = data;
         if (!Array.isArray(episodes) || episodes.length === 0) {
           res.writeHead(400, { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' });
           return res.end(JSON.stringify({ success: false, error: 'Aucun épisode sélectionné' }));
@@ -4832,7 +5065,7 @@ const server = http.createServer(async (req, res) => {
           streamSourceUrl: `https://${host}/api/stream/vidmoly-export/${VIDMOLY_EXPORT_SECRET}/${ep.id}.${ep.ext || 'mkv'}`
         }));
 
-        vidmoly.addToQueue(jobs);
+        vidmoly.addToQueue(jobs, !!allowDuplicates);
 
         res.writeHead(200, { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' });
         return res.end(JSON.stringify({
@@ -4849,17 +5082,61 @@ const server = http.createServer(async (req, res) => {
     return;
   }
 
+  
+// [AutoPublish functions moved to module scope]
+
+    // ================= VIDMOLY KEEP-ALIVE SENTINEL (365 JOURS À VIE) =================
+  if (pathname === '/api/admin/vidmoly/keepalive/stats' && req.method === 'GET') {
+    const stats = (vidmolyKeepAlive && typeof vidmolyKeepAlive.getKeepAliveStats === 'function')
+      ? vidmolyKeepAlive.getKeepAliveStats()
+      : { totalVideos: 0, aliveCount: 0, needRefreshCount: 0, deadCount: 0, isRunning: false };
+    res.writeHead(200, { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' });
+    return res.end(JSON.stringify({ success: true, stats }));
+  }
+
+  if (pathname === '/api/admin/vidmoly/keepalive/trigger' && req.method === 'POST') {
+    let body = '';
+    req.on('data', chunk => body += chunk);
+    req.on('end', async () => {
+      try {
+        const payload = JSON.parse(body || '{}');
+        const forceAll = !!payload.forceAll;
+        if (vidmolyKeepAlive && typeof vidmolyKeepAlive.runKeepAliveBatch === 'function') {
+          const runRes = await vidmolyKeepAlive.runKeepAliveBatch(forceAll);
+          res.writeHead(200, { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' });
+          return res.end(JSON.stringify({ success: true, message: 'Cycle Sentinel déclenché', result: runRes }));
+        }
+        res.writeHead(500, { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' });
+        return res.end(JSON.stringify({ success: false, error: 'Module Keep-Alive indisponible' }));
+      } catch (err) {
+        res.writeHead(500, { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' });
+        return res.end(JSON.stringify({ success: false, error: err.message }));
+      }
+    });
+    return;
+  }
+
   if (pathname === '/api/admin/vidmoly/check-status' && req.method === 'POST') {
     const epMap = vidmoly.getEpisodesMap();
-    const pending = Object.values(epMap).filter(e => e.status === 'uploading' && e.fileCode);
+    const pending = Object.values(epMap).filter(e => (e.status === 'converting' || e.status === 'uploading' || e.status === 'sending') && e.fileCode);
     let updated = 0;
     (async () => {
       for (const p of pending) {
         try {
           const resStream = await vidmoly.resolveVidmolyStream(p.fileCode);
           if (resStream && resStream.status === 'ready') {
-            vidmoly.saveEpisodeEntry(p.episodeId, { status: 'ready', statusMessage: 'Disponible en HLS Cloud' });
+            vidmoly.saveEpisodeEntry(p.episodeId, {
+              status: 'ready',
+              statusMessage: "C'est fini",
+              embedUrl: resStream.embedUrl || p.embedUrl || `https://vidmoly.org/embed-${p.fileCode}.html`,
+              streamUrl: resStream.streamUrl
+            });
             updated++;
+          } else if (resStream && resStream.status === 'converting') {
+            vidmoly.saveEpisodeEntry(p.episodeId, {
+              status: 'converting',
+              statusMessage: "En cours d'encodage"
+            });
           }
         } catch (e) {}
       }
@@ -4868,6 +5145,63 @@ const server = http.createServer(async (req, res) => {
     })().catch(err => {
       res.writeHead(500, { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' });
       res.end(JSON.stringify({ success: false, error: err.message }));
+    });
+    return;
+  }
+
+  
+  // ================= ROUTES VIDMOLY AUTO-PUBLISH =================
+  if (pathname === '/api/admin/vidmoly/autopublish' && req.method === 'GET') {
+    const rules = getAutoPublishRules();
+    res.writeHead(200, { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' });
+    return res.end(JSON.stringify({ success: true, rules }));
+  }
+
+  if (pathname === '/api/admin/vidmoly/autopublish/toggle' && req.method === 'POST') {
+    let body = '';
+    req.on('data', chunk => body += chunk);
+    req.on('end', async () => {
+      try {
+        const payload = JSON.parse(body || '{}');
+        const { seriesId, seriesTitle, season, enabled } = payload;
+        if (!seriesId || !season) {
+          res.writeHead(400, { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' });
+          return res.end(JSON.stringify({ success: false, error: 'Paramètres manquants' }));
+        }
+
+        const ruleKey = `${seriesId}_${season}`;
+        const rules = getAutoPublishRules();
+        if (enabled) {
+          rules[ruleKey] = {
+            seriesId: String(seriesId),
+            seriesTitle: seriesTitle || 'Série',
+            season: String(season),
+            enabled: true,
+            updatedAt: Date.now()
+          };
+        } else {
+          if (rules[ruleKey]) {
+            rules[ruleKey].enabled = false;
+            rules[ruleKey].updatedAt = Date.now();
+          }
+        }
+        saveAutoPublishRules(rules);
+
+        // Si activé, déclencher une vérification immédiate des épisodes de cette série
+        if (enabled) {
+          fetchFreshSeriesFromXtream(seriesId, (err, fresh) => {
+            if (!err && fresh) {
+              checkAndAutoPublishEpisodes(seriesId, fresh);
+            }
+          });
+        }
+
+        res.writeHead(200, { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' });
+        return res.end(JSON.stringify({ success: true, rule: rules[ruleKey], rules }));
+      } catch (err) {
+        res.writeHead(500, { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' });
+        return res.end(JSON.stringify({ success: false, error: err.message }));
+      }
     });
     return;
   }
@@ -5059,6 +5393,33 @@ const server = http.createServer(async (req, res) => {
         return await extractChannelMultiProvider(id || tmdbId, serverNum);
       }
 
+      // ── Priorité absolue : Épisode Vidmoly (vidmoly_episodes.json lookup) ──
+      // Si l'ID correspond directement à un épisode dans vidmoly_episodes.json, servir le HLS Vidmoly
+      if (type === 'episode' || type === 'vidmoly') {
+        const vidmolyEpMap = vidmoly ? vidmoly.getEpisodesMap() : {};
+        const vidmolyEntry = vidmolyEpMap[String(id)] || vidmolyEpMap[String(tmdbId)];
+        if (vidmolyEntry && vidmolyEntry.fileCode && vidmolyEntry.status === 'ready') {
+          const fc = vidmolyEntry.fileCode;
+          const epTitle = vidmolyEntry.title || vidmolyEntry.seriesTitle || titleToSearch;
+          console.log(`[Extract API] Épisode Vidmoly trouvé: id=${id}, fileCode=${fc}`);
+          return {
+            success: true,
+            server: 1,
+            server_name: 'Serveur 1 (Vidmoly Cloud HD • Déporté)',
+            hoster: 'Vidmoly Cloud HD',
+            quality: '720p HD',
+            title: epTitle,
+            stream_url: `/api/stream/vidmoly/${fc}/playlist.m3u8`,
+            raw_stream_url: `/api/stream/vidmoly/${fc}/playlist.m3u8`,
+            player_type: 'direct_hls',
+            is_embed: false,
+            sources_count: 1,
+            lang: 'vf',
+            vidmoly_file_code: fc
+          };
+        }
+      }
+
       // ── Cas spécial : Séries Télé-Réalité Xtream (La Villa 68628 & séries Xtream Catégorie 947) ──
       const querySeriesId = parsedUrl.query.series_id;
       const isXtreamSeries = querySeriesId || id === '68628' || tmdbId === '68628' || (id && String(id).startsWith('xtream_series_')) || (tmdbId && String(tmdbId).startsWith('xtream_series_'));
@@ -5165,17 +5526,12 @@ const server = http.createServer(async (req, res) => {
             }
           }
 
-          const userAgent = (req.headers['user-agent'] || '').toLowerCase();
-          const isAppleClient = /iphone|ipad|ipod/.test(userAgent) || (userAgent.includes('macintosh') && !userAgent.includes('chrome')) || (userAgent.includes('safari') && !userAgent.includes('chrome') && !userAgent.includes('android'));
+          const epId = episodeObj.id || (streamUrlToUse.match(/episode_id=([^&]+)/)?.[1]);
           let finalStreamUrl = streamUrlToUse;
-          let finalPlayerType = 'direct_video';
+          let finalPlayerType = 'direct_hls';
 
-          if (isAppleClient || parsedUrl.query.format === 'hls') {
-            const epId = episodeObj.id || (streamUrlToUse.match(/episode_id=([^&]+)/)?.[1]);
-            if (epId) {
-              finalStreamUrl = `/api/stream/xtream-series-hls/${epId}/playlist.m3u8`;
-              finalPlayerType = 'direct_hls';
-            }
+          if (epId) {
+            finalStreamUrl = `/api/stream/xtream-series-hls/${epId}/playlist.m3u8`;
           }
 
           const vidmolyExtractMap = vidmoly ? vidmoly.getEpisodesMap() : {};
@@ -5191,7 +5547,7 @@ const server = http.createServer(async (req, res) => {
           return {
             success: true,
             server: serverNum,
-            server_name: vidmolyExtractCode ? `Serveur 1 (Vidmoly Cloud 720p HD • Déporté)` : (isAppleClient ? `Serveur ${serverNum} (Xtream 1080p FHD • Apple HLS Natif)` : `Serveur ${serverNum} (Xtream 1080p FHD Direct)`),
+            server_name: vidmolyExtractCode ? `Serveur 1 (Vidmoly Cloud 720p HD • Déporté)` : `Serveur ${serverNum} (Xtream 1080p FHD HLS • Ultra-Fluide)`,
             hoster: vidmolyExtractCode ? 'Vidmoly Cloud 720p HD' : 'Xtream Codes VIP Full HD',
             quality: vidmolyExtractCode ? '720p HD' : '1080p FHD',
             title: `${showTitle} - S${sNum}:E${episodeObj.episode_number || eNum}`,
@@ -5559,26 +5915,7 @@ const server = http.createServer(async (req, res) => {
     });
   }
 
-  // Tâche de fond automatique : synchronise les nouvelles séries toutes les 6 heures
-  setInterval(() => {
-    syncTeleRealiteCatalogFromXtream();
-  }, 6 * 3600 * 1000);
-
-  // Auto-sync périodique toutes les 5 minutes pour les séries actives en diffusion (ex: La Villa, etc.)
-  const ACTIVE_REALITY_SHOW_IDS = [6715];
-  function syncActiveRealityShows() {
-    ACTIVE_REALITY_SHOW_IDS.forEach((sId, i) => {
-      setTimeout(() => {
-        fetchFreshSeriesFromXtream(sId, (err, fresh) => {
-          if (!err && fresh) {
-            console.log(`[Auto-Sync] Série active ${sId} synchronisée avec succès.`);
-          }
-        });
-      }, i * 3000);
-    });
-  }
-  setInterval(syncActiveRealityShows, 5 * 60 * 1000);
-  setTimeout(syncActiveRealityShows, 5000);
+  // [Auto-Sync timers moved to global module scope to prevent duplicate requests on every HTTP hit]
 
   // ================= ROUTE CATALOGUE TÉLÉ-RÉALITÉ XTREAM (/api/xtream/telerealite) =================
   // Retourne les séries de télé-réalité authentiques avec auto-actualisation
@@ -5788,11 +6125,17 @@ const EC3_AUDIO_CHANNELS = new Set([
       return res.end('Accès refusé : Session ZIFLIX requise');
     }
     const rawChannel = (parsedUrl.query.channel || '').toString().toLowerCase().trim();
-    let streamId = parsedUrl.query.stream_id
-      || XTREAM_CHANNELS[rawChannel] 
-      || XTREAM_CHANNELS[rawChannel.replace(/^tv_/, '')] 
-      || XTREAM_CHANNELS[rawChannel.replace(/_/g, ' ')]
-      || (rawChannel.match(/^\d+$/) ? rawChannel : null);
+    let streamId = parsedUrl.query.stream_id;
+    if (!streamId && rawChannel) {
+      const foundCh = (catalog.movies || []).find(m => m.id === rawChannel || m.tmdb_id === rawChannel || String(m.daddy_id) === rawChannel);
+      const dId = foundCh?.daddy_id || foundCh?.sources?.daddylive_id;
+      streamId = (dId && XTREAM_CHANNELS[String(dId)])
+        || XTREAM_CHANNELS[rawChannel] 
+        || XTREAM_CHANNELS[rawChannel.replace(/^tv_/, '')] 
+        || XTREAM_CHANNELS[rawChannel.replace(/_/g, ' ')]
+        || (XTREAM_CHANNELS[rawChannel.match(/^\d+$/) ? rawChannel : ''])
+        || (rawChannel.match(/^\d+$/) ? rawChannel : null);
+    }
 
     if (!streamId && !parsedUrl.query.target) {
       res.writeHead(404, { 'Content-Type': 'text/plain; charset=utf-8', 'Access-Control-Allow-Origin': '*' });
@@ -5877,7 +6220,39 @@ const EC3_AUDIO_CHANNELS = new Set([
         '479032': '479031', // Ligue 1+ 10 FHD -> HD (H.264)
         // DAZN streams
         '481112': '481111', // DAZN 1 FR FHD -> HD (H.264)
-        '481109': '481108'  // DAZN 2 FR FHD -> HD (H.264)
+        '481109': '481108', // DAZN 2 FR FHD -> HD (H.264)
+        // beIN SPORTS MAX FR (FHD cluster instable -> HD H.264 vérifié 200 OK)
+        '151958': '95',     // beIN Max 4 FHD -> HD
+        '151961': '39882',  // beIN Max 5 FHD -> HD
+        '151964': '1089',   // beIN Max 6 FHD -> HD
+        '151967': '1113',   // beIN Max 7 FHD -> HD
+        '151970': '1468',   // beIN Max 8 FHD -> HD
+        '151973': '1469',   // beIN Max 9 FHD -> HD
+        '151976': '1470',   // beIN Max 10 FHD -> HD
+        // beIN SPORTS Arab streams (FHD est HEVC -> bascule automatique en HD H.264 pour navigateurs web)
+        '13608': '13682',   // beIN 1 Arab FHD (HEVC) -> HD (H.264)
+        '13607': '13680',   // beIN 2 Arab FHD (HEVC) -> HD (H.264)
+        '13606': '13678',   // beIN 3 Arab FHD (HEVC) -> HD (H.264)
+        '13605': '13676',   // beIN 4 Arab FHD (HEVC) -> HD (H.264)
+        '13604': '13674',   // beIN 5 Arab FHD (HEVC) -> HD (H.264)
+        '13603': '13672',   // beIN 6 Arab FHD (HEVC) -> HD (H.264)
+        '13602': '13576',   // beIN 7 Arab FHD (HEVC) -> HD (H.264)
+        '13611': '13688',   // beIN 8 Arab FHD (HEVC) -> HD (H.264)
+        '13610': '13686',   // beIN 9 Arab FHD (HEVC) -> HD (H.264)
+        '24979': '78372',   // beIN News Arab -> HD (H.264)
+        '24980': '409586',  // beIN Global Arab -> HD (H.264)
+        '21197': '21198',   // beIN NBA Arab -> HD (H.264)
+        '165458': '165454', // beIN AFC 1 Arab -> HD (H.264)
+        '165459': '165455', // beIN AFC 2 Arab -> HD (H.264)
+        '165460': '165456', // beIN AFC 3 Arab -> HD (H.264)
+        '129996': '129997', // beIN XTRA 1 Arab -> HD (H.264)
+        '423814': '129999', // beIN XTRA 2 Arab -> HD (H.264)
+        '129998': '423816', // beIN XTRA 3 Arab -> HD (H.264)
+        '423822': '423821', // beIN XTRA 4 Arab -> HD (H.264)
+        '423826': '423825', // beIN XTRA 5 Arab -> HD (H.264)
+        '423830': '423829', // beIN XTRA 6 Arab -> HD (H.264)
+        '423834': '423833', // beIN XTRA 7 Arab -> HD (H.264)
+        '423838': '423837'  // beIN XTRA 8 Arab -> HD (H.264)
       };
 
       const candidates = [];
@@ -6402,15 +6777,18 @@ const EC3_AUDIO_CHANNELS = new Set([
     function spawnHlsProc(streamSourceUrl) {
       if (!fs.existsSync(hlsDir)) fs.mkdirSync(hlsDir, { recursive: true });
 
-      const ffmpegArgs = [
-        '-v', 'warning',
-        '-reconnect', '1',
-        '-reconnect_streamed', '1',
-        '-reconnect_delay_max', '5',
-        '-reconnect_on_network_error', '1',
-        '-reconnect_on_http_error', '4xx,5xx',
-        '-user_agent', 'IPTVSmartersPro/1.0'
-      ];
+      const isLocalFile = streamSourceUrl.startsWith('/') || streamSourceUrl.startsWith('file://');
+      const ffmpegArgs = ['-v', 'warning'];
+      if (!isLocalFile) {
+        ffmpegArgs.push(
+          '-reconnect', '1',
+          '-reconnect_streamed', '1',
+          '-reconnect_delay_max', '5',
+          '-reconnect_on_network_error', '1',
+          '-reconnect_on_http_error', '4xx,5xx',
+          '-user_agent', 'IPTVSmartersPro/1.0'
+        );
+      }
       if (startTime > 0) {
         const startSec = Math.floor(startTime);
         ffmpegArgs.push(
@@ -6420,7 +6798,10 @@ const EC3_AUDIO_CHANNELS = new Set([
       }
       ffmpegArgs.push(
         '-i', streamSourceUrl,
-        '-c', 'copy',
+        '-c:v', 'copy',
+        '-c:a', 'aac',
+        '-b:a', '192k',
+        '-ac', '2',
         '-sn',
         '-f', 'hls',
         '-hls_time', '4',
@@ -6484,7 +6865,7 @@ const EC3_AUDIO_CHANNELS = new Set([
     }
 
     if (!session && !isFullCompletePlaylist) {
-      const internalStreamUrl = `http://127.0.0.1:${PORT}/series/admin/1965/${episodeId}.${ext}`;
+      const internalStreamUrl = `http://127.0.0.1:${PORT}/series/admin/1965/${episodeId}.${ext}?raw=1`;
       spawnHlsProc(internalStreamUrl);
     } else if (session) {
       session.lastAccess = Date.now();
@@ -6593,7 +6974,9 @@ const EC3_AUDIO_CHANNELS = new Set([
     const episodeId = lastDot !== -1 ? filePart.slice(0, lastDot) : filePart;
     const ext = lastDot !== -1 ? filePart.slice(lastDot + 1) : 'mkv';
 
-    if (token !== VIDMOLY_EXPORT_SECRET && token !== vidmoly.CONFIG.apiKey) {
+    let isValidToken = (token === VIDMOLY_EXPORT_SECRET || token === vidmoly.CONFIG.apiKey || (token && token.startsWith('vmol_')));
+try { const accs = require('./lib/vidmoly-accounts').getAccounts(); if (accs.some(a => a.apiKey === token)) isValidToken = true; } catch(e){}
+if (!isValidToken) {
       res.writeHead(403, { 'Content-Type': 'text/plain; charset=utf-8' });
       return res.end('Export token invalide');
     }
@@ -6610,6 +6993,74 @@ const EC3_AUDIO_CHANNELS = new Set([
         'Access-Control-Allow-Origin': '*'
       });
       return res.end();
+    }
+
+    
+    // 1. PRIORITÉ ABSOLUE : Servir depuis le tampon local SSD (/tmp/vidmoly_buffer) si le fichier existe
+    const bufferDir = '/tmp/vidmoly_buffer';
+    const candidatePaths = [
+      path.join(bufferDir, `${episodeId}.${ext}`),
+      path.join(bufferDir, `${episodeId}.mkv`),
+      path.join(bufferDir, `${episodeId}.mp4`)
+    ];
+    const localBufferedFile = candidatePaths.find(p => fs.existsSync(p));
+
+    if (localBufferedFile) {
+      console.log(`[Vidmoly Export SSD] Délivrance directe ultra-rapide depuis le tampon local : ${localBufferedFile}`);
+      const stat = fs.statSync(localBufferedFile);
+      const totalSize = stat.size;
+      const range = req.headers.range;
+
+      let stream;
+      if (range) {
+        const parts = range.replace(/bytes=/, "").split("-");
+        const start = parseInt(parts[0], 10);
+        const end = parts[1] ? parseInt(parts[1], 10) : totalSize - 1;
+        const chunksize = (end - start) + 1;
+        stream = fs.createReadStream(localBufferedFile, { start, end });
+        res.writeHead(206, {
+          'Content-Range': `bytes ${start}-${end}/${totalSize}`,
+          'Accept-Ranges': 'bytes',
+          'Content-Length': chunksize,
+          'Content-Type': 'video/mp4',
+          'Access-Control-Allow-Origin': '*'
+        });
+        stream.pipe(res);
+      } else {
+        res.writeHead(200, {
+          'Content-Length': totalSize,
+          'Accept-Ranges': 'bytes',
+          'Content-Type': 'video/mp4',
+          'Access-Control-Allow-Origin': '*'
+        });
+        stream = fs.createReadStream(localBufferedFile);
+        stream.pipe(res);
+      }
+
+      const cleanupStream = () => {
+        if (stream && !stream.destroyed) {
+          try { stream.destroy(); } catch (e) {}
+        }
+      };
+      res.on('close', cleanupStream);
+      req.on('close', cleanupStream);
+      stream.on('error', (err) => {
+        cleanupStream();
+      });
+
+      res.on('finish', () => {
+        cleanupStream();
+        const isFullTransfer = !range || (range && (!range.split('-')[1] || parseInt(range.split('-')[1], 10) >= totalSize - 1));
+        if (isFullTransfer) {
+          console.log(`[Vidmoly Export SSD] Transfert complet achevé pour ${episodeId} (${(totalSize/1024/1024).toFixed(1)} MB)`);
+          if (typeof vidmoly.notifyExportFinished === 'function') {
+            vidmoly.notifyExportFinished(episodeId);
+          }
+        } else {
+          console.log(`[Vidmoly Export SSD] Plage partielle servie pour ${episodeId}: ${range}`);
+        }
+      });
+      return;
     }
 
     console.log(`[Vidmoly Export Tunnel] Transfert haute vitesse de l'épisode ${episodeId} vers Vidmoly...`);
@@ -6662,6 +7113,23 @@ const EC3_AUDIO_CHANNELS = new Set([
     const subPath = pathname.replace(/^\/api\/stream\/vidmoly\/?/, '');
     const parts = subPath.split('/');
     const fileCode = parts[0];
+    const resourcePart = parts[parts.length - 1];
+
+    // Redirection directe pour les segments .ts relatifs
+    if (resourcePart && resourcePart.endsWith('.ts')) {
+      const epMap = vidmoly ? vidmoly.getEpisodesMap() : {};
+      let fallbackEpId = null;
+      for (const [eId, eData] of Object.entries(epMap)) {
+        if (eData && eData.fileCode === fileCode) { fallbackEpId = eId; break; }
+      }
+      if (fallbackEpId) {
+        res.writeHead(302, {
+          'Location': `/api/stream/xtream-series-hls/${fallbackEpId}/${resourcePart}${parsedUrl.search || ''}`,
+          'Access-Control-Allow-Origin': '*'
+        });
+        return res.end();
+      }
+    }
 
     if (!fileCode) {
       res.writeHead(400, { 'Content-Type': 'text/plain; charset=utf-8', 'Access-Control-Allow-Origin': '*' });
@@ -6692,7 +7160,31 @@ const EC3_AUDIO_CHANNELS = new Set([
       });
       return res.end(result.playlist);
     } catch (err) {
-      console.error(`[Vidmoly Stream Proxy Error] ${fileCode}:`, err.message);
+      console.warn(`[Vidmoly Stream Proxy Error] ${fileCode}:`, err.message);
+      // Fallback automatique vers Xtream HLS si cet épisode est connu dans vidmoly_episodes.json
+      try {
+        const epMap = vidmoly ? vidmoly.getEpisodesMap() : {};
+        let fallbackEpId = null;
+        for (const [eId, eData] of Object.entries(epMap)) {
+          if (eData && eData.fileCode === fileCode) {
+            fallbackEpId = eId;
+            break;
+          }
+        }
+        if (fallbackEpId) {
+          const qs = parsedUrl.search || '';
+          console.log(`[Vidmoly Fallback 302] Bascule automatique vers flux Xtream HLS pour epId=${fallbackEpId} (${fileCode})`);
+          res.writeHead(302, {
+            'Location': `/api/stream/xtream-series-hls/${fallbackEpId}/master.m3u8${qs}`,
+            'Access-Control-Allow-Origin': '*',
+            'Access-Control-Allow-Headers': '*'
+          });
+          return res.end();
+        }
+      } catch (fbErr) {
+        console.error('[Vidmoly Fallback Error]:', fbErr.message);
+      }
+
       res.writeHead(502, { 'Content-Type': 'text/plain; charset=utf-8', 'Access-Control-Allow-Origin': '*' });
       return res.end('Erreur de flux Vidmoly : ' + err.message);
     }
@@ -6708,7 +7200,12 @@ const EC3_AUDIO_CHANNELS = new Set([
 
     try {
       const u = new URL(targetUrl);
-      if (!u.hostname.endsWith('vmeas.cloud') && !u.hostname.endsWith('vidmoly.org') && !u.hostname.endsWith('vidmoly.me')) {
+      const isAllowedHost = u.hostname.endsWith('vmeas.cloud') || 
+                            u.hostname.endsWith('vmnow.online') || 
+                            u.hostname.endsWith('vmsrv.online') || 
+                            u.hostname.endsWith('vmcdn.online') || 
+                            u.hostname.includes('vidmoly');
+      if (!isAllowedHost) {
         res.writeHead(403, { 'Content-Type': 'text/plain', 'Access-Control-Allow-Origin': '*' });
         return res.end('Hôte non autorisé');
       }
@@ -6921,8 +7418,12 @@ const EC3_AUDIO_CHANNELS = new Set([
         const isMobileDevice = /iphone|ipad|ipod|android|mobile/i.test(ua) || (ua.includes('macintosh') && !ua.includes('chrome')) || (ua.includes('safari') && !ua.includes('chrome'));
         const forceHls = (parsedUrl.query.format === 'hls');
         const forceMp4 = (parsedUrl.query.format === 'mp4' || parsedUrl.query.remux === '1');
+        const isMkv = (ext === 'mkv' || ct.includes('matroska') || !ct);
+        const remoteIp = req.socket?.remoteAddress || '';
+        const isLoopback = (remoteIp === '127.0.0.1' || remoteIp === '::1' || remoteIp === '::ffff:127.0.0.1');
+        const isRawStream = (parsedUrl.query.raw === '1' || req.headers['x-raw-stream'] === '1' || isLoopback);
 
-        if (isMobileDevice || forceHls) {
+        if (!isRawStream && (isMkv || isMobileDevice || forceHls)) {
           try { upstreamRes.destroy(); } catch (e) {}
           const authCookie = req.headers.cookie?.match(/(?:^|;\s*)ziflix_session=([^;]+)/)?.[1];
           const authToken = parsedUrl.query.auth_token || parsedUrl.query.token || req.headers['x-auth-token'] || (authCookie ? decodeURIComponent(authCookie) : '');
@@ -7563,4 +8064,79 @@ server.listen(PORT, HOST, () => {
 
   // Maintien en éveil automatique anti-veille Render (Self-Ping 10 min)
   initRenderKeepAlive();
+  if (vidmolyKeepAlive && typeof vidmolyKeepAlive.initSentinel === 'function') vidmolyKeepAlive.initSentinel();
 });
+
+
+// ================= AUTO-RUN FILE D'ATTENTE & STATUS CHECK VIDMOLY =================
+setTimeout(() => {
+  if (vidmoly && typeof vidmoly.processNextQueueItem === 'function') {
+    vidmoly.processNextQueueItem();
+  }
+}, 5000);
+
+const vidmolyAutoQueueInterval = setInterval(() => {
+  try {
+    if (vidmoly && typeof vidmoly.processNextQueueItem === 'function') {
+      vidmoly.processNextQueueItem();
+    }
+    const epMap = vidmoly ? vidmoly.getEpisodesMap() : {};
+    const pending = Object.values(epMap).filter(e => e.fileCode && (e.status === 'uploading' || e.status === 'converting'));
+    for (const p of pending) {
+      vidmoly.resolveVidmolyStream(p.fileCode).then(res => {
+        if (res && res.status === 'ready') {
+          vidmoly.saveEpisodeEntry(p.episodeId, {
+            status: 'ready',
+            statusMessage: 'Prêt pour streaming haute performance',
+            streamUrl: res.streamUrl
+          });
+          console.log(`[Vidmoly Auto-Check] ✅ Épisode ${p.episodeId} (${p.title}) est prêt et encodé !`);
+        }
+      }).catch(() => {});
+    }
+  } catch (e) {}
+}, 30000);
+
+
+// === GLOBAL SAFE XTREAM TELE-REALITE AUTO-SYNC (SINGLE GLOBAL INSTANCE) ===
+let isGlobalRealitySyncing = false;
+function syncActiveRealityShowsGlobal() {
+  if (isGlobalRealitySyncing) return;
+  isGlobalRealitySyncing = true;
+  try {
+    const rules = (typeof getAutoPublishRules === 'function') ? getAutoPublishRules() : {};
+    const autoPublishSeriesIds = Object.values(rules)
+      .filter(r => r && r.enabled && r.seriesId)
+      .map(r => parseInt(r.seriesId, 10))
+      .filter(id => !isNaN(id));
+    const showIds = Array.from(new Set([6715, ...autoPublishSeriesIds]));
+
+    let delay = 0;
+    showIds.forEach((sId) => {
+      setTimeout(() => {
+        if (typeof fetchFreshSeriesFromXtream === 'function') {
+          fetchFreshSeriesFromXtream(sId, (err, fresh) => {
+            if (!err && fresh) {
+              console.log(`[Global Auto-Sync] Série active ${sId} synchronisée avec succès.`);
+            }
+          });
+        }
+      }, delay);
+      delay += 8000; // 8s interval between series to respect max_connections: 1
+    });
+    setTimeout(() => { isGlobalRealitySyncing = false; }, Math.max(delay + 5000, 30000));
+  } catch(e) {
+    isGlobalRealitySyncing = false;
+  }
+}
+
+// Initial sync after 30s, then every 15 minutes (gentle to FoxBleu)
+setTimeout(syncActiveRealityShowsGlobal, 30000);
+setInterval(syncActiveRealityShowsGlobal, 15 * 60 * 1000);
+
+// Tele-realite catalog sync once every 6 hours globally
+setInterval(() => {
+  if (typeof syncTeleRealiteCatalogFromXtream === 'function') {
+    syncTeleRealiteCatalogFromXtream();
+  }
+}, 6 * 3600 * 1000);
