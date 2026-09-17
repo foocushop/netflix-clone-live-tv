@@ -202,11 +202,13 @@ class NetflixPlayer {
       this.ctrlPlayBtn.addEventListener('click', () => this.togglePlay());
     }
     if (this.centerPlayBtn) {
-      this.centerPlayBtn.addEventListener('click', (e) => {
+      const handleCenterToggle = (e) => {
         e.stopPropagation();
         e.preventDefault();
         this.togglePlay();
-      });
+      };
+      this.centerPlayBtn.addEventListener('click', handleCenterToggle);
+      this.centerPlayBtn.addEventListener('touchend', handleCenterToggle, { passive: false });
     }
 
     // Saut ±10 secondes
@@ -235,6 +237,34 @@ class NetflixPlayer {
 
     document.addEventListener('fullscreenchange', syncFullscreenUI);
     document.addEventListener('webkitfullscreenchange', syncFullscreenUI);
+
+    // Clic & Tap sur le conteneur média (vidéo ou fond noir letterbox mobile)
+    if (this.mediaContainer) {
+      const handleMediaInteraction = (e) => {
+        if (e.target.closest('.netflix-bottom-controls') || 
+            e.target.closest('.player-top-bar') ||
+            e.target.closest('.center-play-btn') ||
+            e.target.closest('.comments-drawer') ||
+            e.target.closest('.player-status-banner') ||
+            e.target.closest('.timer-expired-modal') ||
+            e.target.closest('.player-loader')) {
+          return;
+        }
+        if (this.isTouchDevice()) {
+          const isIdle = this.overlay && this.overlay.classList.contains('user-idle');
+          if (isIdle) {
+            this.showControls();
+          } else {
+            if (this.video && !this.video.paused) {
+              this.hideControls();
+            }
+          }
+          return;
+        }
+        this.togglePlay();
+      };
+      this.mediaContainer.addEventListener('click', handleMediaInteraction);
+    }
 
     // Clic & Double-clic sur la vidéo
     if (this.video) {
@@ -2346,7 +2376,12 @@ playDirectHls(streamUrl, options = {}) {
     if (this.centerIconPause) this.centerIconPause.classList.toggle('hidden', !isPlaying);
     if (this.centerIconPlay) this.centerIconPlay.classList.toggle('hidden', isPlaying);
 
+    if (this.overlay) {
+      this.overlay.classList.toggle('is-paused', !isPlaying);
+    }
+
     if (!isPlaying) {
+      this.hideLoader();
       this.showControls();
     }
   }

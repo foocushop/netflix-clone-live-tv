@@ -1663,10 +1663,19 @@ body {
 }
 
 /* En cas de chargement ou buffering, masquer le bouton central pour laisser le loader ZIFLIX */
+/* En cas de chargement ou buffering, masquer le bouton central pour laisser le loader ZIFLIX */
 .player-loader:not(.hidden) ~ .center-play-btn {
-  opacity: 0 !important;
-  visibility: hidden !important;
-  pointer-events: none !important;
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+}
+
+/* En pause ou contrôles actifs, le bouton central de lecture est toujours visible */
+.netflix-player-overlay.is-paused .center-play-btn,
+.netflix-player-overlay.is-paused .player-loader:not(.hidden) ~ .center-play-btn {
+  opacity: 1 !important;
+  visibility: visible !important;
+  pointer-events: auto !important;
 }
 
 @media (max-width: 768px) {
