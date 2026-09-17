@@ -444,61 +444,98 @@ class NetflixApp {
     if (!movie) return;
     this.currentHero = movie;
 
-    const bgUrl = this.normalizeImageUrl(movie.backdrop_url || movie.poster_url);
-    this.heroBanner.style.backgroundImage = bgUrl ? `url("${bgUrl}")` : 'none';
-    this.heroTitle.textContent = movie.title;
-    this.heroSynopsis.textContent = movie.overview;
+    if (!this.heroBanner) this.heroBanner = document.getElementById('heroBanner');
+    if (!this.heroTitle) this.heroTitle = document.getElementById('heroTitle');
+    if (!this.heroSynopsis) this.heroSynopsis = document.getElementById('heroSynopsis');
+    if (!this.heroMatch) this.heroMatch = document.getElementById('heroMatch');
+    if (!this.heroAge) this.heroAge = document.getElementById('heroAge');
+    if (!this.heroDuration) this.heroDuration = document.getElementById('heroDuration');
+    if (!this.heroBadges) this.heroBadges = document.getElementById('heroBadges');
+    if (!this.heroPlayBtn) this.heroPlayBtn = document.getElementById('heroPlayBtn');
+
+    if (this.heroBanner) {
+      this.heroBanner.style.display = '';
+      const bgUrl = this.normalizeImageUrl(movie.backdrop_url || movie.poster_url);
+      this.heroBanner.style.backgroundImage = bgUrl ? `url("${bgUrl}")` : 'none';
+    }
+    if (this.heroTitle) this.heroTitle.textContent = movie.title || 'Titre Vedette';
+    if (this.heroSynopsis) this.heroSynopsis.textContent = movie.overview || '';
+
+    // Réinitialiser tout gestionnaire onclick spécifique précédent
+    if (this.heroPlayBtn) {
+      this.heroPlayBtn.onclick = null;
+    }
 
     const isLive = (movie.media_type === 'channel' || movie.is_live);
     if (isLive) {
-      this.heroMatch.innerHTML = `<span class="live-pulse" style="color: #e50914; margin-right: 6px;">●</span> EN DIRECT HD`;
-      this.heroAge.textContent = movie.age_rating || 'Tous publics';
-      this.heroDuration.textContent = 'En direct 24/7';
+      if (this.heroMatch) this.heroMatch.innerHTML = `<span class="live-pulse" style="color: #e50914; margin-right: 6px;">●</span> EN DIRECT HD`;
+      if (this.heroAge) this.heroAge.textContent = movie.age_rating || 'Tous publics';
+      if (this.heroDuration) this.heroDuration.textContent = 'En direct 24/7';
       if (this.heroPlayBtn) {
         this.heroPlayBtn.innerHTML = '<span>▶</span> Regarder en direct';
       }
     } else {
-      this.heroMatch.textContent = `Recommandé à ${movie.match_score}%`;
-      this.heroAge.textContent = movie.age_rating;
-      this.heroDuration.textContent = movie.duration;
+      if (this.heroMatch) this.heroMatch.textContent = movie.match_score ? `Recommandé à ${movie.match_score}%` : 'Recommandé à 98%';
+      if (this.heroAge) this.heroAge.textContent = movie.age_rating || '16+';
+      const dur = movie.duration || (movie.seasons ? `${movie.seasons.length} Saison(s)` : (movie.media_type === 'series' ? 'Série' : 'Film'));
+      if (this.heroDuration) this.heroDuration.textContent = dur;
       if (this.heroPlayBtn) {
         this.heroPlayBtn.innerHTML = '<span>▶</span> Lecture';
       }
     }
 
     // Badges de qualité
-    this.heroBadges.innerHTML = '';
-    (movie.quality_badges || ['4K Ultra HD', '5.1']).forEach(b => {
-      const span = document.createElement('span');
-      span.className = 'quality-badge';
-      span.textContent = b;
-      this.heroBadges.appendChild(span);
-    });
+    if (this.heroBadges) {
+      this.heroBadges.innerHTML = '';
+      (movie.quality_badges || ['4K Ultra HD', '5.1']).forEach(b => {
+        const span = document.createElement('span');
+        span.className = 'quality-badge';
+        span.textContent = b;
+        this.heroBadges.appendChild(span);
+      });
+    }
   }
 
   renderCatalog(data) {
+    if (!this.catalogRowsContainer) this.catalogRowsContainer = document.getElementById('catalogRows');
+    if (!this.catalogRowsContainer) return;
     this.catalogRowsContainer.innerHTML = '';
     const fragment = document.createDocumentFragment();
 
     // Rangée Reprendre la lecture
-    const continueItems = this.getContinueWatchingList();
-    if (continueItems.length > 0) {
-      fragment.appendChild(this.buildContinueWatchingRow(continueItems));
+    try {
+      const continueItems = this.getContinueWatchingList();
+      if (continueItems && continueItems.length > 0) {
+        const continueRow = this.buildContinueWatchingRow(continueItems);
+        if (continueRow) fragment.appendChild(continueRow);
+      }
+    } catch (e) {
+      console.warn('[ZIFLIX] Erreur continue watching:', e);
     }
 
     // Ligne "Ma Liste" si elle contient des titres
-    const myListMovies = this.getMyListMovies();
-    if (myListMovies.length > 0) {
-      fragment.appendChild(this.buildRowElement({
-        category: { name: "Ma Liste", slug: "my-list" },
-        movies: myListMovies
-      }));
+    try {
+      const myListMovies = this.getMyListMovies();
+      if (myListMovies && myListMovies.length > 0) {
+        const myRow = this.buildRowElement({
+          category: { name: "Ma Liste", slug: "my-list" },
+          movies: myListMovies
+        });
+        if (myRow) fragment.appendChild(myRow);
+      }
+    } catch (e) {
+      console.warn('[ZIFLIX] Erreur my list:', e);
     }
 
     // Carrousels de catégories
-    if (data.rows && data.rows.length > 0) {
+    if (data && data.rows && data.rows.length > 0) {
       data.rows.forEach(row => {
-        fragment.appendChild(this.buildRowElement(row));
+        try {
+          const rowEl = this.buildRowElement(row);
+          if (rowEl) fragment.appendChild(rowEl);
+        } catch (e) {
+          console.warn('[ZIFLIX] Erreur rendu rangée:', row?.category?.name, e);
+        }
       });
     }
 
@@ -2014,6 +2051,7 @@ class NetflixApp {
       this.dismissSplash();
     }
     this.checkWelcomeTimerModal();
+    this.initHomeTimer();
   }
 
   showAuthGate() {
@@ -2025,6 +2063,8 @@ class NetflixApp {
     if (this.authGateModal) this.authGateModal.classList.remove('hidden');
     const welcomeToast = document.getElementById('welcomeTimerModal');
     if (welcomeToast) welcomeToast.classList.add('hidden');
+    const navTimer = document.getElementById('navWatchTimer');
+    if (navTimer) navTimer.style.display = 'none';
     this.dismissSplash();
   }
 
@@ -2045,13 +2085,17 @@ class NetflixApp {
 
     const isAdmin = (user.role === 'admin' || user.is_admin || user.isAdmin);
     const welcomeModal = document.getElementById('welcomeTimerModal');
+    const navTimer = document.getElementById('navWatchTimer');
     if (isAdmin) {
       if (welcomeModal) welcomeModal.style.display = 'none';
+      if (navTimer) navTimer.style.display = 'none';
     } else {
       if (welcomeModal) welcomeModal.style.display = '';
+      if (navTimer) navTimer.style.display = 'inline-flex';
       if (!this.authGateModal || this.authGateModal.classList.contains('hidden')) {
         this.checkWelcomeTimerModal();
       }
+      this.initHomeTimer();
     }
   }
 
@@ -2627,10 +2671,93 @@ class NetflixApp {
   }
 
 
+  escapeHtml(str) {
+    if (str === null || str === undefined) return '';
+    return String(str)
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#039;');
+  }
+
   initTimerUI() {
+    this.initHomeTimer();
     // Ne pas afficher si l'utilisateur n'est pas encore connecté ou si l'auth gate est affichée
     if (this.currentUser && (!this.authGateModal || this.authGateModal.classList.contains('hidden'))) {
       this.checkWelcomeTimerModal();
+    }
+  }
+
+  initHomeTimer() {
+    this.navWatchTimer = document.getElementById('navWatchTimer');
+    this.navWatchTimerVal = document.getElementById('navWatchTimerVal');
+    this.navWatchTimerBtn = document.getElementById('navWatchTimerBtn');
+
+    if (this.isAdmin()) {
+      if (this.navWatchTimer) this.navWatchTimer.style.display = 'none';
+      return;
+    }
+
+    if (this.navWatchTimer) {
+      this.navWatchTimer.style.display = 'inline-flex';
+    }
+
+    const currentCredit = (this.player && typeof this.player.getWatchCredit === 'function') 
+      ? this.player.getWatchCredit() 
+      : parseInt(localStorage.getItem('ziflix_watch_credit') || '1800', 10);
+    this.updateHomeTimerDisplay(currentCredit);
+
+    if (this.navWatchTimerBtn && !this.navWatchTimerBtn._hasListener) {
+      this.navWatchTimerBtn._hasListener = true;
+      this.navWatchTimerBtn.addEventListener('click', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        if (this.player && typeof this.player.rechargeWatchCredit === 'function') {
+          this.player.rechargeWatchCredit(false);
+        }
+      });
+    }
+  }
+
+  updateHomeTimerDisplay(credit) {
+    if (this.isAdmin()) {
+      if (this.navWatchTimer) this.navWatchTimer.style.display = 'none';
+      return;
+    }
+    if (!this.navWatchTimer) this.navWatchTimer = document.getElementById('navWatchTimer');
+    if (!this.navWatchTimerVal) this.navWatchTimerVal = document.getElementById('navWatchTimerVal');
+    if (!this.navWatchTimerBtn) this.navWatchTimerBtn = document.getElementById('navWatchTimerBtn');
+
+    if (this.navWatchTimer) {
+      this.navWatchTimer.style.display = 'inline-flex';
+      if (credit <= 300) {
+        this.navWatchTimer.classList.add('timer-low');
+      } else {
+        this.navWatchTimer.classList.remove('timer-low');
+      }
+    }
+
+    credit = Math.max(0, Math.round(credit));
+    const mins = Math.floor(credit / 60);
+    const secs = credit % 60;
+    const timeStr = `${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
+    if (this.navWatchTimerVal) {
+      this.navWatchTimerVal.textContent = timeStr;
+    }
+
+    // Si aucune recharge en cours, gérer l'état max 60 min
+    const isPending = (this.player && this.player.isRechargePending);
+    if (!isPending && this.navWatchTimerBtn) {
+      if (credit >= 3600) {
+        this.navWatchTimerBtn.disabled = true;
+        this.navWatchTimerBtn.textContent = 'Max 60m';
+        this.navWatchTimerBtn.title = 'Crédit maximum de 60 minutes atteint';
+      } else {
+        this.navWatchTimerBtn.disabled = false;
+        this.navWatchTimerBtn.textContent = '+30m';
+        this.navWatchTimerBtn.title = 'Recharger +30 min gratuites';
+      }
     }
   }
 

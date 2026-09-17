@@ -164,6 +164,10 @@ class NetflixPlayer {
     this.MONETAG_LINK = this.DIRECT_LINKS[0];
     this.INITIAL_CREDIT = 1800; // 30 minutes
     this.BONUS_CREDIT = 1800;   // +30 minutes de recharge
+    this.MAX_CREDIT = 3600;     // Plafond strict 60 minutes (3600s)
+    this.COOLDOWN_SECONDS = 5;  // 5 secondes de délai non atomique
+    this.isRechargePending = false;
+    this.rechargeCooldownInterval = null;
     this.WARNING_THRESHOLD = 300; // 5 minutes
     this.watchTimerInterval = null;
     this.lastProgressSave = 0;
@@ -2645,23 +2649,23 @@ playDirectHls(streamUrl, options = {}) {
   }
 
   rechargeWatchCredit(fromModal = false) {
+    if (this.isRechargePending) {
+      this.showToast('⏳ Validation en cours... Veuillez patienter quelques secondes.');
+      return;
+    }
+
     const current = Math.max(0, this.getWatchCredit());
-    const newCredit = current + this.BONUS_CREDIT;
-    this.setWatchCredit(newCredit);
-    this.updateTimerDisplays(newCredit);
-
-    if (this.playerWatchTimer && !this.isAdmin()) {
-      this.playerWatchTimer.style.display = 'inline-flex';
-      this.playerWatchTimer.classList.remove('timer-low');
+    if (current >= this.MAX_CREDIT) {
+      this.showToast('⚠️ Limite de 60 minutes déjà atteinte. Bon visionnage !');
+      this.updateTimerDisplays(current);
+      return;
     }
 
-    if (this.overlay && this.overlay.classList.contains('active') && !this.isAdmin()) {
-      this.startWatchTimer();
-    }
+    this.isRechargePending = true;
 
+    // 1. Ouvrir le lien publicitaire en roulement direct (Monetag / Adsterra)
     const targetUrl = this.getNextDirectLink();
     try {
-      // Ouverture du lien publicitaire en roulement (Monetag / Adsterra)
       const win = window.open(targetUrl, '_blank');
       if (!win) {
         window.location.href = targetUrl;
@@ -2671,21 +2675,79 @@ playDirectHls(streamUrl, options = {}) {
       console.warn('[Ads] Erreur ouverture lien:', e.message);
     }
 
-    if (fromModal) {
-      if (!this.timerExpiredModal) this.timerExpiredModal = document.getElementById('timerExpiredModal');
-      if (this.timerExpiredModal) {
-        this.timerExpiredModal.classList.add('hidden');
-      }
-      this.showToast('🎉 +30 minutes offertes débloquées ! Bon visionnage.');
-      if (this.currentMovie && (!this.video.src || this.video.src === 'about:blank' || this.video.ended)) {
-        this.loadStream();
+    // 2. Décompte d'attente de 5 secondes non atomique avec feedback visuel
+    let remaining = this.COOLDOWN_SECONDS;
+    this.updateRechargeButtonsCountdown(remaining);
+
+    if (this.rechargeCooldownInterval) {
+      clearInterval(this.rechargeCooldownInterval);
+      this.rechargeCooldownInterval = null;
+    }
+
+    this.rechargeCooldownInterval = setInterval(() => {
+      remaining--;
+      if (remaining > 0) {
+        this.updateRechargeButtonsCountdown(remaining);
       } else {
-        try {
-          this.video.play().catch(() => {});
-        } catch (e) {}
+        clearInterval(this.rechargeCooldownInterval);
+        this.rechargeCooldownInterval = null;
+        this.isRechargePending = false;
+
+        // 3. Attribution effective du crédit après les 5 secondes (plafonné à 60 min)
+        const freshCurrent = Math.max(0, this.getWatchCredit());
+        const newCredit = Math.min(this.MAX_CREDIT, freshCurrent + this.BONUS_CREDIT);
+        this.setWatchCredit(newCredit);
+        this.updateTimerDisplays(newCredit);
+
+        if (this.playerWatchTimer && !this.isAdmin()) {
+          this.playerWatchTimer.style.display = 'inline-flex';
+          this.playerWatchTimer.classList.remove('timer-low');
+        }
+
+        if (fromModal) {
+          if (!this.timerExpiredModal) this.timerExpiredModal = document.getElementById('timerExpiredModal');
+          if (this.timerExpiredModal) {
+            this.timerExpiredModal.classList.add('hidden');
+          }
+          this.showToast('🎉 +30 minutes offertes débloquées ! Bon visionnage.');
+          if (this.currentMovie && (!this.video.src || this.video.src === 'about:blank' || this.video.ended)) {
+            this.loadStream();
+          } else {
+            try {
+              this.video.play().catch(() => {});
+            } catch (e) {}
+          }
+        } else {
+          this.showToast(`🎉 +30 minutes offertes ajoutées ! (${Math.round(newCredit / 60)} min au total)`);
+        }
+
+        // Synchroniser également avec l'accueil
+        if (window.netflixApp && typeof window.netflixApp.updateHomeTimerDisplay === 'function') {
+          window.netflixApp.updateHomeTimerDisplay(newCredit);
+        }
       }
-    } else {
-      this.showToast('🎉 +30 minutes offertes ajoutées avec succès !');
+    }, 1000);
+  }
+
+  updateRechargeButtonsCountdown(secondsRemaining) {
+    const navBtn = document.getElementById('navWatchTimerBtn');
+    const playerBtn = document.getElementById('playerWatchTimerBtn') || this.playerWatchTimerBtn;
+    const modalBtn = document.getElementById('timerModalRechargeBtn') || this.timerModalRechargeBtn;
+
+    const shortText = `⏳ ${secondsRemaining}s`;
+    const fullText = `⏳ VALIDATION EN COURS (${secondsRemaining}s)...`;
+
+    if (navBtn) {
+      navBtn.disabled = true;
+      navBtn.textContent = shortText;
+    }
+    if (playerBtn) {
+      playerBtn.disabled = true;
+      playerBtn.textContent = shortText;
+    }
+    if (modalBtn) {
+      modalBtn.disabled = true;
+      modalBtn.textContent = fullText;
     }
   }
 
@@ -2698,6 +2760,52 @@ playDirectHls(streamUrl, options = {}) {
     if (!this.playerWatchTimerVal) this.playerWatchTimerVal = document.getElementById('playerWatchTimerVal');
     if (this.playerWatchTimerVal) {
       this.playerWatchTimerVal.textContent = timeStr;
+    }
+
+    const navTimerVal = document.getElementById('navWatchTimerVal');
+    if (navTimerVal) {
+      navTimerVal.textContent = timeStr;
+    }
+
+    const navTimer = document.getElementById('navWatchTimer');
+    if (navTimer) {
+      if (this.isAdmin()) {
+        navTimer.style.display = 'none';
+      } else {
+        navTimer.style.display = 'inline-flex';
+        if (credit <= this.WARNING_THRESHOLD) {
+          navTimer.classList.add('timer-low');
+        } else {
+          navTimer.classList.remove('timer-low');
+        }
+      }
+    }
+
+    // Gestion de l'état des boutons si aucune recharge n'est en cours d'attente
+    if (!this.isRechargePending) {
+      const isMax = (credit >= this.MAX_CREDIT);
+      const navBtn = document.getElementById('navWatchTimerBtn');
+      const playerBtn = document.getElementById('playerWatchTimerBtn') || this.playerWatchTimerBtn;
+      const modalBtn = document.getElementById('timerModalRechargeBtn') || this.timerModalRechargeBtn;
+
+      if (navBtn) {
+        navBtn.disabled = isMax;
+        navBtn.textContent = isMax ? 'Max 60m' : '+30m';
+        navBtn.title = isMax ? 'Limite de 60 minutes atteinte' : 'Recharger +30 min gratuites';
+      }
+      if (playerBtn) {
+        playerBtn.disabled = isMax;
+        playerBtn.textContent = isMax ? 'Max 60m' : '+30m';
+        playerBtn.title = isMax ? 'Limite de 60 minutes atteinte' : 'Recharger +30 min gratuites';
+      }
+      if (modalBtn) {
+        modalBtn.disabled = isMax;
+        modalBtn.textContent = isMax ? 'MAX 60 MIN ATTEINT' : '⚡ RECHARGER +30 MIN GRATUITES';
+      }
+    }
+
+    if (window.netflixApp && typeof window.netflixApp.updateHomeTimerDisplay === 'function') {
+      try { window.netflixApp.updateHomeTimerDisplay(credit); } catch (e) {}
     }
   }
 
