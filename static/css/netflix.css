@@ -1651,6 +1651,18 @@ body {
   background: rgba(229, 9, 20, 0.55);
 }
 
+/* Zone tactile étendue pour un tap facile sans sniper */
+.center-play-btn::after {
+  content: '';
+  position: absolute;
+  top: -14px;
+  bottom: -14px;
+  left: -14px;
+  right: -14px;
+  border-radius: 50%;
+  pointer-events: auto;
+}
+
 .center-play-circle {
   display: flex;
   align-items: center;
@@ -1689,6 +1701,12 @@ body {
     height: 66px;
     background: rgba(0, 0, 0, 0.32);
     border: 1.5px solid rgba(255, 255, 255, 0.25);
+  }
+  .center-play-btn::after {
+    top: -18px;
+    bottom: -18px;
+    left: -18px;
+    right: -18px;
   }
   .center-icon-pause,
   .center-icon-play {

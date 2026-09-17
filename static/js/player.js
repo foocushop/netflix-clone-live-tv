@@ -202,10 +202,15 @@ class NetflixPlayer {
       this.ctrlPlayBtn.addEventListener('click', () => this.togglePlay());
     }
     if (this.centerPlayBtn) {
+      let lastCenterToggle = 0;
       const handleCenterToggle = (e) => {
         e.stopPropagation();
-        e.preventDefault();
+        if (e.cancelable) e.preventDefault();
+        const now = Date.now();
+        if (now - lastCenterToggle < 350) return;
+        lastCenterToggle = now;
         this.togglePlay();
+        this.showControls();
       };
       this.centerPlayBtn.addEventListener('click', handleCenterToggle);
       this.centerPlayBtn.addEventListener('touchend', handleCenterToggle, { passive: false });
@@ -255,16 +260,10 @@ class NetflixPlayer {
         }
 
         // 1. SUR MOBILE / SMARTPHONE TACTILE :
-        // Un tap sur l'écran réveille ou masque les contrôles SANS mettre la vidéo en pause accidentellement
+        // Un tap sur l'écran réveille et maintient les contrôles actifs (durée naturelle)
+        // Ne force JAMAIS le masquage immédiat : le lecteur s'efface naturellement après le délai d'inactivité
         if (this.isTouchDevice()) {
-          const isIdle = this.overlay && this.overlay.classList.contains('user-idle');
-          if (isIdle) {
-            this.showControls();
-          } else {
-            if (this.video && !this.video.paused) {
-              this.hideControls();
-            }
-          }
+          this.showControls();
           return;
         }
 
@@ -1209,7 +1208,8 @@ class NetflixPlayer {
     this.overlay.classList.remove('user-idle');
     clearTimeout(this.inactivityTimer);
     if (this.video && !this.video.paused) {
-      this.inactivityTimer = setTimeout(() => this.hideControls(), 3500);
+      const delay = (typeof this.isTouchDevice === 'function' && this.isTouchDevice()) ? 4000 : 3500;
+      this.inactivityTimer = setTimeout(() => this.hideControls(), delay);
     }
   }
 
