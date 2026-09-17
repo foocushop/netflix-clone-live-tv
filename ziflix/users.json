@@ -5106,7 +5106,7 @@
     "role": "user",
     "banned": false,
     "created_at": "2026-09-16T21:59:42.020Z",
-    "last_login": "2026-09-17T12:36:53.139Z"
+    "last_login": "2026-09-17T18:46:36.386Z"
   },
   {
     "id": "u_1789598750554_63bbb87e",
@@ -5460,5 +5460,60 @@
     "banned": false,
     "created_at": "2026-09-17T18:00:25.909Z",
     "last_login": "2026-09-17T18:00:25.909Z"
+  },
+  {
+    "id": "u_1789668248295_cc7a9dfd",
+    "username": "Mounira",
+    "password_hash": "9fbba3d2166e5d871e297f5248ebd8ea315df0f5869e0783ce54e9efd2a839e4c4af6e95893da246c4536e8fc21634c0d45a3aad37b249c25df81711ab934d5c",
+    "salt": "52866980c230995d67887a955ff6fa38",
+    "avatar": "assets/avatars/avatar-1.svg",
+    "role": "user",
+    "banned": false,
+    "created_at": "2026-09-17T18:04:08.295Z",
+    "last_login": "2026-09-17T18:04:08.295Z"
+  },
+  {
+    "id": "u_1789668253896_b08b2447",
+    "username": "Rolande",
+    "password_hash": "2a294f08ad43bf203516e08661347b916ce30671e6c449f4b26af9018405b8ff0ac8dcb0750653acde28d8b5215fba246a84fbbe64a1f813f3bebf2e1b294201",
+    "salt": "5f051c43ca81314c012a7e48200e81a3",
+    "avatar": "assets/avatars/avatar-1.svg",
+    "role": "user",
+    "banned": false,
+    "created_at": "2026-09-17T18:04:13.896Z",
+    "last_login": "2026-09-17T18:28:44.685Z"
+  },
+  {
+    "id": "u_1789669481649_7ffab040",
+    "username": "MC.",
+    "password_hash": "589595ee4967fbb58fb2d6e0cb2287f8dce797fcb744446792d39591462a5935abf4c11650ac0d90c0d55cc972add71331afdeeeff006c25182b78d22ee69a79",
+    "salt": "4de997c7d124ab8e2073580e4ea43958",
+    "avatar": "assets/avatars/avatar-1.svg",
+    "role": "user",
+    "banned": false,
+    "created_at": "2026-09-17T18:24:41.649Z",
+    "last_login": "2026-09-17T18:24:41.649Z"
+  },
+  {
+    "id": "u_1789669515965_d6f34f58",
+    "username": "audediabate@gmail.com",
+    "password_hash": "430857c8b1b5ea052ed8e2b3e46690f370d2b434a87a0059626b521a8af22855886f69d43c23bb5d0d4eb5d77fe9af1264bd56310ea4f31fdd895b2c9dad40ad",
+    "salt": "a59ef40040438a6cabfcc7eef273ccc9",
+    "avatar": "assets/avatars/avatar-7.svg",
+    "role": "user",
+    "banned": false,
+    "created_at": "2026-09-17T18:25:15.965Z",
+    "last_login": "2026-09-17T18:25:15.965Z"
+  },
+  {
+    "id": "u_1789670230548_ab6cd9bd",
+    "username": "anaelleyao65@gmail.com",
+    "password_hash": "2585fe15f45f5a60f4b29a6add3ff6fb0bdd34d6e786cf7a7c22f5208d262e92e588d625ec9452e483f6c995a8477c457a844ea290a8f5d3a825f0653b0beda4",
+    "salt": "7419fc465abf0cd7ea0fbe2ce9d416a5",
+    "avatar": "assets/avatars/avatar-2.svg",
+    "role": "user",
+    "banned": false,
+    "created_at": "2026-09-17T18:37:10.548Z",
+    "last_login": "2026-09-17T18:37:10.548Z"
   }
 ]
