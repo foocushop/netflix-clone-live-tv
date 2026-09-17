@@ -238,7 +238,7 @@ class NetflixPlayer {
     document.addEventListener('fullscreenchange', syncFullscreenUI);
     document.addEventListener('webkitfullscreenchange', syncFullscreenUI);
 
-    // Clic & Tap sur le conteneur média (vidéo ou fond noir letterbox mobile)
+    // Clic & Tap unifié sur le lecteur (vidéo ou zone d'affichage)
     if (this.mediaContainer) {
       const handleMediaInteraction = (e) => {
         if (e.target.closest('.netflix-bottom-controls') || 
@@ -247,9 +247,15 @@ class NetflixPlayer {
             e.target.closest('.comments-drawer') ||
             e.target.closest('.player-status-banner') ||
             e.target.closest('.timer-expired-modal') ||
-            e.target.closest('.player-loader')) {
+            e.target.closest('.player-loader') ||
+            e.target.closest('.quality-menu') ||
+            e.target.closest('.speed-menu') ||
+            e.target.closest('.server-selector-container')) {
           return;
         }
+
+        // 1. SUR MOBILE / SMARTPHONE TACTILE :
+        // Un tap sur l'écran réveille ou masque les contrôles SANS mettre la vidéo en pause accidentellement
         if (this.isTouchDevice()) {
           const isIdle = this.overlay && this.overlay.classList.contains('user-idle');
           if (isIdle) {
@@ -261,45 +267,16 @@ class NetflixPlayer {
           }
           return;
         }
+
+        // 2. SUR ORDINATEUR & LAPTOP (Expérience officielle Netflix) :
+        // Un simple clic n'importe où sur l'écran ou la vidéo bascule directement Lecture / Pause !
         this.togglePlay();
       };
       this.mediaContainer.addEventListener('click', handleMediaInteraction);
     }
 
-    // Clic & Double-clic sur la vidéo
+    // Double-clic sur la vidéo pour le plein écran
     if (this.video) {
-      this.video.addEventListener('click', (e) => {
-        if (e.target.closest('.netflix-bottom-controls') || 
-            e.target.closest('.player-top-bar') ||
-            e.target.closest('.center-play-btn') ||
-            e.target.closest('.comments-drawer') ||
-            e.target.closest('.player-status-banner') ||
-            e.target.closest('.timer-expired-modal')) {
-          return;
-        }
-
-        // Sur mobile / appareil tactile : NE PAS METTRE EN PAUSE AUTOMATIQUEMENT
-        // Le tap sur l'écran réveille les contrôles et affiche le bouton central (avec les 2 barres pause ❚❚)
-        if (this.isTouchDevice()) {
-          const now = Date.now();
-          const wokeUpRecently = (now - (this._controlsWokeUpAt || 0)) < 450;
-          const isIdle = this.overlay && this.overlay.classList.contains('user-idle');
-
-          if (isIdle || wokeUpRecently) {
-            this.showControls();
-          } else {
-            // Si les contrôles étaient déjà ouverts et l'utilisateur tapote l'écran, on les referme sans couper la vidéo
-            if (this.video && !this.video.paused) {
-              this.hideControls();
-            }
-          }
-          return;
-        }
-
-        // Sur ordinateur avec souris : bascule lecture/pause classique
-        this.togglePlay();
-      });
-
       this.video.addEventListener('dblclick', (e) => {
         e.preventDefault();
         this.toggleFullscreen();
@@ -1192,10 +1169,18 @@ class NetflixPlayer {
 
   // ================= 8. GESTION DE L'INACTIVITÉ & DÉTECTION MOBILE =================
   isTouchDevice() {
-    const isMobileUA = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+    const isMobileUA = /Android|webOS|iPhone|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
     const isSmallScreen = window.innerWidth <= 820;
-    const hasTouch = ('ontouchstart' in window) || (navigator.maxTouchPoints > 0);
-    return isMobileUA || (hasTouch && isSmallScreen) || (window.matchMedia && window.matchMedia('(pointer: coarse)').matches);
+    const isCoarse = window.matchMedia && window.matchMedia('(pointer: coarse)').matches;
+    const isFine = window.matchMedia && window.matchMedia('(pointer: fine)').matches;
+
+    // Sur ordinateur ou laptop (écran > 820px ou souris/trackpad sans UA mobile) : toujours considéré comme PC / Laptop
+    if (window.innerWidth > 820 && !isMobileUA) {
+      return false;
+    }
+
+    // Appareil mobile uniquement si UA mobile ou (écran étroit ET pointeur tactile sans souris)
+    return isMobileUA || (isSmallScreen && isCoarse && !isFine);
   }
 
   initInactivityTimer() {
