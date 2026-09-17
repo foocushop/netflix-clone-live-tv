@@ -145,6 +145,31 @@ class NetflixPlayer {
     this.initServerNavEvents();
     this.initEpisodeSelectEvents();
     this.initInactivityTimer();
+
+    // 7. Watch Timer Monetag & Continuer la lecture
+    this.timerWarningBadge = document.getElementById('timerWarningBadge');
+    this.timerBadgeTime = document.getElementById('timerBadgeTime');
+    this.timerBadgeRechargeBtn = document.getElementById('timerBadgeRechargeBtn');
+    this.timerExpiredModal = document.getElementById('timerExpiredModal');
+    this.playerWatchTimer = document.getElementById('playerWatchTimer');
+    this.playerWatchTimerVal = document.getElementById('playerWatchTimerVal');
+    this.playerWatchTimerBtn = document.getElementById('playerWatchTimerBtn');
+    this.timerModalRechargeBtn = document.getElementById('timerModalRechargeBtn');
+
+    // Roulement des liens publicitaires (Monetag + Adsterra)
+    this.DIRECT_LINKS = [
+      'https://omg10.com/4/11820445',
+      'https://www.profitableratecpmnetwork.com/kwnxcx7a2s?key=d43d0890cc6512eb65c08a022e42f264'
+    ];
+    this.MONETAG_LINK = this.DIRECT_LINKS[0];
+    this.INITIAL_CREDIT = 1800; // 30 minutes
+    this.BONUS_CREDIT = 1800;   // +30 minutes de recharge
+    this.WARNING_THRESHOLD = 300; // 5 minutes
+    this.watchTimerInterval = null;
+    this.lastProgressSave = 0;
+    this.savedResumeTime = 0;
+
+    this.initWatchTimer();
   }
 
   // Horloge unifiée : réconcilie le currentTime relatif (Safari/iOS) avec le point de départ HLS réel
@@ -653,6 +678,7 @@ class NetflixPlayer {
       const now = performance.now();
       if (now - lastTimeUpdate < 250) return;
       lastTimeUpdate = now;
+      this.savePlaybackProgress();
 
       const isChannel = (this.currentMovie?.media_type === 'channel' || this.currentMovie?.is_live);
       if (isChannel) {
@@ -1312,6 +1338,21 @@ class NetflixPlayer {
     }
 
     this.currentLang = 'vf';
+    // Reprise de lecture
+    this.savedResumeTime = 0;
+    try {
+      const list = JSON.parse(localStorage.getItem('ziflix_continue_watching')) || [];
+      const saved = list.find(item => String(item.id) === String(movie.id));
+      if (saved && saved.currentTime > 10 && (saved.progressPct || 0) < 95) {
+        this.savedResumeTime = saved.currentTime;
+        if (!season && saved.season) season = saved.season;
+        if (!episode && saved.episode) episode = saved.episode;
+      }
+    } catch (e) {}
+
+    // Démarrage du Watch Timer Monetag
+    this.startWatchTimer();
+
     this.currentServer = 1;
     this.updateMetaDisplay();
     this.loadStream();
@@ -1350,6 +1391,8 @@ class NetflixPlayer {
       this.activeExtractionAbort = null;
     }
 
+    this.savePlaybackProgress(true);
+    this.stopWatchTimer();
     this.cleanupActivePlayback();
 
     if (this.backdrop) {
@@ -1589,7 +1632,14 @@ class NetflixPlayer {
 
       if (isChannel || data.player_type === 'direct_hls' || (targetStreamUrl && targetStreamUrl.includes('.m3u8'))) {
         this.playDirectHls(targetStreamUrl);
-      } else if (data.player_type === 'direct_video' || targetStreamUrl.includes('/api/stream/xtream-series')) {
+      } else if (targetStreamUrl.includes('/api/stream/xtream-series')) {
+        const epMatch = targetStreamUrl.match(/episode_id=([^&]+)/);
+        if (epMatch) {
+          this.playDirectHls(`${baseUrl}/api/stream/xtream-series-hls/${epMatch[1]}/master.m3u8`);
+        } else {
+          this.playDirectVideo(targetStreamUrl);
+        }
+      } else if (data.player_type === 'direct_video') {
         this.playDirectVideo(targetStreamUrl);
       } else if (data.player_type === 'iframe' || data.is_embed) {
         this.playEmbedIframe(data.embed_url || targetStreamUrl);
@@ -1675,7 +1725,7 @@ playDirectHls(streamUrl, options = {}) {
       this._audioTranscodeRecovery = false;
     }
     const startMatch = streamUrl.match(/[?&]start=(\d+)/);
-    const startSec = (options.startPosition !== undefined) ? options.startPosition : (startMatch ? parseInt(startMatch[1], 10) : 0);
+    const startSec = (options.startPosition !== undefined) ? options.startPosition : (startMatch ? parseInt(startMatch[1], 10) : (this.savedResumeTime > 0 ? this.savedResumeTime : 0));
     this._hlsStreamOffset = startSec;
 
     this.cleanupActivePlayback();
@@ -1730,16 +1780,24 @@ playDirectHls(streamUrl, options = {}) {
 
     const isChannel = !!(this.currentMovie?.media_type === 'channel' || this.currentMovie?.is_live);
 
-    // Protection Anti-Rollback / Anti-Boucle Xtream UNIQUEMENT pour Live TV (JAMAIS sur VOD)
+    // Protection Anti-Rollback / Anti-Boucle Xtream pour Live TV (Tolérance sécurisée)
     if (isChannel) {
       this.lastLiveMaxTime = 0;
+      this._antiLoopStallCount = 0;
       this._antiLoopHandler = () => {
         if (!this.video.paused && !this.video.seeking) {
           const cur = this.video.currentTime;
-          if (this.lastLiveMaxTime > 6 && cur < (this.lastLiveMaxTime - 2.0)) {
-            console.warn(`[Anti-Loop Xtream] Recalage direct : ${cur.toFixed(1)}s -> ${this.lastLiveMaxTime.toFixed(1)}s`);
-            this.video.currentTime = this.lastLiveMaxTime + 0.2;
-            return;
+          // Ne recalibrer que si le flux revient en arrière de plus de 15 secondes ET répété 5 fois
+          if (this.lastLiveMaxTime > 20 && cur < (this.lastLiveMaxTime - 15.0)) {
+            this._antiLoopStallCount++;
+            if (this._antiLoopStallCount > 5) {
+              this._antiLoopStallCount = 0;
+              console.warn(`[Anti-Loop Xtream] Recalage direct sécurisé : ${cur.toFixed(1)}s -> ${this.lastLiveMaxTime.toFixed(1)}s`);
+              this.video.currentTime = this.lastLiveMaxTime;
+              return;
+            }
+          } else {
+            this._antiLoopStallCount = 0;
           }
           if (cur > this.lastLiveMaxTime) {
             this.lastLiveMaxTime = cur;
@@ -1800,12 +1858,12 @@ playDirectHls(streamUrl, options = {}) {
         maxBufferLength: isMobile ? 35 : 90,            // 35s mobile / 90s PC (coussin profond anti-coupure)
         maxMaxBufferLength: isMobile ? 70 : 180,        // 70s mobile / 180s (3 min) PC
         maxBufferSize: (isMobile ? 50 : 128) * 1024 * 1024, // 50 Mo mobile / 128 Mo PC
-        maxBufferHole: 0.9,                             // Enjambe les micro-décalages
+        maxBufferHole: 1.5,                             // Enjambe les micro-décalages
         highBufferWatchdogPeriod: 0.8,                  // Réagit en 800ms
         lowBufferWatchdogPeriod: 0.4,
-        nudgeOffset: 0.2,                               // Franchit les trous sans freeze
-        nudgeMaxRetry: 6,
-        maxFragLookUpTolerance: 0.35,
+        nudgeOffset: 0.3,                               // Franchit les trous sans freeze
+        nudgeMaxRetry: 10,
+        maxFragLookUpTolerance: 0.5,
         fragLoadingTimeOut: 15000,
         manifestLoadingTimeOut: 8000,
         levelLoadingTimeOut: 8000,
@@ -1864,9 +1922,10 @@ playDirectHls(streamUrl, options = {}) {
           hasStartedPlay = true;
 
           const targetStart = (startSec > 0) ? startSec : 0;
-          if (!isChannel && Math.abs(this.video.currentTime - targetStart) > 1) {
+          if (!isChannel && targetStart > 0) {
             this.video.currentTime = targetStart;
           }
+          this.savedResumeTime = 0;
 
           if (options.keepPlayback !== false && !this._isUserPaused) {
             const playPromise = this.video.play();
@@ -1914,8 +1973,8 @@ playDirectHls(streamUrl, options = {}) {
       hls.on(Hls.Events.ERROR, (event, data) => {
         // Détection d'incompatibilité audio matérielle (ex: EC-3 Dolby / code non supporté)
         const isAudioIncompatibility = (
-          (data.reason && (data.reason.includes('EC-3') || data.reason.includes('Unsupported audio'))) ||
-          (data.details === Hls.ErrorDetails.BUFFER_APPENDING_ERROR && data.mimeType && data.mimeType.includes('ec-3'))
+          (data.reason && (data.reason.includes('EC-3') || data.reason.includes('Unsupported audio') || data.reason.toLowerCase().includes('audio'))) ||
+          (data.details === Hls.ErrorDetails.BUFFER_APPENDING_ERROR && (data.parent === 'audio' || data.sourceBufferName === 'audio' || (data.mimeType && (data.mimeType.includes('ec-3') || data.mimeType.includes('audio')))))
         );
         if (isAudioIncompatibility) {
           console.warn('[HLS] Incompatibilité audio détectée (EC-3).');
@@ -1967,13 +2026,22 @@ playDirectHls(streamUrl, options = {}) {
             break;
           case Hls.ErrorTypes.MEDIA_ERROR:
             this._mediaErrorCount = (this._mediaErrorCount || 0) + 1;
-            if (this._mediaErrorCount >= 3 || data.details === 'mediaSourceRequiresReset') {
+            console.warn('[HLS Media Error #' + this._mediaErrorCount + ']:', data.details);
+            if (this._mediaErrorCount === 1) {
+              hls.recoverMediaError();
+            } else if (this._mediaErrorCount === 2) {
+              try { hls.swapAudioCodec(); } catch (e) {}
+              hls.recoverMediaError();
+            } else if (this._mediaErrorCount <= 4) {
+              // Sur direct (Live TV), laisser HLS.js récupérer sans forcer de seek artificiel
+              if (!isChannel && this.video && !this.video.paused) {
+                this.video.currentTime += 0.3;
+              }
+              hls.recoverMediaError();
+            } else {
               this._mediaErrorCount = 0;
               this.showStatusBanner("Erreur de décodage média. Cliquez sur Réessayer.");
-              return;
             }
-            console.log('[HLS] Récupération média automatique...');
-            hls.recoverMediaError();
             break;
           default:
             try {
@@ -2127,6 +2195,12 @@ playDirectHls(streamUrl, options = {}) {
     const triggerSafePlay = () => {
       if (hasStartedPlay) return;
       hasStartedPlay = true;
+      if (this.savedResumeTime > 0 && !isChannel) {
+        try {
+          this.video.currentTime = this.savedResumeTime;
+        } catch (e) {}
+        this.savedResumeTime = 0;
+      }
       const playPromise = this.video.play();
       if (playPromise !== undefined) {
         playPromise.catch(err => {
@@ -2151,6 +2225,9 @@ playDirectHls(streamUrl, options = {}) {
   // ================= 13. MOTEUR IFRAME DE SECOURS =================
   playEmbedIframe(embedUrl) {
     this.setPlayerQualityMode(true);
+    if (typeof embedUrl === 'string') {
+      embedUrl = embedUrl.replace(/vidmoly\.(me|biz|net|to)/g, 'vidmoly.org').replace(/embed-embed-/g, 'embed-');
+    }
     if (this.hls) {
       try {
         this.hls.stopLoad();
@@ -2429,7 +2506,259 @@ playDirectHls(streamUrl, options = {}) {
     if (h > 0) return `${h}:${pad(m)}:${pad(s)}`;
     return `${pad(m)}:${pad(s)}`;
   }
-}
 
-// Initialisation globale
-window.NetflixPlayer = NetflixPlayer;
+  // ================= ⏳ WATCH TIMER MONETAG & GESTION CONTINUE =================
+  initWatchTimer() {
+    if (!this.playerWatchTimerBtn) this.playerWatchTimerBtn = document.getElementById('playerWatchTimerBtn');
+    if (!this.timerModalRechargeBtn) this.timerModalRechargeBtn = document.getElementById('timerModalRechargeBtn');
+    if (!this.timerExpiredModal) this.timerExpiredModal = document.getElementById('timerExpiredModal');
+
+    if (this.playerWatchTimerBtn) {
+      this.playerWatchTimerBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        this.rechargeWatchCredit(false);
+      });
+    }
+
+    if (this.timerModalRechargeBtn) {
+      this.timerModalRechargeBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        this.rechargeWatchCredit(true);
+      });
+    }
+  }
+
+  isAdmin() {
+    try {
+      if (window.netflixApp && typeof window.netflixApp.isAdmin === 'function' && window.netflixApp.isAdmin()) return true;
+      if (window.app && typeof window.app.isAdmin === 'function' && window.app.isAdmin()) return true;
+      const raw = localStorage.getItem('ziflix_user');
+      if (raw) {
+        const u = JSON.parse(raw);
+        if (u && (u.role === 'admin' || u.is_admin || u.isAdmin)) return true;
+      }
+      if (localStorage.getItem('ziflix_admin_token')) return true;
+      if (localStorage.getItem('ziflix_is_admin') === 'true') return true;
+      if (new URLSearchParams(window.location.search).get('admin') === '1') return true;
+    } catch (e) {}
+    return false;
+  }
+
+  getWatchCredit() {
+    try {
+      const stored = localStorage.getItem('ziflix_watch_credit');
+      if (stored === null || stored === undefined) {
+        localStorage.setItem('ziflix_watch_credit', String(this.INITIAL_CREDIT));
+        return this.INITIAL_CREDIT;
+      }
+      const val = parseInt(stored, 10);
+      return isNaN(val) ? this.INITIAL_CREDIT : val;
+    } catch (e) {
+      return this.INITIAL_CREDIT;
+    }
+  }
+
+  setWatchCredit(val) {
+    try {
+      localStorage.setItem('ziflix_watch_credit', String(Math.max(0, Math.round(val))));
+    } catch (e) {}
+  }
+
+  getNextDirectLink() {
+    try {
+      const links = (this.DIRECT_LINKS && this.DIRECT_LINKS.length > 0) ? this.DIRECT_LINKS : [
+        'https://omg10.com/4/11820445',
+        'https://www.profitableratecpmnetwork.com/kwnxcx7a2s?key=d43d0890cc6512eb65c08a022e42f264'
+      ];
+      let idx = parseInt(localStorage.getItem('ziflix_ad_rotation_idx') || '0', 10);
+      if (isNaN(idx) || idx < 0 || idx >= links.length) idx = 0;
+      const targetUrl = links[idx];
+      // Roulement automatique 50/50 vers le lien suivant pour la prochaine recharge
+      localStorage.setItem('ziflix_ad_rotation_idx', String((idx + 1) % links.length));
+      return targetUrl;
+    } catch (e) {
+      return (this.DIRECT_LINKS && this.DIRECT_LINKS[0]) || 'https://omg10.com/4/11820445';
+    }
+  }
+
+  rechargeWatchCredit(fromModal = false) {
+    const targetUrl = this.getNextDirectLink();
+    try {
+      // Ouverture du lien publicitaire en roulement (Monetag / Adsterra)
+      window.open(targetUrl, '_blank');
+    } catch (e) {
+      console.warn('[Ads] Erreur ouverture lien:', e.message);
+    }
+
+    const current = Math.max(0, this.getWatchCredit());
+    const newCredit = current + this.BONUS_CREDIT;
+    this.setWatchCredit(newCredit);
+    this.updateTimerDisplays(newCredit);
+
+    if (this.playerWatchTimer && !this.isAdmin()) {
+      this.playerWatchTimer.style.display = 'inline-flex';
+      this.playerWatchTimer.classList.remove('timer-low');
+    }
+
+    if (fromModal) {
+      if (!this.timerExpiredModal) this.timerExpiredModal = document.getElementById('timerExpiredModal');
+      if (this.timerExpiredModal) {
+        this.timerExpiredModal.classList.add('hidden');
+      }
+      this.showToast('🎉 +30 minutes gratuites débloquées ! Bon visionnage.');
+      try {
+        this.video.play().catch(() => {});
+      } catch (e) {}
+    } else {
+      if (this.playerWatchTimerVal) {
+        this.playerWatchTimerVal.textContent = '+30m !';
+        setTimeout(() => {
+          this.updateTimerDisplays(this.getWatchCredit());
+        }, 1400);
+      }
+      this.showToast('🎉 +30 minutes gratuites ajoutées avec succès !');
+    }
+  }
+
+  updateTimerDisplays(credit) {
+    credit = Math.max(0, Math.round(credit));
+    const mins = Math.floor(credit / 60);
+    const secs = credit % 60;
+    const timeStr = `${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
+
+    if (!this.playerWatchTimerVal) this.playerWatchTimerVal = document.getElementById('playerWatchTimerVal');
+    if (this.playerWatchTimerVal) {
+      this.playerWatchTimerVal.textContent = timeStr;
+    }
+  }
+
+  startWatchTimer() {
+    this.stopWatchTimer();
+    if (this.isAdmin()) {
+      if (this.playerWatchTimer) this.playerWatchTimer.style.display = 'none';
+      return;
+    }
+
+    if (!this.playerWatchTimer) this.playerWatchTimer = document.getElementById('playerWatchTimer');
+    if (this.playerWatchTimer) {
+      this.playerWatchTimer.style.display = 'inline-flex';
+      this.playerWatchTimer.classList.remove('timer-low');
+    }
+
+    const initialCredit = this.getWatchCredit();
+    this.updateTimerDisplays(initialCredit);
+
+    this.watchTimerInterval = setInterval(() => {
+      if (this.isAdmin()) {
+        this.stopWatchTimer();
+        return;
+      }
+
+      const isPlaying = this.overlay && this.overlay.classList.contains('active') && !this.video.paused && !this.video.ended && this.video.currentTime > 0;
+      if (!isPlaying) return;
+
+      let credit = this.getWatchCredit() - 1;
+      this.setWatchCredit(credit);
+      this.updateTimerDisplays(credit);
+
+      if (credit <= 0) {
+        try { this.video.pause(); } catch (e) {}
+        if (this.playerWatchTimer) this.playerWatchTimer.style.display = 'none';
+        if (!this.timerExpiredModal) this.timerExpiredModal = document.getElementById('timerExpiredModal');
+        if (this.timerExpiredModal) this.timerExpiredModal.classList.remove('hidden');
+      } else if (credit <= this.WARNING_THRESHOLD) {
+        // Alerte 5 min : style timer-low discret
+        if (this.playerWatchTimer) this.playerWatchTimer.classList.add('timer-low');
+      } else {
+        if (this.playerWatchTimer) this.playerWatchTimer.classList.remove('timer-low');
+      }
+    }, 1000);
+  }
+
+  stopWatchTimer() {
+    if (this.watchTimerInterval) {
+      clearInterval(this.watchTimerInterval);
+      this.watchTimerInterval = null;
+    }
+    if (this.playerWatchTimer) this.playerWatchTimer.style.display = 'none';
+    if (!this.timerExpiredModal) this.timerExpiredModal = document.getElementById('timerExpiredModal');
+    if (this.timerExpiredModal) this.timerExpiredModal.classList.add('hidden');
+  }
+
+  showToast(msg) {
+    let toast = document.getElementById('playerZiflixToast');
+    if (!toast) {
+      toast = document.createElement('div');
+      toast.id = 'playerZiflixToast';
+      toast.style.cssText = 'position:absolute;top:70px;left:50%;transform:translateX(-50%);background:rgba(18,18,22,0.92);border:1px solid rgba(229,9,20,0.5);color:#fff;padding:10px 20px;border-radius:30px;font-size:0.9rem;font-weight:700;z-index:99999;box-shadow:0 8px 24px rgba(0,0,0,0.7);backdrop-filter:blur(10px);transition:all 0.3s ease;pointer-events:none;';
+      if (this.overlay) this.overlay.appendChild(toast);
+    }
+    toast.textContent = msg;
+    toast.style.opacity = '1';
+    toast.style.display = 'block';
+    setTimeout(() => {
+      if (toast) {
+        toast.style.opacity = '0';
+        setTimeout(() => { toast.style.display = 'none'; }, 350);
+      }
+    }, 3500);
+  }
+
+  savePlaybackProgress(force = false) {
+    if (!this.currentMovie || !this.video) return;
+    const isChannel = (this.currentMovie.media_type === 'channel' || this.currentMovie.is_live);
+    if (isChannel) return;
+
+    const cur = this.video.currentTime || 0;
+    const dur = this.video.duration || 0;
+    if (!isFinite(dur) || dur < 60) return;
+
+    const now = Date.now();
+    if (!force && now - (this.lastProgressSave || 0) < 4000) return;
+    this.lastProgressSave = now;
+
+    try {
+      let list = JSON.parse(localStorage.getItem('ziflix_continue_watching')) || [];
+      const movieId = String(this.currentMovie.id);
+
+      // Si le contenu est regardé à plus de 95%, le supprimer
+      if ((cur / dur) >= 0.95 || this.video.ended) {
+        list = list.filter(item => String(item.id) !== movieId);
+        localStorage.setItem('ziflix_continue_watching', JSON.stringify(list));
+        if (window.netflixApp && typeof window.netflixApp.refreshContinueWatching === 'function') {
+          window.netflixApp.refreshContinueWatching();
+        }
+        return;
+      }
+
+      if (cur >= 10) {
+        const entry = {
+          id: this.currentMovie.id,
+          title: this.currentMovie.title || (this.titleDisplay ? this.titleDisplay.textContent : 'Titre'),
+          poster: this.currentMovie.poster_path || this.currentMovie.poster || this.currentMovie.backdrop_path || this.currentMovie.backdrop || '',
+          backdrop: this.currentMovie.backdrop_path || this.currentMovie.backdrop || '',
+          season: this.currentSeason || null,
+          episode: this.currentEpisode || null,
+          currentTime: Math.floor(cur),
+          duration: Math.floor(dur),
+          progressPct: Math.min(100, Math.max(1, Math.round((cur / dur) * 100))),
+          media_type: this.currentMovie.media_type || (this.currentSeason ? 'series' : 'movie'),
+          updatedAt: now,
+          movieData: this.currentMovie
+        };
+
+        list = list.filter(item => String(item.id) !== movieId);
+        list.unshift(entry);
+        if (list.length > 15) list = list.slice(0, 15);
+        localStorage.setItem('ziflix_continue_watching', JSON.stringify(list));
+
+        if (window.netflixApp && typeof window.netflixApp.refreshContinueWatching === 'function') {
+          window.netflixApp.refreshContinueWatching();
+        }
+      }
+    } catch (e) {
+      console.warn('[Continue Watching] Erreur sauvegarde:', e.message);
+    }
+  }
+
+}

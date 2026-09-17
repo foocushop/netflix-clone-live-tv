@@ -31,6 +31,7 @@ class NetflixApp {
     this.initAuthEvents();
     this.initBugReporting();
     this.checkAuth();
+    this.initTimerUI();
   }
 
   getAuthHeaders(extra = {}) {
@@ -478,6 +479,12 @@ class NetflixApp {
   renderCatalog(data) {
     this.catalogRowsContainer.innerHTML = '';
     const fragment = document.createDocumentFragment();
+
+    // Rangée Reprendre la lecture
+    const continueItems = this.getContinueWatchingList();
+    if (continueItems.length > 0) {
+      fragment.appendChild(this.buildContinueWatchingRow(continueItems));
+    }
 
     // Ligne "Ma Liste" si elle contient des titres
     const myListMovies = this.getMyListMovies();
@@ -2032,6 +2039,16 @@ class NetflixApp {
     if (openAdminBtn) {
       openAdminBtn.style.display = (user.role === 'admin') ? 'flex' : 'none';
     }
+
+    const isAdmin = (user.role === 'admin' || user.is_admin || user.isAdmin);
+    const headerPill = document.getElementById('headerTimerPill');
+    const mobilePill = document.getElementById('mobileTimerPill');
+    const welcomeModal = document.getElementById('welcomeTimerModal');
+    if (isAdmin) {
+      if (headerPill) headerPill.style.display = 'none';
+      if (mobilePill) mobilePill.style.display = 'none';
+      if (welcomeModal) welcomeModal.style.display = 'none';
+    }
   }
 
   async handleLogin(e) {
@@ -2487,6 +2504,161 @@ class NetflixApp {
       toast.classList.add('fade-out');
       setTimeout(() => toast.remove(), 300);
     }, 3500);
+  }
+
+
+  // ================= 🎬 REPRENDRE LA LECTURE & GESTION ADMIN =================
+  isAdmin() {
+    if (this.currentUser && (this.currentUser.role === 'admin' || this.currentUser.is_admin || this.currentUser.isAdmin)) return true;
+    try {
+      const raw = localStorage.getItem('ziflix_user');
+      if (raw) {
+        const u = JSON.parse(raw);
+        if (u && (u.role === 'admin' || u.is_admin || u.isAdmin)) return true;
+      }
+      if (localStorage.getItem('ziflix_admin_token')) return true;
+      if (localStorage.getItem('ziflix_is_admin') === 'true') return true;
+      if (new URLSearchParams(window.location.search).get('admin') === '1') return true;
+    } catch (e) {}
+    return false;
+  }
+
+  getContinueWatchingList() {
+    try {
+      const raw = localStorage.getItem('ziflix_continue_watching');
+      if (!raw) return [];
+      const list = JSON.parse(raw);
+      if (!Array.isArray(list)) return [];
+      return list.filter(item => item && item.id && (item.currentTime >= 10 || item.progressPct > 0) && (item.progressPct || 0) < 95);
+    } catch (e) {
+      return [];
+    }
+  }
+
+  buildContinueWatchingRow(items) {
+    const rowEl = document.createElement('div');
+    rowEl.className = 'movie-row continue-watching-row';
+    rowEl.innerHTML = `
+      <h2 class="row-title"><span>▶️</span> Reprendre la lecture</h2>
+      <div class="row-slider-container">
+        <button class="slider-arrow left" aria-label="Défiler à gauche">‹</button>
+        <div class="row-slider"></div>
+        <button class="slider-arrow right" aria-label="Défiler à droite">›</button>
+      </div>
+    `;
+
+    const slider = rowEl.querySelector('.row-slider');
+    const arrowLeft = rowEl.querySelector('.slider-arrow.left');
+    const arrowRight = rowEl.querySelector('.slider-arrow.right');
+
+    if (arrowLeft) arrowLeft.addEventListener('click', () => slider.scrollBy({ left: -600, behavior: 'smooth' }));
+    if (arrowRight) arrowRight.addEventListener('click', () => slider.scrollBy({ left: 600, behavior: 'smooth' }));
+
+    const cardFragment = document.createDocumentFragment();
+    items.forEach(item => {
+      const card = document.createElement('div');
+      card.className = 'movie-card continue-card focusable';
+      card.setAttribute('tabindex', '0');
+
+      const imgUrl = item.backdrop || item.poster || 'assets/hero/live-tv-banner.webp';
+      const remSec = Math.max(0, (item.duration || 0) - (item.currentTime || 0));
+      const remMin = Math.round(remSec / 60);
+      const remLabel = remMin > 0 ? `${remMin} min restantes` : '';
+      const epLabel = item.season ? `S${item.season}:E${item.episode}` : (item.media_type === 'series' ? 'Série' : 'Film');
+
+      card.innerHTML = `
+        <img class="card-img" src="${imgUrl}" alt="${this.escapeHtml(item.title || '')}" loading="lazy" onerror="this.src='assets/hero/live-tv-banner.webp'">
+        <button type="button" class="continue-remove-btn" title="Retirer de la liste" aria-label="Supprimer">✕</button>
+        <div class="continue-info-pill">
+          <span class="continue-ep-tag">${epLabel}</span>
+          ${remLabel ? `<span class="continue-time-tag">${remLabel}</span>` : ''}
+        </div>
+        <div class="continue-progress-wrap">
+          <div class="continue-progress-fill" style="width: ${item.progressPct || 0}%;"></div>
+        </div>
+        <div class="card-overlay">
+          <div class="card-title">${this.escapeHtml(item.title || '')}</div>
+          <div class="card-actions">
+            <button class="action-btn play-btn" title="Reprendre la lecture">▶</button>
+          </div>
+        </div>
+      `;
+
+      const removeBtn = card.querySelector('.continue-remove-btn');
+      if (removeBtn) {
+        removeBtn.addEventListener('click', (e) => {
+          e.stopPropagation();
+          this.removeFromContinueWatching(item.id);
+          card.remove();
+          if (slider.children.length === 0) {
+            rowEl.remove();
+          }
+        });
+      }
+
+      card.addEventListener('click', () => {
+        const movieObj = item.movieData || {
+          id: item.id,
+          title: item.title,
+          poster: item.poster,
+          backdrop: item.backdrop,
+          media_type: item.media_type
+        };
+        this.player.open(movieObj, 1, item.season, item.episode);
+      });
+
+      cardFragment.appendChild(card);
+    });
+
+    slider.appendChild(cardFragment);
+    return rowEl;
+  }
+
+  removeFromContinueWatching(id) {
+    try {
+      let list = JSON.parse(localStorage.getItem('ziflix_continue_watching')) || [];
+      list = list.filter(item => String(item.id) !== String(id));
+      localStorage.setItem('ziflix_continue_watching', JSON.stringify(list));
+    } catch (e) {}
+  }
+
+
+    initTimerUI() {
+    this.checkWelcomeTimerModal();
+  }
+
+  checkWelcomeTimerModal() {
+    if (this.isAdmin()) return;
+    const modal = document.getElementById('welcomeTimerModal');
+    const acceptBtn = document.getElementById('welcomeTimerAcceptBtn');
+    if (!modal || !acceptBtn) return;
+
+    const accepted = localStorage.getItem('ziflix_welcome_accepted');
+    if (!accepted) {
+      modal.classList.remove('hidden');
+
+      acceptBtn.addEventListener('click', () => {
+        localStorage.setItem('ziflix_welcome_accepted', 'true');
+        modal.classList.add('hidden');
+        this.showToast('30 minutes offertes activées.');
+      }, { once: true });
+    }
+  }
+
+    refreshContinueWatching() {
+    if (!this.catalogRowsContainer) return;
+    const existing = this.catalogRowsContainer.querySelector('.continue-watching-row');
+    const items = this.getContinueWatchingList();
+    if (items.length > 0) {
+      const newRow = this.buildContinueWatchingRow(items);
+      if (existing) {
+        existing.replaceWith(newRow);
+      } else {
+        this.catalogRowsContainer.prepend(newRow);
+      }
+    } else if (existing) {
+      existing.remove();
+    }
   }
 }
 

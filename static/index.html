@@ -6,8 +6,8 @@
   <title>ZIFLIX - Streaming & Télévision en Direct</title>
   <link rel="icon" type="image/svg+xml" href="assets/logos/ziflix-icon.svg">
   <link rel="preload" href="assets/logos/ziflix-logo.svg?v=4" as="image" type="image/svg+xml">
-  <link rel="stylesheet" href="css/netflix.css?v=27">
-  <link rel="stylesheet" href="css/admin.css?v=27">
+  <link rel="stylesheet" href="css/netflix.css?v=1789612950">
+  <link rel="stylesheet" href="css/admin.css?v=1789612950">
   <!-- Critical Zero-FOUC & Splash early styles -->
   <style>
     .auth-gate-backdrop.hidden { display: none !important; }
@@ -27,7 +27,20 @@
       margin: 24px auto 0 auto;
     }
   </style>
-  <script>window.__ZIFLIX_SPLASH_START = Date.now();</script>
+  <script>
+    window.__ZIFLIX_SPLASH_START = Date.now();
+    setTimeout(function() {
+      var sp = document.getElementById('ziflixSplash');
+      var app = document.getElementById('ziflixApp');
+      if (sp && sp.style.display !== 'none') {
+        if (app) app.style.display = 'block';
+        sp.style.transition = 'opacity 0.4s ease';
+        sp.style.opacity = '0';
+        sp.style.pointerEvents = 'none';
+        setTimeout(function() { sp.style.display = 'none'; }, 450);
+      }
+    }, 3500);
+  </script>
 </head>
 <body>
 
@@ -65,7 +78,7 @@
         <span class="search-icon">🔍</span>
         <input type="text" id="searchInput" class="search-input" placeholder="Titres, personnes, genres...">
       </div>
-            <button class="nav-premium-btn" id="navPremiumBtn" title="Abonnement VIP ZIFLIX">
+            <button class="nav-premium-btn" id="navPremiumBtn" style="display:none !important;" title="Abonnement VIP ZIFLIX">
         <span class="vip-crown-icon">👑</span>
         <span class="vip-btn-text" id="navVipBtnText">Passer VIP</span>
       </button>
@@ -74,7 +87,7 @@
           <img id="headerProfileImg" src="assets/avatars/avatar-1.svg" alt="Profil" style="width: 100%; height: 100%; border-radius: 50%; object-fit: cover;">
         </div>
         <div class="profile-dropdown" id="profileDropdown">
-                    <div class="dropdown-item dropdown-vip-item" id="openPremiumDropdownBtn">
+                    <div class="dropdown-item dropdown-vip-item" id="openPremiumDropdownBtn" style="display:none !important;">
             <span style="font-size: 1.3rem;">👑</span>
             <div style="flex: 1;">
               <div style="font-weight: 700; color: #fbbf24; display: flex; align-items: center; justify-content: space-between;">
@@ -112,7 +125,7 @@
   <!-- ================= BARRE DE SOUS-NAVIGATION MOBILE (CATÉGORIES DÉFILANTES) ================= -->
   <nav class="mobile-sub-nav" id="mobileSubNav">
     <div class="mobile-sub-nav-scroll">
-      <a href="#" class="mobile-sub-pill nav-premium-pill" id="mobilePremiumBtn">👑 Passer VIP</a>
+      <a href="#" class="mobile-sub-pill nav-premium-pill" id="mobilePremiumBtn" style="display:none !important;">👑 Passer VIP</a>
       <a href="#" class="mobile-sub-pill nav-link active" data-filter="all">🍿 Tout</a>
       <a href="#" class="mobile-sub-pill nav-link" data-filter="series">📺 Séries</a>
       <a href="#" class="mobile-sub-pill nav-link" data-filter="movie">🎬 Films</a>
@@ -430,6 +443,12 @@
 
           <div class="controls-center">
             <span class="ctrl-media-title" id="ctrlMediaTitle">Lecture en cours</span>
+            <!-- Timer Netflix ZIFLIX (Entre le nom de la série et le 1x) -->
+            <div class="player-watch-timer" id="playerWatchTimer" title="Temps gratuit restant (Recharger +30 min)" style="display:none;">
+              <span class="player-watch-timer-dot">⏱</span>
+              <span class="player-watch-timer-val" id="playerWatchTimerVal">30:00</span>
+              <button type="button" class="player-watch-timer-btn" id="playerWatchTimerBtn" title="Recharger +30 min gratuites">+30m</button>
+            </div>
           </div>
 
           <div class="controls-right">
@@ -505,6 +524,22 @@
         <div class="player-drawer-compose">
           <input type="text" id="playerCommentInput" class="player-drawer-input" placeholder="Votre commentaire..." maxlength="400" autocomplete="off">
           <button type="button" id="playerCommentSubmitBtn" class="player-drawer-send-btn">Envoyer</button>
+        </div>
+      </div>
+
+      <!-- ================= MODAL EXPIRATION TIMER (+30 MIN RECHARGE) ================= -->
+      <div class="timer-expired-modal hidden" id="timerExpiredModal">
+        <div class="timer-modal-card">
+          <div class="timer-modal-icon">⏱</div>
+          <h3 class="timer-modal-title">Temps de visionnage écoulé</h3>
+          <p class="timer-modal-desc">
+            Vos 30 minutes offertes sont terminées.<br>
+            Rechargez <b>+30 minutes gratuites</b> en 1 clic pour reprendre la lecture immédiatement.
+          </p>
+          <button type="button" class="timer-recharge-cta-btn" id="timerModalRechargeBtn">
+            ⚡ Recharger +30 min gratuites
+          </button>
+          <div class="timer-modal-subtext">Gratuit & illimité • Reprise immédiate du flux</div>
         </div>
       </div>
     </div>
@@ -794,10 +829,13 @@
           </div>
           <div class="cluster-header-actions" style="display: flex; align-items: center; gap: 12px;">
             <div id="vidmolyQuotaBadge" style="background: rgba(229,9,20,0.15); border: 1px solid rgba(229,9,20,0.4); padding: 6px 14px; border-radius: 20px; font-size: 0.85rem; font-weight: 700; color: #ff5252;">
-              ⚡ Quota restant : <span id="vidmolyQuotaRemaining">50</span> / 50 requêtes aujourd'hui
+              ⚡ Quota pool (20 comptes) : <span id="vidmolyQuotaRemaining">1000</span> / <span id="vidmolyQuotaTotal">1000</span> requêtes
             </div>
             <button type="button" class="btn-admin btn-admin-secondary btn-sm" id="vidmolyRefreshStatusBtn" title="Vérifier les encodages terminés">
               🔄 Actualiser
+            </button>
+            <button type="button" class="btn-admin btn-admin-secondary btn-sm" id="vidmolyKeepAliveBtn" title="Maintenir les vidéos actives pour réinitialiser les 365 jours" style="background: rgba(33,150,243,0.15); border: 1px solid rgba(33,150,243,0.4); color: #64b5f6; font-weight: 700;">
+              🛡️ Sentinel Keep-Alive (365j)
             </button>
           </div>
         </div>
@@ -822,13 +860,43 @@
           </div>
         </div>
 
+        <!-- ================= AUTO-PUBLICATION VIDMOLY ================= -->
+        <div id="vidmolyAutoPublishCard" style="margin-bottom: 18px; padding: 14px 18px; background: rgba(229,9,20,0.06); border: 1px solid rgba(229,9,20,0.25); border-radius: 8px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 14px;">
+          <div style="flex: 1; min-width: 260px;">
+            <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap; margin-bottom: 4px;">
+              <span style="font-size: 0.95rem; font-weight: 800; color: #fff;">⚡ Auto-publication sur nouveaux épisodes</span>
+              <span id="vidmolyAutoPublishBadge" style="padding: 3px 10px; border-radius: 12px; font-size: 0.75rem; font-weight: 700; background: rgba(255,255,255,0.1); color: #aaa;">Sélectionnez une saison</span>
+            </div>
+            <p style="font-size: 0.8rem; color: var(--admin-text-secondary); margin: 0; line-height: 1.4;">
+              Dès qu'un nouvel épisode sort chez le fournisseur (Xtream), il est immédiatement téléchargé à 100% sur SSD et publié sur Vidmoly de manière autonome.
+            </p>
+          </div>
+          <div>
+            <button type="button" class="btn-admin" id="vidmolyToggleAutoPublishBtn" style="height: 38px; padding: 0 18px; font-weight: 700; font-size: 0.85rem; border-radius: 6px; cursor: pointer; transition: all 0.2s;">
+              ⚙️ Sélectionner une saison
+            </button>
+          </div>
+        </div>
+
+
         <!-- Tableau interactif des épisodes -->
         <div id="vidmolyEpisodesWrapper" style="display: none; background: rgba(0,0,0,0.35); border: 1px solid rgba(255,255,255,0.08); border-radius: 8px; overflow: hidden; margin-bottom: 18px;">
-          <div style="padding: 10px 16px; background: rgba(255,255,255,0.03); display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(255,255,255,0.08);">
-            <label style="cursor: pointer; display: flex; align-items: center; gap: 8px; font-size: 0.85rem; font-weight: 600;">
-              <input type="checkbox" id="vidmolySelectAllEp"> Tout cocher / Décocher
-            </label>
-            <span id="vidmolySelectedCounter" style="font-size: 0.85rem; color: var(--admin-text-muted);">0 sélectionné(s)</span>
+          <div style="padding: 10px 16px; background: rgba(255,255,255,0.03); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; border-bottom: 1px solid rgba(255,255,255,0.08);">
+            <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
+              <button type="button" id="vidmolySelectFoxBleuOnlyBtn" onclick="if(window.netflixAdmin&&window.netflixAdmin.selectOnlyFoxBleu){window.netflixAdmin.selectOnlyFoxBleu();}else{document.querySelectorAll('.vidmoly-ep-checkbox').forEach(cb=>{const s=cb.dataset.status||'none';cb.checked=(s==='none'||s==='error'||cb.dataset.isDuplicate==='0');});const c=document.getElementById('vidmolySelectedCounter');if(c)c.textContent=document.querySelectorAll('.vidmoly-ep-checkbox:checked').length+' sélectionné(s)';const u=document.getElementById('vidmolyStartUploadBtn');if(u){const n=document.querySelectorAll('.vidmoly-ep-checkbox:checked').length;u.disabled=n===0;u.style.opacity=n===0?'0.5':'1';}}" class="btn-admin btn-admin-blue btn-sm" style="font-weight: 700; display: inline-flex; align-items: center; gap: 6px; padding: 6px 14px; font-size: 0.82rem; border-radius: 4px; box-shadow: 0 2px 8px rgba(33,150,243,0.35); cursor: pointer;">
+                ⚡ Cocher non transférés (FoxBleu)
+              </button>
+              <button type="button" id="vidmolySelectAllBtn" onclick="if(window.netflixAdmin&&window.netflixAdmin.selectAllEpisodes){window.netflixAdmin.selectAllEpisodes(true);}else{document.querySelectorAll('.vidmoly-ep-checkbox').forEach(cb=>cb.checked=true);const c=document.getElementById('vidmolySelectedCounter');if(c)c.textContent=document.querySelectorAll('.vidmoly-ep-checkbox').length+' sélectionné(s)';const u=document.getElementById('vidmolyStartUploadBtn');if(u){u.disabled=false;u.style.opacity='1';}}" class="btn-admin btn-admin-secondary btn-sm" style="font-size: 0.8rem; padding: 5px 12px; cursor: pointer;">
+                Tout cocher
+              </button>
+              <button type="button" id="vidmolyDeselectAllBtn" onclick="if(window.netflixAdmin&&window.netflixAdmin.selectAllEpisodes){window.netflixAdmin.selectAllEpisodes(false);}else{document.querySelectorAll('.vidmoly-ep-checkbox').forEach(cb=>cb.checked=false);const c=document.getElementById('vidmolySelectedCounter');if(c)c.textContent='0 sélectionné(s)';const u=document.getElementById('vidmolyStartUploadBtn');if(u){u.disabled=true;u.style.opacity='0.5';}}" class="btn-admin btn-admin-secondary btn-sm" style="font-size: 0.8rem; padding: 5px 12px; cursor: pointer;">
+                Tout décocher
+              </button>
+              <label style="cursor: pointer; display: flex; align-items: center; gap: 6px; font-size: 0.82rem; font-weight: 500; color: #aaa; margin-left: 4px;">
+                <input type="checkbox" id="vidmolySelectAllEp" onchange="if(window.netflixAdmin&&window.netflixAdmin.selectAllEpisodes){window.netflixAdmin.selectAllEpisodes(this.checked);}else{document.querySelectorAll('.vidmoly-ep-checkbox').forEach(cb=>cb.checked=this.checked);}"> Basculer tout
+              </label>
+            </div>
+            <span id="vidmolySelectedCounter" style="font-size: 0.85rem; color: var(--admin-text-muted); font-weight: 600;">0 sélectionné(s)</span>
           </div>
           <div style="max-height: 280px; overflow-y: auto;">
             <table class="admin-table" style="width: 100%; margin: 0; border-collapse: collapse;">
@@ -1268,7 +1336,7 @@
 
   
   <!-- ================= MODAL ABONNEMENT PREMIUM VIP & PAIEMENT MOBILE MONEY ================= -->
-  <div class="modal-backdrop premium-modal-backdrop hidden" id="premiumModal">
+  <div class="modal-backdrop premium-modal-backdrop hidden" id="premiumModal" style="display:none !important;">
     <div class="premium-modal-card">
       <button class="modal-close-btn" id="closePremiumModalBtn" title="Fermer">✕</button>
 
@@ -1594,10 +1662,23 @@
     </a>
   </nav>
 
+  <!-- ================= NOTIFICATION D'ACCUEIL NETFLIX : 30 MIN SANS PUB ================= -->
+  <div class="welcome-toast-overlay hidden" id="welcomeTimerModal">
+    <div class="welcome-netflix-box">
+      <span class="welcome-netflix-icon">⏱</span>
+      <div class="welcome-netflix-text">
+        Vous avez <strong>30 minutes offertes</strong> sans publicité.
+      </div>
+      <button type="button" class="welcome-netflix-btn" id="welcomeTimerAcceptBtn">
+        J'accepte
+      </button>
+    </div>
+  </div>
+
   <!-- Scripts -->
   <script src="js/hls.min.js"></script>
-  <script src="js/player.js?v=34"></script>
-  <script src="js/admin.js?v=31"></script>
-  <script src="js/app.js?v=32"></script>
+  <script src="js/player.js?v=1789612950"></script>
+  <script src="js/admin.js?v=1789612950"></script>
+  <script src="js/app.js?v=1789612950"></script>
 </body>
 </html>

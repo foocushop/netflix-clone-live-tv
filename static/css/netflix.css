@@ -3325,8 +3325,19 @@ button:focus-visible {
   }
 
   .volume-container,
-  .controls-center,
   .speed-control-wrapper {
+    display: none !important;
+  }
+
+  .controls-center {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    min-width: 0 !important;
+    flex: 1 1 auto !important;
+  }
+
+  .controls-center .ctrl-media-title {
     display: none !important;
   }
 
@@ -4693,3 +4704,506 @@ button:focus-visible {
 
 
 
+
+/* ========================================================================= */
+/* ⏳ ZIFLIX MONETAG WATCH TIMER & REPRENDRE LA LECTURE                      */
+/* ========================================================================= */
+
+.timer-warning-badge {
+  position: absolute;
+  bottom: 95px;
+  right: 28px;
+  z-index: 10000;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 8px 16px;
+  background: rgba(18, 18, 22, 0.92);
+  border: 1px solid rgba(229, 9, 20, 0.6);
+  border-radius: 50px;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.6), 0 0 15px rgba(229, 9, 20, 0.3);
+  animation: timerSlideIn 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  transition: all 0.3s ease;
+  user-select: none;
+}
+
+.timer-warning-badge.hidden {
+  display: none !important;
+}
+
+@keyframes timerSlideIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.timer-badge-icon {
+  font-size: 1.2rem;
+  animation: timerPulse 1.5s infinite alternate;
+}
+
+@keyframes timerPulse {
+  0% { transform: scale(1); }
+  100% { transform: scale(1.18); }
+}
+
+.timer-badge-text {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.15;
+}
+
+.timer-badge-time {
+  font-size: 0.95rem;
+  font-weight: 800;
+  color: #fbbf24;
+  letter-spacing: 0.5px;
+}
+
+.timer-badge-label {
+  font-size: 0.68rem;
+  color: #94a3b8;
+  font-weight: 500;
+}
+
+.timer-badge-btn {
+  background: linear-gradient(135deg, #e50914, #b20710);
+  color: #fff;
+  border: none;
+  border-radius: 20px;
+  padding: 6px 14px;
+  font-size: 0.78rem;
+  font-weight: 700;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  transition: all 0.2s ease;
+  box-shadow: 0 4px 12px rgba(229, 9, 20, 0.4);
+}
+
+.timer-badge-btn:hover {
+  transform: scale(1.06);
+  background: linear-gradient(135deg, #f40612, #c50813);
+  box-shadow: 0 6px 18px rgba(229, 9, 20, 0.6);
+}
+
+.timer-badge-btn:active {
+  transform: scale(0.96);
+}
+
+.timer-badge-success {
+  color: #4ade80 !important;
+  font-weight: 700;
+  font-size: 0.85rem;
+}
+
+.timer-expired-modal {
+  position: absolute;
+  inset: 0;
+  z-index: 100000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(8, 8, 10, 0.92);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  padding: 20px;
+  animation: modalFadeIn 0.3s ease;
+}
+
+.timer-expired-modal.hidden {
+  display: none !important;
+}
+
+@keyframes modalFadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.timer-modal-card {
+  max-width: 440px;
+  width: 90%;
+  max-height: 85vh;
+  background: #141417;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 10px;
+  padding: 26px 24px;
+  text-align: center;
+  box-shadow: 0 25px 60px -15px rgba(0, 0, 0, 0.9), 0 0 35px rgba(229, 9, 20, 0.2);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  box-sizing: border-box;
+}
+
+.timer-modal-icon {
+  font-size: 2.5rem;
+  margin-bottom: 10px;
+  filter: drop-shadow(0 4px 12px rgba(251, 191, 36, 0.4));
+  animation: timerPulse 1.8s infinite alternate;
+}
+
+.timer-modal-title {
+  font-size: 1.35rem;
+  font-weight: 800;
+  color: #fff;
+  margin-bottom: 10px;
+  letter-spacing: -0.4px;
+}
+
+.timer-modal-desc {
+  font-size: 0.9rem;
+  color: #cbd5e1;
+  line-height: 1.45;
+  margin-bottom: 20px;
+}
+
+.timer-modal-desc b {
+  color: #e50914;
+}
+
+.timer-recharge-cta-btn {
+  width: 100%;
+  padding: 13px 20px;
+  background: #e50914;
+  color: #fff;
+  font-size: 1rem;
+  font-weight: 800;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  transition: all 0.2s ease;
+  box-shadow: 0 8px 24px rgba(229, 9, 20, 0.5);
+}
+
+.timer-recharge-cta-btn:hover {
+  background: #f40612;
+  transform: translateY(-2px);
+  box-shadow: 0 12px 28px rgba(229, 9, 20, 0.7);
+}
+
+.timer-recharge-cta-btn:active {
+  transform: translateY(0);
+}
+
+.timer-modal-subtext {
+  font-size: 0.76rem;
+  color: #888;
+  margin-top: 12px;
+}
+
+.continue-watching-row {
+  margin-bottom: 28px;
+}
+
+.continue-watching-row .row-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: #f8fafc;
+}
+
+.continue-card {
+  position: relative;
+}
+
+.continue-progress-wrap {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: rgba(255, 255, 255, 0.3);
+  overflow: hidden;
+  border-bottom-left-radius: 6px;
+  border-bottom-right-radius: 6px;
+  z-index: 5;
+}
+
+.continue-progress-fill {
+  height: 100%;
+  background: #e50914;
+  border-radius: 2px;
+  transition: width 0.3s ease;
+}
+
+.continue-info-pill {
+  position: absolute;
+  bottom: 8px;
+  left: 8px;
+  right: 8px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: #fff;
+  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.9);
+  z-index: 6;
+  pointer-events: none;
+}
+
+.continue-ep-tag {
+  background: rgba(0, 0, 0, 0.75);
+  padding: 2px 6px;
+  border-radius: 4px;
+  backdrop-filter: blur(4px);
+}
+
+.continue-time-tag {
+  background: rgba(229, 9, 20, 0.85);
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-size: 0.68rem;
+}
+
+.continue-remove-btn {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  background: rgba(15, 15, 18, 0.85);
+  color: #cbd5e1;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.72rem;
+  cursor: pointer;
+  z-index: 10;
+  opacity: 0;
+  transition: all 0.2s ease;
+}
+
+.movie-card:hover .continue-remove-btn,
+.continue-card:hover .continue-remove-btn {
+  opacity: 1;
+}
+
+.continue-remove-btn:hover {
+  background: #e50914;
+  color: #fff;
+  border-color: #e50914;
+  transform: scale(1.12);
+}
+
+@media (max-width: 768px) {
+  .timer-warning-badge {
+    bottom: 82px;
+    right: 14px;
+    padding: 6px 12px;
+    gap: 8px;
+  }
+  .timer-badge-time {
+    font-size: 0.82rem;
+  }
+  .timer-badge-btn {
+    padding: 5px 10px;
+    font-size: 0.72rem;
+  }
+  .timer-modal-card {
+    padding: 28px 18px;
+  }
+  .timer-modal-title {
+    font-size: 1.3rem;
+  }
+}
+
+
+
+
+/* ================= 🎁 NOTIFICATION D'ACCUEIL NETFLIX (CONCISE & ÉPURÉE) ================= */
+.welcome-toast-overlay {
+  position: fixed;
+  top: 72px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 999999;
+  animation: netflixToastIn 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  pointer-events: auto;
+}
+
+.welcome-toast-overlay.hidden {
+  display: none !important;
+}
+
+@keyframes netflixToastIn {
+  from { opacity: 0; transform: translate(-50%, -10px); }
+  to { opacity: 1; transform: translate(-50%, 0); }
+}
+
+.welcome-netflix-box {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  background: rgba(20, 20, 20, 0.96);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-left: 4px solid #e50914;
+  border-radius: 4px;
+  padding: 10px 18px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.9);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  color: #fff;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+}
+
+.welcome-netflix-icon {
+  font-size: 1.15rem;
+  line-height: 1;
+  flex-shrink: 0;
+}
+
+.welcome-netflix-text {
+  font-size: 0.92rem;
+  font-weight: 500;
+  color: #e5e5e5;
+  white-space: nowrap;
+}
+
+.welcome-netflix-text strong {
+  color: #fff;
+  font-weight: 700;
+}
+
+.welcome-netflix-btn {
+  background: #e50914;
+  color: #fff;
+  border: none;
+  border-radius: 3px;
+  padding: 6px 14px;
+  font-size: 0.85rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background 0.15s ease, transform 0.1s ease;
+  white-space: nowrap;
+}
+
+.welcome-netflix-btn:hover {
+  background: #f40612;
+}
+
+.welcome-netflix-btn:active {
+  transform: scale(0.97);
+}
+
+@media (max-width: 640px) {
+  .welcome-toast-overlay {
+    top: 60px;
+    width: calc(100% - 32px);
+  }
+  .welcome-netflix-box {
+    width: 100%;
+    justify-content: space-between;
+    gap: 10px;
+    padding: 10px 14px;
+  }
+  .welcome-netflix-text {
+    font-size: 0.82rem;
+    white-space: normal;
+  }
+  .welcome-netflix-btn {
+    padding: 5px 12px;
+    font-size: 0.78rem;
+  }
+}
+
+/* ================= ⏱️ TIMER INTÉGRÉ DANS LE LECTEUR NETFLIX ================= */
+.player-watch-timer {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  border-radius: 4px;
+  padding: 3px 8px;
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: #e5e5e5;
+  margin-left: 12px;
+  backdrop-filter: blur(4px);
+  transition: all 0.2s ease;
+  user-select: none;
+  vertical-align: middle;
+  flex-shrink: 0;
+}
+
+.player-watch-timer:hover {
+  background: rgba(255, 255, 255, 0.14);
+  border-color: rgba(255, 255, 255, 0.3);
+}
+
+.player-watch-timer-dot {
+  font-size: 0.8rem;
+  color: #a3a3a3;
+  line-height: 1;
+}
+
+.player-watch-timer-val {
+  color: #fff;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.4px;
+  font-weight: 700;
+}
+
+.player-watch-timer-btn {
+  background: rgba(229, 9, 20, 0.85);
+  border: none;
+  border-radius: 3px;
+  color: #fff;
+  font-size: 0.72rem;
+  font-weight: 700;
+  padding: 2px 6px;
+  cursor: pointer;
+  transition: background 0.15s ease, transform 0.1s ease;
+  line-height: 1.2;
+}
+
+.player-watch-timer-btn:hover {
+  background: #e50914;
+  transform: scale(1.05);
+}
+
+/* Alerte 5 minutes restantes : bordure orange/rouge discrète */
+.player-watch-timer.timer-low {
+  border-color: rgba(255, 152, 0, 0.7);
+  background: rgba(255, 152, 0, 0.12);
+  color: #ffb74d;
+}
+
+.player-watch-timer.timer-low .player-watch-timer-btn {
+  background: #e50914;
+  animation: pulseTimerBtn 1.5s infinite ease-in-out;
+}
+
+@keyframes pulseTimerBtn {
+  0%, 100% { opacity: 0.9; }
+  50% { opacity: 1; transform: scale(1.08); }
+}
+
+@media (max-width: 768px) {
+  .player-watch-timer {
+    margin-left: 6px;
+    padding: 2px 6px;
+    font-size: 0.75rem;
+    gap: 4px;
+  }
+  .player-watch-timer-btn {
+    font-size: 0.68rem;
+    padding: 1px 4px;
+  }
+}
