@@ -3843,9 +3843,10 @@
     "token": "7d519794f23f1ac99505fb10dd6f3d453479e703aa3cc54d3a286d5a782a2f3c",
     "user_id": "u_1789592488800_beae338b",
     "username": "dezminator007",
-    "role": "user",
+    "role": "vip",
     "avatar": "assets/avatars/avatar-1.svg",
-    "expires_at": 1792184488875
+    "expires_at": 1792184488875,
+    "is_vip": true
   },
   {
     "token": "e7fd910ec4f09079923ac52a228aa9e524acb36e8f7d3a83ac89d63fa5711def",
@@ -4024,14 +4025,6 @@
     "expires_at": 1792205892265
   },
   {
-    "token": "773013d5a83fed0620ebf4331b3c8a96a17cce3d17ca51ac62eb56be2863108d",
-    "user_id": "u_1789311667862_dacf0880",
-    "username": "fffbdfb",
-    "role": "premium",
-    "avatar": "assets/avatars/avatar-1.svg",
-    "expires_at": 1792207588544
-  },
-  {
     "token": "64e0d6fbe94cba80802a76fa9204708d6c47e74c91f910c10bd6f4b4df6753f0",
     "user_id": "u_1789617056727_782ef544",
     "username": "Wgcw",
@@ -4062,5 +4055,54 @@
     "role": "user",
     "avatar": "assets/avatars/avatar-4.svg",
     "expires_at": 1792221672230
+  },
+  {
+    "token": "07affb01e282bfcbdb7dd6dc8e0c28c8a5191d8b4b15359fbfb5c219c8241ee2",
+    "user_id": "u_1789636144472_d96c871e",
+    "username": "briearidja2023@gmail.com",
+    "role": "user",
+    "avatar": "assets/avatars/avatar-1.svg",
+    "expires_at": 1792228144479
+  },
+  {
+    "token": "f423c66b67c28f8a605ec6fd35195f8160f0f99e5ea214d4a117534f775a0c65",
+    "user_id": "u_admin",
+    "username": "admin",
+    "role": "admin",
+    "avatar": "assets/avatars/avatar-1.svg",
+    "expires_at": 1792229211329
+  },
+  {
+    "token": "0de86929bbd151af1b83c99a72e1922847688f782e1326d30221f3648969c8be",
+    "user_id": "u_1789499780676_1e86a96e",
+    "username": "mamitahraz@gmail.com",
+    "role": "user",
+    "avatar": "assets/avatars/avatar-1.svg",
+    "expires_at": 1792230124110
+  },
+  {
+    "token": "ad98a7fd5e72891dbb73e7000352ea6eb0c0d6b073a2f0bd050b72335b2f0c2e",
+    "user_id": "u_1789638492554_bb4c27f7",
+    "username": "bgvgj",
+    "role": "vip",
+    "avatar": "assets/avatars/avatar-1.svg",
+    "expires_at": 1792230492560,
+    "is_vip": true
+  },
+  {
+    "token": "e527303d1392a2c8707dcc5a152aa01411b2708df75ab358cb5a0a1e18c6a11c",
+    "user_id": "u_1789638959447_61fc95e4",
+    "username": "Maremedansokho",
+    "role": "user",
+    "avatar": "assets/avatars/avatar-1.svg",
+    "expires_at": 1792230959452
+  },
+  {
+    "token": "6de07804c6379ce8c6407feeee70ed708b6b4c32fbf7f46e02bf158ef5ada02b",
+    "user_id": "u_1789639281490_0b2a83fd",
+    "username": "THE REAL OG",
+    "role": "user",
+    "avatar": "assets/avatars/avatar-10.svg",
+    "expires_at": 1792231281513
   }
 ]
