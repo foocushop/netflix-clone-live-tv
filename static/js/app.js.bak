@@ -30,8 +30,8 @@ class NetflixApp {
     this.initEvents();
     this.initAuthEvents();
     this.initBugReporting();
+    this.initPremiumEvents();
     this.checkAuth();
-    this.initTimerUI();
   }
 
   getAuthHeaders(extra = {}) {
@@ -444,98 +444,55 @@ class NetflixApp {
     if (!movie) return;
     this.currentHero = movie;
 
-    if (!this.heroBanner) this.heroBanner = document.getElementById('heroBanner');
-    if (!this.heroTitle) this.heroTitle = document.getElementById('heroTitle');
-    if (!this.heroSynopsis) this.heroSynopsis = document.getElementById('heroSynopsis');
-    if (!this.heroMatch) this.heroMatch = document.getElementById('heroMatch');
-    if (!this.heroAge) this.heroAge = document.getElementById('heroAge');
-    if (!this.heroDuration) this.heroDuration = document.getElementById('heroDuration');
-    if (!this.heroBadges) this.heroBadges = document.getElementById('heroBadges');
-    if (!this.heroPlayBtn) this.heroPlayBtn = document.getElementById('heroPlayBtn');
-
-    if (this.heroBanner) {
-      this.heroBanner.style.display = '';
-      const bgUrl = this.normalizeImageUrl(movie.backdrop_url || movie.poster_url);
-      this.heroBanner.style.backgroundImage = bgUrl ? `url("${bgUrl}")` : 'none';
-    }
-    if (this.heroTitle) this.heroTitle.textContent = movie.title || 'Titre Vedette';
-    if (this.heroSynopsis) this.heroSynopsis.textContent = movie.overview || '';
-
-    // Réinitialiser tout gestionnaire onclick spécifique précédent
-    if (this.heroPlayBtn) {
-      this.heroPlayBtn.onclick = null;
-    }
+    const bgUrl = this.normalizeImageUrl(movie.backdrop_url || movie.poster_url);
+    this.heroBanner.style.backgroundImage = bgUrl ? `url("${bgUrl}")` : 'none';
+    this.heroTitle.textContent = movie.title;
+    this.heroSynopsis.textContent = movie.overview;
 
     const isLive = (movie.media_type === 'channel' || movie.is_live);
     if (isLive) {
-      if (this.heroMatch) this.heroMatch.innerHTML = `<span class="live-pulse" style="color: #e50914; margin-right: 6px;">●</span> EN DIRECT HD`;
-      if (this.heroAge) this.heroAge.textContent = movie.age_rating || 'Tous publics';
-      if (this.heroDuration) this.heroDuration.textContent = 'En direct 24/7';
+      this.heroMatch.innerHTML = `<span class="live-pulse" style="color: #e50914; margin-right: 6px;">●</span> EN DIRECT HD`;
+      this.heroAge.textContent = movie.age_rating || 'Tous publics';
+      this.heroDuration.textContent = 'En direct 24/7';
       if (this.heroPlayBtn) {
         this.heroPlayBtn.innerHTML = '<span>▶</span> Regarder en direct';
       }
     } else {
-      if (this.heroMatch) this.heroMatch.textContent = movie.match_score ? `Recommandé à ${movie.match_score}%` : 'Recommandé à 98%';
-      if (this.heroAge) this.heroAge.textContent = movie.age_rating || '16+';
-      const dur = movie.duration || (movie.seasons ? `${movie.seasons.length} Saison(s)` : (movie.media_type === 'series' ? 'Série' : 'Film'));
-      if (this.heroDuration) this.heroDuration.textContent = dur;
+      this.heroMatch.textContent = `Recommandé à ${movie.match_score}%`;
+      this.heroAge.textContent = movie.age_rating;
+      this.heroDuration.textContent = movie.duration;
       if (this.heroPlayBtn) {
         this.heroPlayBtn.innerHTML = '<span>▶</span> Lecture';
       }
     }
 
     // Badges de qualité
-    if (this.heroBadges) {
-      this.heroBadges.innerHTML = '';
-      (movie.quality_badges || ['4K Ultra HD', '5.1']).forEach(b => {
-        const span = document.createElement('span');
-        span.className = 'quality-badge';
-        span.textContent = b;
-        this.heroBadges.appendChild(span);
-      });
-    }
+    this.heroBadges.innerHTML = '';
+    (movie.quality_badges || ['4K Ultra HD', '5.1']).forEach(b => {
+      const span = document.createElement('span');
+      span.className = 'quality-badge';
+      span.textContent = b;
+      this.heroBadges.appendChild(span);
+    });
   }
 
   renderCatalog(data) {
-    if (!this.catalogRowsContainer) this.catalogRowsContainer = document.getElementById('catalogRows');
-    if (!this.catalogRowsContainer) return;
     this.catalogRowsContainer.innerHTML = '';
     const fragment = document.createDocumentFragment();
 
-    // Rangée Reprendre la lecture
-    try {
-      const continueItems = this.getContinueWatchingList();
-      if (continueItems && continueItems.length > 0) {
-        const continueRow = this.buildContinueWatchingRow(continueItems);
-        if (continueRow) fragment.appendChild(continueRow);
-      }
-    } catch (e) {
-      console.warn('[ZIFLIX] Erreur continue watching:', e);
-    }
-
     // Ligne "Ma Liste" si elle contient des titres
-    try {
-      const myListMovies = this.getMyListMovies();
-      if (myListMovies && myListMovies.length > 0) {
-        const myRow = this.buildRowElement({
-          category: { name: "Ma Liste", slug: "my-list" },
-          movies: myListMovies
-        });
-        if (myRow) fragment.appendChild(myRow);
-      }
-    } catch (e) {
-      console.warn('[ZIFLIX] Erreur my list:', e);
+    const myListMovies = this.getMyListMovies();
+    if (myListMovies.length > 0) {
+      fragment.appendChild(this.buildRowElement({
+        category: { name: "Ma Liste", slug: "my-list" },
+        movies: myListMovies
+      }));
     }
 
     // Carrousels de catégories
-    if (data && data.rows && data.rows.length > 0) {
+    if (data.rows && data.rows.length > 0) {
       data.rows.forEach(row => {
-        try {
-          const rowEl = this.buildRowElement(row);
-          if (rowEl) fragment.appendChild(rowEl);
-        } catch (e) {
-          console.warn('[ZIFLIX] Erreur rendu rangée:', row?.category?.name, e);
-        }
+        fragment.appendChild(this.buildRowElement(row));
       });
     }
 
@@ -2050,8 +2007,6 @@ class NetflixApp {
     } else {
       this.dismissSplash();
     }
-    this.checkWelcomeTimerModal();
-    this.initHomeTimer();
   }
 
   showAuthGate() {
@@ -2061,10 +2016,6 @@ class NetflixApp {
     }
     if (this.ziflixApp) this.ziflixApp.style.display = 'none';
     if (this.authGateModal) this.authGateModal.classList.remove('hidden');
-    const welcomeToast = document.getElementById('welcomeTimerModal');
-    if (welcomeToast) welcomeToast.classList.add('hidden');
-    const navTimer = document.getElementById('navWatchTimer');
-    if (navTimer) navTimer.style.display = 'none';
     this.dismissSplash();
   }
 
@@ -2082,21 +2033,7 @@ class NetflixApp {
     if (openAdminBtn) {
       openAdminBtn.style.display = (user.role === 'admin') ? 'flex' : 'none';
     }
-
-    const isAdmin = (user.role === 'admin' || user.is_admin || user.isAdmin);
-    const welcomeModal = document.getElementById('welcomeTimerModal');
-    const navTimer = document.getElementById('navWatchTimer');
-    if (isAdmin) {
-      if (welcomeModal) welcomeModal.style.display = 'none';
-      if (navTimer) navTimer.style.display = 'none';
-    } else {
-      if (welcomeModal) welcomeModal.style.display = '';
-      if (navTimer) navTimer.style.display = 'inline-flex';
-      if (!this.authGateModal || this.authGateModal.classList.contains('hidden')) {
-        this.checkWelcomeTimerModal();
-      }
-      this.initHomeTimer();
-    }
+    this.updateUserVipUI();
   }
 
   async handleLogin(e) {
@@ -2316,7 +2253,7 @@ class NetflixApp {
             <img src="${c.avatar || 'assets/avatars/avatar-1.svg'}" alt="${c.username}" class="comment-author-avatar">
             <div class="comment-card-body">
               <div class="comment-card-header">
-                <span class="comment-author-name">${c.username}</span>
+                <span class="comment-author-name">${c.username} ${(c.is_vip || c.role === "admin" || c.role === "premium") ? '<span class="vip-badge-tag">👑 VIP</span>' : ""}</span>
                 <div style="display: flex; align-items: center; gap: 8px;">
                   <span class="comment-date">${new Date(c.createdAt).toLocaleDateString('fr-FR', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })}</span>
                   ${isAuthorOrAdmin ? `<button type="button" class="comment-delete-btn" data-id="${c.id}" title="Supprimer">🗑️</button>` : ''}
@@ -2554,422 +2491,939 @@ class NetflixApp {
     }, 3500);
   }
 
-
-  // ================= 🎬 REPRENDRE LA LECTURE & GESTION ADMIN =================
-  isAdmin() {
-    if (this.currentUser && (this.currentUser.role === 'admin' || this.currentUser.is_admin || this.currentUser.isAdmin)) return true;
-    try {
-      const raw = localStorage.getItem('ziflix_user');
-      if (raw) {
-        const u = JSON.parse(raw);
-        if (u && (u.role === 'admin' || u.is_admin || u.isAdmin)) return true;
-      }
-      if (localStorage.getItem('ziflix_admin_token')) return true;
-      if (localStorage.getItem('ziflix_is_admin') === 'true') return true;
-      if (new URLSearchParams(window.location.search).get('admin') === '1') return true;
-    } catch (e) {}
+  // ================= GESTION DU STATUT & ABONNEMENTS PREMIUM VIP =================
+  isUserPremium() {
+    if (!this.currentUser) return false;
+    if (this.currentUser.role === 'admin') return true;
+    if (this.currentUser.is_premium) return true;
+    if (this.currentUser.role === 'premium') {
+      if (!this.currentUser.premium_until) return true;
+      const exp = (typeof this.currentUser.premium_until === 'number')
+        ? this.currentUser.premium_until
+        : new Date(this.currentUser.premium_until).getTime();
+      return exp > Date.now();
+    }
     return false;
   }
 
-  getContinueWatchingList() {
-    try {
-      const raw = localStorage.getItem('ziflix_continue_watching');
-      if (!raw) return [];
-      const list = JSON.parse(raw);
-      if (!Array.isArray(list)) return [];
-      return list.filter(item => item && item.id && (item.currentTime >= 10 || item.progressPct > 0) && (item.progressPct || 0) < 95);
-    } catch (e) {
-      return [];
+  updateUserVipUI() {
+    const navVipBtnText = document.getElementById('navVipBtnText');
+    const navPremiumBtn = document.getElementById('navPremiumBtn');
+    const dropdownVipTitle = document.getElementById('dropdownVipTitle');
+    const dropdownVipBadge = document.getElementById('dropdownVipBadge');
+    const dropdownVipSub = document.getElementById('dropdownVipSub');
+
+    // 1. COMPTE ADMINISTRATEUR (Accès permanent garanti sans date d'expiration)
+    if (this.currentUser && this.currentUser.role === 'admin') {
+      if (navPremiumBtn) {
+        navPremiumBtn.classList.add('is-vip');
+        if (navVipBtnText) navVipBtnText.textContent = 'VIP';
+        navPremiumBtn.title = 'Accès Administrateur Illimité';
+      }
+      if (dropdownVipBadge) {
+        dropdownVipBadge.textContent = 'ADMIN';
+        dropdownVipBadge.classList.remove('hidden');
+      }
+      if (dropdownVipTitle) dropdownVipTitle.textContent = '👑 Mon Statut VIP';
+      if (dropdownVipSub) dropdownVipSub.textContent = 'Accès Administrateur Illimité';
+      return;
+    }
+
+    // 2. UTILISATEUR STANDARD / PREMIUM
+    const isVip = this.isUserPremium();
+
+    if (navPremiumBtn) {
+      if (isVip) {
+        navPremiumBtn.classList.add('is-vip');
+        if (navVipBtnText) navVipBtnText.textContent = 'VIP';
+        navPremiumBtn.title = 'Abonnement VIP Actif';
+      } else {
+        navPremiumBtn.classList.remove('is-vip');
+        if (navVipBtnText) navVipBtnText.textContent = 'Passer VIP';
+        navPremiumBtn.title = 'Passer Premium VIP';
+      }
+    }
+
+    if (dropdownVipBadge) {
+      dropdownVipBadge.textContent = 'ACTIF';
+      dropdownVipBadge.classList.toggle('hidden', !isVip);
+    }
+    if (dropdownVipTitle) {
+      dropdownVipTitle.textContent = isVip ? '👑 Mon Statut VIP' : '👑 Passer VIP';
+    }
+    if (dropdownVipSub) {
+      if (isVip && this.currentUser && this.currentUser.premium_until) {
+        const expDate = new Date(this.currentUser.premium_until).toLocaleDateString('fr-FR', { day: 'numeric', month: 'short', year: 'numeric' });
+        dropdownVipSub.textContent = `Actif jusqu'au ${expDate}`;
+      } else {
+        dropdownVipSub.textContent = 'Multi-qualité & Éco-Data Mobile';
+      }
     }
   }
 
-  buildContinueWatchingRow(items) {
-    const rowEl = document.createElement('div');
-    rowEl.className = 'movie-row continue-watching-row';
-    rowEl.innerHTML = `
-      <h2 class="row-title"><span>▶️</span> Reprendre la lecture</h2>
-      <div class="row-slider-container">
-        <button class="slider-arrow left" aria-label="Défiler à gauche">‹</button>
-        <div class="row-slider"></div>
-        <button class="slider-arrow right" aria-label="Défiler à droite">›</button>
-      </div>
-    `;
+  openPremiumModal(reason = '', targetQ = null) {
+    const modal = document.getElementById('premiumModal');
+    if (!modal) return;
+    modal.classList.remove('hidden');
+    document.body.classList.add('premium-modal-open');
 
-    const slider = rowEl.querySelector('.row-slider');
-    const arrowLeft = rowEl.querySelector('.slider-arrow.left');
-    const arrowRight = rowEl.querySelector('.slider-arrow.right');
+    const isVip = this.isUserPremium();
+    const activeSection = document.getElementById('premiumActiveStatusSection');
+    const subscribeSection = document.getElementById('premiumSubscribeSection');
+    const extendBtn = document.getElementById('vipExtendToggleBtn');
 
-    if (arrowLeft) arrowLeft.addEventListener('click', () => slider.scrollBy({ left: -600, behavior: 'smooth' }));
-    if (arrowRight) arrowRight.addEventListener('click', () => slider.scrollBy({ left: 600, behavior: 'smooth' }));
+    if (isVip) {
+      // UTILISATEUR DÉJÀ VIP : Afficher ses privilèges et masquer le tunnel de paiement
+      if (activeSection) activeSection.classList.remove('hidden');
+      if (subscribeSection) subscribeSection.classList.add('hidden');
+      if (extendBtn) extendBtn.textContent = 'Prolonger mon abonnement ou utiliser un code recharge ▾';
 
-    const cardFragment = document.createDocumentFragment();
-    items.forEach(item => {
-      const card = document.createElement('div');
-      card.className = 'movie-card continue-card focusable';
-      card.setAttribute('tabindex', '0');
+      const statusBadge = document.getElementById('vipStatusBadge');
+      const statusTitle = document.getElementById('vipStatusTitle');
+      const validityText = document.getElementById('vipStatusValidityText');
 
-      // Priorité absolue à la carte d'affiche verticale (poster_url, poster, cover)
-      let rawImg = item.poster_url || item.poster || item.cover || item.card_image;
-      if (!rawImg && item.movieData) {
-        rawImg = item.movieData.poster_url || item.movieData.poster || item.movieData.cover;
-      }
-      if (!rawImg && this.catalogData && Array.isArray(this.catalogData.movies)) {
-        const found = this.catalogData.movies.find(m => String(m.id) === String(item.id) || (item.title && m.title && m.title.toLowerCase() === item.title.toLowerCase()));
-        if (found) {
-          rawImg = found.poster_url || found.poster || found.cover;
+      if (this.currentUser && this.currentUser.role === 'admin') {
+        if (statusBadge) statusBadge.textContent = '👑 ACCÈS ADMINISTRATEUR';
+        if (statusTitle) statusTitle.textContent = 'Statut VIP Permanent';
+        if (validityText) {
+          validityText.innerHTML = 'Vous disposez d\'un <strong>accès VIP illimité à vie</strong> en tant qu\'administrateur de ZIFLIX.';
         }
-      }
-      if (!rawImg && this.movies && Array.isArray(this.movies)) {
-        const found = this.movies.find(m => String(m.id) === String(item.id) || (item.title && m.title && m.title.toLowerCase() === item.title.toLowerCase()));
-        if (found) {
-          rawImg = found.poster_url || found.poster || found.cover;
-        }
-      }
-      if (!rawImg && this.catalog && Array.isArray(this.catalog)) {
-        const found = this.catalog.find(m => String(m.id) === String(item.id) || (item.title && m.title && m.title.toLowerCase() === item.title.toLowerCase()));
-        if (found) {
-          rawImg = found.poster_url || found.poster || found.cover;
-        }
-      }
-      // Fallback si aucune affiche portrait n'est disponible
-      if (!rawImg) {
-        rawImg = item.backdrop_url || item.backdrop || item.still_url || (item.movieData && (item.movieData.backdrop_url || item.movieData.backdrop));
-      }
-
-      const secureImg = this.normalizeImageUrl(rawImg) || 'assets/hero/live-tv-banner.webp';
-      const fallbackSvg = this.getMovieFallbackSvg(item.title);
-      const remSec = Math.max(0, (item.duration || 0) - (item.currentTime || 0));
-      const remMin = Math.round(remSec / 60);
-      const remLabel = remMin > 0 ? `${remMin} min restantes` : '';
-      const epLabel = item.season ? `S${item.season}:E${item.episode}` : (item.media_type === 'series' ? 'Série' : 'Film');
-
-      card.innerHTML = `
-        <img class="card-image card-img" src="${secureImg}" alt="${this.escapeHtml(item.title || '')}" loading="lazy" decoding="async" onerror="this.onerror=null; this.src='${fallbackSvg}';">
-        <button type="button" class="continue-remove-btn" title="Retirer de la liste" aria-label="Supprimer">✕</button>
-        <div class="continue-info-pill">
-          <span class="continue-ep-tag">${epLabel}</span>
-          ${remLabel ? `<span class="continue-time-tag">${remLabel}</span>` : ''}
-        </div>
-        <div class="continue-progress-wrap">
-          <div class="continue-progress-fill" style="width: ${item.progressPct || 0}%;"></div>
-        </div>
-        <div class="card-overlay">
-          <div class="card-title">${this.escapeHtml(item.title || '')}</div>
-          <div class="card-actions">
-            <button class="action-btn play-btn" title="Reprendre la lecture">▶</button>
-          </div>
-        </div>
-      `;
-
-      const removeBtn = card.querySelector('.continue-remove-btn');
-      if (removeBtn) {
-        removeBtn.addEventListener('click', (e) => {
-          e.stopPropagation();
-          this.removeFromContinueWatching(item.id);
-          card.remove();
-          if (slider.children.length === 0) {
-            rowEl.remove();
+      } else {
+        if (statusBadge) statusBadge.textContent = '👑 ABONNEMENT VIP ACTIF';
+        if (statusTitle) statusTitle.textContent = 'Votre statut VIP est actif';
+        if (this.currentUser && this.currentUser.premium_until) {
+          const expTime = (typeof this.currentUser.premium_until === 'number')
+            ? this.currentUser.premium_until
+            : new Date(this.currentUser.premium_until).getTime();
+          const expDate = new Date(expTime).toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' });
+          const diffDays = Math.max(0, Math.ceil((expTime - Date.now()) / (1000 * 60 * 60 * 24)));
+          if (validityText) {
+            validityText.innerHTML = `Votre forfait est actif jusqu'au <strong>${expDate}</strong> (encore <strong>${diffDays} jour${diffDays > 1 ? 's' : ''}</strong> d'accès garanti).`;
           }
-        });
-      }
-
-      card.addEventListener('click', () => {
-        let movieObj = item.movieData;
-        if (!movieObj) {
-          if (this.movies && Array.isArray(this.movies)) {
-            movieObj = this.movies.find(m => String(m.id) === String(item.id));
-          }
-          if (!movieObj && this.catalog && Array.isArray(this.catalog)) {
-            movieObj = this.catalog.find(m => String(m.id) === String(item.id));
+        } else {
+          if (validityText) {
+            validityText.innerHTML = 'Vous bénéficiez de l\'ensemble des fonctionnalités et avantages VIP ZIFLIX.';
           }
         }
-        if (!movieObj) {
-          movieObj = {
-            id: item.id,
-            title: item.title,
-            poster: item.poster || item.poster_url,
-            backdrop: item.backdrop || item.backdrop_url,
-            poster_url: item.poster_url || item.poster,
-            backdrop_url: item.backdrop_url || item.backdrop,
-            media_type: item.media_type
-          };
-        }
-        this.player.open(movieObj, 1, item.season, item.episode);
-      });
+      }
+    } else {
+      // UTILISATEUR NON-VIP : Afficher les forfaits et passerelles de paiement
+      if (activeSection) activeSection.classList.add('hidden');
+      if (subscribeSection) subscribeSection.classList.remove('hidden');
 
-      cardFragment.appendChild(card);
+      const subTitle = document.getElementById('premiumModalSubtitle');
+      if (subTitle) {
+        if (reason === 'quality') {
+          if (targetQ === 480) {
+            subTitle.innerHTML = "🍃 <strong>Mode Éco-Data Mobile :</strong> Économisez jusqu'à <strong>70% de vos données internet</strong> en 3G/4G tout en conservant une lecture parfaitement nette sur smartphone ! Réservé aux membres Premium VIP.";
+          } else if (targetQ === 720 || targetQ === 1080) {
+            subTitle.innerHTML = "⚡ <strong>Haute Définition Garantie :</strong> Forcez la résolution <strong>" + targetQ + "p HD</strong> avec bande passante prioritaire et zéro attente. Passez VIP pour débloquer le sélecteur.";
+          } else {
+            subTitle.innerHTML = "Débloquez la <strong>Haute Définition</strong> et le <strong>Mode Éco-Data Mobile</strong> en devenant membre VIP.";
+          }
+        } else {
+          subTitle.innerHTML = "Activez le <strong>sélecteur multi-qualité</strong>, économisez votre forfait internet avec le mode <strong>Éco-Data Mobile</strong> et profitez des <strong>avant-premières inédites</strong>.";
+        }
+      }
+    }
+  }
+
+  closePremiumModal() {
+    const modal = document.getElementById('premiumModal');
+    if (modal) {
+      modal.classList.add('hidden');
+      document.body.classList.remove('premium-modal-open');
+    }
+  }
+
+  initPremiumEvents() {
+    // Detection automatique du retour utilisateur apres paiement mobile Wave / PayDunya
+    const checkVipStatusOnReturn = async () => {
+      const prevIsPremium = !!(this.currentUser && (this.currentUser.role === 'admin' || this.currentUser.role === 'premium'));
+      if (prevIsPremium) return;
+      try {
+        const baseUrl = window.API_BASE || '';
+        const res = await fetch(baseUrl + '/api/auth/me', { headers: this.getAuthHeaders() });
+        const json = await res.json();
+        if (json.success && json.user && (json.user.role === 'admin' || json.user.role === 'premium')) {
+          this.setCurrentUser(json.user);
+          this.closePremiumModal();
+          this.showToast('🎉 Félicitations ! Votre paiement a été validé. Bienvenue en VIP !');
+        }
+      } catch (e) {}
+    };
+
+    document.addEventListener('visibilitychange', () => {
+      if (document.visibilityState === 'visible') checkVipStatusOnReturn();
+    });
+    window.addEventListener('focus', () => {
+      checkVipStatusOnReturn();
+    });
+    // Detection du retour de paiement PayDunya
+    try {
+      const urlParams = new URLSearchParams(window.location.search);
+      const payStatus = urlParams.get('payment_status');
+      if (payStatus === 'success') {
+        this.showToast('🎉 Félicitations ! Votre paiement a été validé avec succès. Bienvenue en VIP !');
+        window.history.replaceState({}, '', window.location.pathname);
+        setTimeout(() => this.checkAuth(), 600);
+      } else if (payStatus === 'cancel' || payStatus === 'failed') {
+        this.showToast('Paiement annulé ou non abouti.', true);
+        window.history.replaceState({}, '', window.location.pathname);
+      }
+    } catch (e) {}
+    document.getElementById('navPremiumBtn')?.addEventListener('click', () => this.openPremiumModal());
+    document.getElementById('openPremiumDropdownBtn')?.addEventListener('click', () => {
+      document.getElementById('profileDropdown')?.classList.remove('active');
+      this.openPremiumModal();
+    });
+    document.getElementById('mobilePremiumBtn')?.addEventListener('click', (e) => {
+      e.preventDefault();
+      this.openPremiumModal();
     });
 
-    slider.appendChild(cardFragment);
-    return rowEl;
-  }
-
-  removeFromContinueWatching(id) {
-    try {
-      let list = JSON.parse(localStorage.getItem('ziflix_continue_watching')) || [];
-      list = list.filter(item => String(item.id) !== String(id));
-      localStorage.setItem('ziflix_continue_watching', JSON.stringify(list));
-    } catch (e) {}
-  }
-
-
-  escapeHtml(str) {
-    if (str === null || str === undefined) return '';
-    return String(str)
-      .replace(/&/g, '&amp;')
-      .replace(/</g, '&lt;')
-      .replace(/>/g, '&gt;')
-      .replace(/"/g, '&quot;')
-      .replace(/'/g, '&#039;');
-  }
-
-  initTimerUI() {
-    this.initHomeTimer();
-    // Ne pas afficher si l'utilisateur n'est pas encore connecté ou si l'auth gate est affichée
-    if (this.currentUser && (!this.authGateModal || this.authGateModal.classList.contains('hidden'))) {
-      this.checkZeroCreditModal();
-      this.checkWelcomeTimerModal();
-    }
-  }
-
-  getWatchCredit() {
-    if (this.isAdmin()) return 999999;
-    if (this.player && typeof this.player.getWatchCredit === 'function') {
-      return this.player.getWatchCredit();
-    }
-    try {
-      const expStr = localStorage.getItem('ziflix_watch_expires_at');
-      const now = Date.now();
-      if (!expStr) {
-        const legacy = parseInt(localStorage.getItem('ziflix_watch_credit') || '0', 10);
-        if (legacy > 0 && !localStorage.getItem('ziflix_watch_migrated')) {
-          localStorage.setItem('ziflix_watch_migrated', 'true');
-          const newExp = now + legacy * 1000;
-          localStorage.setItem('ziflix_watch_expires_at', String(newExp));
-          return Math.min(3600, legacy);
+    document.getElementById('closePremiumModalBtn')?.addEventListener('click', () => this.closePremiumModal());
+    document.getElementById('vipStatusContinueBtn')?.addEventListener('click', () => this.closePremiumModal());
+    document.getElementById('vipExtendToggleBtn')?.addEventListener('click', () => {
+      const subSection = document.getElementById('premiumSubscribeSection');
+      const extBtn = document.getElementById('vipExtendToggleBtn');
+      if (subSection) {
+        const isHidden = subSection.classList.contains('hidden');
+        if (isHidden) {
+          subSection.classList.remove('hidden');
+          if (extBtn) extBtn.textContent = 'Masquer les options de recharge ▴';
+        } else {
+          subSection.classList.add('hidden');
+          if (extBtn) extBtn.textContent = 'Prolonger mon abonnement ou utiliser un code recharge ▾';
         }
-        const accepted = localStorage.getItem('ziflix_welcome_accepted');
-        if (!accepted) return 1800;
-        return 0;
       }
-      const exp = parseInt(expStr, 10);
-      if (isNaN(exp) || exp <= now) return 0;
-      return Math.min(3600, Math.floor((exp - now) / 1000));
-    } catch (e) {
-      return 0;
+    });
+    document.addEventListener('keydown', (e) => { if (e.key === 'Escape') this.closePremiumModal(); });
+    document.getElementById('premiumModal')?.addEventListener('click', (e) => {
+      if (e.target.id === 'premiumModal') this.closePremiumModal();
+    });
+
+    // Sélection de forfait Netflix
+    const planCards = document.querySelectorAll('.netflix-plan-card');
+    planCards.forEach(card => {
+      card.addEventListener('click', () => {
+        planCards.forEach(c => c.classList.remove('active'));
+        card.classList.add('active');
+        const price = card.dataset.price || '1000 FCFA';
+        const display = document.getElementById('paydunyaSelectedPrice');
+        if (display) display.textContent = price;
+      });
+    });
+
+    
+    // === SYSTÈME MULTI-DEVISES & GÉO-PAYS ZIFLIX ===
+    const PRICING_TABLE = {
+      'XOF': {
+        symbol: 'FCFA',
+        weekend: { display: '300 FCFA', equiv: 'Accès 48H Illimité', amountXof: 300 },
+        monthly: { display: '1000 FCFA', equiv: 'Sans engagement', amountXof: 1000 },
+        vip3m:   { display: '2500 FCFA', equiv: '90 jours (-17%)', amountXof: 2500 }
+      },
+      'EUR': {
+        symbol: '€',
+        weekend: { display: '1 €', equiv: 'Accès 48H Illimité', amountXof: 650 },
+        monthly: { display: '1 €', equiv: 'Sans engagement', amountXof: 1000 },
+        vip3m:   { display: '3 €', equiv: '90 jours de streaming', amountXof: 2000 }
+      },
+      'USD': {
+        symbol: '$',
+        weekend: { display: '1 $', equiv: '48H Full Access', amountXof: 600 },
+        monthly: { display: '1 $', equiv: 'Cancel anytime', amountXof: 1000 },
+        vip3m:   { display: '3 $', equiv: '90 days access', amountXof: 2000 }
+      }
+    };
+
+    let currentCurrency = 'XOF';
+
+    function autoDetectCurrency() {
+      try {
+        const saved = localStorage.getItem('ziflix_currency');
+        if (saved && PRICING_TABLE[saved]) return saved;
+        const tz = (Intl.DateTimeFormat().resolvedOptions().timeZone || '').toLowerCase();
+        const lang = (navigator.language || '').toLowerCase();
+        if (tz.includes('paris') || tz.includes('europe') || lang.includes('fr-fr')) {
+          return 'EUR';
+        }
+        if (tz.includes('america') || tz.includes('new_york') || tz.includes('los_angeles') || tz.includes('chicago') || lang.includes('en-us')) {
+          return 'USD';
+        }
+      } catch (e) {}
+      return 'XOF';
     }
-  }
 
-  initHomeTimer() {
-    this.navWatchTimer = document.getElementById('navWatchTimer');
-    this.navWatchTimerVal = document.getElementById('navWatchTimerVal');
-    this.navWatchTimerBtn = document.getElementById('navWatchTimerBtn');
+    function applyCurrencyPricing(curr) {
+      currentCurrency = curr;
+      try { localStorage.setItem('ziflix_currency', curr); } catch(e){}
 
-    if (this.isAdmin()) {
-      if (this.navWatchTimer) this.navWatchTimer.style.display = 'none';
-      const zeroModal = document.getElementById('zeroCreditHomeModal');
-      if (zeroModal) zeroModal.classList.add('hidden');
-      return;
+      document.querySelectorAll('.curr-pill').forEach(btn => {
+        btn.classList.toggle('active', btn.dataset.curr === curr);
+      });
+
+      const table = PRICING_TABLE[curr] || PRICING_TABLE['XOF'];
+
+      const cards = document.querySelectorAll('.netflix-plan-card');
+      cards.forEach(card => {
+        const plan = card.dataset.plan;
+        const info = table[plan];
+        if (info) {
+          card.dataset.price = info.display;
+          const priceEl = card.querySelector('.netflix-plan-price');
+          if (priceEl) priceEl.innerHTML = info.display;
+          const equivEl = card.querySelector('.netflix-plan-equiv');
+          if (equivEl) equivEl.textContent = info.equiv;
+        }
+      });
+
+      const activeCard = document.querySelector('.netflix-plan-card.active');
+      const curPrice = activeCard ? (activeCard.dataset.price || table['monthly'].display) : table['monthly'].display;
+      const display = document.getElementById('paydunyaSelectedPrice');
+      if (display) display.textContent = curPrice;
     }
 
-    if (this.navWatchTimer) {
-      this.navWatchTimer.style.display = 'inline-flex';
-    }
+    currentCurrency = autoDetectCurrency();
+    applyCurrencyPricing(currentCurrency);
 
-    const currentCredit = this.getWatchCredit();
-    this.updateHomeTimerDisplay(currentCredit);
+    document.querySelectorAll('.curr-pill').forEach(btn => {
+      btn.addEventListener('click', () => {
+        applyCurrencyPricing(btn.dataset.curr);
+      });
+    });
 
-    if (this.navWatchTimerBtn && !this.navWatchTimerBtn._hasListener) {
-      this.navWatchTimerBtn._hasListener = true;
-      this.navWatchTimerBtn.addEventListener('click', (e) => {
-        e.preventDefault();
-        e.stopPropagation();
-        if (this.player && typeof this.player.rechargeWatchCredit === 'function') {
-          this.player.rechargeWatchCredit(false);
+    // Bouton de paiement PayDunya
+    const paydunyaBtn = document.getElementById('paydunyaPayBtn');
+    if (paydunyaBtn) {
+      paydunyaBtn.addEventListener('click', async () => {
+        const activeCard = document.querySelector('.netflix-plan-card.active');
+        const planId = activeCard ? activeCard.dataset.plan : 'monthly';
+        const price = activeCard ? (activeCard.dataset.price || '1 000 FCFA') : '1 000 FCFA';
+
+        paydunyaBtn.disabled = true;
+        paydunyaBtn.innerHTML = '<span class="btn-pay-text">Connexion sécurisée...</span> <span class="btn-pay-arrow">⏳</span>';
+
+        try {
+          const baseUrl = window.API_BASE || '';
+          const res = await fetch(`${baseUrl}/api/premium/paydunya/checkout`, {
+            method: 'POST',
+            headers: this.getAuthHeaders({ 'Content-Type': 'application/json' }),
+            body: JSON.stringify({ plan: planId, plan_id: planId, currency: currentCurrency })
+          });
+          const json = await res.json();
+          if (json.success && json.checkout_url) {
+            window.location.href = json.checkout_url;
+          } else if (json.needs_key) {
+            this.showToast("Passerelle PayDunya : Clés API non configurées dans config/paydunya.json", true);
+          } else {
+            this.showToast(json.error || "Impossible d'initier la transaction.", true);
+          }
+        } catch (err) {
+          this.showToast("Erreur de connexion avec le serveur de paiement.", true);
+        } finally {
+          paydunyaBtn.disabled = false;
+          paydunyaBtn.innerHTML = `<span>Procéder au paiement sécurisé (<span id="paydunyaSelectedPrice">${price}</span>)</span> <span>▶</span>`;
         }
       });
     }
 
-    // Défilement continu du timer en temps réel (horloge réelle / wall-clock)
-    if (this.homeTimerInterval) {
-      clearInterval(this.homeTimerInterval);
-      this.homeTimerInterval = null;
+    // Toggle accordéon code VIP
+    const toggleVoucher = document.getElementById('toggleVoucherAccordion');
+    const voucherBox = document.getElementById('voucherAccordionContent');
+    if (toggleVoucher && voucherBox) {
+      toggleVoucher.addEventListener('click', () => {
+        voucherBox.classList.toggle('hidden');
+      });
     }
-    this.homeTimerInterval = setInterval(() => {
-      if (this.isAdmin()) {
-        if (this.navWatchTimer) this.navWatchTimer.style.display = 'none';
-        return;
-      }
-      const credit = this.getWatchCredit();
-      this.updateHomeTimerDisplay(credit);
 
-      // Si le lecteur n'est pas ouvert et que le crédit est à 0 pour un utilisateur ayant déjà accepté
-      const playerOverlay = document.getElementById('netflixPlayer');
-      const isPlayerOpen = playerOverlay && playerOverlay.classList.contains('active');
-      if (!isPlayerOpen && credit <= 0) {
-        const accepted = localStorage.getItem('ziflix_welcome_accepted');
-        if (accepted) {
-          this.checkZeroCreditModal();
+    // Formulaire de code VIP
+    const voucherForm = document.getElementById('voucherRedeemForm');
+    const voucherInput = document.getElementById('voucherCodeInput');
+    const voucherStatus = document.getElementById('voucherStatusMsg');
+    const voucherBtn = document.getElementById('voucherSubmitBtn');
+
+    if (voucherForm && voucherInput) {
+      voucherForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const code = voucherInput.value.trim().toUpperCase();
+        if (!code) return;
+
+        if (voucherBtn) {
+          voucherBtn.disabled = true;
+          voucherBtn.textContent = 'Vérification...';
         }
-      }
-    }, 1000);
-  }
+        if (voucherStatus) {
+          voucherStatus.className = 'voucher-status-msg hidden';
+        }
 
-  updateHomeTimerDisplay(credit) {
-    if (this.isAdmin()) {
-      if (this.navWatchTimer) this.navWatchTimer.style.display = 'none';
-      const zeroModal = document.getElementById('zeroCreditHomeModal');
-      if (zeroModal) zeroModal.classList.add('hidden');
-      return;
-    }
-    if (!this.navWatchTimer) this.navWatchTimer = document.getElementById('navWatchTimer');
-    if (!this.navWatchTimerVal) this.navWatchTimerVal = document.getElementById('navWatchTimerVal');
-    if (!this.navWatchTimerBtn) this.navWatchTimerBtn = document.getElementById('navWatchTimerBtn');
+        try {
+          const baseUrl = window.API_BASE || '';
+          const res = await fetch(`${baseUrl}/api/premium/redeem`, {
+            method: 'POST',
+            headers: this.getAuthHeaders({ 'Content-Type': 'application/json' }),
+            body: JSON.stringify({ code })
+          });
+          const json = await res.json();
 
-    if (this.navWatchTimer) {
-      this.navWatchTimer.style.display = 'inline-flex';
-      if (credit <= 300) {
-        this.navWatchTimer.classList.add('timer-low');
-      } else {
-        this.navWatchTimer.classList.remove('timer-low');
-      }
-    }
-
-    credit = Math.max(0, Math.round(credit));
-    const mins = Math.floor(credit / 60);
-    const secs = credit % 60;
-    const timeStr = `${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
-    if (this.navWatchTimerVal) {
-      this.navWatchTimerVal.textContent = timeStr;
-    }
-
-    // Si le crédit redevient > 0, masquer le pop-up 0 minute
-    if (credit > 0) {
-      const zeroModal = document.getElementById('zeroCreditHomeModal');
-      if (zeroModal) zeroModal.classList.add('hidden');
-    }
-
-    // Si aucune recharge en cours, gérer l'état max 60 min
-    const isPending = (this.player && this.player.isRechargePending);
-    if (!isPending && this.navWatchTimerBtn) {
-      if (credit >= 3600) {
-        this.navWatchTimerBtn.disabled = true;
-        this.navWatchTimerBtn.textContent = 'Max 60m';
-        this.navWatchTimerBtn.title = 'Crédit maximum de 60 minutes atteint';
-      } else {
-        this.navWatchTimerBtn.disabled = false;
-        this.navWatchTimerBtn.textContent = '+30';
-        this.navWatchTimerBtn.title = 'Recharger +30 min gratuites';
-      }
-    }
-  }
-
-  checkZeroCreditModal() {
-    if (this.isAdmin()) {
-      const modal = document.getElementById('zeroCreditHomeModal');
-      if (modal) modal.classList.add('hidden');
-      return;
-    }
-    const modal = document.getElementById('zeroCreditHomeModal');
-    if (!modal) return;
-    if (this.authGateModal && !this.authGateModal.classList.contains('hidden')) return;
-    if (document.getElementById('netflixPlayer')?.classList.contains('active')) return;
-
-    const credit = this.getWatchCredit();
-
-    if (credit <= 0) {
-      // Masquer le toast d'accueil normal
-      const welcomeToast = document.getElementById('welcomeTimerModal');
-      if (welcomeToast) welcomeToast.classList.add('hidden');
-
-      modal.classList.remove('hidden');
-
-      const closeBtn = document.getElementById('zeroCreditCloseBtn');
-      if (closeBtn && !closeBtn._hasListener) {
-        closeBtn._hasListener = true;
-        closeBtn.addEventListener('click', () => {
-          modal.classList.add('hidden');
-        });
-      }
-
-      const rechargeBtn = document.getElementById('zeroCreditRechargeBtn');
-      if (rechargeBtn && !rechargeBtn._hasListener) {
-        rechargeBtn._hasListener = true;
-        rechargeBtn.addEventListener('click', (e) => {
-          e.preventDefault();
-          if (this.player && typeof this.player.rechargeWatchCredit === 'function') {
-            this.player.rechargeWatchCredit(false);
+          if (json.success) {
+            if (voucherStatus) {
+              voucherStatus.className = 'voucher-status-msg success';
+              voucherStatus.textContent = '🎉 ' + json.message;
+            }
+            if (json.user) {
+              this.setCurrentUser(Object.assign({}, this.currentUser, json.user));
+            }
+            this.showToast('👑 Félicitations ! Votre abonnement VIP est actif !');
+            setTimeout(() => {
+              this.closePremiumModal();
+              if (voucherStatus) voucherStatus.className = 'voucher-status-msg hidden';
+            }, 2500);
+          } else {
+            if (voucherStatus) {
+              voucherStatus.className = 'voucher-status-msg error';
+              voucherStatus.textContent = '❌ ' + (json.error || 'Code invalide');
+            }
           }
-        });
-      }
-    } else {
-      modal.classList.add('hidden');
-    }
-  }
-
-  checkWelcomeTimerModal() {
-    if (this.isAdmin()) {
-      const modal = document.getElementById('welcomeTimerModal');
-      if (modal) modal.classList.add('hidden');
-      return;
-    }
-    const modal = document.getElementById('welcomeTimerModal');
-    const acceptBtn = document.getElementById('welcomeTimerAcceptBtn');
-    const dismissBtn = document.getElementById('welcomeTimerDismissBtn');
-    if (!modal || !acceptBtn) return;
-
-    // Ne pas afficher si l'auth gate est active ou si le lecteur plein écran est ouvert
-    if (this.authGateModal && !this.authGateModal.classList.contains('hidden')) return;
-    if (document.getElementById('netflixPlayer')?.classList.contains('active')) return;
-
-    const accepted = localStorage.getItem('ziflix_welcome_accepted');
-    if (!accepted) {
-      modal.classList.remove('hidden');
-
-      const dismiss = () => {
-        localStorage.setItem('ziflix_welcome_accepted', 'true');
-        modal.classList.add('hidden');
-      };
-
-      acceptBtn.addEventListener('click', () => {
-        dismiss();
-        const now = Date.now();
-        const exp = now + 1800 * 1000;
-        localStorage.setItem('ziflix_watch_expires_at', String(exp));
-        localStorage.setItem('ziflix_watch_credit', '1800');
-        if (this.player && typeof this.player.updateTimerDisplays === 'function') {
-          this.player.updateTimerDisplays(1800);
+        } catch (err) {
+          if (voucherStatus) {
+            voucherStatus.className = 'voucher-status-msg error';
+            voucherStatus.textContent = '❌ Erreur de communication avec le serveur.';
+          }
+        } finally {
+          if (voucherBtn) {
+            voucherBtn.disabled = false;
+            voucherBtn.textContent = 'Activer 👑';
+          }
         }
-        this.updateHomeTimerDisplay(1800);
-        this.showToast('⏱ 30 minutes offertes activées. Bon visionnage !');
-      }, { once: true });
-
-      if (dismissBtn) {
-        dismissBtn.addEventListener('click', () => {
-          dismiss();
-        }, { once: true });
-      }
-    } else {
-      modal.classList.add('hidden');
+      });
     }
   }
+  }
 
-    refreshContinueWatching() {
-    if (!this.catalogRowsContainer) return;
-    const existing = this.catalogRowsContainer.querySelector('.continue-watching-row');
-    const items = this.getContinueWatchingList();
-    if (items.length > 0) {
-      const newRow = this.buildContinueWatchingRow(items);
-      if (existing) {
-        existing.replaceWith(newRow);
-      } else {
-        this.catalogRowsContainer.prepend(newRow);
-      }
-    } else if (existing) {
-      existing.remove();
+// Initialisation au chargement du DOM
+document.addEventListener('DOMContentLoaded', () => {
+  window.netflixApp = new NetflixApp();
+});
+,
+        weekend: { display: '1 
+
+    // Bouton de paiement PayDunya
+    const paydunyaBtn = document.getElementById('paydunyaPayBtn');
+    if (paydunyaBtn) {
+      paydunyaBtn.addEventListener('click', async () => {
+        const activeCard = document.querySelector('.netflix-plan-card.active');
+        const planId = activeCard ? activeCard.dataset.plan : 'monthly';
+        const price = activeCard ? (activeCard.dataset.price || '1 000 FCFA') : '1 000 FCFA';
+
+        paydunyaBtn.disabled = true;
+        paydunyaBtn.innerHTML = '<span>Connexion à la passerelle sécurisée...</span>';
+
+        try {
+          const baseUrl = window.API_BASE || '';
+          const res = await fetch(`${baseUrl}/api/premium/paydunya/checkout`, {
+            method: 'POST',
+            headers: this.getAuthHeaders({ 'Content-Type': 'application/json' }),
+            body: JSON.stringify({ plan_id: planId })
+          });
+          const json = await res.json();
+          if (json.success && json.checkout_url) {
+            window.location.href = json.checkout_url;
+          } else if (json.needs_key) {
+            this.showToast("Passerelle PayDunya : Clés API non configurées dans config/paydunya.json", true);
+          } else {
+            this.showToast(json.error || "Impossible d'initier la transaction.", true);
+          }
+        } catch (err) {
+          this.showToast("Erreur de connexion avec le serveur de paiement.", true);
+        } finally {
+          paydunyaBtn.disabled = false;
+          paydunyaBtn.innerHTML = `<span>Procéder au paiement sécurisé (<span id="paydunyaSelectedPrice">${price}</span>)</span> <span>▶</span>`;
+        }
+      });
+    }
+
+    // Toggle accordéon code VIP
+    const toggleVoucher = document.getElementById('toggleVoucherAccordion');
+    const voucherBox = document.getElementById('voucherAccordionContent');
+    if (toggleVoucher && voucherBox) {
+      toggleVoucher.addEventListener('click', () => {
+        voucherBox.classList.toggle('hidden');
+      });
+    }
+
+    // Formulaire de code VIP
+    const voucherForm = document.getElementById('voucherRedeemForm');
+    const voucherInput = document.getElementById('voucherCodeInput');
+    const voucherStatus = document.getElementById('voucherStatusMsg');
+    const voucherBtn = document.getElementById('voucherSubmitBtn');
+
+    if (voucherForm && voucherInput) {
+      voucherForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const code = voucherInput.value.trim().toUpperCase();
+        if (!code) return;
+
+        if (voucherBtn) {
+          voucherBtn.disabled = true;
+          voucherBtn.textContent = 'Vérification...';
+        }
+        if (voucherStatus) {
+          voucherStatus.className = 'voucher-status-msg hidden';
+        }
+
+        try {
+          const baseUrl = window.API_BASE || '';
+          const res = await fetch(`${baseUrl}/api/premium/redeem`, {
+            method: 'POST',
+            headers: this.getAuthHeaders({ 'Content-Type': 'application/json' }),
+            body: JSON.stringify({ code })
+          });
+          const json = await res.json();
+
+          if (json.success) {
+            if (voucherStatus) {
+              voucherStatus.className = 'voucher-status-msg success';
+              voucherStatus.textContent = '🎉 ' + json.message;
+            }
+            if (json.user) {
+              this.setCurrentUser(Object.assign({}, this.currentUser, json.user));
+            }
+            this.showToast('👑 Félicitations ! Votre abonnement VIP est actif !');
+            setTimeout(() => {
+              this.closePremiumModal();
+              if (voucherStatus) voucherStatus.className = 'voucher-status-msg hidden';
+            }, 2500);
+          } else {
+            if (voucherStatus) {
+              voucherStatus.className = 'voucher-status-msg error';
+              voucherStatus.textContent = '❌ ' + (json.error || 'Code invalide');
+            }
+          }
+        } catch (err) {
+          if (voucherStatus) {
+            voucherStatus.className = 'voucher-status-msg error';
+            voucherStatus.textContent = '❌ Erreur de communication avec le serveur.';
+          }
+        } finally {
+          if (voucherBtn) {
+            voucherBtn.disabled = false;
+            voucherBtn.textContent = 'Activer 👑';
+          }
+        }
+      });
     }
   }
-}
+  }
+
+// Initialisation au chargement du DOM
+document.addEventListener('DOMContentLoaded', () => {
+  window.netflixApp = new NetflixApp();
+});
+, equiv: '48H Full Access', amountXof: 600 },
+        monthly: { display: '1 
+
+    // Bouton de paiement PayDunya
+    const paydunyaBtn = document.getElementById('paydunyaPayBtn');
+    if (paydunyaBtn) {
+      paydunyaBtn.addEventListener('click', async () => {
+        const activeCard = document.querySelector('.netflix-plan-card.active');
+        const planId = activeCard ? activeCard.dataset.plan : 'monthly';
+        const price = activeCard ? (activeCard.dataset.price || '1 000 FCFA') : '1 000 FCFA';
+
+        paydunyaBtn.disabled = true;
+        paydunyaBtn.innerHTML = '<span>Connexion à la passerelle sécurisée...</span>';
+
+        try {
+          const baseUrl = window.API_BASE || '';
+          const res = await fetch(`${baseUrl}/api/premium/paydunya/checkout`, {
+            method: 'POST',
+            headers: this.getAuthHeaders({ 'Content-Type': 'application/json' }),
+            body: JSON.stringify({ plan_id: planId })
+          });
+          const json = await res.json();
+          if (json.success && json.checkout_url) {
+            window.location.href = json.checkout_url;
+          } else if (json.needs_key) {
+            this.showToast("Passerelle PayDunya : Clés API non configurées dans config/paydunya.json", true);
+          } else {
+            this.showToast(json.error || "Impossible d'initier la transaction.", true);
+          }
+        } catch (err) {
+          this.showToast("Erreur de connexion avec le serveur de paiement.", true);
+        } finally {
+          paydunyaBtn.disabled = false;
+          paydunyaBtn.innerHTML = `<span>Procéder au paiement sécurisé (<span id="paydunyaSelectedPrice">${price}</span>)</span> <span>▶</span>`;
+        }
+      });
+    }
+
+    // Toggle accordéon code VIP
+    const toggleVoucher = document.getElementById('toggleVoucherAccordion');
+    const voucherBox = document.getElementById('voucherAccordionContent');
+    if (toggleVoucher && voucherBox) {
+      toggleVoucher.addEventListener('click', () => {
+        voucherBox.classList.toggle('hidden');
+      });
+    }
+
+    // Formulaire de code VIP
+    const voucherForm = document.getElementById('voucherRedeemForm');
+    const voucherInput = document.getElementById('voucherCodeInput');
+    const voucherStatus = document.getElementById('voucherStatusMsg');
+    const voucherBtn = document.getElementById('voucherSubmitBtn');
+
+    if (voucherForm && voucherInput) {
+      voucherForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const code = voucherInput.value.trim().toUpperCase();
+        if (!code) return;
+
+        if (voucherBtn) {
+          voucherBtn.disabled = true;
+          voucherBtn.textContent = 'Vérification...';
+        }
+        if (voucherStatus) {
+          voucherStatus.className = 'voucher-status-msg hidden';
+        }
+
+        try {
+          const baseUrl = window.API_BASE || '';
+          const res = await fetch(`${baseUrl}/api/premium/redeem`, {
+            method: 'POST',
+            headers: this.getAuthHeaders({ 'Content-Type': 'application/json' }),
+            body: JSON.stringify({ code })
+          });
+          const json = await res.json();
+
+          if (json.success) {
+            if (voucherStatus) {
+              voucherStatus.className = 'voucher-status-msg success';
+              voucherStatus.textContent = '🎉 ' + json.message;
+            }
+            if (json.user) {
+              this.setCurrentUser(Object.assign({}, this.currentUser, json.user));
+            }
+            this.showToast('👑 Félicitations ! Votre abonnement VIP est actif !');
+            setTimeout(() => {
+              this.closePremiumModal();
+              if (voucherStatus) voucherStatus.className = 'voucher-status-msg hidden';
+            }, 2500);
+          } else {
+            if (voucherStatus) {
+              voucherStatus.className = 'voucher-status-msg error';
+              voucherStatus.textContent = '❌ ' + (json.error || 'Code invalide');
+            }
+          }
+        } catch (err) {
+          if (voucherStatus) {
+            voucherStatus.className = 'voucher-status-msg error';
+            voucherStatus.textContent = '❌ Erreur de communication avec le serveur.';
+          }
+        } finally {
+          if (voucherBtn) {
+            voucherBtn.disabled = false;
+            voucherBtn.textContent = 'Activer 👑';
+          }
+        }
+      });
+    }
+  }
+  }
+
+// Initialisation au chargement du DOM
+document.addEventListener('DOMContentLoaded', () => {
+  window.netflixApp = new NetflixApp();
+});
+, equiv: 'Cancel anytime', amountXof: 1000 },
+        vip3m:   { display: '3 
+
+    // Bouton de paiement PayDunya
+    const paydunyaBtn = document.getElementById('paydunyaPayBtn');
+    if (paydunyaBtn) {
+      paydunyaBtn.addEventListener('click', async () => {
+        const activeCard = document.querySelector('.netflix-plan-card.active');
+        const planId = activeCard ? activeCard.dataset.plan : 'monthly';
+        const price = activeCard ? (activeCard.dataset.price || '1 000 FCFA') : '1 000 FCFA';
+
+        paydunyaBtn.disabled = true;
+        paydunyaBtn.innerHTML = '<span>Connexion à la passerelle sécurisée...</span>';
+
+        try {
+          const baseUrl = window.API_BASE || '';
+          const res = await fetch(`${baseUrl}/api/premium/paydunya/checkout`, {
+            method: 'POST',
+            headers: this.getAuthHeaders({ 'Content-Type': 'application/json' }),
+            body: JSON.stringify({ plan_id: planId })
+          });
+          const json = await res.json();
+          if (json.success && json.checkout_url) {
+            window.location.href = json.checkout_url;
+          } else if (json.needs_key) {
+            this.showToast("Passerelle PayDunya : Clés API non configurées dans config/paydunya.json", true);
+          } else {
+            this.showToast(json.error || "Impossible d'initier la transaction.", true);
+          }
+        } catch (err) {
+          this.showToast("Erreur de connexion avec le serveur de paiement.", true);
+        } finally {
+          paydunyaBtn.disabled = false;
+          paydunyaBtn.innerHTML = `<span>Procéder au paiement sécurisé (<span id="paydunyaSelectedPrice">${price}</span>)</span> <span>▶</span>`;
+        }
+      });
+    }
+
+    // Toggle accordéon code VIP
+    const toggleVoucher = document.getElementById('toggleVoucherAccordion');
+    const voucherBox = document.getElementById('voucherAccordionContent');
+    if (toggleVoucher && voucherBox) {
+      toggleVoucher.addEventListener('click', () => {
+        voucherBox.classList.toggle('hidden');
+      });
+    }
+
+    // Formulaire de code VIP
+    const voucherForm = document.getElementById('voucherRedeemForm');
+    const voucherInput = document.getElementById('voucherCodeInput');
+    const voucherStatus = document.getElementById('voucherStatusMsg');
+    const voucherBtn = document.getElementById('voucherSubmitBtn');
+
+    if (voucherForm && voucherInput) {
+      voucherForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const code = voucherInput.value.trim().toUpperCase();
+        if (!code) return;
+
+        if (voucherBtn) {
+          voucherBtn.disabled = true;
+          voucherBtn.textContent = 'Vérification...';
+        }
+        if (voucherStatus) {
+          voucherStatus.className = 'voucher-status-msg hidden';
+        }
+
+        try {
+          const baseUrl = window.API_BASE || '';
+          const res = await fetch(`${baseUrl}/api/premium/redeem`, {
+            method: 'POST',
+            headers: this.getAuthHeaders({ 'Content-Type': 'application/json' }),
+            body: JSON.stringify({ code })
+          });
+          const json = await res.json();
+
+          if (json.success) {
+            if (voucherStatus) {
+              voucherStatus.className = 'voucher-status-msg success';
+              voucherStatus.textContent = '🎉 ' + json.message;
+            }
+            if (json.user) {
+              this.setCurrentUser(Object.assign({}, this.currentUser, json.user));
+            }
+            this.showToast('👑 Félicitations ! Votre abonnement VIP est actif !');
+            setTimeout(() => {
+              this.closePremiumModal();
+              if (voucherStatus) voucherStatus.className = 'voucher-status-msg hidden';
+            }, 2500);
+          } else {
+            if (voucherStatus) {
+              voucherStatus.className = 'voucher-status-msg error';
+              voucherStatus.textContent = '❌ ' + (json.error || 'Code invalide');
+            }
+          }
+        } catch (err) {
+          if (voucherStatus) {
+            voucherStatus.className = 'voucher-status-msg error';
+            voucherStatus.textContent = '❌ Erreur de communication avec le serveur.';
+          }
+        } finally {
+          if (voucherBtn) {
+            voucherBtn.disabled = false;
+            voucherBtn.textContent = 'Activer 👑';
+          }
+        }
+      });
+    }
+  }
+  }
+
+// Initialisation au chargement du DOM
+document.addEventListener('DOMContentLoaded', () => {
+  window.netflixApp = new NetflixApp();
+});
+, equiv: '90 days access', amountXof: 2000 }
+      }
+    };
+
+    let currentCurrency = 'XOF';
+
+    // Détection automatique du pays / devise
+    function autoDetectCurrency() {
+      const saved = localStorage.getItem('ziflix_currency');
+      if (saved && PRICING_TABLE[saved]) return saved;
+      try {
+        const tz = (Intl.DateTimeFormat().resolvedOptions().timeZone || '').toLowerCase();
+        const lang = (navigator.language || '').toLowerCase();
+        if (tz.includes('paris') || tz.includes('europe') || lang.includes('fr-fr')) {
+          return 'EUR';
+        }
+        if (tz.includes('america') || tz.includes('new_york') || tz.includes('los_angeles') || tz.includes('chicago') || lang.includes('en-us')) {
+          return 'USD';
+        }
+      } catch (e) {}
+      return 'XOF';
+    }
+
+    function applyCurrencyPricing(curr) {
+      currentCurrency = curr;
+      localStorage.setItem('ziflix_currency', curr);
+
+      // Mettre à jour les pilules
+      document.querySelectorAll('.curr-pill').forEach(btn => {
+        btn.classList.toggle('active', btn.dataset.curr === curr);
+      });
+
+      const table = PRICING_TABLE[curr] || PRICING_TABLE['XOF'];
+
+      // Mettre à jour les cartes
+      const cards = document.querySelectorAll('.netflix-plan-card');
+      cards.forEach(card => {
+        const plan = card.dataset.plan;
+        const info = table[plan];
+        if (info) {
+          card.dataset.price = info.display;
+          const priceEl = card.querySelector('.netflix-plan-price');
+          if (priceEl) priceEl.innerHTML = info.display;
+          const equivEl = card.querySelector('.netflix-plan-equiv');
+          if (equivEl) equivEl.textContent = info.equiv;
+        }
+      });
+
+      // Mettre à jour le bouton actif
+      const activeCard = document.querySelector('.netflix-plan-card.active');
+      const curPrice = activeCard ? (activeCard.dataset.price || table['monthly'].display) : table['monthly'].display;
+      const display = document.getElementById('paydunyaSelectedPrice');
+      if (display) display.textContent = curPrice;
+    }
+
+    currentCurrency = autoDetectCurrency();
+    applyCurrencyPricing(currentCurrency);
+
+    // Écouteurs sur les boutons de devise
+    document.querySelectorAll('.curr-pill').forEach(btn => {
+      btn.addEventListener('click', () => {
+        applyCurrencyPricing(btn.dataset.curr);
+      });
+    });
+
+
+    // Bouton de paiement PayDunya
+    const paydunyaBtn = document.getElementById('paydunyaPayBtn');
+    if (paydunyaBtn) {
+      paydunyaBtn.addEventListener('click', async () => {
+        const activeCard = document.querySelector('.netflix-plan-card.active');
+        const planId = activeCard ? activeCard.dataset.plan : 'monthly';
+        const price = activeCard ? (activeCard.dataset.price || '1 000 FCFA') : '1 000 FCFA';
+
+        paydunyaBtn.disabled = true;
+        paydunyaBtn.innerHTML = '<span>Connexion à la passerelle sécurisée...</span>';
+
+        try {
+          const baseUrl = window.API_BASE || '';
+          const res = await fetch(`${baseUrl}/api/premium/paydunya/checkout`, {
+            method: 'POST',
+            headers: this.getAuthHeaders({ 'Content-Type': 'application/json' }),
+            body: JSON.stringify({ plan_id: planId })
+          });
+          const json = await res.json();
+          if (json.success && json.checkout_url) {
+            window.location.href = json.checkout_url;
+          } else if (json.needs_key) {
+            this.showToast("Passerelle PayDunya : Clés API non configurées dans config/paydunya.json", true);
+          } else {
+            this.showToast(json.error || "Impossible d'initier la transaction.", true);
+          }
+        } catch (err) {
+          this.showToast("Erreur de connexion avec le serveur de paiement.", true);
+        } finally {
+          paydunyaBtn.disabled = false;
+          paydunyaBtn.innerHTML = `<span>Procéder au paiement sécurisé (<span id="paydunyaSelectedPrice">${price}</span>)</span> <span>▶</span>`;
+        }
+      });
+    }
+
+    // Toggle accordéon code VIP
+    const toggleVoucher = document.getElementById('toggleVoucherAccordion');
+    const voucherBox = document.getElementById('voucherAccordionContent');
+    if (toggleVoucher && voucherBox) {
+      toggleVoucher.addEventListener('click', () => {
+        voucherBox.classList.toggle('hidden');
+      });
+    }
+
+    // Formulaire de code VIP
+    const voucherForm = document.getElementById('voucherRedeemForm');
+    const voucherInput = document.getElementById('voucherCodeInput');
+    const voucherStatus = document.getElementById('voucherStatusMsg');
+    const voucherBtn = document.getElementById('voucherSubmitBtn');
+
+    if (voucherForm && voucherInput) {
+      voucherForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const code = voucherInput.value.trim().toUpperCase();
+        if (!code) return;
+
+        if (voucherBtn) {
+          voucherBtn.disabled = true;
+          voucherBtn.textContent = 'Vérification...';
+        }
+        if (voucherStatus) {
+          voucherStatus.className = 'voucher-status-msg hidden';
+        }
+
+        try {
+          const baseUrl = window.API_BASE || '';
+          const res = await fetch(`${baseUrl}/api/premium/redeem`, {
+            method: 'POST',
+            headers: this.getAuthHeaders({ 'Content-Type': 'application/json' }),
+            body: JSON.stringify({ code })
+          });
+          const json = await res.json();
+
+          if (json.success) {
+            if (voucherStatus) {
+              voucherStatus.className = 'voucher-status-msg success';
+              voucherStatus.textContent = '🎉 ' + json.message;
+            }
+            if (json.user) {
+              this.setCurrentUser(Object.assign({}, this.currentUser, json.user));
+            }
+            this.showToast('👑 Félicitations ! Votre abonnement VIP est actif !');
+            setTimeout(() => {
+              this.closePremiumModal();
+              if (voucherStatus) voucherStatus.className = 'voucher-status-msg hidden';
+            }, 2500);
+          } else {
+            if (voucherStatus) {
+              voucherStatus.className = 'voucher-status-msg error';
+              voucherStatus.textContent = '❌ ' + (json.error || 'Code invalide');
+            }
+          }
+        } catch (err) {
+          if (voucherStatus) {
+            voucherStatus.className = 'voucher-status-msg error';
+            voucherStatus.textContent = '❌ Erreur de communication avec le serveur.';
+          }
+        } finally {
+          if (voucherBtn) {
+            voucherBtn.disabled = false;
+            voucherBtn.textContent = 'Activer 👑';
+          }
+        }
+      });
+    }
+  }
+  }
 
 // Initialisation au chargement du DOM
 document.addEventListener('DOMContentLoaded', () => {

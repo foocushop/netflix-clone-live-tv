@@ -145,35 +145,6 @@ class NetflixPlayer {
     this.initServerNavEvents();
     this.initEpisodeSelectEvents();
     this.initInactivityTimer();
-
-    // 7. Watch Timer Monetag & Continuer la lecture
-    this.timerWarningBadge = document.getElementById('timerWarningBadge');
-    this.timerBadgeTime = document.getElementById('timerBadgeTime');
-    this.timerBadgeRechargeBtn = document.getElementById('timerBadgeRechargeBtn');
-    this.timerExpiredModal = document.getElementById('timerExpiredModal');
-    this.playerWatchTimer = document.getElementById('playerWatchTimer');
-    this.playerWatchTimerVal = document.getElementById('playerWatchTimerVal');
-    this.playerWatchTimerBtn = document.getElementById('playerWatchTimerBtn');
-    this.timerModalRechargeBtn = document.getElementById('timerModalRechargeBtn');
-
-    // Roulement des liens publicitaires (Monetag + Adsterra)
-    this.DIRECT_LINKS = [
-      'https://omg10.com/4/11820445',
-      'https://www.profitableratecpmnetwork.com/kwnxcx7a2s?key=d43d0890cc6512eb65c08a022e42f264'
-    ];
-    this.MONETAG_LINK = this.DIRECT_LINKS[0];
-    this.INITIAL_CREDIT = 1800; // 30 minutes
-    this.BONUS_CREDIT = 1800;   // +30 minutes de recharge
-    this.MAX_CREDIT = 3600;     // Plafond strict 60 minutes (3600s)
-    this.COOLDOWN_SECONDS = 5;  // 5 secondes de délai non atomique
-    this.isRechargePending = false;
-    this.rechargeCooldownInterval = null;
-    this.WARNING_THRESHOLD = 300; // 5 minutes
-    this.watchTimerInterval = null;
-    this.lastProgressSave = 0;
-    this.savedResumeTime = 0;
-
-    this.initWatchTimer();
   }
 
   // Horloge unifiée : réconcilie le currentTime relatif (Safari/iOS) avec le point de départ HLS réel
@@ -238,15 +209,7 @@ class NetflixPlayer {
         this.toggleFullscreen();
       });
 
-      this.video.addEventListener('play', () => {
-        if (!this.isAdmin() && this.getWatchCredit() <= 0) {
-          try { this.video.pause(); } catch (e) {}
-          if (!this.timerExpiredModal) this.timerExpiredModal = document.getElementById('timerExpiredModal');
-          if (this.timerExpiredModal) this.timerExpiredModal.classList.remove('hidden');
-          return;
-        }
-        this.updatePlayStateUI(true);
-      });
+      this.video.addEventListener('play', () => this.updatePlayStateUI(true));
       this.video.addEventListener('pause', () => this.updatePlayStateUI(false));
       this.video.addEventListener('ended', () => {
         const isSeries = (this.currentMovie?.media_type === 'series' || this.currentMovie?.is_xtream_series);
@@ -690,7 +653,6 @@ class NetflixPlayer {
       const now = performance.now();
       if (now - lastTimeUpdate < 250) return;
       lastTimeUpdate = now;
-      this.savePlaybackProgress();
 
       const isChannel = (this.currentMovie?.media_type === 'channel' || this.currentMovie?.is_live);
       if (isChannel) {
@@ -1223,9 +1185,6 @@ class NetflixPlayer {
     this.overlay.classList.add('active');
     this.showControls();
 
-    const welcomeToast = document.getElementById('welcomeTimerModal');
-    if (welcomeToast) welcomeToast.classList.add('hidden');
-
     this.iframe.classList.add('hidden');
     this.iframe.src = 'about:blank';
     this.video.classList.remove('hidden');
@@ -1353,36 +1312,6 @@ class NetflixPlayer {
     }
 
     this.currentLang = 'vf';
-    // Reprise de lecture
-    this.savedResumeTime = 0;
-    try {
-      const list = JSON.parse(localStorage.getItem('ziflix_continue_watching')) || [];
-      const saved = list.find(item => String(item.id) === String(movie.id));
-      if (saved && saved.currentTime > 10 && (saved.progressPct || 0) < 95) {
-        this.savedResumeTime = saved.currentTime;
-        if (!season && saved.season) season = saved.season;
-        if (!episode && saved.episode) episode = saved.episode;
-      }
-    } catch (e) {}
-
-    // Démarrage du Watch Timer Monetag
-    this.startWatchTimer();
-
-    // Verrouillage strict si le crédit est épuisé (0 min)
-    if (!this.isAdmin() && this.getWatchCredit() <= 0) {
-      this.currentServer = 1;
-      this.updateMetaDisplay();
-      this.stopWatchTimer();
-      if (this.video) {
-        try { this.video.pause(); } catch (e) {}
-      }
-      this.hideLoader();
-      if (!this.timerExpiredModal) this.timerExpiredModal = document.getElementById('timerExpiredModal');
-      if (this.timerExpiredModal) this.timerExpiredModal.classList.remove('hidden');
-      this.showToast('⏱ Votre temps gratuit est écoulé. Rechargez +30m pour regarder.');
-      return;
-    }
-
     this.currentServer = 1;
     this.updateMetaDisplay();
     this.loadStream();
@@ -1421,8 +1350,6 @@ class NetflixPlayer {
       this.activeExtractionAbort = null;
     }
 
-    this.savePlaybackProgress(true);
-    this.stopWatchTimer();
     this.cleanupActivePlayback();
 
     if (this.backdrop) {
@@ -1459,9 +1386,6 @@ class NetflixPlayer {
     if (window.app && typeof window.app.resumeBackgroundTasks === 'function') {
       window.app.resumeBackgroundTasks();
     }
-    if (window.netflixApp && typeof window.netflixApp.checkWelcomeTimerModal === 'function') {
-      window.netflixApp.checkWelcomeTimerModal();
-    }
   }
 
   // ================= 10. MOTEURS DE STREAMING (LIVE & VOD) =================
@@ -1483,15 +1407,6 @@ class NetflixPlayer {
     try {
       this.video.pause();
     } catch (e) {}
-
-    // Verrouillage strict si crédit épuisé (0s)
-    if (!this.isAdmin() && this.getWatchCredit() <= 0) {
-      this.hideLoader();
-      if (!this.timerExpiredModal) this.timerExpiredModal = document.getElementById('timerExpiredModal');
-      if (this.timerExpiredModal) this.timerExpiredModal.classList.remove('hidden');
-      this.showToast('⏱ Votre temps gratuit est écoulé. Rechargez +30m pour regarder.');
-      return;
-    }
 
     // A. Chemin Rapide : Chaîne Xtream Live TV
     if (this.currentMovie && this.currentMovie.stream_url && (this.currentMovie.is_xtream || this.currentMovie.stream_url.includes('/api/stream/xtream'))) {
@@ -1674,14 +1589,7 @@ class NetflixPlayer {
 
       if (isChannel || data.player_type === 'direct_hls' || (targetStreamUrl && targetStreamUrl.includes('.m3u8'))) {
         this.playDirectHls(targetStreamUrl);
-      } else if (targetStreamUrl.includes('/api/stream/xtream-series')) {
-        const epMatch = targetStreamUrl.match(/episode_id=([^&]+)/);
-        if (epMatch) {
-          this.playDirectHls(`${baseUrl}/api/stream/xtream-series-hls/${epMatch[1]}/master.m3u8`);
-        } else {
-          this.playDirectVideo(targetStreamUrl);
-        }
-      } else if (data.player_type === 'direct_video') {
+      } else if (data.player_type === 'direct_video' || targetStreamUrl.includes('/api/stream/xtream-series')) {
         this.playDirectVideo(targetStreamUrl);
       } else if (data.player_type === 'iframe' || data.is_embed) {
         this.playEmbedIframe(data.embed_url || targetStreamUrl);
@@ -1767,7 +1675,7 @@ playDirectHls(streamUrl, options = {}) {
       this._audioTranscodeRecovery = false;
     }
     const startMatch = streamUrl.match(/[?&]start=(\d+)/);
-    const startSec = (options.startPosition !== undefined) ? options.startPosition : (startMatch ? parseInt(startMatch[1], 10) : (this.savedResumeTime > 0 ? this.savedResumeTime : 0));
+    const startSec = (options.startPosition !== undefined) ? options.startPosition : (startMatch ? parseInt(startMatch[1], 10) : 0);
     this._hlsStreamOffset = startSec;
 
     this.cleanupActivePlayback();
@@ -1822,24 +1730,16 @@ playDirectHls(streamUrl, options = {}) {
 
     const isChannel = !!(this.currentMovie?.media_type === 'channel' || this.currentMovie?.is_live);
 
-    // Protection Anti-Rollback / Anti-Boucle Xtream pour Live TV (Tolérance sécurisée)
+    // Protection Anti-Rollback / Anti-Boucle Xtream UNIQUEMENT pour Live TV (JAMAIS sur VOD)
     if (isChannel) {
       this.lastLiveMaxTime = 0;
-      this._antiLoopStallCount = 0;
       this._antiLoopHandler = () => {
         if (!this.video.paused && !this.video.seeking) {
           const cur = this.video.currentTime;
-          // Ne recalibrer que si le flux revient en arrière de plus de 15 secondes ET répété 5 fois
-          if (this.lastLiveMaxTime > 20 && cur < (this.lastLiveMaxTime - 15.0)) {
-            this._antiLoopStallCount++;
-            if (this._antiLoopStallCount > 5) {
-              this._antiLoopStallCount = 0;
-              console.warn(`[Anti-Loop Xtream] Recalage direct sécurisé : ${cur.toFixed(1)}s -> ${this.lastLiveMaxTime.toFixed(1)}s`);
-              this.video.currentTime = this.lastLiveMaxTime;
-              return;
-            }
-          } else {
-            this._antiLoopStallCount = 0;
+          if (this.lastLiveMaxTime > 6 && cur < (this.lastLiveMaxTime - 2.0)) {
+            console.warn(`[Anti-Loop Xtream] Recalage direct : ${cur.toFixed(1)}s -> ${this.lastLiveMaxTime.toFixed(1)}s`);
+            this.video.currentTime = this.lastLiveMaxTime + 0.2;
+            return;
           }
           if (cur > this.lastLiveMaxTime) {
             this.lastLiveMaxTime = cur;
@@ -1900,12 +1800,12 @@ playDirectHls(streamUrl, options = {}) {
         maxBufferLength: isMobile ? 35 : 90,            // 35s mobile / 90s PC (coussin profond anti-coupure)
         maxMaxBufferLength: isMobile ? 70 : 180,        // 70s mobile / 180s (3 min) PC
         maxBufferSize: (isMobile ? 50 : 128) * 1024 * 1024, // 50 Mo mobile / 128 Mo PC
-        maxBufferHole: 1.5,                             // Enjambe les micro-décalages
+        maxBufferHole: 0.9,                             // Enjambe les micro-décalages
         highBufferWatchdogPeriod: 0.8,                  // Réagit en 800ms
         lowBufferWatchdogPeriod: 0.4,
-        nudgeOffset: 0.3,                               // Franchit les trous sans freeze
-        nudgeMaxRetry: 10,
-        maxFragLookUpTolerance: 0.5,
+        nudgeOffset: 0.2,                               // Franchit les trous sans freeze
+        nudgeMaxRetry: 6,
+        maxFragLookUpTolerance: 0.35,
         fragLoadingTimeOut: 15000,
         manifestLoadingTimeOut: 8000,
         levelLoadingTimeOut: 8000,
@@ -1964,10 +1864,9 @@ playDirectHls(streamUrl, options = {}) {
           hasStartedPlay = true;
 
           const targetStart = (startSec > 0) ? startSec : 0;
-          if (!isChannel && targetStart > 0) {
+          if (!isChannel) {
             this.video.currentTime = targetStart;
           }
-          this.savedResumeTime = 0;
 
           if (options.keepPlayback !== false && !this._isUserPaused) {
             const playPromise = this.video.play();
@@ -2015,8 +1914,8 @@ playDirectHls(streamUrl, options = {}) {
       hls.on(Hls.Events.ERROR, (event, data) => {
         // Détection d'incompatibilité audio matérielle (ex: EC-3 Dolby / code non supporté)
         const isAudioIncompatibility = (
-          (data.reason && (data.reason.includes('EC-3') || data.reason.includes('Unsupported audio') || data.reason.toLowerCase().includes('audio'))) ||
-          (data.details === Hls.ErrorDetails.BUFFER_APPENDING_ERROR && (data.parent === 'audio' || data.sourceBufferName === 'audio' || (data.mimeType && (data.mimeType.includes('ec-3') || data.mimeType.includes('audio')))))
+          (data.reason && (data.reason.includes('EC-3') || data.reason.includes('Unsupported audio'))) ||
+          (data.details === Hls.ErrorDetails.BUFFER_APPENDING_ERROR && data.mimeType && data.mimeType.includes('ec-3'))
         );
         if (isAudioIncompatibility) {
           console.warn('[HLS] Incompatibilité audio détectée (EC-3).');
@@ -2068,22 +1967,13 @@ playDirectHls(streamUrl, options = {}) {
             break;
           case Hls.ErrorTypes.MEDIA_ERROR:
             this._mediaErrorCount = (this._mediaErrorCount || 0) + 1;
-            console.warn('[HLS Media Error #' + this._mediaErrorCount + ']:', data.details);
-            if (this._mediaErrorCount === 1) {
-              hls.recoverMediaError();
-            } else if (this._mediaErrorCount === 2) {
-              try { hls.swapAudioCodec(); } catch (e) {}
-              hls.recoverMediaError();
-            } else if (this._mediaErrorCount <= 4) {
-              // Sur direct (Live TV), laisser HLS.js récupérer sans forcer de seek artificiel
-              if (!isChannel && this.video && !this.video.paused) {
-                this.video.currentTime += 0.3;
-              }
-              hls.recoverMediaError();
-            } else {
+            if (this._mediaErrorCount >= 3 || data.details === 'mediaSourceRequiresReset') {
               this._mediaErrorCount = 0;
               this.showStatusBanner("Erreur de décodage média. Cliquez sur Réessayer.");
+              return;
             }
+            console.log('[HLS] Récupération média automatique...');
+            hls.recoverMediaError();
             break;
           default:
             try {
@@ -2237,12 +2127,6 @@ playDirectHls(streamUrl, options = {}) {
     const triggerSafePlay = () => {
       if (hasStartedPlay) return;
       hasStartedPlay = true;
-      if (this.savedResumeTime > 0 && !isChannel) {
-        try {
-          this.video.currentTime = this.savedResumeTime;
-        } catch (e) {}
-        this.savedResumeTime = 0;
-      }
       const playPromise = this.video.play();
       if (playPromise !== undefined) {
         playPromise.catch(err => {
@@ -2267,9 +2151,6 @@ playDirectHls(streamUrl, options = {}) {
   // ================= 13. MOTEUR IFRAME DE SECOURS =================
   playEmbedIframe(embedUrl) {
     this.setPlayerQualityMode(true);
-    if (typeof embedUrl === 'string') {
-      embedUrl = embedUrl.replace(/vidmoly\.(me|biz|net|to)/g, 'vidmoly.org').replace(/embed-embed-/g, 'embed-');
-    }
     if (this.hls) {
       try {
         this.hls.stopLoad();
@@ -2298,15 +2179,6 @@ playDirectHls(streamUrl, options = {}) {
 
   // ================= 14. UTILITAIRES D'AFFICHAGE & LOADER =================
   togglePlay() {
-    if (!this.isAdmin() && this.getWatchCredit() <= 0) {
-      if (this.video) {
-        try { this.video.pause(); } catch (e) {}
-      }
-      if (!this.timerExpiredModal) this.timerExpiredModal = document.getElementById('timerExpiredModal');
-      if (this.timerExpiredModal) this.timerExpiredModal.classList.remove('hidden');
-      this.showToast('⏱ Votre temps gratuit est écoulé. Rechargez +30m pour regarder.');
-      return;
-    }
     if (this.video && this.video.error) {
       console.warn('[Player] Clic Play/Pause sur vidéo en erreur, relance automatique du flux...');
       this.loadStream();
@@ -2557,441 +2429,7 @@ playDirectHls(streamUrl, options = {}) {
     if (h > 0) return `${h}:${pad(m)}:${pad(s)}`;
     return `${pad(m)}:${pad(s)}`;
   }
-
-  // ================= ⏳ WATCH TIMER MONETAG & GESTION CONTINUE =================
-  initWatchTimer() {
-    if (!this.playerWatchTimerBtn) this.playerWatchTimerBtn = document.getElementById('playerWatchTimerBtn');
-    if (!this.timerModalRechargeBtn) this.timerModalRechargeBtn = document.getElementById('timerModalRechargeBtn');
-    if (!this.timerExpiredModal) this.timerExpiredModal = document.getElementById('timerExpiredModal');
-
-    if (this.playerWatchTimerBtn) {
-      this.playerWatchTimerBtn.addEventListener('click', (e) => {
-        e.stopPropagation();
-        this.rechargeWatchCredit(false);
-      });
-    }
-
-    if (this.timerModalRechargeBtn) {
-      this.timerModalRechargeBtn.addEventListener('click', (e) => {
-        e.stopPropagation();
-        this.rechargeWatchCredit(true);
-      });
-    }
-
-    const modalCloseBtn = document.getElementById('timerModalCloseBtn');
-    if (modalCloseBtn) {
-      modalCloseBtn.addEventListener('click', (e) => {
-        e.stopPropagation();
-        this.close();
-      });
-    }
-
-    const modalBackCatalogBtn = document.getElementById('timerModalBackCatalogBtn');
-    if (modalBackCatalogBtn) {
-      modalBackCatalogBtn.addEventListener('click', (e) => {
-        e.stopPropagation();
-        this.close();
-      });
-    }
-  }
-
-  isAdmin() {
-    try {
-      if (window.netflixApp && typeof window.netflixApp.isAdmin === 'function' && window.netflixApp.isAdmin()) return true;
-      if (window.app && typeof window.app.isAdmin === 'function' && window.app.isAdmin()) return true;
-      const raw = localStorage.getItem('ziflix_user');
-      if (raw) {
-        const u = JSON.parse(raw);
-        if (u && (u.role === 'admin' || u.is_admin || u.isAdmin)) return true;
-      }
-      if (localStorage.getItem('ziflix_admin_token')) return true;
-      if (localStorage.getItem('ziflix_is_admin') === 'true') return true;
-      if (new URLSearchParams(window.location.search).get('admin') === '1') return true;
-    } catch (e) {}
-    return false;
-  }
-
-  getWatchCredit() {
-    if (this.isAdmin()) return 999999;
-    try {
-      const expStr = localStorage.getItem('ziflix_watch_expires_at');
-      const now = Date.now();
-      if (!expStr) {
-        // Migration d'un crédit legacy éventuel
-        const legacy = parseInt(localStorage.getItem('ziflix_watch_credit') || '0', 10);
-        if (legacy > 0 && !localStorage.getItem('ziflix_watch_migrated')) {
-          localStorage.setItem('ziflix_watch_migrated', 'true');
-          const newExp = now + legacy * 1000;
-          localStorage.setItem('ziflix_watch_expires_at', String(newExp));
-          return Math.min(this.MAX_CREDIT, legacy);
-        }
-        // Si première visite et offre non encore acceptée
-        const accepted = localStorage.getItem('ziflix_welcome_accepted');
-        if (!accepted) return this.INITIAL_CREDIT;
-        return 0;
-      }
-      const exp = parseInt(expStr, 10);
-      if (isNaN(exp) || exp <= now) return 0;
-      return Math.min(this.MAX_CREDIT, Math.floor((exp - now) / 1000));
-    } catch (e) {
-      return 0;
-    }
-  }
-
-  setWatchCredit(val) {
-    try {
-      const now = Date.now();
-      const s = Math.max(0, Math.min(this.MAX_CREDIT, Math.round(val)));
-      const exp = now + s * 1000;
-      localStorage.setItem('ziflix_watch_expires_at', String(exp));
-      localStorage.setItem('ziflix_watch_credit', String(s));
-    } catch (e) {}
-  }
-
-  addWatchCredit(seconds) {
-    try {
-      const now = Date.now();
-      const currentExp = parseInt(localStorage.getItem('ziflix_watch_expires_at') || '0', 10);
-      const baseTime = (!isNaN(currentExp) && currentExp > now) ? currentExp : now;
-      const newExp = Math.min(now + this.MAX_CREDIT * 1000, baseTime + seconds * 1000);
-      localStorage.setItem('ziflix_watch_expires_at', String(newExp));
-      const remainingSec = Math.max(0, Math.floor((newExp - now) / 1000));
-      localStorage.setItem('ziflix_watch_credit', String(remainingSec));
-      return remainingSec;
-    } catch (e) {
-      return 0;
-    }
-  }
-
-  getNextDirectLink() {
-    try {
-      const links = (this.DIRECT_LINKS && this.DIRECT_LINKS.length > 0) ? this.DIRECT_LINKS : [
-        'https://omg10.com/4/11820445',
-        'https://www.profitableratecpmnetwork.com/kwnxcx7a2s?key=d43d0890cc6512eb65c08a022e42f264'
-      ];
-      let idx = parseInt(localStorage.getItem('ziflix_ad_rotation_idx') || '0', 10);
-      if (isNaN(idx) || idx < 0 || idx >= links.length) idx = 0;
-      const targetUrl = links[idx];
-      // Roulement automatique 50/50 vers le lien suivant pour la prochaine recharge
-      localStorage.setItem('ziflix_ad_rotation_idx', String((idx + 1) % links.length));
-      return targetUrl;
-    } catch (e) {
-      return (this.DIRECT_LINKS && this.DIRECT_LINKS[0]) || 'https://omg10.com/4/11820445';
-    }
-  }
-
-  rechargeWatchCredit(fromModal = false) {
-    if (this.isRechargePending) {
-      this.showToast('⏳ Validation en cours... Veuillez patienter quelques secondes.');
-      return;
-    }
-
-    const current = Math.max(0, this.getWatchCredit());
-    if (current >= this.MAX_CREDIT) {
-      this.showToast('⚠️ Limite de 60 minutes déjà atteinte. Bon visionnage !');
-      this.updateTimerDisplays(current);
-      return;
-    }
-
-    this.isRechargePending = true;
-
-    // 1. Ouvrir le lien publicitaire en roulement direct (Monetag / Adsterra)
-    const targetUrl = this.getNextDirectLink();
-    try {
-      const win = window.open(targetUrl, '_blank');
-      if (!win) {
-        window.location.href = targetUrl;
-        return;
-      }
-    } catch (e) {
-      console.warn('[Ads] Erreur ouverture lien:', e.message);
-    }
-
-    // 2. Décompte d'attente de 5 secondes non atomique avec feedback visuel
-    let remaining = this.COOLDOWN_SECONDS;
-    this.updateRechargeButtonsCountdown(remaining);
-
-    if (this.rechargeCooldownInterval) {
-      clearInterval(this.rechargeCooldownInterval);
-      this.rechargeCooldownInterval = null;
-    }
-
-    this.rechargeCooldownInterval = setInterval(() => {
-      remaining--;
-      if (remaining > 0) {
-        this.updateRechargeButtonsCountdown(remaining);
-      } else {
-        clearInterval(this.rechargeCooldownInterval);
-        this.rechargeCooldownInterval = null;
-        this.isRechargePending = false;
-
-        // 3. Attribution effective du crédit après 5 secondes sur l'horloge réelle (+30 min)
-        const newCredit = this.addWatchCredit(this.BONUS_CREDIT);
-        this.updateTimerDisplays(newCredit);
-
-        if (this.playerWatchTimer && !this.isAdmin()) {
-          this.playerWatchTimer.style.display = 'inline-flex';
-          this.playerWatchTimer.classList.remove('timer-low');
-        }
-
-        if (fromModal) {
-          if (!this.timerExpiredModal) this.timerExpiredModal = document.getElementById('timerExpiredModal');
-          if (this.timerExpiredModal) {
-            this.timerExpiredModal.classList.add('hidden');
-          }
-          this.showToast('🎉 +30 minutes offertes débloquées ! Bon visionnage.');
-          if (this.currentMovie && (!this.video.src || this.video.src === 'about:blank' || this.video.ended)) {
-            this.loadStream();
-          } else {
-            try {
-              this.video.play().catch(() => {});
-            } catch (e) {}
-          }
-        } else {
-          this.showToast(`🎉 +30 minutes offertes ajoutées ! (${Math.round(newCredit / 60)} min au total)`);
-        }
-
-        // Fermer également la modale d'accueil 0 minute si ouverte
-        const zeroModal = document.getElementById('zeroCreditHomeModal');
-        if (zeroModal) zeroModal.classList.add('hidden');
-
-        // Synchroniser également avec l'accueil
-        if (window.netflixApp && typeof window.netflixApp.updateHomeTimerDisplay === 'function') {
-          window.netflixApp.updateHomeTimerDisplay(newCredit);
-        }
-      }
-    }, 1000);
-  }
-
-  updateRechargeButtonsCountdown(secondsRemaining) {
-    const navBtn = document.getElementById('navWatchTimerBtn');
-    const playerBtn = document.getElementById('playerWatchTimerBtn') || this.playerWatchTimerBtn;
-    const modalBtn = document.getElementById('timerModalRechargeBtn') || this.timerModalRechargeBtn;
-    const zeroBtn = document.getElementById('zeroCreditRechargeBtn');
-
-    const shortText = `⏳ ${secondsRemaining}s`;
-    const fullText = `⏳ VALIDATION EN COURS (${secondsRemaining}s)...`;
-
-    if (navBtn) {
-      navBtn.disabled = true;
-      navBtn.textContent = shortText;
-    }
-    if (playerBtn) {
-      playerBtn.disabled = true;
-      playerBtn.textContent = shortText;
-    }
-    if (modalBtn) {
-      modalBtn.disabled = true;
-      modalBtn.textContent = fullText;
-    }
-    if (zeroBtn) {
-      zeroBtn.disabled = true;
-      zeroBtn.textContent = fullText;
-    }
-  }
-
-  updateTimerDisplays(credit) {
-    credit = Math.max(0, Math.round(credit));
-    const mins = Math.floor(credit / 60);
-    const secs = credit % 60;
-    const timeStr = `${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
-
-    if (!this.playerWatchTimerVal) this.playerWatchTimerVal = document.getElementById('playerWatchTimerVal');
-    if (this.playerWatchTimerVal) {
-      this.playerWatchTimerVal.textContent = timeStr;
-    }
-
-    const navTimerVal = document.getElementById('navWatchTimerVal');
-    if (navTimerVal) {
-      navTimerVal.textContent = timeStr;
-    }
-
-    const navTimer = document.getElementById('navWatchTimer');
-    if (navTimer) {
-      if (this.isAdmin()) {
-        navTimer.style.display = 'none';
-      } else {
-        navTimer.style.display = 'inline-flex';
-        if (credit <= this.WARNING_THRESHOLD) {
-          navTimer.classList.add('timer-low');
-        } else {
-          navTimer.classList.remove('timer-low');
-        }
-      }
-    }
-
-    // Gestion de l'état des boutons si aucune recharge n'est en cours d'attente
-    if (!this.isRechargePending) {
-      const isMax = (credit >= this.MAX_CREDIT);
-      const navBtn = document.getElementById('navWatchTimerBtn');
-      const playerBtn = document.getElementById('playerWatchTimerBtn') || this.playerWatchTimerBtn;
-      const modalBtn = document.getElementById('timerModalRechargeBtn') || this.timerModalRechargeBtn;
-      const zeroBtn = document.getElementById('zeroCreditRechargeBtn');
-
-      if (navBtn) {
-        navBtn.disabled = isMax;
-        navBtn.textContent = isMax ? 'Max 60m' : '+30';
-        navBtn.title = isMax ? 'Limite de 60 minutes atteinte' : 'Recharger +30 min gratuites';
-      }
-      if (playerBtn) {
-        playerBtn.disabled = isMax;
-        playerBtn.textContent = isMax ? 'Max 60m' : '+30m';
-        playerBtn.title = isMax ? 'Limite de 60 minutes atteinte' : 'Recharger +30 min gratuites';
-      }
-      if (modalBtn) {
-        modalBtn.disabled = isMax;
-        modalBtn.textContent = isMax ? 'MAX 60 MIN ATTEINT' : '⚡ RECHARGER +30 MIN GRATUITES';
-      }
-      if (zeroBtn) {
-        zeroBtn.disabled = isMax;
-        zeroBtn.textContent = isMax ? 'MAX 60 MIN ATTEINT' : '⚡ RECHARGER +30 MIN GRATUITES';
-      }
-    }
-
-    if (window.netflixApp && typeof window.netflixApp.updateHomeTimerDisplay === 'function') {
-      try { window.netflixApp.updateHomeTimerDisplay(credit); } catch (e) {}
-    }
-  }
-
-  startWatchTimer() {
-    this.stopWatchTimer();
-    if (this.isAdmin()) {
-      if (this.playerWatchTimer) this.playerWatchTimer.style.display = 'none';
-      return;
-    }
-
-    if (!this.playerWatchTimer) this.playerWatchTimer = document.getElementById('playerWatchTimer');
-    if (this.playerWatchTimer) {
-      this.playerWatchTimer.style.display = 'inline-flex';
-      this.playerWatchTimer.classList.remove('timer-low');
-    }
-
-    const initialCredit = this.getWatchCredit();
-    this.updateTimerDisplays(initialCredit);
-
-    this.watchTimerInterval = setInterval(() => {
-      if (this.isAdmin()) {
-        this.stopWatchTimer();
-        return;
-      }
-
-      // Le timer s'écoule en temps réel continu (horloge réelle / wall-clock)
-      const credit = this.getWatchCredit();
-      this.updateTimerDisplays(credit);
-
-      if (credit <= 0) {
-        try { this.video.pause(); } catch (e) {}
-        if (document.fullscreenElement) {
-          try { document.exitFullscreen(); } catch (e) {}
-        } else if (this.video && typeof this.video.webkitExitFullscreen === 'function') {
-          try { this.video.webkitExitFullscreen(); } catch (e) {}
-        }
-        if (this.playerWatchTimer) this.playerWatchTimer.style.display = 'none';
-        if (!this.timerExpiredModal) this.timerExpiredModal = document.getElementById('timerExpiredModal');
-        if (this.timerExpiredModal) this.timerExpiredModal.classList.remove('hidden');
-        return;
-      }
-
-      if (credit <= this.WARNING_THRESHOLD) {
-        // Alerte 5 min : style timer-low discret
-        if (this.playerWatchTimer) this.playerWatchTimer.classList.add('timer-low');
-      } else {
-        if (this.playerWatchTimer) this.playerWatchTimer.classList.remove('timer-low');
-      }
-    }, 1000);
-  }
-
-  stopWatchTimer() {
-    if (this.watchTimerInterval) {
-      clearInterval(this.watchTimerInterval);
-      this.watchTimerInterval = null;
-    }
-    if (this.playerWatchTimer) this.playerWatchTimer.style.display = 'none';
-    if (!this.timerExpiredModal) this.timerExpiredModal = document.getElementById('timerExpiredModal');
-    if (this.timerExpiredModal) this.timerExpiredModal.classList.add('hidden');
-  }
-
-  showToast(msg) {
-    let toast = document.getElementById('playerZiflixToast');
-    if (!toast) {
-      toast = document.createElement('div');
-      toast.id = 'playerZiflixToast';
-      toast.style.cssText = 'position:absolute;top:70px;left:50%;transform:translateX(-50%);background:rgba(18,18,22,0.92);border:1px solid rgba(229,9,20,0.5);color:#fff;padding:10px 20px;border-radius:30px;font-size:0.9rem;font-weight:700;z-index:99999;box-shadow:0 8px 24px rgba(0,0,0,0.7);backdrop-filter:blur(10px);transition:all 0.3s ease;pointer-events:none;';
-      if (this.overlay) this.overlay.appendChild(toast);
-    }
-    toast.textContent = msg;
-    toast.style.opacity = '1';
-    toast.style.display = 'block';
-    setTimeout(() => {
-      if (toast) {
-        toast.style.opacity = '0';
-        setTimeout(() => { toast.style.display = 'none'; }, 350);
-      }
-    }, 3500);
-  }
-
-  savePlaybackProgress(force = false) {
-    if (!this.currentMovie || !this.video) return;
-    const isChannel = (this.currentMovie.media_type === 'channel' || this.currentMovie.is_live);
-    if (isChannel) return;
-
-    const cur = this.video.currentTime || 0;
-    const dur = this.video.duration || 0;
-    if (!isFinite(dur) || dur < 60) return;
-
-    const now = Date.now();
-    if (!force && now - (this.lastProgressSave || 0) < 4000) return;
-    this.lastProgressSave = now;
-
-    try {
-      let list = JSON.parse(localStorage.getItem('ziflix_continue_watching')) || [];
-      const movieId = String(this.currentMovie.id);
-
-      // Si le contenu est regardé à plus de 95%, le supprimer
-      if ((cur / dur) >= 0.95 || this.video.ended) {
-        list = list.filter(item => String(item.id) !== movieId);
-        localStorage.setItem('ziflix_continue_watching', JSON.stringify(list));
-        if (window.netflixApp && typeof window.netflixApp.refreshContinueWatching === 'function') {
-          window.netflixApp.refreshContinueWatching();
-        }
-        return;
-      }
-
-      if (cur >= 10) {
-        const m = this.currentMovie;
-        const posterImg = m.poster_url || m.poster || m.poster_path || m.cover || m.stream_icon || m.still_url || m.backdrop_url || m.backdrop || m.backdrop_path || '';
-        const backdropImg = m.backdrop_url || m.backdrop || m.backdrop_path || m.poster_url || m.poster || m.poster_path || m.cover || '';
-
-        const entry = {
-          id: m.id,
-          title: m.title || (this.titleDisplay ? this.titleDisplay.textContent : 'Titre'),
-          poster: posterImg,
-          backdrop: backdropImg,
-          poster_url: posterImg,
-          backdrop_url: backdropImg,
-          cover: m.cover || posterImg,
-          season: this.currentSeason || null,
-          episode: this.currentEpisode || null,
-          currentTime: Math.floor(cur),
-          duration: Math.floor(dur),
-          progressPct: Math.min(100, Math.max(1, Math.round((cur / dur) * 100))),
-          media_type: m.media_type || (this.currentSeason ? 'series' : 'movie'),
-          updatedAt: now,
-          movieData: m
-        };
-
-        list = list.filter(item => String(item.id) !== movieId);
-        list.unshift(entry);
-        if (list.length > 15) list = list.slice(0, 15);
-        localStorage.setItem('ziflix_continue_watching', JSON.stringify(list));
-
-        if (window.netflixApp && typeof window.netflixApp.refreshContinueWatching === 'function') {
-          window.netflixApp.refreshContinueWatching();
-        }
-      }
-    } catch (e) {
-      console.warn('[Continue Watching] Erreur sauvegarde:', e.message);
-    }
-  }
-
 }
+
+// Initialisation globale
+window.NetflixPlayer = NetflixPlayer;
