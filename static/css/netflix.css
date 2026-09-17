@@ -1601,31 +1601,35 @@ body {
   100% { opacity: 0; transform: translate(-50%, -50%) scale(1.35); }
 }
 
-/* Bouton Central Tactile Play/Pause (Style Officiel Netflix Mobile) */
+/* Bouton Central Tactile Play/Pause (Style Officiel Netflix Mobile - Verre Translucide & Centrage Fixe) */
 .center-play-btn {
   position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%) scale(1);
-  width: 76px;
-  height: 76px;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  margin: auto;
+  width: 72px;
+  height: 72px;
   border-radius: 50%;
-  background: rgba(15, 15, 18, 0.68);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  border: 2px solid rgba(255, 255, 255, 0.28);
+  background: rgba(0, 0, 0, 0.32);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border: 1.5px solid rgba(255, 255, 255, 0.25);
   color: #ffffff;
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
   z-index: 85;
-  transition: opacity 0.3s cubic-bezier(0.16, 1, 0.3, 1), 
-              transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), 
+  transform: scale(1);
+  transform-origin: center center;
+  transition: opacity 0.25s cubic-bezier(0.16, 1, 0.3, 1), 
+              transform 0.2s cubic-bezier(0.16, 1, 0.3, 1), 
               background-color 0.2s ease, 
               border-color 0.2s ease, 
               box-shadow 0.2s ease;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.65), 0 0 0 1px rgba(0, 0, 0, 0.4);
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.45);
   padding: 0;
   outline: none;
   -webkit-tap-highlight-color: transparent;
@@ -1633,16 +1637,18 @@ body {
   pointer-events: auto;
 }
 
-.center-play-btn:hover {
-  background: rgba(229, 9, 20, 0.88);
-  border-color: rgba(255, 255, 255, 0.5);
-  transform: translate(-50%, -50%) scale(1.08);
-  box-shadow: 0 10px 36px rgba(229, 9, 20, 0.4), 0 0 20px rgba(229, 9, 20, 0.3);
+@media (hover: hover) and (pointer: fine) {
+  .center-play-btn:hover {
+    background: rgba(229, 9, 20, 0.45);
+    border-color: rgba(255, 255, 255, 0.6);
+    transform: scale(1.06);
+    box-shadow: 0 6px 28px rgba(229, 9, 20, 0.35);
+  }
 }
 
 .center-play-btn:active {
-  transform: translate(-50%, -50%) scale(0.92);
-  background: #e50914;
+  transform: scale(0.92);
+  background: rgba(229, 9, 20, 0.55);
 }
 
 .center-play-circle {
@@ -1663,7 +1669,6 @@ body {
 }
 
 /* En cas de chargement ou buffering, masquer le bouton central pour laisser le loader ZIFLIX */
-/* En cas de chargement ou buffering, masquer le bouton central pour laisser le loader ZIFLIX */
 .player-loader:not(.hidden) ~ .center-play-btn {
   opacity: 0;
   visibility: hidden;
@@ -1680,15 +1685,15 @@ body {
 
 @media (max-width: 768px) {
   .center-play-btn {
-    width: 68px;
-    height: 68px;
-    background: rgba(15, 15, 18, 0.75);
-    border-width: 2px;
+    width: 66px;
+    height: 66px;
+    background: rgba(0, 0, 0, 0.32);
+    border: 1.5px solid rgba(255, 255, 255, 0.25);
   }
   .center-icon-pause,
   .center-icon-play {
-    width: 30px;
-    height: 30px;
+    width: 28px;
+    height: 28px;
   }
 }
 
@@ -1716,9 +1721,14 @@ body {
   cursor: none;
 }
 
-.netflix-player-overlay.user-idle .player-top-bar,
-.netflix-player-overlay.user-idle .netflix-bottom-controls,
-.netflix-player-overlay.user-idle .center-play-btn {
+.netflix-player-overlay.user-idle .player-top-bar {
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transform: translateY(-8px);
+}
+
+.netflix-player-overlay.user-idle .netflix-bottom-controls {
   opacity: 0;
   visibility: hidden;
   pointer-events: none;
@@ -1726,7 +1736,17 @@ body {
 }
 
 .netflix-player-overlay.user-idle .center-play-btn {
-  transform: translate(-50%, -50%) scale(0.85);
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transform: scale(0.85);
+}
+
+.netflix-player-overlay.user-idle .center-play-btn {
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transform: scale(0.85);
 }
 
 .netflix-player-overlay.user-idle .player-top-bar {
