@@ -234,7 +234,15 @@ class NetflixPlayer {
         this.toggleFullscreen();
       });
 
-      this.video.addEventListener('play', () => this.updatePlayStateUI(true));
+      this.video.addEventListener('play', () => {
+        if (!this.isAdmin() && this.getWatchCredit() <= 0) {
+          try { this.video.pause(); } catch (e) {}
+          if (!this.timerExpiredModal) this.timerExpiredModal = document.getElementById('timerExpiredModal');
+          if (this.timerExpiredModal) this.timerExpiredModal.classList.remove('hidden');
+          return;
+        }
+        this.updatePlayStateUI(true);
+      });
       this.video.addEventListener('pause', () => this.updatePlayStateUI(false));
       this.video.addEventListener('ended', () => {
         const isSeries = (this.currentMovie?.media_type === 'series' || this.currentMovie?.is_xtream_series);
@@ -1211,6 +1219,9 @@ class NetflixPlayer {
     this.overlay.classList.add('active');
     this.showControls();
 
+    const welcomeToast = document.getElementById('welcomeTimerModal');
+    if (welcomeToast) welcomeToast.classList.add('hidden');
+
     this.iframe.classList.add('hidden');
     this.iframe.src = 'about:blank';
     this.video.classList.remove('hidden');
@@ -1353,6 +1364,21 @@ class NetflixPlayer {
     // Démarrage du Watch Timer Monetag
     this.startWatchTimer();
 
+    // Verrouillage strict si le crédit est épuisé (0 min)
+    if (!this.isAdmin() && this.getWatchCredit() <= 0) {
+      this.currentServer = 1;
+      this.updateMetaDisplay();
+      this.stopWatchTimer();
+      if (this.video) {
+        try { this.video.pause(); } catch (e) {}
+      }
+      this.hideLoader();
+      if (!this.timerExpiredModal) this.timerExpiredModal = document.getElementById('timerExpiredModal');
+      if (this.timerExpiredModal) this.timerExpiredModal.classList.remove('hidden');
+      this.showToast('⏱ Votre temps gratuit est écoulé. Rechargez +30m pour regarder.');
+      return;
+    }
+
     this.currentServer = 1;
     this.updateMetaDisplay();
     this.loadStream();
@@ -1429,6 +1455,9 @@ class NetflixPlayer {
     if (window.app && typeof window.app.resumeBackgroundTasks === 'function') {
       window.app.resumeBackgroundTasks();
     }
+    if (window.netflixApp && typeof window.netflixApp.checkWelcomeTimerModal === 'function') {
+      window.netflixApp.checkWelcomeTimerModal();
+    }
   }
 
   // ================= 10. MOTEURS DE STREAMING (LIVE & VOD) =================
@@ -1450,6 +1479,15 @@ class NetflixPlayer {
     try {
       this.video.pause();
     } catch (e) {}
+
+    // Verrouillage strict si crédit épuisé (0s)
+    if (!this.isAdmin() && this.getWatchCredit() <= 0) {
+      this.hideLoader();
+      if (!this.timerExpiredModal) this.timerExpiredModal = document.getElementById('timerExpiredModal');
+      if (this.timerExpiredModal) this.timerExpiredModal.classList.remove('hidden');
+      this.showToast('⏱ Votre temps gratuit est écoulé. Rechargez +30m pour regarder.');
+      return;
+    }
 
     // A. Chemin Rapide : Chaîne Xtream Live TV
     if (this.currentMovie && this.currentMovie.stream_url && (this.currentMovie.is_xtream || this.currentMovie.stream_url.includes('/api/stream/xtream'))) {
@@ -2256,6 +2294,15 @@ playDirectHls(streamUrl, options = {}) {
 
   // ================= 14. UTILITAIRES D'AFFICHAGE & LOADER =================
   togglePlay() {
+    if (!this.isAdmin() && this.getWatchCredit() <= 0) {
+      if (this.video) {
+        try { this.video.pause(); } catch (e) {}
+      }
+      if (!this.timerExpiredModal) this.timerExpiredModal = document.getElementById('timerExpiredModal');
+      if (this.timerExpiredModal) this.timerExpiredModal.classList.remove('hidden');
+      this.showToast('⏱ Votre temps gratuit est écoulé. Rechargez +30m pour regarder.');
+      return;
+    }
     if (this.video && this.video.error) {
       console.warn('[Player] Clic Play/Pause sur vidéo en erreur, relance automatique du flux...');
       this.loadStream();
@@ -2526,6 +2573,22 @@ playDirectHls(streamUrl, options = {}) {
         this.rechargeWatchCredit(true);
       });
     }
+
+    const modalCloseBtn = document.getElementById('timerModalCloseBtn');
+    if (modalCloseBtn) {
+      modalCloseBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        this.close();
+      });
+    }
+
+    const modalBackCatalogBtn = document.getElementById('timerModalBackCatalogBtn');
+    if (modalBackCatalogBtn) {
+      modalBackCatalogBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        this.close();
+      });
+    }
   }
 
   isAdmin() {
@@ -2582,14 +2645,6 @@ playDirectHls(streamUrl, options = {}) {
   }
 
   rechargeWatchCredit(fromModal = false) {
-    const targetUrl = this.getNextDirectLink();
-    try {
-      // Ouverture du lien publicitaire en roulement (Monetag / Adsterra)
-      window.open(targetUrl, '_blank');
-    } catch (e) {
-      console.warn('[Ads] Erreur ouverture lien:', e.message);
-    }
-
     const current = Math.max(0, this.getWatchCredit());
     const newCredit = current + this.BONUS_CREDIT;
     this.setWatchCredit(newCredit);
@@ -2600,23 +2655,37 @@ playDirectHls(streamUrl, options = {}) {
       this.playerWatchTimer.classList.remove('timer-low');
     }
 
+    if (this.overlay && this.overlay.classList.contains('active') && !this.isAdmin()) {
+      this.startWatchTimer();
+    }
+
+    const targetUrl = this.getNextDirectLink();
+    try {
+      // Ouverture du lien publicitaire en roulement (Monetag / Adsterra)
+      const win = window.open(targetUrl, '_blank');
+      if (!win) {
+        window.location.href = targetUrl;
+        return;
+      }
+    } catch (e) {
+      console.warn('[Ads] Erreur ouverture lien:', e.message);
+    }
+
     if (fromModal) {
       if (!this.timerExpiredModal) this.timerExpiredModal = document.getElementById('timerExpiredModal');
       if (this.timerExpiredModal) {
         this.timerExpiredModal.classList.add('hidden');
       }
-      this.showToast('🎉 +30 minutes gratuites débloquées ! Bon visionnage.');
-      try {
-        this.video.play().catch(() => {});
-      } catch (e) {}
-    } else {
-      if (this.playerWatchTimerVal) {
-        this.playerWatchTimerVal.textContent = '+30m !';
-        setTimeout(() => {
-          this.updateTimerDisplays(this.getWatchCredit());
-        }, 1400);
+      this.showToast('🎉 +30 minutes offertes débloquées ! Bon visionnage.');
+      if (this.currentMovie && (!this.video.src || this.video.src === 'about:blank' || this.video.ended)) {
+        this.loadStream();
+      } else {
+        try {
+          this.video.play().catch(() => {});
+        } catch (e) {}
       }
-      this.showToast('🎉 +30 minutes gratuites ajoutées avec succès !');
+    } else {
+      this.showToast('🎉 +30 minutes offertes ajoutées avec succès !');
     }
   }
 
@@ -2658,15 +2727,24 @@ playDirectHls(streamUrl, options = {}) {
       if (!isPlaying) return;
 
       let credit = this.getWatchCredit() - 1;
-      this.setWatchCredit(credit);
-      this.updateTimerDisplays(credit);
-
       if (credit <= 0) {
+        credit = 0;
+        this.setWatchCredit(0);
+        this.updateTimerDisplays(0);
         try { this.video.pause(); } catch (e) {}
+        if (this.video && typeof this.video.webkitExitFullscreen === 'function') {
+          try { this.video.webkitExitFullscreen(); } catch (e) {}
+        }
         if (this.playerWatchTimer) this.playerWatchTimer.style.display = 'none';
         if (!this.timerExpiredModal) this.timerExpiredModal = document.getElementById('timerExpiredModal');
         if (this.timerExpiredModal) this.timerExpiredModal.classList.remove('hidden');
-      } else if (credit <= this.WARNING_THRESHOLD) {
+        return;
+      }
+
+      this.setWatchCredit(credit);
+      this.updateTimerDisplays(credit);
+
+      if (credit <= this.WARNING_THRESHOLD) {
         // Alerte 5 min : style timer-low discret
         if (this.playerWatchTimer) this.playerWatchTimer.classList.add('timer-low');
       } else {

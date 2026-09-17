@@ -2013,6 +2013,7 @@ class NetflixApp {
     } else {
       this.dismissSplash();
     }
+    this.checkWelcomeTimerModal();
   }
 
   showAuthGate() {
@@ -2022,6 +2023,8 @@ class NetflixApp {
     }
     if (this.ziflixApp) this.ziflixApp.style.display = 'none';
     if (this.authGateModal) this.authGateModal.classList.remove('hidden');
+    const welcomeToast = document.getElementById('welcomeTimerModal');
+    if (welcomeToast) welcomeToast.classList.add('hidden');
     this.dismissSplash();
   }
 
@@ -2041,13 +2044,14 @@ class NetflixApp {
     }
 
     const isAdmin = (user.role === 'admin' || user.is_admin || user.isAdmin);
-    const headerPill = document.getElementById('headerTimerPill');
-    const mobilePill = document.getElementById('mobileTimerPill');
     const welcomeModal = document.getElementById('welcomeTimerModal');
     if (isAdmin) {
-      if (headerPill) headerPill.style.display = 'none';
-      if (mobilePill) mobilePill.style.display = 'none';
       if (welcomeModal) welcomeModal.style.display = 'none';
+    } else {
+      if (welcomeModal) welcomeModal.style.display = '';
+      if (!this.authGateModal || this.authGateModal.classList.contains('hidden')) {
+        this.checkWelcomeTimerModal();
+      }
     }
   }
 
@@ -2623,25 +2627,47 @@ class NetflixApp {
   }
 
 
-    initTimerUI() {
-    this.checkWelcomeTimerModal();
+  initTimerUI() {
+    // Ne pas afficher si l'utilisateur n'est pas encore connecté ou si l'auth gate est affichée
+    if (this.currentUser && (!this.authGateModal || this.authGateModal.classList.contains('hidden'))) {
+      this.checkWelcomeTimerModal();
+    }
   }
 
   checkWelcomeTimerModal() {
-    if (this.isAdmin()) return;
+    if (this.isAdmin()) {
+      const modal = document.getElementById('welcomeTimerModal');
+      if (modal) modal.classList.add('hidden');
+      return;
+    }
     const modal = document.getElementById('welcomeTimerModal');
     const acceptBtn = document.getElementById('welcomeTimerAcceptBtn');
+    const dismissBtn = document.getElementById('welcomeTimerDismissBtn');
     if (!modal || !acceptBtn) return;
+
+    // Ne pas afficher si l'auth gate est active ou si le lecteur plein écran est ouvert
+    if (this.authGateModal && !this.authGateModal.classList.contains('hidden')) return;
+    if (document.getElementById('netflixPlayer')?.classList.contains('active')) return;
 
     const accepted = localStorage.getItem('ziflix_welcome_accepted');
     if (!accepted) {
       modal.classList.remove('hidden');
 
-      acceptBtn.addEventListener('click', () => {
+      const dismiss = () => {
         localStorage.setItem('ziflix_welcome_accepted', 'true');
         modal.classList.add('hidden');
-        this.showToast('30 minutes offertes activées.');
+      };
+
+      acceptBtn.addEventListener('click', () => {
+        dismiss();
+        this.showToast('⏱ 30 minutes offertes activées. Bon visionnage !');
       }, { once: true });
+
+      if (dismissBtn) {
+        dismissBtn.addEventListener('click', () => {
+          dismiss();
+        }, { once: true });
+      }
     }
   }
 

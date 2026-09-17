@@ -4812,11 +4812,12 @@ button:focus-visible {
   display: flex;
   align-items: center;
   justify-content: center;
-  background: rgba(8, 8, 10, 0.92);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-  padding: 20px;
-  animation: modalFadeIn 0.3s ease;
+  background: rgba(0, 0, 0, 0.88);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  padding: 16px;
+  animation: modalFadeIn 0.25s ease;
+  box-sizing: border-box;
 }
 
 .timer-expired-modal.hidden {
@@ -4828,55 +4829,98 @@ button:focus-visible {
   to { opacity: 1; }
 }
 
+@keyframes modalPopIn {
+  from { opacity: 0; transform: scale(0.95); }
+  to { opacity: 1; transform: scale(1); }
+}
+
 .timer-modal-card {
-  max-width: 440px;
-  width: 90%;
-  max-height: 85vh;
-  background: #141417;
+  position: relative;
+  max-width: 420px;
+  width: 92%;
+  max-height: 88vh;
+  background: #141414;
   border: 1px solid rgba(255, 255, 255, 0.15);
-  border-radius: 10px;
-  padding: 26px 24px;
+  border-top: 3px solid #e50914;
+  border-radius: 8px;
+  padding: 26px 22px 20px;
   text-align: center;
-  box-shadow: 0 25px 60px -15px rgba(0, 0, 0, 0.9), 0 0 35px rgba(229, 9, 20, 0.2);
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.95), 0 0 35px rgba(229, 9, 20, 0.25);
   display: flex;
   flex-direction: column;
   align-items: center;
   box-sizing: border-box;
+  animation: modalPopIn 0.25s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-.timer-modal-icon {
-  font-size: 2.5rem;
-  margin-bottom: 10px;
-  filter: drop-shadow(0 4px 12px rgba(251, 191, 36, 0.4));
-  animation: timerPulse 1.8s infinite alternate;
+.timer-modal-close-btn {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  color: #cbd5e1;
+  font-size: 0.85rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  line-height: 1;
+}
+
+.timer-modal-close-btn:hover {
+  background: rgba(255, 255, 255, 0.2);
+  color: #fff;
+  transform: scale(1.08);
+}
+
+.timer-modal-icon-wrap {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background: rgba(229, 9, 20, 0.1);
+  border: 1px solid rgba(229, 9, 20, 0.3);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 14px;
+  box-shadow: 0 0 20px rgba(229, 9, 20, 0.2);
+  flex-shrink: 0;
 }
 
 .timer-modal-title {
-  font-size: 1.35rem;
+  font-size: 1.25rem;
   font-weight: 800;
   color: #fff;
-  margin-bottom: 10px;
-  letter-spacing: -0.4px;
+  margin: 0 0 8px;
+  letter-spacing: -0.3px;
+  text-transform: uppercase;
 }
 
 .timer-modal-desc {
-  font-size: 0.9rem;
+  font-size: 0.88rem;
   color: #cbd5e1;
   line-height: 1.45;
-  margin-bottom: 20px;
+  margin: 0 0 18px;
 }
 
 .timer-modal-desc b {
-  color: #e50914;
+  color: #fff;
+  font-weight: 700;
 }
 
 .timer-recharge-cta-btn {
   width: 100%;
-  padding: 13px 20px;
+  padding: 13px 18px;
   background: #e50914;
   color: #fff;
-  font-size: 1rem;
+  font-size: 0.95rem;
   font-weight: 800;
+  letter-spacing: 0.5px;
   border: none;
   border-radius: 4px;
   cursor: pointer;
@@ -4884,24 +4928,86 @@ button:focus-visible {
   align-items: center;
   justify-content: center;
   gap: 8px;
-  transition: all 0.2s ease;
-  box-shadow: 0 8px 24px rgba(229, 9, 20, 0.5);
+  transition: all 0.18s ease;
+  box-shadow: 0 4px 18px rgba(229, 9, 20, 0.45);
+  text-transform: uppercase;
 }
 
 .timer-recharge-cta-btn:hover {
   background: #f40612;
-  transform: translateY(-2px);
-  box-shadow: 0 12px 28px rgba(229, 9, 20, 0.7);
+  box-shadow: 0 6px 24px rgba(229, 9, 20, 0.65);
+  transform: translateY(-1px);
 }
 
 .timer-recharge-cta-btn:active {
   transform: translateY(0);
 }
 
-.timer-modal-subtext {
-  font-size: 0.76rem;
-  color: #888;
+.timer-modal-footer {
   margin-top: 12px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+}
+
+.timer-modal-subtext {
+  font-size: 0.74rem;
+  color: #888;
+}
+
+.timer-modal-back-link {
+  background: transparent;
+  border: none;
+  color: #999;
+  font-size: 0.78rem;
+  cursor: pointer;
+  padding: 4px 8px;
+  text-decoration: underline;
+  transition: color 0.15s ease;
+}
+
+.timer-modal-back-link:hover {
+  color: #fff;
+}
+
+@media (max-height: 520px) {
+  .timer-modal-card {
+    padding: 12px 18px;
+    max-width: 380px;
+  }
+  .timer-modal-icon-wrap {
+    width: 38px;
+    height: 38px;
+    margin-bottom: 6px;
+  }
+  .timer-modal-icon-wrap svg {
+    width: 22px;
+    height: 22px;
+  }
+  .timer-modal-title {
+    font-size: 1rem;
+    margin-bottom: 4px;
+  }
+  .timer-modal-desc {
+    font-size: 0.78rem;
+    margin-bottom: 10px;
+    line-height: 1.3;
+  }
+  .timer-recharge-cta-btn {
+    padding: 9px 14px;
+    font-size: 0.82rem;
+  }
+  .timer-modal-footer {
+    margin-top: 6px;
+    gap: 3px;
+  }
+  .timer-modal-subtext {
+    font-size: 0.66rem;
+  }
+  .timer-modal-back-link {
+    font-size: 0.72rem;
+  }
 }
 
 .continue-watching-row {
@@ -5029,12 +5135,13 @@ button:focus-visible {
 /* ================= 🎁 NOTIFICATION D'ACCUEIL NETFLIX (CONCISE & ÉPURÉE) ================= */
 .welcome-toast-overlay {
   position: fixed;
-  top: 72px;
+  bottom: 28px;
   left: 50%;
   transform: translateX(-50%);
-  z-index: 999999;
-  animation: netflixToastIn 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  z-index: 1000;
+  animation: netflixToastIn 0.3s cubic-bezier(0.16, 1, 0.3, 1);
   pointer-events: auto;
+  max-width: 95vw;
 }
 
 .welcome-toast-overlay.hidden {
@@ -5042,7 +5149,7 @@ button:focus-visible {
 }
 
 @keyframes netflixToastIn {
-  from { opacity: 0; transform: translate(-50%, -10px); }
+  from { opacity: 0; transform: translate(-50%, 15px); }
   to { opacity: 1; transform: translate(-50%, 0); }
 }
 
@@ -5050,28 +5157,28 @@ button:focus-visible {
   display: flex;
   align-items: center;
   gap: 14px;
-  background: rgba(20, 20, 20, 0.96);
-  border: 1px solid rgba(255, 255, 255, 0.15);
+  background: #141414;
+  border: 1px solid rgba(255, 255, 255, 0.16);
   border-left: 4px solid #e50914;
-  border-radius: 4px;
+  border-radius: 6px;
   padding: 10px 18px;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.9);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
+  box-shadow: 0 14px 40px rgba(0, 0, 0, 0.95);
   color: #fff;
   font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  user-select: none;
 }
 
-.welcome-netflix-icon {
-  font-size: 1.15rem;
-  line-height: 1;
+.welcome-netflix-icon-wrap {
+  display: flex;
+  align-items: center;
+  justify-content: center;
   flex-shrink: 0;
 }
 
 .welcome-netflix-text {
   font-size: 0.92rem;
   font-weight: 500;
-  color: #e5e5e5;
+  color: #d1d5db;
   white-space: nowrap;
 }
 
@@ -5084,40 +5191,66 @@ button:focus-visible {
   background: #e50914;
   color: #fff;
   border: none;
-  border-radius: 3px;
-  padding: 6px 14px;
+  border-radius: 4px;
+  padding: 7px 16px;
   font-size: 0.85rem;
   font-weight: 700;
   cursor: pointer;
-  transition: background 0.15s ease, transform 0.1s ease;
+  transition: all 0.15s ease;
   white-space: nowrap;
 }
 
 .welcome-netflix-btn:hover {
   background: #f40612;
+  transform: scale(1.03);
 }
 
 .welcome-netflix-btn:active {
   transform: scale(0.97);
 }
 
+.welcome-netflix-close {
+  background: transparent;
+  border: none;
+  color: #888;
+  font-size: 0.9rem;
+  cursor: pointer;
+  padding: 2px 6px;
+  border-radius: 3px;
+  transition: color 0.15s ease;
+  line-height: 1;
+}
+
+.welcome-netflix-close:hover {
+  color: #fff;
+}
+
 @media (max-width: 640px) {
   .welcome-toast-overlay {
-    top: 60px;
-    width: calc(100% - 32px);
+    bottom: 74px; /* Docké au-dessus de la barre de navigation basse mobile */
+    left: 14px;
+    right: 14px;
+    transform: none;
+    max-width: none;
+  }
+  @keyframes netflixToastIn {
+    from { opacity: 0; transform: translateY(15px); }
+    to { opacity: 1; transform: translateY(0); }
   }
   .welcome-netflix-box {
     width: 100%;
     justify-content: space-between;
     gap: 10px;
-    padding: 10px 14px;
+    padding: 10px 12px;
+    box-sizing: border-box;
   }
   .welcome-netflix-text {
-    font-size: 0.82rem;
+    font-size: 0.8rem;
     white-space: normal;
+    line-height: 1.3;
   }
   .welcome-netflix-btn {
-    padding: 5px 12px;
+    padding: 6px 12px;
     font-size: 0.78rem;
   }
 }
@@ -5127,15 +5260,16 @@ button:focus-visible {
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  background: rgba(255, 255, 255, 0.08);
-  border: 1px solid rgba(255, 255, 255, 0.18);
+  background: rgba(20, 20, 20, 0.75);
+  border: 1px solid rgba(255, 255, 255, 0.2);
   border-radius: 4px;
   padding: 3px 8px;
   font-size: 0.82rem;
   font-weight: 600;
   color: #e5e5e5;
-  margin-left: 12px;
-  backdrop-filter: blur(4px);
+  margin-left: 10px;
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
   transition: all 0.2s ease;
   user-select: none;
   vertical-align: middle;
@@ -5143,13 +5277,15 @@ button:focus-visible {
 }
 
 .player-watch-timer:hover {
-  background: rgba(255, 255, 255, 0.14);
-  border-color: rgba(255, 255, 255, 0.3);
+  background: rgba(30, 30, 30, 0.9);
+  border-color: rgba(255, 255, 255, 0.35);
 }
 
 .player-watch-timer-dot {
-  font-size: 0.8rem;
-  color: #a3a3a3;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #e50914;
   line-height: 1;
 }
 
@@ -5161,28 +5297,32 @@ button:focus-visible {
 }
 
 .player-watch-timer-btn {
-  background: rgba(229, 9, 20, 0.85);
+  background: #e50914;
   border: none;
   border-radius: 3px;
   color: #fff;
   font-size: 0.72rem;
-  font-weight: 700;
-  padding: 2px 6px;
+  font-weight: 800;
+  padding: 2px 7px;
   cursor: pointer;
-  transition: background 0.15s ease, transform 0.1s ease;
+  transition: background 0.15s ease, transform 0.15s ease;
   line-height: 1.2;
 }
 
 .player-watch-timer-btn:hover {
-  background: #e50914;
-  transform: scale(1.05);
+  background: #f40612;
+  transform: scale(1.06);
 }
 
-/* Alerte 5 minutes restantes : bordure orange/rouge discrète */
+.player-watch-timer-btn:active {
+  transform: scale(0.96);
+}
+
+/* Alerte 5 minutes restantes : bordure rouge/orange discrète */
 .player-watch-timer.timer-low {
-  border-color: rgba(255, 152, 0, 0.7);
-  background: rgba(255, 152, 0, 0.12);
-  color: #ffb74d;
+  border-color: rgba(229, 9, 20, 0.75);
+  background: rgba(229, 9, 20, 0.18);
+  color: #ff8585;
 }
 
 .player-watch-timer.timer-low .player-watch-timer-btn {
@@ -5191,19 +5331,19 @@ button:focus-visible {
 }
 
 @keyframes pulseTimerBtn {
-  0%, 100% { opacity: 0.9; }
+  0%, 100% { opacity: 0.9; transform: scale(1); }
   50% { opacity: 1; transform: scale(1.08); }
 }
 
 @media (max-width: 768px) {
   .player-watch-timer {
-    margin-left: 6px;
+    margin-left: 0;
     padding: 2px 6px;
     font-size: 0.75rem;
     gap: 4px;
   }
   .player-watch-timer-btn {
     font-size: 0.68rem;
-    padding: 1px 4px;
+    padding: 1px 5px;
   }
 }
