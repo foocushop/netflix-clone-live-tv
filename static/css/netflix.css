@@ -5390,21 +5390,23 @@ button:focus-visible {
 }
 
 .nav-watch-timer-btn {
-  background: #e50914;
-  border: none;
+  background: rgba(229, 9, 20, 0.12);
+  border: 1px solid rgba(229, 9, 20, 0.55);
   border-radius: 4px;
-  color: #fff;
-  font-size: 0.72rem;
+  color: #e50914 !important;
+  font-size: 0.74rem;
   font-weight: 800;
   padding: 3px 8px;
   cursor: pointer;
-  transition: background 0.15s ease, transform 0.15s ease, opacity 0.15s ease;
+  transition: background 0.15s ease, border-color 0.15s ease, color 0.15s ease, transform 0.15s ease;
   line-height: 1.2;
   white-space: nowrap;
 }
 
 .nav-watch-timer-btn:hover:not(:disabled) {
-  background: #f40612;
+  background: rgba(229, 9, 20, 0.25);
+  border-color: #e50914;
+  color: #ff3333 !important;
   transform: scale(1.05);
 }
 
@@ -5414,13 +5416,150 @@ button:focus-visible {
 
 .nav-watch-timer-btn:disabled,
 .player-watch-timer-btn:disabled,
-.timer-recharge-cta-btn:disabled {
-  background: #333338 !important;
-  color: #888892 !important;
+.timer-recharge-cta-btn:disabled,
+.zero-credit-cta-btn:disabled {
+  background: #25252b !important;
+  border-color: rgba(255, 255, 255, 0.1) !important;
+  color: #737380 !important;
   cursor: not-allowed !important;
   opacity: 0.75 !important;
   transform: none !important;
   box-shadow: none !important;
+}
+
+/* ================= MODALE POP-UP CRÉDIT ÉPUISÉ À L'ACCUEIL (DA NETFLIX) ================= */
+.zero-credit-modal-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 99990;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.88);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  padding: 16px;
+  animation: modalFadeIn 0.25s ease;
+  box-sizing: border-box;
+}
+
+.zero-credit-modal-overlay.hidden {
+  display: none !important;
+}
+
+.zero-credit-modal-card {
+  position: relative;
+  max-width: 440px;
+  width: 92%;
+  max-height: 90vh;
+  background: #141416;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-top: 3px solid #e50914;
+  border-radius: 10px;
+  padding: 30px 24px 22px;
+  text-align: center;
+  box-shadow: 0 22px 60px rgba(0, 0, 0, 0.95), 0 0 35px rgba(229, 9, 20, 0.2);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  box-sizing: border-box;
+  animation: modalPopIn 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.zero-credit-close-btn {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  color: #cbd5e1;
+  font-size: 0.9rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  line-height: 1;
+}
+
+.zero-credit-close-btn:hover {
+  background: rgba(255, 255, 255, 0.2);
+  color: #fff;
+  transform: scale(1.08);
+}
+
+.zero-credit-icon-wrap {
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  background: rgba(229, 9, 20, 0.12);
+  border: 1px solid rgba(229, 9, 20, 0.35);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 16px;
+  box-shadow: 0 0 25px rgba(229, 9, 20, 0.22);
+  flex-shrink: 0;
+}
+
+.zero-credit-title {
+  font-size: 1.3rem;
+  font-weight: 800;
+  color: #fff;
+  margin: 0 0 10px;
+  letter-spacing: -0.3px;
+  text-transform: uppercase;
+}
+
+.zero-credit-desc {
+  font-size: 0.92rem;
+  color: #cbd5e1;
+  line-height: 1.5;
+  margin: 0 0 20px;
+}
+
+.zero-credit-desc strong {
+  color: #e50914;
+  font-weight: 800;
+}
+
+.zero-credit-cta-btn {
+  width: 100%;
+  padding: 13px 18px;
+  background: #e50914;
+  color: #fff;
+  font-size: 0.95rem;
+  font-weight: 800;
+  letter-spacing: 0.5px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  box-shadow: 0 6px 20px rgba(229, 9, 20, 0.45);
+  transition: background 0.15s ease, transform 0.15s ease, box-shadow 0.15s ease;
+  user-select: none;
+}
+
+.zero-credit-cta-btn:hover:not(:disabled) {
+  background: #f40612;
+  box-shadow: 0 8px 25px rgba(229, 9, 20, 0.6);
+  transform: translateY(-1px);
+}
+
+.zero-credit-cta-btn:active:not(:disabled) {
+  transform: translateY(1px);
+}
+
+.zero-credit-footer {
+  margin-top: 14px;
+  font-size: 0.76rem;
+  color: #8e8e98;
 }
 
 .nav-watch-timer.timer-low {

@@ -2608,14 +2608,33 @@ class NetflixApp {
       card.className = 'movie-card continue-card focusable';
       card.setAttribute('tabindex', '0');
 
-      const imgUrl = item.backdrop || item.poster || 'assets/hero/live-tv-banner.webp';
+      // Récupération multi-sources robuste de l'image (séries, films, télé-réalité)
+      let rawImg = item.backdrop_url || item.backdrop || item.poster_url || item.poster || item.cover || item.still_url;
+      if (!rawImg && item.movieData) {
+        rawImg = item.movieData.backdrop_url || item.movieData.backdrop || item.movieData.poster_url || item.movieData.poster || item.movieData.cover;
+      }
+      if (!rawImg && this.movies && Array.isArray(this.movies)) {
+        const found = this.movies.find(m => String(m.id) === String(item.id));
+        if (found) {
+          rawImg = found.backdrop_url || found.backdrop || found.poster_url || found.poster || found.cover;
+        }
+      }
+      if (!rawImg && this.catalog && Array.isArray(this.catalog)) {
+        const found = this.catalog.find(m => String(m.id) === String(item.id));
+        if (found) {
+          rawImg = found.backdrop_url || found.backdrop || found.poster_url || found.poster || found.cover;
+        }
+      }
+
+      const secureImg = this.normalizeImageUrl(rawImg) || 'assets/hero/live-tv-banner.webp';
+      const fallbackSvg = this.getMovieFallbackSvg(item.title);
       const remSec = Math.max(0, (item.duration || 0) - (item.currentTime || 0));
       const remMin = Math.round(remSec / 60);
       const remLabel = remMin > 0 ? `${remMin} min restantes` : '';
       const epLabel = item.season ? `S${item.season}:E${item.episode}` : (item.media_type === 'series' ? 'Série' : 'Film');
 
       card.innerHTML = `
-        <img class="card-img" src="${imgUrl}" alt="${this.escapeHtml(item.title || '')}" loading="lazy" onerror="this.src='assets/hero/live-tv-banner.webp'">
+        <img class="card-img" src="${secureImg}" alt="${this.escapeHtml(item.title || '')}" loading="lazy" onerror="this.onerror=null; this.src='${fallbackSvg}';">
         <button type="button" class="continue-remove-btn" title="Retirer de la liste" aria-label="Supprimer">✕</button>
         <div class="continue-info-pill">
           <span class="continue-ep-tag">${epLabel}</span>
@@ -2645,13 +2664,26 @@ class NetflixApp {
       }
 
       card.addEventListener('click', () => {
-        const movieObj = item.movieData || {
-          id: item.id,
-          title: item.title,
-          poster: item.poster,
-          backdrop: item.backdrop,
-          media_type: item.media_type
-        };
+        let movieObj = item.movieData;
+        if (!movieObj) {
+          if (this.movies && Array.isArray(this.movies)) {
+            movieObj = this.movies.find(m => String(m.id) === String(item.id));
+          }
+          if (!movieObj && this.catalog && Array.isArray(this.catalog)) {
+            movieObj = this.catalog.find(m => String(m.id) === String(item.id));
+          }
+        }
+        if (!movieObj) {
+          movieObj = {
+            id: item.id,
+            title: item.title,
+            poster: item.poster || item.poster_url,
+            backdrop: item.backdrop || item.backdrop_url,
+            poster_url: item.poster_url || item.poster,
+            backdrop_url: item.backdrop_url || item.backdrop,
+            media_type: item.media_type
+          };
+        }
         this.player.open(movieObj, 1, item.season, item.episode);
       });
 
@@ -2685,6 +2717,7 @@ class NetflixApp {
     this.initHomeTimer();
     // Ne pas afficher si l'utilisateur n'est pas encore connecté ou si l'auth gate est affichée
     if (this.currentUser && (!this.authGateModal || this.authGateModal.classList.contains('hidden'))) {
+      this.checkZeroCreditModal();
       this.checkWelcomeTimerModal();
     }
   }
@@ -2696,6 +2729,8 @@ class NetflixApp {
 
     if (this.isAdmin()) {
       if (this.navWatchTimer) this.navWatchTimer.style.display = 'none';
+      const zeroModal = document.getElementById('zeroCreditHomeModal');
+      if (zeroModal) zeroModal.classList.add('hidden');
       return;
     }
 
@@ -2723,6 +2758,8 @@ class NetflixApp {
   updateHomeTimerDisplay(credit) {
     if (this.isAdmin()) {
       if (this.navWatchTimer) this.navWatchTimer.style.display = 'none';
+      const zeroModal = document.getElementById('zeroCreditHomeModal');
+      if (zeroModal) zeroModal.classList.add('hidden');
       return;
     }
     if (!this.navWatchTimer) this.navWatchTimer = document.getElementById('navWatchTimer');
@@ -2746,6 +2783,12 @@ class NetflixApp {
       this.navWatchTimerVal.textContent = timeStr;
     }
 
+    // Si le crédit redevient > 0, masquer le pop-up 0 minute
+    if (credit > 0) {
+      const zeroModal = document.getElementById('zeroCreditHomeModal');
+      if (zeroModal) zeroModal.classList.add('hidden');
+    }
+
     // Si aucune recharge en cours, gérer l'état max 60 min
     const isPending = (this.player && this.player.isRechargePending);
     if (!isPending && this.navWatchTimerBtn) {
@@ -2755,9 +2798,54 @@ class NetflixApp {
         this.navWatchTimerBtn.title = 'Crédit maximum de 60 minutes atteint';
       } else {
         this.navWatchTimerBtn.disabled = false;
-        this.navWatchTimerBtn.textContent = '+30m';
+        this.navWatchTimerBtn.textContent = '+30';
         this.navWatchTimerBtn.title = 'Recharger +30 min gratuites';
       }
+    }
+  }
+
+  checkZeroCreditModal() {
+    if (this.isAdmin()) {
+      const modal = document.getElementById('zeroCreditHomeModal');
+      if (modal) modal.classList.add('hidden');
+      return;
+    }
+    const modal = document.getElementById('zeroCreditHomeModal');
+    if (!modal) return;
+    if (this.authGateModal && !this.authGateModal.classList.contains('hidden')) return;
+    if (document.getElementById('netflixPlayer')?.classList.contains('active')) return;
+
+    const credit = (this.player && typeof this.player.getWatchCredit === 'function') 
+      ? this.player.getWatchCredit() 
+      : parseInt(localStorage.getItem('ziflix_watch_credit') || '1800', 10);
+
+    if (credit <= 0) {
+      // Masquer le toast d'accueil normal
+      const welcomeToast = document.getElementById('welcomeTimerModal');
+      if (welcomeToast) welcomeToast.classList.add('hidden');
+
+      modal.classList.remove('hidden');
+
+      const closeBtn = document.getElementById('zeroCreditCloseBtn');
+      if (closeBtn && !closeBtn._hasListener) {
+        closeBtn._hasListener = true;
+        closeBtn.addEventListener('click', () => {
+          modal.classList.add('hidden');
+        });
+      }
+
+      const rechargeBtn = document.getElementById('zeroCreditRechargeBtn');
+      if (rechargeBtn && !rechargeBtn._hasListener) {
+        rechargeBtn._hasListener = true;
+        rechargeBtn.addEventListener('click', (e) => {
+          e.preventDefault();
+          if (this.player && typeof this.player.rechargeWatchCredit === 'function') {
+            this.player.rechargeWatchCredit(false);
+          }
+        });
+      }
+    } else {
+      modal.classList.add('hidden');
     }
   }
 
@@ -2775,6 +2863,14 @@ class NetflixApp {
     // Ne pas afficher si l'auth gate est active ou si le lecteur plein écran est ouvert
     if (this.authGateModal && !this.authGateModal.classList.contains('hidden')) return;
     if (document.getElementById('netflixPlayer')?.classList.contains('active')) return;
+
+    const credit = (this.player && typeof this.player.getWatchCredit === 'function') 
+      ? this.player.getWatchCredit() 
+      : parseInt(localStorage.getItem('ziflix_watch_credit') || '1800', 10);
+    if (credit <= 0) {
+      // Si 0 minute, la modale zeroCreditHomeModal s'occupe de notifier l'utilisateur
+      return;
+    }
 
     const accepted = localStorage.getItem('ziflix_welcome_accepted');
     if (!accepted) {

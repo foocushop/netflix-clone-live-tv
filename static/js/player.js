@@ -2721,6 +2721,10 @@ playDirectHls(streamUrl, options = {}) {
           this.showToast(`🎉 +30 minutes offertes ajoutées ! (${Math.round(newCredit / 60)} min au total)`);
         }
 
+        // Fermer également la modale d'accueil 0 minute si ouverte
+        const zeroModal = document.getElementById('zeroCreditHomeModal');
+        if (zeroModal) zeroModal.classList.add('hidden');
+
         // Synchroniser également avec l'accueil
         if (window.netflixApp && typeof window.netflixApp.updateHomeTimerDisplay === 'function') {
           window.netflixApp.updateHomeTimerDisplay(newCredit);
@@ -2733,6 +2737,7 @@ playDirectHls(streamUrl, options = {}) {
     const navBtn = document.getElementById('navWatchTimerBtn');
     const playerBtn = document.getElementById('playerWatchTimerBtn') || this.playerWatchTimerBtn;
     const modalBtn = document.getElementById('timerModalRechargeBtn') || this.timerModalRechargeBtn;
+    const zeroBtn = document.getElementById('zeroCreditRechargeBtn');
 
     const shortText = `⏳ ${secondsRemaining}s`;
     const fullText = `⏳ VALIDATION EN COURS (${secondsRemaining}s)...`;
@@ -2748,6 +2753,10 @@ playDirectHls(streamUrl, options = {}) {
     if (modalBtn) {
       modalBtn.disabled = true;
       modalBtn.textContent = fullText;
+    }
+    if (zeroBtn) {
+      zeroBtn.disabled = true;
+      zeroBtn.textContent = fullText;
     }
   }
 
@@ -2787,10 +2796,11 @@ playDirectHls(streamUrl, options = {}) {
       const navBtn = document.getElementById('navWatchTimerBtn');
       const playerBtn = document.getElementById('playerWatchTimerBtn') || this.playerWatchTimerBtn;
       const modalBtn = document.getElementById('timerModalRechargeBtn') || this.timerModalRechargeBtn;
+      const zeroBtn = document.getElementById('zeroCreditRechargeBtn');
 
       if (navBtn) {
         navBtn.disabled = isMax;
-        navBtn.textContent = isMax ? 'Max 60m' : '+30m';
+        navBtn.textContent = isMax ? 'Max 60m' : '+30';
         navBtn.title = isMax ? 'Limite de 60 minutes atteinte' : 'Recharger +30 min gratuites';
       }
       if (playerBtn) {
@@ -2801,6 +2811,10 @@ playDirectHls(streamUrl, options = {}) {
       if (modalBtn) {
         modalBtn.disabled = isMax;
         modalBtn.textContent = isMax ? 'MAX 60 MIN ATTEINT' : '⚡ RECHARGER +30 MIN GRATUITES';
+      }
+      if (zeroBtn) {
+        zeroBtn.disabled = isMax;
+        zeroBtn.textContent = isMax ? 'MAX 60 MIN ATTEINT' : '⚡ RECHARGER +30 MIN GRATUITES';
       }
     }
 
@@ -2918,19 +2932,26 @@ playDirectHls(streamUrl, options = {}) {
       }
 
       if (cur >= 10) {
+        const m = this.currentMovie;
+        const posterImg = m.poster_url || m.poster || m.poster_path || m.cover || m.stream_icon || m.still_url || m.backdrop_url || m.backdrop || m.backdrop_path || '';
+        const backdropImg = m.backdrop_url || m.backdrop || m.backdrop_path || m.poster_url || m.poster || m.poster_path || m.cover || '';
+
         const entry = {
-          id: this.currentMovie.id,
-          title: this.currentMovie.title || (this.titleDisplay ? this.titleDisplay.textContent : 'Titre'),
-          poster: this.currentMovie.poster_path || this.currentMovie.poster || this.currentMovie.backdrop_path || this.currentMovie.backdrop || '',
-          backdrop: this.currentMovie.backdrop_path || this.currentMovie.backdrop || '',
+          id: m.id,
+          title: m.title || (this.titleDisplay ? this.titleDisplay.textContent : 'Titre'),
+          poster: posterImg,
+          backdrop: backdropImg,
+          poster_url: posterImg,
+          backdrop_url: backdropImg,
+          cover: m.cover || posterImg,
           season: this.currentSeason || null,
           episode: this.currentEpisode || null,
           currentTime: Math.floor(cur),
           duration: Math.floor(dur),
           progressPct: Math.min(100, Math.max(1, Math.round((cur / dur) * 100))),
-          media_type: this.currentMovie.media_type || (this.currentSeason ? 'series' : 'movie'),
+          media_type: m.media_type || (this.currentSeason ? 'series' : 'movie'),
           updatedAt: now,
-          movieData: this.currentMovie
+          movieData: m
         };
 
         list = list.filter(item => String(item.id) !== movieId);

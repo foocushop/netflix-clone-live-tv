@@ -80,7 +80,7 @@
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
         </span>
         <span class="nav-watch-timer-val" id="navWatchTimerVal">30:00</span>
-        <button type="button" class="nav-watch-timer-btn" id="navWatchTimerBtn" title="Recharger +30 min gratuites">+30m</button>
+        <button type="button" class="nav-watch-timer-btn" id="navWatchTimerBtn" title="Recharger +30 min gratuites">+30</button>
       </div>
       <div class="search-box">
         <span class="search-icon">🔍</span>
@@ -1678,6 +1678,30 @@
     </a>
   </nav>
 
+  <!-- ================= POP-UP CRÉDIT ÉPUISÉ À L'ACCUEIL (0 MIN) ================= -->
+  <div class="zero-credit-modal-overlay hidden" id="zeroCreditHomeModal">
+    <div class="zero-credit-modal-card">
+      <button type="button" class="zero-credit-close-btn" id="zeroCreditCloseBtn" title="Fermer">✕</button>
+      <div class="zero-credit-icon-wrap" aria-hidden="true">
+        <svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="#e50914" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="9"></circle>
+          <polyline points="12 6 12 12 16 14"></polyline>
+        </svg>
+      </div>
+      <h3 class="zero-credit-title">Temps de visionnage épuisé</h3>
+      <p class="zero-credit-desc">
+        Vous n'avez plus de minutes de visionnage disponibles.<br>
+        Cliquez sur <strong>+30 min</strong> pour recharger gratuitement et continuer à profiter de ZIFLIX sans interruption.
+      </p>
+      <button type="button" class="zero-credit-cta-btn" id="zeroCreditRechargeBtn">
+        ⚡ RECHARGER +30 MIN GRATUITES
+      </button>
+      <div class="zero-credit-footer">
+        Gratuit, rapide et illimité • Pas d'inscription requise
+      </div>
+    </div>
+  </div>
+
   <!-- ================= NOTIFICATION D'ACCUEIL NETFLIX : 30 MIN SANS PUB ================= -->
   <div class="welcome-toast-overlay hidden" id="welcomeTimerModal">
     <div class="welcome-netflix-box">
@@ -1696,8 +1720,8 @@
 
   <!-- Scripts -->
   <script src="js/hls.min.js"></script>
-  <script src="js/player.js?v=1789639999"></script>
-  <script src="js/admin.js?v=1789639999"></script>
-  <script src="js/app.js?v=1789639999"></script>
+  <script src="js/player.js?v=1789640200"></script>
+  <script src="js/admin.js?v=1789640200"></script>
+  <script src="js/app.js?v=1789640200"></script>
 </body>
 </html>
