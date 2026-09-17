@@ -504,21 +504,82 @@ class NetflixPlayer {
           return;
         }
         this.commentsList.innerHTML = '';
+        const isAdmin = (window.netflixApp && window.netflixApp.currentUser && window.netflixApp.currentUser.role === 'admin') ||
+                        (localStorage.getItem('ziflix_admin_token') === '1965');
+
         json.comments.forEach(c => {
           const div = document.createElement('div');
           div.className = 'player-drawer-item';
           div.innerHTML = `
-            <div class="player-drawer-meta">
-              <span class="player-drawer-author">${c.username} ${(c.is_vip || c.role === "admin" || c.role === "premium") ? '<span class="vip-badge-tag">👑 VIP</span>' : ""}</span>
-              <span>${new Date(c.createdAt).toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })}</span>
+            <div class="player-drawer-meta" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 4px;">
+              <span class="player-drawer-author" style="display: inline-flex; align-items: center; gap: 5px; flex-wrap: wrap;">
+                ${c.username} ${(c.is_vip || c.role === "admin" || c.role === "premium") ? '<span class="vip-badge-tag">👑 VIP</span>' : ""}
+                ${isAdmin && c.ip ? `<span style="color: #888; font-size: 0.65rem; font-weight: normal; font-family: monospace; background: rgba(255,255,255,0.06); padding: 1px 4px; border-radius: 3px;">IP: ${c.ip}</span>` : ''}
+              </span>
+              <div style="display: flex; align-items: center; gap: 6px;">
+                <span style="font-size: 0.72rem; color: #888;">${new Date(c.createdAt || c.created_at).toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })}</span>
+                ${isAdmin ? `
+                  <button type="button" class="player-comment-ban-btn" data-id="${c.id}" data-user-id="${c.userId || c.user_id}" data-username="${c.username}" title="Bannir l'utilisateur et son IP" style="background: rgba(229, 9, 20, 0.25); color: #ff5252; border: 1px solid rgba(229, 9, 20, 0.45); border-radius: 4px; padding: 2px 6px; font-size: 0.65rem; font-weight: 700; cursor: pointer;">🚫 Bannir</button>
+                  <button type="button" class="player-comment-del-btn" data-id="${c.id}" title="Supprimer le commentaire" style="background: none; border: none; font-size: 0.75rem; cursor: pointer; color: #aaa;">🗑️</button>
+                ` : ''}
+              </div>
             </div>
             <div class="player-drawer-text">${c.text.replace(/</g, '&lt;').replace(/>/g, '&gt;')}</div>
           `;
+          if (isAdmin) {
+            div.querySelector('.player-comment-del-btn')?.addEventListener('click', async () => {
+              if (confirm('Supprimer ce commentaire ?')) {
+                await this.deleteComment(c.id);
+                this.loadLiveComments();
+              }
+            });
+            div.querySelector('.player-comment-ban-btn')?.addEventListener('click', async () => {
+              if (confirm(`Bannir définitivement "${c.username}" et son adresse IP ?`)) {
+                await this.banUserFromComment(c.id, c.userId || c.user_id, c.username);
+                this.loadLiveComments();
+              }
+            });
+          }
           this.commentsList.appendChild(div);
         });
         this.commentsList.scrollTop = this.commentsList.scrollHeight;
       }
     } catch (e) {}
+  }
+
+  async deleteComment(commentId) {
+    try {
+      const baseUrl = window.API_BASE || '';
+      const headers = this.getAuthHeaders();
+      const adminPin = localStorage.getItem('ziflix_admin_token');
+      if (adminPin) headers['x-admin-password'] = '1965';
+      await fetch(`${baseUrl}/api/comments?id=${encodeURIComponent(commentId)}`, {
+        method: 'DELETE',
+        headers
+      });
+    } catch(e) {}
+  }
+
+  async banUserFromComment(commentId, userId, username) {
+    try {
+      const baseUrl = window.API_BASE || '';
+      const headers = this.getAuthHeaders({ 'Content-Type': 'application/json' });
+      const adminPin = localStorage.getItem('ziflix_admin_token');
+      if (adminPin) headers['x-admin-password'] = '1965';
+
+      const res = await fetch(`${baseUrl}/api/admin/comments/ban-user`, {
+        method: 'POST',
+        headers,
+        body: JSON.stringify({ commentId, userId })
+      });
+      const json = await res.json();
+      if (json.success) {
+        if (typeof this.showStatusBanner === 'function') {
+          this.showStatusBanner(`🚫 ${username} et son IP ont été bannis`);
+          setTimeout(() => this.hideStatusBanner(), 3500);
+        }
+      }
+    } catch(e) {}
   }
 
   async submitLiveComment() {

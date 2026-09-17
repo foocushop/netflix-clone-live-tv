@@ -2345,14 +2345,20 @@ class NetflixApp {
         json.comments.forEach(c => {
           const item = document.createElement('div');
           item.className = 'comment-card';
-          const isAuthorOrAdmin = this.currentUser && (this.currentUser.id === c.userId || this.currentUser.role === 'admin');
+          const isAuthor = this.currentUser && this.currentUser.id === c.userId;
+          const isAdmin = this.currentUser && (this.currentUser.role === 'admin' || localStorage.getItem('ziflix_admin_token') === '1965');
+          const isAuthorOrAdmin = isAuthor || isAdmin;
           item.innerHTML = `
             <img src="${c.avatar || 'assets/avatars/avatar-1.svg'}" alt="${c.username}" class="comment-author-avatar">
             <div class="comment-card-body">
               <div class="comment-card-header">
-                <span class="comment-author-name">${c.username}</span>
+                <span class="comment-author-name">
+                  ${c.username}
+                  ${isAdmin && c.ip ? `<span style="color: #888; font-size: 0.7rem; font-weight: normal; margin-left: 6px; font-family: monospace; background: rgba(255,255,255,0.06); padding: 1px 5px; border-radius: 4px;">IP: ${c.ip}</span>` : ''}
+                </span>
                 <div style="display: flex; align-items: center; gap: 8px;">
-                  <span class="comment-date">${new Date(c.createdAt).toLocaleDateString('fr-FR', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })}</span>
+                  <span class="comment-date">${new Date(c.createdAt || c.created_at).toLocaleDateString('fr-FR', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })}</span>
+                  ${isAdmin ? `<button type="button" class="comment-ban-btn" data-id="${c.id}" data-user-id="${c.userId || c.user_id}" data-username="${c.username}" title="Bannir cet utilisateur et son adresse IP" style="background: rgba(229, 9, 20, 0.22); color: #ff5252; border: 1px solid rgba(229, 9, 20, 0.45); border-radius: 4px; padding: 2px 7px; font-size: 0.72rem; font-weight: 700; cursor: pointer; display: inline-flex; align-items: center; gap: 3px;">🚫 Bannir</button>` : ''}
                   ${isAuthorOrAdmin ? `<button type="button" class="comment-delete-btn" data-id="${c.id}" title="Supprimer">🗑️</button>` : ''}
                 </div>
               </div>
@@ -2361,6 +2367,9 @@ class NetflixApp {
           `;
           if (isAuthorOrAdmin) {
             item.querySelector('.comment-delete-btn')?.addEventListener('click', () => this.deleteComment(c.id, mediaId));
+          }
+          if (isAdmin) {
+            item.querySelector('.comment-ban-btn')?.addEventListener('click', () => this.banUserFromComment(c.id, c.userId || c.user_id, c.username, mediaId));
           }
           listEl.appendChild(item);
         });
@@ -2405,6 +2414,33 @@ class NetflixApp {
       }
     } catch (e) {
       this.showToast('Erreur réseau lors de la publication', true);
+    }
+  }
+
+  async banUserFromComment(commentId, userId, username, mediaId) {
+    if (!confirm(`Voulez-vous vraiment bannir définitivement "${username}" et son adresse IP ?\nLe compte sera suspendu, son IP bannie et le commentaire supprimé.`)) {
+      return;
+    }
+    try {
+      const baseUrl = window.API_BASE || '';
+      const headers = this.getAuthHeaders({ 'Content-Type': 'application/json' });
+      const adminPin = localStorage.getItem('ziflix_admin_token');
+      if (adminPin) headers['x-admin-password'] = '1965';
+
+      const res = await fetch(`${baseUrl}/api/admin/comments/ban-user`, {
+        method: 'POST',
+        headers,
+        body: JSON.stringify({ commentId, userId })
+      });
+      const json = await res.json();
+      if (json.success) {
+        this.showToast(`🚫 Utilisateur "${username}" et son adresse IP ont été bannis`);
+        this.loadComments(mediaId);
+      } else {
+        this.showToast(json.error || 'Erreur lors du bannissement', true);
+      }
+    } catch(e) {
+      this.showToast('Erreur réseau', true);
     }
   }
 

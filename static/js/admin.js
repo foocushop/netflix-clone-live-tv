@@ -1472,8 +1472,13 @@ class NetflixAdmin {
             <td style="padding: 10px 8px; display: flex; align-items: center; gap: 8px;">
               <img src="${u.avatar || 'assets/avatars/avatar-1.svg'}" alt="${u.username}" style="width: 28px; height: 28px; border-radius: 50%; object-fit: cover;">
               <div>
-                <strong style="color: #fff; font-size: 0.82rem; display: block;">${u.username}</strong>
-                ${isVip && !isAdmin ? '<span style="color: #ffd700; font-size: 0.65rem; font-weight: 600;">Sans pub • Illimité</span>' : ''}
+                <strong style="color: #fff; font-size: 0.82rem; display: inline-flex; align-items: center; gap: 6px; flex-wrap: wrap;">
+                  ${u.username}
+                  <span style="color: #888; font-size: 0.72rem; font-weight: normal; font-family: monospace; background: rgba(255, 255, 255, 0.06); padding: 1px 6px; border-radius: 4px; border: 1px solid rgba(255, 255, 255, 0.08);" title="Adresse IP enregistrée">
+                    IP: ${u.ip || 'Inconnue'}
+                  </span>
+                </strong>
+                ${isVip && !isAdmin ? '<span style="color: #ffd700; font-size: 0.65rem; font-weight: 600; display: block;">Sans pub • Illimité</span>' : ''}
               </div>
             </td>
             <td style="padding: 10px 8px; text-align: center;">
@@ -1526,6 +1531,9 @@ class NetflixAdmin {
   }
 
   async toggleUserBan(userId, ban) {
+    if (ban && !confirm("Voulez-vous vraiment bannir cet utilisateur et son adresse IP ?\nIl ne pourra plus se connecter ni recréer de compte.")) {
+      return;
+    }
     try {
       const headers = this.getAdminHeaders();
       const res = await fetch('/api/admin/users/ban', {
@@ -1535,7 +1543,7 @@ class NetflixAdmin {
       });
       const json = await res.json();
       if (json.success) {
-        this.showToast(ban ? '🚫 Utilisateur banni' : '✅ Utilisateur débanni');
+        this.showToast(ban ? '🚫 Utilisateur et adresse IP bannis' : '✅ Utilisateur et IP débannis');
         this.loadCommunityUsers();
       } else {
         this.showToast(json.error || "Erreur lors de l'opération", true);

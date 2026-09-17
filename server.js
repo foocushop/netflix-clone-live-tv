@@ -4266,8 +4266,15 @@ const server = http.createServer(async (req, res) => {
       results = ZIFLIX_COMMENTS.slice(0, 60);
     }
 
+    const reqUser = typeof getAuthUser === 'function' ? getAuthUser(req) : null;
+    const isReqAdmin = (reqUser && reqUser.role === 'admin') || (req.headers['x-admin-password'] === '1965');
+    const sanitized = results.map(c => {
+      const copy = { ...c };
+      if (!isReqAdmin) delete copy.ip;
+      return copy;
+    });
     res.writeHead(200, { 'Content-Type': 'application/json; charset=utf-8', 'Access-Control-Allow-Origin': '*' });
-    return res.end(JSON.stringify({ success: true, count: results.length, data: results, comments: results }));
+    return res.end(JSON.stringify({ success: true, count: sanitized.length, data: sanitized, comments: sanitized }));
   }
 
   if (pathname === '/api/comments' && req.method === 'POST') {
