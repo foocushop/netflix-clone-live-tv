@@ -2947,6 +2947,136 @@ let ZIFLIX_BUGS = [];
 const BUGS_LOCAL = path.join(__dirname, 'data', 'bugs.json');
 const BUGS_BACKUP = path.join(SYSTEM_PERSISTENT_DIR, 'bugs.json');
 
+// ================= MODULE LISTE NOIRE IP ZIFLIX (ANTI-RECRÉATION DE COMPTE) =================
+let ZIFLIX_BANNED_IPS = [];
+const BANNED_IPS_LOCAL = path.join(__dirname, 'data', 'banned_ips.json');
+const BANNED_IPS_BACKUP = path.join(SYSTEM_PERSISTENT_DIR, 'banned_ips.json');
+
+function normalizeIp(ip) {
+  if (!ip) return '';
+  let clean = String(ip).trim();
+  if (clean.startsWith('::ffff:')) {
+    clean = clean.replace('::ffff:', '');
+  }
+  return clean;
+}
+
+function getIpv6Subnet64(ipv6) {
+  const norm = normalizeIp(ipv6);
+  if (!norm.includes(':')) return null;
+  const parts = norm.split(':');
+  if (parts.length >= 4) {
+    return parts.slice(0, 4).join(':').toLowerCase();
+  }
+  return null;
+}
+
+function loadZiflixBannedIps() {
+  let localData = [];
+  let backupData = [];
+  if (fs.existsSync(BANNED_IPS_LOCAL)) {
+    try { localData = JSON.parse(fs.readFileSync(BANNED_IPS_LOCAL, 'utf8')) || []; } catch (e) {}
+  }
+  if (fs.existsSync(BANNED_IPS_BACKUP)) {
+    try { backupData = JSON.parse(fs.readFileSync(BANNED_IPS_BACKUP, 'utf8')) || []; } catch (e) {}
+  }
+  const ipsMap = new Map();
+  if (Array.isArray(localData)) {
+    localData.forEach(item => {
+      if (item && item.ip) ipsMap.set(item.ip.toLowerCase(), item);
+    });
+  }
+  if (Array.isArray(backupData)) {
+    backupData.forEach(item => {
+      if (item && item.ip) ipsMap.set(item.ip.toLowerCase(), item);
+    });
+  }
+  ZIFLIX_BANNED_IPS = Array.from(ipsMap.values());
+  saveZiflixBannedIps();
+}
+
+function saveZiflixBannedIps() {
+  try {
+    const dir = path.dirname(BANNED_IPS_LOCAL);
+    if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
+    fs.writeFileSync(BANNED_IPS_LOCAL, JSON.stringify(ZIFLIX_BANNED_IPS, null, 2), 'utf8');
+  } catch (e) {
+    console.error('[ZIFLIX Banned IPs] Erreur sauvegarde locale:', e.message);
+  }
+  try {
+    const bDir = path.dirname(BANNED_IPS_BACKUP);
+    if (!fs.existsSync(bDir)) fs.mkdirSync(bDir, { recursive: true });
+    fs.writeFileSync(BANNED_IPS_BACKUP, JSON.stringify(ZIFLIX_BANNED_IPS, null, 2), 'utf8');
+  } catch (e) {}
+}
+
+function isIpBanned(clientIp) {
+  const norm = normalizeIp(clientIp).toLowerCase();
+  if (!norm) return false;
+
+  const clientSubnet = getIpv6Subnet64(norm);
+
+  for (const entry of ZIFLIX_BANNED_IPS) {
+    const bannedNorm = normalizeIp(entry.ip).toLowerCase();
+    // 1. Correspondance exacte d'IP
+    if (bannedNorm === norm) {
+      return { banned: true, entry };
+    }
+    // 2. Correspondance sous-réseau IPv6 /64
+    if (entry.subnet && clientSubnet && entry.subnet.toLowerCase() === clientSubnet) {
+      return { banned: true, entry, subnetMatch: true };
+    }
+    if (clientSubnet && (bannedNorm.startsWith(clientSubnet) || (entry.subnet && clientSubnet.startsWith(entry.subnet.toLowerCase())))) {
+      return { banned: true, entry, subnetMatch: true };
+    }
+  }
+  return false;
+}
+
+function banIpAddress(ip, username, userId, reason = 'Bannissement administrateur') {
+  const norm = normalizeIp(ip);
+  if (!norm || norm === '127.0.0.1' || norm === '::1') return;
+
+  const subnet = getIpv6Subnet64(norm);
+  const exists = ZIFLIX_BANNED_IPS.some(b => normalizeIp(b.ip).toLowerCase() === norm.toLowerCase());
+  if (!exists) {
+    ZIFLIX_BANNED_IPS.push({
+      ip: norm,
+      subnet: subnet,
+      reason: reason,
+      user_id: userId || null,
+      username: username || 'Inconnu',
+      banned_at: new Date().toISOString()
+    });
+  }
+  if (subnet) {
+    const subnetEntry = subnet + '::/64';
+    if (!ZIFLIX_BANNED_IPS.some(b => b.subnet && b.subnet.toLowerCase() === subnet.toLowerCase())) {
+      ZIFLIX_BANNED_IPS.push({
+        ip: subnetEntry,
+        subnet: subnet,
+        reason: reason + ' (Sous-réseau IPv6 /64)',
+        user_id: userId || null,
+        username: username || 'Inconnu',
+        banned_at: new Date().toISOString()
+      });
+    }
+  }
+  saveZiflixBannedIps();
+}
+
+function unbanIpAddress(ip) {
+  const norm = normalizeIp(ip).toLowerCase();
+  const subnet = getIpv6Subnet64(norm);
+  ZIFLIX_BANNED_IPS = ZIFLIX_BANNED_IPS.filter(b => {
+    const bNorm = normalizeIp(b.ip).toLowerCase();
+    if (bNorm === norm) return false;
+    if (subnet && b.subnet && b.subnet.toLowerCase() === subnet) return false;
+    return true;
+  });
+  saveZiflixBannedIps();
+}
+
 function loadZiflixBugs() {
   let localData = null;
   let backupData = null;
@@ -2991,6 +3121,7 @@ loadZiflixUsers();
 loadZiflixComments();
 loadZiflixSessions();
 loadZiflixBugs();
+loadZiflixBannedIps();
 
 function getAuthUser(req) {
   const authHeader = req.headers['authorization'] || '';
@@ -3017,6 +3148,10 @@ function getAuthUser(req) {
   }
   const user = ZIFLIX_USERS.find(u => u.id === session.user_id);
   if (!user) return null;
+  const clientIp = typeof getClientIp === 'function' ? getClientIp(req) : '';
+  if (isIpBanned(clientIp)) {
+    return { ...user, is_banned: true, is_ip_banned: true };
+  }
   if (user.banned) return { ...user, is_banned: true };
   return user;
 }
@@ -3830,6 +3965,15 @@ const server = http.createServer(async (req, res) => {
 
   // ================= AUTHENTIFICATION & PROFILS UTILISATEURS ZIFLIX =================
   if (pathname === '/api/auth/register' && req.method === 'POST') {
+    const clientIp = getClientIp(req);
+    const ipCheck = isIpBanned(clientIp);
+    if (ipCheck) {
+      res.writeHead(403, { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' });
+      return res.end(JSON.stringify({
+        success: false,
+        error: 'Impossible de créer un compte : votre adresse IP a été suspendue pour non-respect des règles de la plateforme.'
+      }));
+    }
     let body = '';
     req.on('data', chunk => body += chunk);
     req.on('end', () => {
@@ -3866,6 +4010,8 @@ const server = http.createServer(async (req, res) => {
           avatar,
           role,
           banned: false,
+          ip: clientIp,
+          last_ip: clientIp,
           created_at: new Date().toISOString(),
           last_login: new Date().toISOString()
         };
@@ -3911,6 +4057,15 @@ const server = http.createServer(async (req, res) => {
   }
 
   if (pathname === '/api/auth/login' && req.method === 'POST') {
+    const clientIp = getClientIp(req);
+    const ipCheck = isIpBanned(clientIp);
+    if (ipCheck) {
+      res.writeHead(403, { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' });
+      return res.end(JSON.stringify({
+        success: false,
+        error: 'Accès refusé : votre adresse IP a été suspendue par un administrateur.'
+      }));
+    }
     let body = '';
     req.on('data', chunk => body += chunk);
     req.on('end', () => {
@@ -3943,6 +4098,8 @@ const server = http.createServer(async (req, res) => {
         }
 
         user.last_login = new Date().toISOString();
+        user.last_ip = clientIp;
+        if (!user.ip) user.ip = clientIp;
         saveZiflixUsers();
 
         const token = cryptoModule.randomBytes(32).toString('hex');
@@ -4114,6 +4271,11 @@ const server = http.createServer(async (req, res) => {
   }
 
   if (pathname === '/api/comments' && req.method === 'POST') {
+    const clientIp = getClientIp(req);
+    if (isIpBanned(clientIp)) {
+      res.writeHead(403, { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' });
+      return res.end(JSON.stringify({ success: false, error: 'Votre adresse IP a été suspendue. Vous ne pouvez plus publier de commentaires.' }));
+    }
     const user = getAuthUser(req);
     if (!user || user.is_banned) {
       res.writeHead(401, { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' });
@@ -4340,6 +4502,7 @@ const server = http.createServer(async (req, res) => {
         role: u.role,
         is_vip: !!(u.is_vip || u.role === 'vip' || u.role === 'admin'),
         banned: !!u.banned,
+        ip: u.ip || u.last_ip || 'Non enregistrée',
         created_at: u.created_at,
         last_login: u.last_login
       }));
@@ -4354,21 +4517,149 @@ const server = http.createServer(async (req, res) => {
         try {
           const payload = JSON.parse(body || '{}');
           const targetId = payload.userId || payload.user_id;
-          const target = ZIFLIX_USERS.find(u => u.id === targetId);
+          const target = ZIFLIX_USERS.find(u => u.id === targetId || (payload.username && u.username.toLowerCase() === String(payload.username).toLowerCase()));
           if (!target) {
             res.writeHead(404, { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' });
             return res.end(JSON.stringify({ success: false, error: 'Utilisateur introuvable' }));
           }
-          target.banned = !!payload.banned;
+          const shouldBan = !!payload.banned;
+          target.banned = shouldBan;
+
+          if (shouldBan) {
+            // 1. Révoquer immédiatement toutes les sessions actives
+            for (const [token, sess] of ZIFLIX_SESSIONS.entries()) {
+              if (sess && (sess.user_id === target.id || sess.username === target.username)) {
+                ZIFLIX_SESSIONS.delete(token);
+              }
+            }
+            saveZiflixSessions();
+
+            // 2. Bannir toutes les IPs connues de l'utilisateur
+            const ipsToBan = new Set();
+            if (target.ip) ipsToBan.add(target.ip);
+            if (target.last_ip) ipsToBan.add(target.last_ip);
+            if (payload.ip) ipsToBan.add(payload.ip);
+
+            // Ajouter les IPs de ses commentaires
+            ZIFLIX_COMMENTS.forEach(c => {
+              if ((c.user_id === target.id || c.userId === target.id) && c.ip) {
+                ipsToBan.add(c.ip);
+              }
+            });
+
+            ipsToBan.forEach(ip => {
+              banIpAddress(ip, target.username, target.id, 'Bannissement compte par administrateur');
+            });
+          } else {
+            // Débannissement : débloquer ses IPs
+            if (target.ip) unbanIpAddress(target.ip);
+            if (target.last_ip) unbanIpAddress(target.last_ip);
+          }
+
           saveZiflixUsers();
           res.writeHead(200, { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' });
-          return res.end(JSON.stringify({ success: true, user: { id: target.id, username: target.username, banned: target.banned } }));
+          return res.end(JSON.stringify({
+            success: true,
+            user: { id: target.id, username: target.username, banned: target.banned, ip: target.ip || target.last_ip }
+          }));
         } catch (e) {
           res.writeHead(400, { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' });
           return res.end(JSON.stringify({ success: false, error: 'Corps JSON invalide' }));
         }
       });
       return;
+    }
+
+    // ================= 9. /api/admin/comments/ban-user : MODÉRATION RAPIDE DEPUIS LES COMMENTAIRES =================
+    if (pathname === '/api/admin/comments/ban-user' && req.method === 'POST') {
+      let body = '';
+      req.on('data', chunk => body += chunk);
+      req.on('end', () => {
+        try {
+          const payload = JSON.parse(body || '{}');
+          const commentId = payload.commentId || payload.id;
+          const userId = payload.userId || payload.user_id;
+
+          let targetUser = null;
+          let commentToDelete = null;
+
+          if (commentId) {
+            commentToDelete = ZIFLIX_COMMENTS.find(c => c.id === commentId);
+            if (commentToDelete) {
+              const uId = commentToDelete.user_id || commentToDelete.userId;
+              targetUser = ZIFLIX_USERS.find(u => u.id === uId || u.username.toLowerCase() === (commentToDelete.username || '').toLowerCase());
+            }
+          }
+
+          if (!targetUser && userId) {
+            targetUser = ZIFLIX_USERS.find(u => u.id === userId);
+          }
+
+          if (!targetUser) {
+            res.writeHead(404, { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' });
+            return res.end(JSON.stringify({ success: false, error: 'Auteur du commentaire introuvable' }));
+          }
+
+          // 1. Bannir l'utilisateur
+          targetUser.banned = true;
+
+          // 2. Révoquer ses sessions
+          for (const [token, sess] of ZIFLIX_SESSIONS.entries()) {
+            if (sess && (sess.user_id === targetUser.id || sess.username === targetUser.username)) {
+              ZIFLIX_SESSIONS.delete(token);
+            }
+          }
+          saveZiflixSessions();
+
+          // 3. Bannir l'IP
+          const ipsToBan = new Set();
+          if (targetUser.ip) ipsToBan.add(targetUser.ip);
+          if (targetUser.last_ip) ipsToBan.add(targetUser.last_ip);
+          if (commentToDelete && commentToDelete.ip) ipsToBan.add(commentToDelete.ip);
+
+          ZIFLIX_COMMENTS.forEach(c => {
+            if ((c.user_id === targetUser.id || c.userId === targetUser.id) && c.ip) {
+              ipsToBan.add(c.ip);
+            }
+          });
+
+          ipsToBan.forEach(ip => {
+            banIpAddress(ip, targetUser.username, targetUser.id, 'Bannissement depuis modération commentaires');
+          });
+
+          // 4. Supprimer le commentaire incriminé
+          if (commentId) {
+            const idx = ZIFLIX_COMMENTS.findIndex(c => c.id === commentId);
+            if (idx !== -1) {
+              ZIFLIX_COMMENTS.splice(idx, 1);
+            }
+          }
+          // Nettoyer tous les commentaires si demandé
+          if (payload.deleteAll) {
+            ZIFLIX_COMMENTS = ZIFLIX_COMMENTS.filter(c => c.user_id !== targetUser.id && c.userId !== targetUser.id);
+          }
+
+          saveZiflixComments();
+          saveZiflixUsers();
+
+          res.writeHead(200, { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' });
+          return res.end(JSON.stringify({
+            success: true,
+            message: 'Utilisateur "' + targetUser.username + '" et son adresse IP ont été bannis avec succès.',
+            user: { id: targetUser.id, username: targetUser.username, banned: true, ip: targetUser.ip || targetUser.last_ip }
+          }));
+        } catch (e) {
+          res.writeHead(400, { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' });
+          return res.end(JSON.stringify({ success: false, error: 'Erreur lors du bannissement: ' + e.message }));
+        }
+      });
+      return;
+    }
+
+    // ================= 10. /api/admin/banned-ips : GESTION DES IPS BANserver =================
+    if (pathname === '/api/admin/banned-ips' && req.method === 'GET') {
+      res.writeHead(200, { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' });
+      return res.end(JSON.stringify({ success: true, banned_ips: ZIFLIX_BANNED_IPS }));
     }
 
     if (pathname === '/api/admin/users/role' && req.method === 'POST') {
