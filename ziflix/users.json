@@ -3665,9 +3665,9 @@
     "role": "user",
     "banned": false,
     "created_at": "2026-09-15T07:54:29.824Z",
-    "last_login": "2026-09-16T19:33:53.020Z",
+    "last_login": "2026-09-17T21:13:09.097Z",
     "ip": "2a01:e0a:1076:8bb0:49a6:6112:899c:8145",
-    "last_ip": "2a01:e0a:1076:8bb0:49a6:6112:899c:8145"
+    "last_ip": "2a0d:e487:38f:c373:a9ef:c4d:840:ed86"
   },
   {
     "id": "u_1789458871928_f79a6798",
@@ -5317,9 +5317,9 @@
     "role": "user",
     "banned": false,
     "created_at": "2026-09-15T21:18:07.184Z",
-    "last_login": "2026-09-17T16:57:46.997Z",
+    "last_login": "2026-09-17T21:21:10.298Z",
     "ip": "154.124.197.68",
-    "last_ip": "154.124.197.68"
+    "last_ip": "2a09:bac3:5536:28a0::40c:40"
   },
   {
     "id": "u_1789508249336_c04a00a4",
@@ -6690,6 +6690,20 @@
     "last_ip": "87.251.69.80",
     "created_at": "2026-09-17T21:00:24.517Z",
     "last_login": "2026-09-17T21:00:24.517Z",
+    "is_banned": true
+  },
+  {
+    "id": "u_1789679184242_0a54984b",
+    "username": "lopsadetelegram",
+    "password_hash": "a1cea759aee50daaf0a6be4df5c7f288cc63e39a4a74430e863a49260cdf84fb252c16d3ae7c4bff58f4404831e4aeca84a90da0a1afd965108b0a34cd5d1473",
+    "salt": "b6bd137d724dfce54a6304645080a08a",
+    "avatar": "assets/avatars/avatar-1.svg",
+    "role": "user",
+    "banned": true,
+    "ip": "92.223.62.226",
+    "last_ip": "85.234.86.126",
+    "created_at": "2026-09-17T21:06:24.242Z",
+    "last_login": "2026-09-17T21:11:54.593Z",
     "is_banned": true
   }
 ]

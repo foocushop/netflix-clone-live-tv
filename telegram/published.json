@@ -146,6 +146,13 @@
       "title": "La Villa des cœurs brisés (2015) - S11E20 - Episode 20",
       "published_at": "2026-09-16T19:21:36.315Z",
       "telegram_msg_id": 189
+    },
+    {
+      "id": "manual_ep_21",
+      "episode_num": 21,
+      "title": "Épisode 21",
+      "published_at": "2026-09-17T21:28:31.592Z",
+      "telegram_msg_id": "manual-external"
     }
   ],
   "series_9066_s9": [
@@ -232,6 +239,21 @@
       "title": "Les Apprentis Aventuriers (2016) - S09E12 - Episode 12",
       "published_at": "2026-09-16T19:35:01.660Z",
       "telegram_msg_id": 24
+    }
+  ],
+  "series_test_s1": [
+    {
+      "id": "test_ep_99",
+      "episode_num": 99,
+      "title": "Test 99",
+      "published_at": "2026-09-17T21:32:01.537Z",
+      "hd_published": true,
+      "sd_published": true,
+      "telegram_msg_id_hd": 1001,
+      "telegram_msg_id_sd": 1002,
+      "published_at_hd": "2026-09-17T21:32:01.537Z",
+      "telegram_msg_id": 1001,
+      "published_at_sd": "2026-09-17T21:32:01.540Z"
     }
   ]
 }
