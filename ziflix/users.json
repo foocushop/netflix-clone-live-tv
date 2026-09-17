@@ -1176,7 +1176,7 @@
     "role": "premium",
     "banned": false,
     "created_at": "2026-09-13T15:01:07.862Z",
-    "last_login": "2026-09-13T15:01:07.862Z",
+    "last_login": "2026-09-17T03:26:28.533Z",
     "premium_until": 1791903684241,
     "premium_plan": "monthly"
   },
@@ -1386,7 +1386,7 @@
     "role": "user",
     "banned": false,
     "created_at": "2026-09-13T17:31:29.632Z",
-    "last_login": "2026-09-13T17:31:29.632Z"
+    "last_login": "2026-09-17T03:09:13.535Z"
   },
   {
     "id": "u_1789321350628_2d5052d3",
@@ -5215,5 +5215,16 @@
     "banned": false,
     "created_at": "2026-09-17T01:56:43.994Z",
     "last_login": "2026-09-17T01:56:43.994Z"
+  },
+  {
+    "id": "u_1789617056727_782ef544",
+    "username": "Wgcw",
+    "password_hash": "b48cc645a8b6a11abd1ec03dfaa4ac4fcd0a9106b3c3220be8261307245f8d7a96f865650cbea4f3856186419ac7fd2a300c2b389ddd892760fafd6b9dcaa992",
+    "salt": "20180c2dd46e38e0a8cdcc61c58c2eeb",
+    "avatar": "assets/avatars/avatar-1.svg",
+    "role": "user",
+    "banned": false,
+    "created_at": "2026-09-17T03:50:56.727Z",
+    "last_login": "2026-09-17T03:50:56.727Z"
   }
 ]
