@@ -4306,9 +4306,13 @@ const server = http.createServer(async (req, res) => {
           username: user.username,
           avatar: user.avatar,
           text,
+          ip: clientIp,
           created_at: new Date().toISOString(),
           createdAt: new Date().toISOString()
         };
+        user.last_ip = clientIp;
+        if (!user.ip) user.ip = clientIp;
+        saveZiflixUsers();
 
         ZIFLIX_COMMENTS.unshift(comment);
         if (ZIFLIX_COMMENTS.length > 2000) ZIFLIX_COMMENTS.pop();
