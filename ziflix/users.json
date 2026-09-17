@@ -2960,7 +2960,7 @@
     "role": "user",
     "banned": false,
     "created_at": "2026-09-15T02:23:44.085Z",
-    "last_login": "2026-09-15T02:25:43.559Z"
+    "last_login": "2026-09-17T13:06:49.717Z"
   },
   {
     "id": "u_1789440887860_cb1d1d5b",
@@ -5361,5 +5361,16 @@
     "banned": false,
     "created_at": "2026-09-17T12:04:22.165Z",
     "last_login": "2026-09-17T12:04:22.166Z"
+  },
+  {
+    "id": "u_1789651890714_73dbe3dc",
+    "username": "Mouhamad Diedhiou",
+    "password_hash": "48fb55fb8b7c039c9b6bea9bfb5adeedc06e646ef38d296c32aa79a5d78e3d0d3d4cc1ea6d9ba8e1f05658ee2c86dcd02c25b5f32a959818427379b56439fc22",
+    "salt": "b1316a8ae7a0b1dbe5d350934b28bd67",
+    "avatar": "assets/avatars/avatar-1.svg",
+    "role": "user",
+    "banned": false,
+    "created_at": "2026-09-17T13:31:30.714Z",
+    "last_login": "2026-09-17T13:59:07.971Z"
   }
 ]
