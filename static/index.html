@@ -382,6 +382,21 @@
         </div>
       </div>
 
+      <!-- Bouton Tactile Central Play/Pause (Style Officiel Netflix Mobile) -->
+      <button type="button" class="center-play-btn" id="centerPlayBtn" aria-label="Lecture / Pause" title="Lecture / Pause">
+        <span class="center-play-circle">
+          <!-- Icône Pause (2 barres verticales nettes) : affichée quand la vidéo est en cours de lecture -->
+          <svg class="center-icon-pause" id="centerIconPause" viewBox="0 0 24 24" width="34" height="34" fill="currentColor">
+            <rect x="5.5" y="4" width="4.5" height="16" rx="1.5"></rect>
+            <rect x="14" y="4" width="4.5" height="16" rx="1.5"></rect>
+          </svg>
+          <!-- Icône Play (triangle Netflix) : affichée quand la vidéo est en pause -->
+          <svg class="center-icon-play hidden" id="centerIconPlay" viewBox="0 0 24 24" width="34" height="34" fill="currentColor">
+            <polygon points="6 4 20 12 6 20 6 4"></polygon>
+          </svg>
+        </span>
+      </button>
+
       <!-- ================= CONTRÔLES OFFICIELS NETFLIX ================= -->
       <div class="netflix-bottom-controls" id="netflixBottomControls">
         <!-- Scrubber Bar / Timeline Netflix -->

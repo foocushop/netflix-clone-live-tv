@@ -1601,6 +1601,88 @@ body {
   100% { opacity: 0; transform: translate(-50%, -50%) scale(1.35); }
 }
 
+/* Bouton Central Tactile Play/Pause (Style Officiel Netflix Mobile) */
+.center-play-btn {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%) scale(1);
+  width: 76px;
+  height: 76px;
+  border-radius: 50%;
+  background: rgba(15, 15, 18, 0.68);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 2px solid rgba(255, 255, 255, 0.28);
+  color: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  z-index: 85;
+  transition: opacity 0.3s cubic-bezier(0.16, 1, 0.3, 1), 
+              transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), 
+              background-color 0.2s ease, 
+              border-color 0.2s ease, 
+              box-shadow 0.2s ease;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.65), 0 0 0 1px rgba(0, 0, 0, 0.4);
+  padding: 0;
+  outline: none;
+  -webkit-tap-highlight-color: transparent;
+  user-select: none;
+  pointer-events: auto;
+}
+
+.center-play-btn:hover {
+  background: rgba(229, 9, 20, 0.88);
+  border-color: rgba(255, 255, 255, 0.5);
+  transform: translate(-50%, -50%) scale(1.08);
+  box-shadow: 0 10px 36px rgba(229, 9, 20, 0.4), 0 0 20px rgba(229, 9, 20, 0.3);
+}
+
+.center-play-btn:active {
+  transform: translate(-50%, -50%) scale(0.92);
+  background: #e50914;
+}
+
+.center-play-circle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+}
+
+.center-icon-pause,
+.center-icon-play {
+  transition: transform 0.2s ease, opacity 0.2s ease;
+}
+
+.center-icon-play {
+  margin-left: 3px;
+}
+
+/* En cas de chargement ou buffering, masquer le bouton central pour laisser le loader ZIFLIX */
+.player-loader:not(.hidden) ~ .center-play-btn {
+  opacity: 0 !important;
+  visibility: hidden !important;
+  pointer-events: none !important;
+}
+
+@media (max-width: 768px) {
+  .center-play-btn {
+    width: 68px;
+    height: 68px;
+    background: rgba(15, 15, 18, 0.75);
+    border-width: 2px;
+  }
+  .center-icon-pause,
+  .center-icon-play {
+    width: 30px;
+    height: 30px;
+  }
+}
+
 .netflix-bottom-controls {
   position: absolute;
   bottom: 0;
@@ -1626,11 +1708,16 @@ body {
 }
 
 .netflix-player-overlay.user-idle .player-top-bar,
-.netflix-player-overlay.user-idle .netflix-bottom-controls {
+.netflix-player-overlay.user-idle .netflix-bottom-controls,
+.netflix-player-overlay.user-idle .center-play-btn {
   opacity: 0;
   visibility: hidden;
   pointer-events: none;
   transform: translateY(8px);
+}
+
+.netflix-player-overlay.user-idle .center-play-btn {
+  transform: translate(-50%, -50%) scale(0.85);
 }
 
 .netflix-player-overlay.user-idle .player-top-bar {

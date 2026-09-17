@@ -73,6 +73,9 @@ class NetflixPlayer {
     this.ctrlPlayBtn = document.getElementById('ctrlPlayBtn');
     this.iconPlay = document.getElementById('iconPlay');
     this.iconPause = document.getElementById('iconPause');
+    this.centerPlayBtn = document.getElementById('centerPlayBtn');
+    this.centerIconPlay = document.getElementById('centerIconPlay');
+    this.centerIconPause = document.getElementById('centerIconPause');
     this.ctrlRewindBtn = document.getElementById('ctrlRewindBtn');
     this.ctrlForwardBtn = document.getElementById('ctrlForwardBtn');
     this.ctrlNextEpBtn = document.getElementById('ctrlNextEpBtn');
@@ -194,9 +197,16 @@ class NetflixPlayer {
       this.backBtn.addEventListener('click', () => this.close());
     }
 
-    // Play / Pause
+    // Play / Pause (Bouton barre inférieure & Bouton tactile central Netflix)
     if (this.ctrlPlayBtn) {
       this.ctrlPlayBtn.addEventListener('click', () => this.togglePlay());
+    }
+    if (this.centerPlayBtn) {
+      this.centerPlayBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        e.preventDefault();
+        this.togglePlay();
+      });
     }
 
     // Saut ±10 secondes
@@ -229,7 +239,34 @@ class NetflixPlayer {
     // Clic & Double-clic sur la vidéo
     if (this.video) {
       this.video.addEventListener('click', (e) => {
-        if (e.target.closest('.netflix-bottom-controls') || e.target.closest('.player-top-bar')) return;
+        if (e.target.closest('.netflix-bottom-controls') || 
+            e.target.closest('.player-top-bar') ||
+            e.target.closest('.center-play-btn') ||
+            e.target.closest('.comments-drawer') ||
+            e.target.closest('.player-status-banner') ||
+            e.target.closest('.timer-expired-modal')) {
+          return;
+        }
+
+        // Sur mobile / appareil tactile : NE PAS METTRE EN PAUSE AUTOMATIQUEMENT
+        // Le tap sur l'écran réveille les contrôles et affiche le bouton central (avec les 2 barres pause ❚❚)
+        if (this.isTouchDevice()) {
+          const now = Date.now();
+          const wokeUpRecently = (now - (this._controlsWokeUpAt || 0)) < 450;
+          const isIdle = this.overlay && this.overlay.classList.contains('user-idle');
+
+          if (isIdle || wokeUpRecently) {
+            this.showControls();
+          } else {
+            // Si les contrôles étaient déjà ouverts et l'utilisateur tapote l'écran, on les referme sans couper la vidéo
+            if (this.video && !this.video.paused) {
+              this.hideControls();
+            }
+          }
+          return;
+        }
+
+        // Sur ordinateur avec souris : bascule lecture/pause classique
         this.togglePlay();
       });
 
@@ -1021,53 +1058,6 @@ class NetflixPlayer {
     }
   }
 
-  // ================= INACTIVITÉ SOURIS : MASQUAGE AUTOMATIQUE =================
-  initInactivityTimer() {
-    const IDLE_DELAY = 4000; // 4 secondes d'inactivité
-
-    const showControls = () => {
-      if (!this.overlay) return;
-      this.overlay.classList.remove('user-idle');
-    };
-
-    const hideControls = () => {
-      if (!this.overlay) return;
-      // Ne pas cacher si on est en train de scrubber ou si la vidéo est en pause
-      if (this.isScrubbing) return;
-      if (this.video && this.video.paused && !this.video.ended) return;
-      this.overlay.classList.add('user-idle');
-    };
-
-    const resetTimer = () => {
-      showControls();
-      clearTimeout(this.inactivityTimer);
-      this.inactivityTimer = setTimeout(hideControls, IDLE_DELAY);
-    };
-
-    // Écouter les mouvements souris sur le player overlay
-    if (this.overlay) {
-      this.overlay.addEventListener('mousemove', resetTimer);
-      this.overlay.addEventListener('mousedown', resetTimer);
-      this.overlay.addEventListener('touchstart', resetTimer, { passive: true });
-      this.overlay.addEventListener('touchmove', resetTimer, { passive: true });
-
-      // Quand la souris quitte le player, cacher les contrôles immédiatement
-      this.overlay.addEventListener('mouseleave', () => {
-        clearTimeout(this.inactivityTimer);
-        hideControls();
-      });
-
-      // Quand la souris entre dans le player, montrer les contrôles
-      this.overlay.addEventListener('mouseenter', resetTimer);
-    }
-
-    // Les raccourcis clavier doivent aussi réinitialiser le timer
-    document.addEventListener('keydown', (e) => {
-      if (!this.overlay || !this.overlay.classList.contains('active')) return;
-      resetTimer();
-    });
-  }
-
   populateSeasons() {
     if (!this.seasonSelect) return;
     this.seasonSelect.innerHTML = '';
@@ -1170,33 +1160,49 @@ class NetflixPlayer {
     }
   }
 
-  // ================= 8. GESTION DE L'INACTIVITÉ =================
+  // ================= 8. GESTION DE L'INACTIVITÉ & DÉTECTION MOBILE =================
+  isTouchDevice() {
+    const isMobileUA = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+    const isSmallScreen = window.innerWidth <= 820;
+    const hasTouch = ('ontouchstart' in window) || (navigator.maxTouchPoints > 0);
+    return isMobileUA || (hasTouch && isSmallScreen) || (window.matchMedia && window.matchMedia('(pointer: coarse)').matches);
+  }
+
   initInactivityTimer() {
     const showAndReset = () => {
       this.showControls();
-      clearTimeout(this.inactivityTimer);
-      if (!this.video.paused) {
-        this.inactivityTimer = setTimeout(() => this.hideControls(), 3500);
-      }
     };
 
     if (this.overlay) {
       this.overlay.addEventListener('mousemove', showAndReset);
       this.overlay.addEventListener('touchstart', showAndReset, { passive: true });
+      this.overlay.addEventListener('touchmove', showAndReset, { passive: true });
     }
+
+    document.addEventListener('keydown', (e) => {
+      if (!this.overlay || !this.overlay.classList.contains('active')) return;
+      showAndReset();
+    });
   }
 
   showControls() {
-    if (this.overlay) this.overlay.classList.remove('user-idle');
-    // Redémarrer le timer d'inactivité
+    if (!this.overlay) return;
+    const wasIdle = this.overlay.classList.contains('user-idle');
+    if (wasIdle) {
+      this._controlsWokeUpAt = Date.now();
+    }
+    this.overlay.classList.remove('user-idle');
     clearTimeout(this.inactivityTimer);
-    this.inactivityTimer = setTimeout(() => this.hideControls(), 4000);
+    if (this.video && !this.video.paused) {
+      this.inactivityTimer = setTimeout(() => this.hideControls(), 3500);
+    }
   }
 
   hideControls() {
+    if (!this.overlay) return;
     if (this.video && this.video.paused && !this.video.ended) return;
     if (this.isScrubbing) return;
-    if (this.overlay) this.overlay.classList.add('user-idle');
+    this.overlay.classList.add('user-idle');
   }
 
   // ================= 9. OUVERTURE & FERMETURE DU LECTEUR =================
@@ -2328,8 +2334,21 @@ playDirectHls(streamUrl, options = {}) {
   }
 
   updatePlayStateUI(isPlaying) {
+    if (!this.centerPlayBtn) this.centerPlayBtn = document.getElementById('centerPlayBtn');
+    if (!this.centerIconPause) this.centerIconPause = document.getElementById('centerIconPause');
+    if (!this.centerIconPlay) this.centerIconPlay = document.getElementById('centerIconPlay');
+
     if (this.iconPlay) this.iconPlay.classList.toggle('hidden', isPlaying);
     if (this.iconPause) this.iconPause.classList.toggle('hidden', !isPlaying);
+
+    // Bouton tactile central Netflix mobile : 
+    // Affiche les 2 barres (pause ❚❚) pendant la lecture, et le triangle (play ▶) en pause
+    if (this.centerIconPause) this.centerIconPause.classList.toggle('hidden', !isPlaying);
+    if (this.centerIconPlay) this.centerIconPlay.classList.toggle('hidden', isPlaying);
+
+    if (!isPlaying) {
+      this.showControls();
+    }
   }
 
   seekRelative(seconds) {
