@@ -375,6 +375,17 @@
         "mime_type": "video/mp4",
         "size": 1821162375,
         "dc_id": 4
+      },
+      "sd_published": true,
+      "telegram_msg_id_sd": 21,
+      "published_at_sd": "2026-09-18T02:38:49.477Z",
+      "file_ref_sd": {
+        "id": "5866004558362189672",
+        "access_hash": "-7502653999657819491",
+        "file_reference": "BgAAAADk2LnoAAAAFWqspDkYK8G5PJKsaYKXdZNCfv5z",
+        "mime_type": "video/mp4",
+        "size": 676503720,
+        "dc_id": 4
       }
     },
     {
@@ -382,14 +393,47 @@
       "episode_num": 9,
       "title": "Épisode 9",
       "published_at": "2026-09-15T19:39:12.993Z",
-      "telegram_msg_id": "pre-existing"
+      "telegram_msg_id": 22,
+      "hd_published": true,
+      "telegram_msg_id_hd": 22,
+      "published_at_hd": "2026-09-18T02:43:26.803Z",
+      "file_ref_hd": {
+        "id": "5866004558362189673",
+        "access_hash": "6100895278922061360",
+        "file_reference": "BgAAAADk2LnoAAAAFmqspU76ZNlojtv+GRWePnGAMSV3",
+        "mime_type": "video/mp4",
+        "size": 1586670210,
+        "dc_id": 4
+      },
+      "sd_published": true,
+      "telegram_msg_id_sd": 23,
+      "published_at_sd": "2026-09-18T03:01:51.150Z",
+      "file_ref_sd": {
+        "id": "5866004558362189675",
+        "access_hash": "-9146603770446615426",
+        "file_reference": "BgAAAADk2LnoAAAAF2qsqZ5j6Xdlu7LZ7lPJVmuQBtvf",
+        "mime_type": "video/mp4",
+        "size": 621182923,
+        "dc_id": 4
+      }
     },
     {
       "id": "manual_skip_9066_10",
       "episode_num": 10,
       "title": "Épisode 10",
       "published_at": "2026-09-15T19:39:12.993Z",
-      "telegram_msg_id": "pre-existing"
+      "telegram_msg_id": 24,
+      "hd_published": true,
+      "telegram_msg_id_hd": 24,
+      "published_at_hd": "2026-09-18T03:06:22.415Z",
+      "file_ref_hd": {
+        "id": "5866004558362189677",
+        "access_hash": "3432315201088090809",
+        "file_reference": "BgAAAADk2LnoAAAAGGqsqq7gCoM+Z8QgcgZMu20ZG6uj",
+        "mime_type": "video/mp4",
+        "size": 1831635892,
+        "dc_id": 4
+      }
     },
     {
       "id": "483407",
