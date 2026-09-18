@@ -6849,5 +6849,18 @@
     "last_ip": "195.68.41.242",
     "created_at": "2026-09-18T07:57:16.846Z",
     "last_login": "2026-09-18T07:58:19.129Z"
+  },
+  {
+    "id": "u_1789720446755_29073bac",
+    "username": "Cass",
+    "password_hash": "b58ed0f1d5c7632d870a3d89a8fdd64517778110f1ec9ceda22f6768d6eca953cb6a6d5b44637d7528509f10c989beaf24e9ed97c4266c1cb9473967c27ea779",
+    "salt": "67d20e3a5c3fa8ab305524b0d25842d4",
+    "avatar": "assets/avatars/avatar-1.svg",
+    "role": "user",
+    "banned": false,
+    "ip": "2001:861:d1:9c60:c587:5cfa:a431:77eb",
+    "last_ip": "2001:861:d1:9c60:c587:5cfa:a431:77eb",
+    "created_at": "2026-09-18T08:34:06.755Z",
+    "last_login": "2026-09-18T08:34:06.755Z"
   }
 ]
