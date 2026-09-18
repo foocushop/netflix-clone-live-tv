@@ -8,7 +8,7 @@
     "template": "<b>{titre}</b> {emoji} Saison {saison}\n\nÉpisode {episode}",
     "channel_id": "-1002615244456",
     "enabled": true,
-    "source_priority": "hybrid",
+    "source_priority": "foxbleu",
     "tf1_program_slug": "la-villa-des-coeurs-brises",
     "tf1_channel_slug": "tfx"
   },
