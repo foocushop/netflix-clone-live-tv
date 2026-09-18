@@ -1,5 +1,24 @@
 [
   {
+    "id": "bug_1789766526939_2b0b1a",
+    "user_id": "u_1789340612841_3ed31ab5",
+    "username": "blablaaa",
+    "avatar": "assets/avatars/avatar-1.svg",
+    "category": "playback",
+    "title": "Signalement : La Villa des cœurs brisés (2015) S11E22",
+    "description": "",
+    "media_id": "xtream_series_6715",
+    "media_title": "La Villa des cœurs brisés (2015)",
+    "season": 11,
+    "episode": 22,
+    "episode_id": null,
+    "device_info": "Mac (macOS) • Chrome",
+    "user_agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.0.0 Safari/537.36",
+    "url": "https://ziablo.xyz/",
+    "status": "open",
+    "created_at": "2026-09-18T21:22:06.939Z"
+  },
+  {
     "id": "bug_1789764822097_c9df05",
     "user_id": "u_1789564003577_72b11664",
     "username": "Ticha36",

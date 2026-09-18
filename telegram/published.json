@@ -180,14 +180,32 @@
       "episode_num": 22,
       "title": "Avant-première - La Villa - Saison 11 Episode 22 du 22 septembre 2026",
       "published_at": "2026-09-18T15:06:05.457Z",
-      "hd_published": false,
-      "sd_published": false,
-      "telegram_msg_id": 196,
-      "telegram_msg_id_hd": null,
-      "telegram_msg_id_sd": null,
+      "hd_published": true,
+      "sd_published": true,
+      "telegram_msg_id": 200,
+      "telegram_msg_id_hd": 200,
+      "telegram_msg_id_sd": 201,
       "telegram_msg_id_tf1": 196,
       "tf1_announced": true,
-      "tf1_announced_at": "2026-09-18T15:06:05.457Z"
+      "tf1_announced_at": "2026-09-18T15:06:05.457Z",
+      "published_at_hd": "2026-09-18T21:21:06.944Z",
+      "file_ref_hd": {
+        "id": "5868380551450206200",
+        "access_hash": "6768417924711210142",
+        "file_reference": "BgAAAACb4XaoAAAAyGqtq0L642qMHb3AlnJvMEL+vV+0",
+        "mime_type": "video/mp4",
+        "size": 1031529002,
+        "dc_id": 4
+      },
+      "published_at_sd": "2026-09-18T21:36:25.823Z",
+      "file_ref_sd": {
+        "id": "5868380551450206202",
+        "access_hash": "-677957960613145384",
+        "file_reference": "BgAAAACb4XaoAAAAyWqtrtntLnsfQI2qbFS6eRqYbII+",
+        "mime_type": "video/mp4",
+        "size": 437121401,
+        "dc_id": 4
+      }
     },
     {
       "id": "acb43daf-f8d8-4936-af7c-8ab720cc2496",
