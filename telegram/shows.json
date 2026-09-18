@@ -7,7 +7,10 @@
     "emoji": "💔",
     "template": "<b>{titre}</b> {emoji} Saison {saison}\n\nÉpisode {episode}",
     "channel_id": "-1002615244456",
-    "enabled": true
+    "enabled": true,
+    "source_priority": "hybrid",
+    "tf1_program_slug": "la-villa-des-coeurs-brises",
+    "tf1_channel_slug": "tfx"
   },
   {
     "id": "series_9066_s9",
@@ -17,6 +20,7 @@
     "emoji": "**👹**",
     "template": "<b>{titre}</b> {emoji} Saison {saison}\n\nÉpisode {episode}",
     "channel_id": "-1003839408616",
-    "enabled": true
+    "enabled": true,
+    "source_priority": "foxbleu"
   }
 ]

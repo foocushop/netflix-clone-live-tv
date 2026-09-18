@@ -148,11 +148,78 @@
       "telegram_msg_id": 189
     },
     {
-      "id": "manual_ep_21",
+      "id": "5960cf85-1bab-409f-a763-20ff215c911d",
+      "episode_num": 24,
+      "title": "Avant-première - La Villa - Saison 11 Episode 24 du 24 septembre 2026",
+      "published_at": "2026-09-18T15:05:56.178Z",
+      "hd_published": false,
+      "sd_published": false,
+      "telegram_msg_id": 194,
+      "telegram_msg_id_hd": null,
+      "telegram_msg_id_sd": null,
+      "telegram_msg_id_tf1": 194,
+      "tf1_announced": true,
+      "tf1_announced_at": "2026-09-18T15:05:56.178Z"
+    },
+    {
+      "id": "599698cf-c448-4cb8-a323-d3a5a48b6f6f",
+      "episode_num": 23,
+      "title": "Avant-première - La Villa - Saison 11 Episode 23 du 23 septembre 2026",
+      "published_at": "2026-09-18T15:06:00.782Z",
+      "hd_published": false,
+      "sd_published": false,
+      "telegram_msg_id": 195,
+      "telegram_msg_id_hd": null,
+      "telegram_msg_id_sd": null,
+      "telegram_msg_id_tf1": 195,
+      "tf1_announced": true,
+      "tf1_announced_at": "2026-09-18T15:06:00.782Z"
+    },
+    {
+      "id": "80628668-3f87-4faa-b488-cb7b5dc47d02",
+      "episode_num": 22,
+      "title": "Avant-première - La Villa - Saison 11 Episode 22 du 22 septembre 2026",
+      "published_at": "2026-09-18T15:06:05.457Z",
+      "hd_published": false,
+      "sd_published": false,
+      "telegram_msg_id": 196,
+      "telegram_msg_id_hd": null,
+      "telegram_msg_id_sd": null,
+      "telegram_msg_id_tf1": 196,
+      "tf1_announced": true,
+      "tf1_announced_at": "2026-09-18T15:06:05.457Z"
+    },
+    {
+      "id": "acb43daf-f8d8-4936-af7c-8ab720cc2496",
       "episode_num": 21,
-      "title": "Épisode 21",
-      "published_at": "2026-09-17T21:28:31.592Z",
-      "telegram_msg_id": "manual-external"
+      "title": "Avant-première - La Villa - Saison 11 Episode 21 du 21 septembre 2026",
+      "published_at": "2026-09-18T15:06:09.765Z",
+      "hd_published": true,
+      "sd_published": true,
+      "telegram_msg_id": 198,
+      "telegram_msg_id_hd": 198,
+      "telegram_msg_id_sd": 199,
+      "telegram_msg_id_tf1": 197,
+      "tf1_announced": true,
+      "tf1_announced_at": "2026-09-18T15:06:09.765Z",
+      "published_at_hd": "2026-09-18T15:12:10.134Z",
+      "file_ref_hd": {
+        "id": "5866128751636520689",
+        "access_hash": "316124054047324951",
+        "file_reference": "BgAAAACb4XaoAAAAxmqtVMmTyXha2AbAPdt7G9bl9HPT",
+        "mime_type": "video/mp4",
+        "size": 1008018798,
+        "dc_id": 4
+      },
+      "published_at_sd": "2026-09-18T15:27:31.357Z",
+      "file_ref_sd": {
+        "id": "5866128751636520702",
+        "access_hash": "2641298966731572330",
+        "file_reference": "BgAAAACb4XaoAAAAx2qtWGN0yb9OGpNzJAo5AKLq5VGC",
+        "mime_type": "video/mp4",
+        "size": 421087615,
+        "dc_id": 4
+      }
     }
   ],
   "series_9066_s9": [
