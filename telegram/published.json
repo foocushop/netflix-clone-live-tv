@@ -510,9 +510,9 @@
       "title": "Les Apprentis Aventuriers (2016) - S09E13 - Episode 13",
       "published_at": "2026-09-18T04:04:37.486Z",
       "hd_published": true,
-      "sd_published": false,
+      "sd_published": true,
       "telegram_msg_id_hd": 30,
-      "telegram_msg_id_sd": null,
+      "telegram_msg_id_sd": 31,
       "file_ref_hd": {
         "id": "5866004558362189687",
         "access_hash": "5831980551188256083",
@@ -521,9 +521,17 @@
         "size": 1716747908,
         "dc_id": 4
       },
-      "file_ref_sd": null,
+      "file_ref_sd": {
+        "id": "5866004558362189688",
+        "access_hash": "1044239589778975625",
+        "file_reference": "BgAAAADk2LnoAAAAH2qsu3Gh9eQFSV6FC7kWDRVYgXj9",
+        "mime_type": "video/mp4",
+        "size": 516896498,
+        "dc_id": 4
+      },
       "published_at_hd": "2026-09-18T04:04:37.486Z",
-      "telegram_msg_id": 30
+      "telegram_msg_id": 30,
+      "published_at_sd": "2026-09-18T04:17:53.657Z"
     }
   ],
   "series_test_s1": [
