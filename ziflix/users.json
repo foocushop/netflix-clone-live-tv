@@ -6939,7 +6939,7 @@
     "ip": "154.124.70.91",
     "last_ip": "154.124.70.91",
     "created_at": "2026-09-18T14:04:45.937Z",
-    "last_login": "2026-09-18T14:04:45.937Z"
+    "last_login": "2026-09-18T22:28:22.283Z"
   },
   {
     "id": "u_1789740946965_124b6138",
@@ -7135,5 +7135,44 @@
     "last_ip": "93.9.214.10",
     "created_at": "2026-09-18T21:41:07.502Z",
     "last_login": "2026-09-18T21:41:07.502Z"
+  },
+  {
+    "id": "u_1789770816666_f2b44603",
+    "username": "Loukas1501",
+    "password_hash": "13eeb496f3c84112d2ba055bd1dd13be5f1c4e534cb7763d624af405dc74cd982b6c770c9721721987db1d89abf3d9f302d5df76c53c149b57a5101ceed182e2",
+    "salt": "fae72566392170a9f88cd91cfab934f3",
+    "avatar": "assets/avatars/avatar-1.svg",
+    "role": "user",
+    "banned": false,
+    "ip": "132.243.168.97",
+    "last_ip": "2a04:cec0:11fa:d811:0:4d:302:2501",
+    "created_at": "2026-09-18T22:33:36.666Z",
+    "last_login": "2026-09-18T22:39:52.332Z"
+  },
+  {
+    "id": "u_1789772346505_37744e4d",
+    "username": "Nanaland",
+    "password_hash": "4ff968501cb6bdff81fc2bde82085180884bf27be9e9fb59e2a1ad16cadd8942affd0591927cb9f7bc48ecf0530b1040fabfb2c7029352966c5fff1892be2699",
+    "salt": "5c771b74a6181a631312c52f60926fdd",
+    "avatar": "assets/avatars/avatar-1.svg",
+    "role": "user",
+    "banned": false,
+    "ip": "2604:3d09:a27e:dee0:316d:3053:c17e:cb90",
+    "last_ip": "2604:3d09:a27e:dee0:316d:3053:c17e:cb90",
+    "created_at": "2026-09-18T22:59:06.505Z",
+    "last_login": "2026-09-18T23:00:24.477Z"
+  },
+  {
+    "id": "u_1789772721476_4c3bfbeb",
+    "username": "Mama",
+    "password_hash": "ac4a950da424ccacaceecbaf2fb6556907261494b240432ea0c1d59fee4a6053426ead51784efa11d884349f98ecb5f8354d01e905ddae293b0bec192adb74d7",
+    "salt": "d09789587e0170bfbec8b7709905ea06",
+    "avatar": "assets/avatars/avatar-1.svg",
+    "role": "user",
+    "banned": false,
+    "ip": "200.113.214.61",
+    "last_ip": "200.113.214.61",
+    "created_at": "2026-09-18T23:05:21.476Z",
+    "last_login": "2026-09-18T23:05:21.476Z"
   }
 ]
