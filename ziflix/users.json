@@ -6771,5 +6771,18 @@
     "last_ip": "196.207.218.244",
     "created_at": "2026-09-17T23:38:01.260Z",
     "last_login": "2026-09-17T23:38:01.260Z"
+  },
+  {
+    "id": "u_1789690568925_1f866eaa",
+    "username": "Saalma",
+    "password_hash": "5ddc4d523e0988aa8c6f05f87ef0c5e4db676a64abaee58baa8ad00a570cac7c0bf3b9807f5ba6b994fd95b0beabbdf91e8702a8e482baa54a0d7d6a90e7cb34",
+    "salt": "77d372833f9dd20e7fa17439470cf5e8",
+    "avatar": "assets/avatars/avatar-1.svg",
+    "role": "user",
+    "banned": false,
+    "ip": "105.66.7.131",
+    "last_ip": "105.66.7.131",
+    "created_at": "2026-09-18T00:16:08.925Z",
+    "last_login": "2026-09-18T00:16:08.925Z"
   }
 ]

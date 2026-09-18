@@ -230,6 +230,17 @@
         "mime_type": "video/mp4",
         "size": 1894621887,
         "dc_id": 4
+      },
+      "sd_published": true,
+      "telegram_msg_id_sd": 11,
+      "published_at_sd": "2026-09-18T00:25:43.096Z",
+      "file_ref_sd": {
+        "id": "5866004558362189656",
+        "access_hash": "6423353047669280814",
+        "file_reference": "BgAAAADk2LnoAAAAC2qshQbolrAPWTAPSPLJhSLConSK",
+        "mime_type": "video/mp4",
+        "size": 735015827,
+        "dc_id": 4
       }
     },
     {
@@ -237,14 +248,47 @@
       "episode_num": 4,
       "title": "Épisode 4",
       "published_at": "2026-09-15T19:39:12.993Z",
-      "telegram_msg_id": "pre-existing"
+      "telegram_msg_id": 12,
+      "hd_published": true,
+      "telegram_msg_id_hd": 12,
+      "published_at_hd": "2026-09-18T00:29:51.399Z",
+      "file_ref_hd": {
+        "id": "5866004558362189657",
+        "access_hash": "8610419085091196825",
+        "file_reference": "BgAAAADk2LnoAAAADGqshf/n6RMUzXIRNBn9+IjuXzrE",
+        "mime_type": "video/mp4",
+        "size": 1656653492,
+        "dc_id": 4
+      },
+      "sd_published": true,
+      "telegram_msg_id_sd": 13,
+      "published_at_sd": "2026-09-18T00:47:27.467Z",
+      "file_ref_sd": {
+        "id": "5866004558362189658",
+        "access_hash": "1172575939854971463",
+        "file_reference": "BgAAAADk2LnoAAAADWqsih8Nht2amMZIGxbX/6oLdram",
+        "mime_type": "video/mp4",
+        "size": 440749303,
+        "dc_id": 4
+      }
     },
     {
       "id": "manual_skip_9066_5",
       "episode_num": 5,
       "title": "Épisode 5",
       "published_at": "2026-09-15T19:39:12.993Z",
-      "telegram_msg_id": "pre-existing"
+      "telegram_msg_id": 14,
+      "hd_published": true,
+      "telegram_msg_id_hd": 14,
+      "published_at_hd": "2026-09-18T00:51:38.816Z",
+      "file_ref_hd": {
+        "id": "5866004558362189659",
+        "access_hash": "-3280024648717946130",
+        "file_reference": "BgAAAADk2LnoAAAADmqsixrPXDVwnsnztmikCpOYy4xG",
+        "mime_type": "video/mp4",
+        "size": 1743054347,
+        "dc_id": 4
+      }
     },
     {
       "id": "manual_skip_9066_6",

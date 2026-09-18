@@ -1,5 +1,24 @@
 [
   {
+    "id": "bug_1789690654161_ed3979",
+    "user_id": "u_1789604212018_fb52be7f",
+    "username": "orkann 21",
+    "avatar": "assets/avatars/avatar-3.svg",
+    "category": "episode",
+    "title": "Signalement : La Villa des cœurs brisés (2015) S11E13",
+    "description": "",
+    "media_id": "xtream_series_6715",
+    "media_title": "La Villa des cœurs brisés (2015)",
+    "season": 11,
+    "episode": 13,
+    "episode_id": null,
+    "device_info": "PC Windows • Chrome",
+    "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/153.0.0.0 Safari/537.36 Edg/153.0.0.0",
+    "url": "https://ziablo.xyz/",
+    "status": "open",
+    "created_at": "2026-09-18T00:17:34.161Z"
+  },
+  {
     "id": "bug_1789680604625_3db5b9",
     "user_id": "u_1789507087184_3f923cdf",
     "username": "Fatimashu",
