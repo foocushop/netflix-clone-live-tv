@@ -433,6 +433,17 @@
         "mime_type": "video/mp4",
         "size": 1831635892,
         "dc_id": 4
+      },
+      "sd_published": true,
+      "telegram_msg_id_sd": 25,
+      "published_at_sd": "2026-09-18T03:23:27.018Z",
+      "file_ref_sd": {
+        "id": "5866004558362189681",
+        "access_hash": "-4981999084252031604",
+        "file_reference": "BgAAAADk2LnoAAAAGWqsrq6xY3f3v/t2DzJb6mXpgrto",
+        "mime_type": "video/mp4",
+        "size": 605459001,
+        "dc_id": 4
       }
     },
     {
@@ -440,14 +451,79 @@
       "episode_num": 11,
       "title": "Les Apprentis Aventuriers (2016) - S09E11 - Episode 11",
       "published_at": "2026-09-15T19:46:08.223Z",
-      "telegram_msg_id": 185
+      "telegram_msg_id": 26,
+      "hd_published": true,
+      "telegram_msg_id_hd": 26,
+      "published_at_hd": "2026-09-18T03:27:25.207Z",
+      "file_ref_hd": {
+        "id": "5866004558362189682",
+        "access_hash": "7946079464101669760",
+        "file_reference": "BgAAAADk2LnoAAAAGmqsr5zkI0MWXb5WP7cAsvSOd0fq",
+        "mime_type": "video/mp4",
+        "size": 1696290257,
+        "dc_id": 4
+      },
+      "sd_published": true,
+      "telegram_msg_id_sd": 27,
+      "published_at_sd": "2026-09-18T03:43:51.194Z",
+      "file_ref_sd": {
+        "id": "5866004558362189684",
+        "access_hash": "7497441580824899878",
+        "file_reference": "BgAAAADk2LnoAAAAG2qss3csMEHomzSQ+/ervVkrMnS9",
+        "mime_type": "video/mp4",
+        "size": 601956540,
+        "dc_id": 4
+      }
     },
     {
       "id": "483565",
       "episode_num": 12,
       "title": "Les Apprentis Aventuriers (2016) - S09E12 - Episode 12",
       "published_at": "2026-09-16T19:35:01.660Z",
-      "telegram_msg_id": 24
+      "telegram_msg_id": 28,
+      "hd_published": true,
+      "telegram_msg_id_hd": 28,
+      "published_at_hd": "2026-09-18T03:47:49.854Z",
+      "file_ref_hd": {
+        "id": "5866004558362189685",
+        "access_hash": "-247674416893984173",
+        "file_reference": "BgAAAADk2LnoAAAAHGqstGWqvE2NJRPcHG3DEJpTk0ij",
+        "mime_type": "video/mp4",
+        "size": 1677265981,
+        "dc_id": 4
+      },
+      "sd_published": true,
+      "telegram_msg_id_sd": 29,
+      "published_at_sd": "2026-09-18T04:00:25.455Z",
+      "file_ref_sd": {
+        "id": "5866004558362189686",
+        "access_hash": "-2612680604216804732",
+        "file_reference": "BgAAAADk2LnoAAAAHWqst1kThFIzz7nz2e3cyTyLNpmj",
+        "mime_type": "video/mp4",
+        "size": 461561235,
+        "dc_id": 4
+      }
+    },
+    {
+      "id": "483590",
+      "episode_num": 13,
+      "title": "Les Apprentis Aventuriers (2016) - S09E13 - Episode 13",
+      "published_at": "2026-09-18T04:04:37.486Z",
+      "hd_published": true,
+      "sd_published": false,
+      "telegram_msg_id_hd": 30,
+      "telegram_msg_id_sd": null,
+      "file_ref_hd": {
+        "id": "5866004558362189687",
+        "access_hash": "5831980551188256083",
+        "file_reference": "BgAAAADk2LnoAAAAHmqsuFUGj7cD+WK7FibQsSJSPHwm",
+        "mime_type": "video/mp4",
+        "size": 1716747908,
+        "dc_id": 4
+      },
+      "file_ref_sd": null,
+      "published_at_hd": "2026-09-18T04:04:37.486Z",
+      "telegram_msg_id": 30
     }
   ],
   "series_test_s1": [
