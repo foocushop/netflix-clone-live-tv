@@ -161,25 +161,25 @@
       "episode_num": 1,
       "title": "Épisode 1",
       "published_at": "2026-09-15T19:39:12.993Z",
-      "telegram_msg_id": 4,
+      "telegram_msg_id": 6,
       "hd_published": true,
-      "telegram_msg_id_hd": 4,
-      "published_at_hd": "2026-09-17T22:20:08.578Z",
+      "telegram_msg_id_hd": 6,
+      "published_at_hd": "2026-09-17T23:16:46.283Z",
       "file_ref_hd": {
         "id": "5866004558362189641",
         "access_hash": "5756686681964173938",
-        "file_reference": "BgAAAADk2LnoAAAABGqsZ5haze425htnozj8S8ZBGm/S",
+        "file_reference": "BgAAAADk2LnoAAAABmqsdN7dbjUcuDP8yrMhChbPlgwW",
         "mime_type": "video/mp4",
         "size": 1865335922,
         "dc_id": 4
       },
       "sd_published": true,
-      "telegram_msg_id_sd": 5,
-      "published_at_sd": "2026-09-17T23:08:24.508Z",
+      "telegram_msg_id_sd": 7,
+      "published_at_sd": "2026-09-17T23:16:46.533Z",
       "file_ref_sd": {
         "id": "5866004558362189650",
         "access_hash": "-4649026641343128861",
-        "file_reference": "BgAAAADk2LnoAAAABWqscujgHYmFZAL4cNRj5u1FdoxX",
+        "file_reference": "BgAAAADk2LnoAAAAB2qsdN7T61gJriyVved0Oj4Z3zAY",
         "mime_type": "video/mp4",
         "size": 531147595,
         "dc_id": 4
@@ -190,14 +190,47 @@
       "episode_num": 2,
       "title": "Épisode 2",
       "published_at": "2026-09-15T19:39:12.993Z",
-      "telegram_msg_id": "pre-existing"
+      "telegram_msg_id": 8,
+      "hd_published": true,
+      "telegram_msg_id_hd": 8,
+      "published_at_hd": "2026-09-17T23:26:10.503Z",
+      "file_ref_hd": {
+        "id": "5866004558362189651",
+        "access_hash": "1053294400950858389",
+        "file_reference": "BgAAAADk2LnoAAAACGqsdxLd2cAwxbq/v59ut9uBYFYO",
+        "mime_type": "video/mp4",
+        "size": 1882758531,
+        "dc_id": 4
+      },
+      "sd_published": true,
+      "telegram_msg_id_sd": 9,
+      "published_at_sd": "2026-09-17T23:59:18.764Z",
+      "file_ref_sd": {
+        "id": "5866004558362189653",
+        "access_hash": "1815146114393671822",
+        "file_reference": "BgAAAADk2LnoAAAACWqsftZ0js5JdIejWhQqPFK0CPMr",
+        "mime_type": "video/mp4",
+        "size": 568901220,
+        "dc_id": 4
+      }
     },
     {
       "id": "manual_skip_9066_3",
       "episode_num": 3,
       "title": "Épisode 3",
       "published_at": "2026-09-15T19:39:12.993Z",
-      "telegram_msg_id": "pre-existing"
+      "telegram_msg_id": 10,
+      "hd_published": true,
+      "telegram_msg_id_hd": 10,
+      "published_at_hd": "2026-09-18T00:04:13.708Z",
+      "file_ref_hd": {
+        "id": "5866004558362189655",
+        "access_hash": "-2714537086723822019",
+        "file_reference": "BgAAAADk2LnoAAAACmqsf/2QDlg6E+RPAgc0vR284fK1",
+        "mime_type": "video/mp4",
+        "size": 1894621887,
+        "dc_id": 4
+      }
     },
     {
       "id": "manual_skip_9066_4",
