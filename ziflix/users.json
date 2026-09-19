@@ -7343,5 +7343,18 @@
     "last_ip": "180.181.191.179",
     "created_at": "2026-09-19T21:29:36.276Z",
     "last_login": "2026-09-19T21:53:34.894Z"
+  },
+  {
+    "id": "u_1789859237983_5d675e01",
+    "username": "Sihem",
+    "password_hash": "2ec8ac77be4f9c63f90962652f493065b0c7b8602c14b07f0791550f79bfcd18f262d3473428b28778aa2da89cfab8e0afb499fa55f7c59a20ca5a081064ed10",
+    "salt": "f51c73c07a31d64e9c022da250c750c5",
+    "avatar": "assets/avatars/avatar-1.svg",
+    "role": "user",
+    "banned": false,
+    "ip": "2607:fea8:bd61:b900:650d:2842:1709:281e",
+    "last_ip": "2607:fea8:bd61:b900:650d:2842:1709:281e",
+    "created_at": "2026-09-19T23:07:17.984Z",
+    "last_login": "2026-09-19T23:07:17.984Z"
   }
 ]
