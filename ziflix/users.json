@@ -2339,9 +2339,9 @@
     "role": "user",
     "banned": false,
     "created_at": "2026-09-14T01:13:20.996Z",
-    "last_login": "2026-09-18T20:31:42.682Z",
+    "last_login": "2026-09-19T12:51:24.259Z",
     "ip": "2001:4278:20:5bec:314b:56ca:e346:a374",
-    "last_ip": "2001:4278:1f:6376:a042:98c:3258:7532"
+    "last_ip": "2001:4278:23:44ca:e88f:24e5:219a:67bf"
   },
   {
     "id": "u_1789358755452_67788c0f",
@@ -4536,9 +4536,9 @@
     "role": "user",
     "banned": false,
     "created_at": "2026-09-15T17:49:52.362Z",
-    "last_login": "2026-09-15T17:49:52.362Z",
+    "last_login": "2026-09-19T12:41:34.359Z",
     "ip": "41.214.39.223",
-    "last_ip": "41.214.39.223"
+    "last_ip": "41.82.12.195"
   },
   {
     "id": "u_1789495159097_d69bfb28",
@@ -7265,5 +7265,18 @@
     "last_ip": "2a02:8440:3502:350f:9196:ca50:54c8:b365",
     "created_at": "2026-09-19T10:41:03.308Z",
     "last_login": "2026-09-19T10:41:03.308Z"
+  },
+  {
+    "id": "u_1789822217354_b159f659",
+    "username": "Spectro13k03",
+    "password_hash": "19c3eba78e648b971ee04c8404861acf2e0d8e10e601395417a6e7b24640bc49922f7bfe5ca5382b943da7f02276068bb0c14f455733b0dd160fe96dde3d017c",
+    "salt": "eb9871b8bbf5a69a40836cab266bd8a0",
+    "avatar": "assets/avatars/avatar-1.svg",
+    "role": "user",
+    "banned": false,
+    "ip": "2a01:e0a:a2d:68e0:184a:c426:b235:6067",
+    "last_ip": "2a01:e0a:a2d:68e0:184a:c426:b235:6067",
+    "created_at": "2026-09-19T12:50:17.354Z",
+    "last_login": "2026-09-19T12:50:17.354Z"
   }
 ]
