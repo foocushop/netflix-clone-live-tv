@@ -7213,5 +7213,18 @@
     "last_ip": "2a01:cb08:82df:8600:11c6:6536:f644:eb98",
     "created_at": "2026-09-19T00:55:39.482Z",
     "last_login": "2026-09-19T00:55:39.482Z"
+  },
+  {
+    "id": "u_1789797800168_ba5052a4",
+    "username": "Dhc",
+    "password_hash": "282104f2464ac33f91861ab25e558cd158858b51301cc7688858a7cf557677958090e033fc2ad4c6b3b727119db57fb0ed3186614c9ce395688cb6621cf70bee",
+    "salt": "51f8e29f69281d759620f35dd76d434e",
+    "avatar": "assets/avatars/avatar-1.svg",
+    "role": "user",
+    "banned": false,
+    "ip": "154.72.161.153",
+    "last_ip": "154.72.161.153",
+    "created_at": "2026-09-19T06:03:20.169Z",
+    "last_login": "2026-09-19T06:03:20.169Z"
   }
 ]
