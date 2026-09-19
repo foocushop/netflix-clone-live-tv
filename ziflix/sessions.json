@@ -5400,5 +5400,13 @@
     "role": "user",
     "avatar": "assets/avatars/avatar-1.svg",
     "expires_at": 1792375850789
+  },
+  {
+    "token": "1d17a62e9e9261f934b9cd437dafa72f9a3c0dcedc1a309f4b8e5523af1d2f55",
+    "user_id": "u_1789740946965_124b6138",
+    "username": "Lods-0333",
+    "role": "user",
+    "avatar": "assets/avatars/avatar-1.svg",
+    "expires_at": 1792376394940
   }
 ]
