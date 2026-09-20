@@ -5187,7 +5187,7 @@
     "role": "user",
     "banned": false,
     "created_at": "2026-09-15T20:27:18.405Z",
-    "last_login": "2026-09-15T20:58:50.315Z",
+    "last_login": "2026-09-20T22:46:39.067Z",
     "ip": "102.67.226.240",
     "last_ip": "102.67.226.240"
   },
@@ -7486,5 +7486,31 @@
     "last_ip": "196.77.248.53",
     "created_at": "2026-09-20T21:56:47.316Z",
     "last_login": "2026-09-20T21:56:47.316Z"
+  },
+  {
+    "id": "u_1789944279042_07ebd56f",
+    "username": "Deborah55",
+    "password_hash": "34430c149494e82b17e2d94e063ef442a90dbe43f006b094cbaf6bc3533cf14dde08c78e829ff531f69c263c02c92dd5f836b3d9dc292b3662fb19433bca86ce",
+    "salt": "a415c42f5d1702a479fcc9b4b7c4a74f",
+    "avatar": "assets/avatars/avatar-1.svg",
+    "role": "user",
+    "banned": false,
+    "ip": "102.67.226.240",
+    "last_ip": "102.67.226.240",
+    "created_at": "2026-09-20T22:44:39.043Z",
+    "last_login": "2026-09-20T22:44:39.043Z"
+  },
+  {
+    "id": "u_1789947330143_00d00e27",
+    "username": "Ziko",
+    "password_hash": "5ec903b6edbfc9e5c6167f337134b0718b826edde9266c50718ece722d4d6bc6c3e730823eefbe9bf40c96b1268dce1a1a0869cbf164f015b53cc287d2946e97",
+    "salt": "ac79f7da159f48ddb647f1c09d037b20",
+    "avatar": "assets/avatars/avatar-6.svg",
+    "role": "user",
+    "banned": false,
+    "ip": "196.117.191.138",
+    "last_ip": "196.117.191.138",
+    "created_at": "2026-09-20T23:35:30.143Z",
+    "last_login": "2026-09-20T23:35:30.143Z"
   }
 ]
