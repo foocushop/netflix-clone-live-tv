@@ -5664,5 +5664,13 @@
     "role": "user",
     "avatar": "assets/avatars/avatar-1.svg",
     "expires_at": 1792491542816
+  },
+  {
+    "token": "c15dcf65c1738e43a6f51cf8224d220a3608cbd0194e0a066b3910618d26e944",
+    "user_id": "u_1789908220394_dcc4112e",
+    "username": "Mira2",
+    "role": "user",
+    "avatar": "assets/avatars/avatar-1.svg",
+    "expires_at": 1792500220399
   }
 ]
