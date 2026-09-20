@@ -5672,5 +5672,13 @@
     "role": "user",
     "avatar": "assets/avatars/avatar-1.svg",
     "expires_at": 1792500220399
+  },
+  {
+    "token": "ca7f58d27f0265d7e7540a803628d4851747f6a66ce9e1d7de6cced4b39a4167",
+    "user_id": "u_1789911542400_3852427d",
+    "username": "Danfa",
+    "role": "user",
+    "avatar": "assets/avatars/avatar-1.svg",
+    "expires_at": 1792503542407
   }
 ]
