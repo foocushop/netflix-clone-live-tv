@@ -617,6 +617,17 @@
       "published_at_hd": "2026-09-18T04:04:37.486Z",
       "telegram_msg_id": 30,
       "published_at_sd": "2026-09-18T04:17:53.657Z"
+    },
+    {
+      "id": "manual_ep_14",
+      "episode_num": 14,
+      "title": "Épisode 14",
+      "published_at": "2026-09-20T18:39:25.624Z",
+      "hd_published": true,
+      "sd_published": true,
+      "telegram_msg_id": "manual-external",
+      "file_ref_hd": null,
+      "file_ref_sd": null
     }
   ],
   "series_test_s1": [
