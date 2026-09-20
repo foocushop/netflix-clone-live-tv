@@ -5600,5 +5600,13 @@
     "role": "user",
     "avatar": "assets/avatars/avatar-1.svg",
     "expires_at": 1792451237993
+  },
+  {
+    "token": "ee01ee2b33be518eb112db01e1e5b458ecc80d3d01157ca84fcc541999a2616b",
+    "user_id": "u_1789866257810_ddfee9fa",
+    "username": "saimatouba20@gmail.com",
+    "role": "user",
+    "avatar": "assets/avatars/avatar-7.svg",
+    "expires_at": 1792458257817
   }
 ]

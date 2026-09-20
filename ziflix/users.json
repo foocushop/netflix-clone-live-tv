@@ -7356,5 +7356,18 @@
     "last_ip": "2607:fea8:bd61:b900:650d:2842:1709:281e",
     "created_at": "2026-09-19T23:07:17.984Z",
     "last_login": "2026-09-19T23:07:17.984Z"
+  },
+  {
+    "id": "u_1789866257810_ddfee9fa",
+    "username": "saimatouba20@gmail.com",
+    "password_hash": "9d3bb420a8b7b70cfe328db19d10075988ca84a308fe33565cc349dfd1c76e885193035201e316396a09cf9b25e0549da49eba605b88600dfec5635ea1cb4ff4",
+    "salt": "b4f973b4631a9116bfd37cb75c91fe82",
+    "avatar": "assets/avatars/avatar-7.svg",
+    "role": "user",
+    "banned": false,
+    "ip": "154.125.181.107",
+    "last_ip": "154.125.181.107",
+    "created_at": "2026-09-20T01:04:17.811Z",
+    "last_login": "2026-09-20T01:04:17.811Z"
   }
 ]
