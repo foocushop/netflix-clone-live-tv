@@ -5656,5 +5656,13 @@
     "role": "user",
     "avatar": "assets/avatars/avatar-1.svg",
     "expires_at": 1792489240533
+  },
+  {
+    "token": "87552717e5a720a3c161487c6f010b4bb920ba6d230f8fb4a881b4fab4bf06cb",
+    "user_id": "u_1789899542807_758d1cdb",
+    "username": "fafi",
+    "role": "user",
+    "avatar": "assets/avatars/avatar-1.svg",
+    "expires_at": 1792491542816
   }
 ]
