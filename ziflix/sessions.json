@@ -5688,5 +5688,13 @@
     "role": "user",
     "avatar": "assets/avatars/avatar-3.svg",
     "expires_at": 1792506408892
+  },
+  {
+    "token": "d04ee8fe508f26027703c642bb8b56aa2798cf85003b0e9651ba02212b4fbf5c",
+    "user_id": "u_1789916763059_61c2923b",
+    "username": "yanoski",
+    "role": "user",
+    "avatar": "assets/avatars/avatar-1.svg",
+    "expires_at": 1792508763066
   }
 ]
