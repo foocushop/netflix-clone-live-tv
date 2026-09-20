@@ -17,7 +17,7 @@
     "series_id": 9066,
     "season": 9,
     "name": "Les Apprentis Aventuriers",
-    "emoji": "**👹**",
+    "emoji": "👹",
     "template": "<b>{titre}</b> {emoji} Saison {saison}\n\nÉpisode {episode}",
     "channel_id": "-1003839408616",
     "enabled": true,
