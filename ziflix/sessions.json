@@ -5800,5 +5800,13 @@
     "role": "user",
     "avatar": "assets/avatars/avatar-1.svg",
     "expires_at": 1792566675357
+  },
+  {
+    "token": "c1f9bb9b79c235766c923406a61e7845182ed524df2ef67768ce52d4795a5fdf",
+    "user_id": "u_1789760415824_daa805d3",
+    "username": "Mayaa",
+    "role": "user",
+    "avatar": "assets/avatars/avatar-1.svg",
+    "expires_at": 1792577336089
   }
 ]
