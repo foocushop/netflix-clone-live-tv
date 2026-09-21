@@ -813,9 +813,9 @@
     "role": "user",
     "banned": false,
     "created_at": "2026-09-12T23:48:51.627Z",
-    "last_login": "2026-09-15T19:33:34.818Z",
+    "last_login": "2026-09-21T22:55:43.593Z",
     "ip": "154.244.99.77",
-    "last_ip": "154.244.99.77"
+    "last_ip": "129.45.64.4"
   },
   {
     "id": "u_1789257043127_a6e8bf40",
@@ -1021,9 +1021,9 @@
     "role": "user",
     "banned": false,
     "created_at": "2026-09-13T08:34:49.620Z",
-    "last_login": "2026-09-13T08:34:49.620Z",
+    "last_login": "2026-09-21T23:07:22.379Z",
     "ip": "2a01:cb19:9f5b:5d00:462d:f3:359c:772f",
-    "last_ip": "2a01:cb19:9f5b:5d00:462d:f3:359c:772f"
+    "last_ip": "91.199.84.80"
   },
   {
     "id": "u_1789288731180_853bf238",
@@ -7564,5 +7564,31 @@
     "last_ip": "2a01:e0a:a6c:d240:d263:2827:2e1f:522d",
     "created_at": "2026-09-21T20:00:03.499Z",
     "last_login": "2026-09-21T20:00:03.499Z"
+  },
+  {
+    "id": "u_1790030427786_be2f2353",
+    "username": "Lola33",
+    "password_hash": "2eb73583d570e7a2ed1e3f802ad2428f2fd24a8446091c6eab13397ee853c316ec88423d9803929816879e091fbab16c654c96377ab933cdd743d034ac6ea4e7",
+    "salt": "ed5f4a7ae49d53aae1b92ea16e4c0025",
+    "avatar": "assets/avatars/avatar-10.svg",
+    "role": "user",
+    "banned": false,
+    "ip": "2a01:e34:ec53:8750:a465:4f95:1d4a:1d58",
+    "last_ip": "2a01:e34:ec53:8750:a465:4f95:1d4a:1d58",
+    "created_at": "2026-09-21T22:40:27.786Z",
+    "last_login": "2026-09-21T22:40:27.786Z"
+  },
+  {
+    "id": "u_1790032627099_d7f56c9a",
+    "username": "Gobelean",
+    "password_hash": "560a83b1c825ccfce90693108c23b6e09e877c095ae12e9627ed2bc94c106d4b6bc6be97b6ea1ffb9e2c2be546b63dd94b4cdf89d5ca457d2b49c628b7e02628",
+    "salt": "d93fa32e4bdad21a05c306c512eb3f2d",
+    "avatar": "assets/avatars/avatar-4.svg",
+    "role": "user",
+    "banned": false,
+    "ip": "2a01:e0a:10ab:c5d0:be55:94be:61b9:913f",
+    "last_ip": "2a01:e0a:10ab:c5d0:be55:94be:61b9:913f",
+    "created_at": "2026-09-21T23:17:07.099Z",
+    "last_login": "2026-09-21T23:17:07.099Z"
   }
 ]
