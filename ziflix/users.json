@@ -7707,5 +7707,18 @@
     "last_ip": "2a01:e0a:1089:a7e0:28db:f74d:6ba1:69fe",
     "created_at": "2026-09-22T12:45:15.006Z",
     "last_login": "2026-09-22T12:45:15.006Z"
+  },
+  {
+    "id": "u_1790086611967_da40042d",
+    "username": "peanutt123",
+    "password_hash": "a7eda5a680f829f200291615717efcfe3346deb92dce267b59575f1d0a7b2d51585467dff14199c15136dee35257b4312a703bc1887163fb0196a9fd02aead17",
+    "salt": "652e29ec3c2d4afae5bd4fe455042c1d",
+    "avatar": "assets/avatars/avatar-1.svg",
+    "role": "user",
+    "banned": false,
+    "ip": "2001:4958:3dba:6e01:61e4:8a29:2510:ccd1",
+    "last_ip": "2001:4958:3dba:6e01:61e4:8a29:2510:ccd1",
+    "created_at": "2026-09-22T14:16:51.967Z",
+    "last_login": "2026-09-22T14:16:51.967Z"
   }
 ]

@@ -6056,5 +6056,13 @@
     "role": "user",
     "avatar": "assets/avatars/avatar-1.svg",
     "expires_at": 1792673115012
+  },
+  {
+    "token": "2ce28db81e74a0defb64e3fc06f9a237fe8d945f9ae1dc06af61146350c04f94",
+    "user_id": "u_1790086611967_da40042d",
+    "username": "peanutt123",
+    "role": "user",
+    "avatar": "assets/avatars/avatar-1.svg",
+    "expires_at": 1792678611984
   }
 ]
