@@ -4159,9 +4159,9 @@
     "role": "user",
     "banned": false,
     "created_at": "2026-09-15T16:10:12.541Z",
-    "last_login": "2026-09-15T16:10:12.541Z",
+    "last_login": "2026-09-22T00:23:41.490Z",
     "ip": "2a01:cb20:4109:b500:ddc7:fb50:ac7b:54d1",
-    "last_ip": "2a01:cb20:4109:b500:ddc7:fb50:ac7b:54d1"
+    "last_ip": "2a01:cb20:4109:b500:3049:2fd1:b989:fd63"
   },
   {
     "id": "u_1789488613387_f58b7ea7",
@@ -6543,9 +6543,9 @@
     "role": "user",
     "banned": false,
     "created_at": "2026-09-17T19:46:29.938Z",
-    "last_login": "2026-09-19T01:24:55.319Z",
+    "last_login": "2026-09-21T23:49:31.986Z",
     "ip": "2a09:bac2:5533:191::28:f1",
-    "last_ip": "2a09:bac3:5534:191::28:11e"
+    "last_ip": "2a09:bac3:5535:191::28:180"
   },
   {
     "id": "u_1789674605450_0b03eee2",
@@ -7590,5 +7590,31 @@
     "last_ip": "2a01:e0a:10ab:c5d0:be55:94be:61b9:913f",
     "created_at": "2026-09-21T23:17:07.099Z",
     "last_login": "2026-09-21T23:17:07.099Z"
+  },
+  {
+    "id": "u_1790034346493_fd5a9aca",
+    "username": "clara1510",
+    "password_hash": "cca18a60dd5b6fc6218eef9e8a15f2d1eb8e2a2b81a70cccd6b38052395304e34fa85b53fa3e0513929a3ea67c3ef0d1f010a2f9a41e259990961912b7db53af",
+    "salt": "53deb97b4a3e0245acc5400bc0b687f9",
+    "avatar": "assets/avatars/avatar-4.svg",
+    "role": "user",
+    "banned": false,
+    "ip": "2a01:cb10:223:4300:b483:e63c:512d:39b7",
+    "last_ip": "2a01:cb10:223:4300:b483:e63c:512d:39b7",
+    "created_at": "2026-09-21T23:45:46.493Z",
+    "last_login": "2026-09-21T23:45:46.493Z"
+  },
+  {
+    "id": "u_1790035883510_c31e3274",
+    "username": "nuevebaby",
+    "password_hash": "7b0ae07828aa08264e21676ace74dd0b15db2801bb46e67147773f2bf06ccc257fcf55103e853d7ae5862c8d92dd82229648c424beecc2ead3aafee64bf84736",
+    "salt": "3a70b2a9d9f7e1eb4cf1000184a4dc7d",
+    "avatar": "assets/avatars/avatar-1.svg",
+    "role": "user",
+    "banned": false,
+    "ip": "2a02:8440:9500:1b98:dc77:a78e:4b6f:11d4",
+    "last_ip": "2a02:8440:9500:1b98:dc77:a78e:4b6f:11d4",
+    "created_at": "2026-09-22T00:11:23.510Z",
+    "last_login": "2026-09-22T00:11:23.510Z"
   }
 ]
