@@ -6016,5 +6016,13 @@
     "role": "user",
     "avatar": "assets/avatars/avatar-1.svg",
     "expires_at": 1792657946226
+  },
+  {
+    "token": "c6126203bb22fae534f67c450197570cc25a9903c580e31a732bf5b3d66eab52",
+    "user_id": "u_1789668253896_b08b2447",
+    "username": "Rolande",
+    "role": "user",
+    "avatar": "assets/avatars/avatar-1.svg",
+    "expires_at": 1792665324089
   }
 ]
