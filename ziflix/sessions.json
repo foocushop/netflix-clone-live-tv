@@ -6048,5 +6048,13 @@
     "role": "user",
     "avatar": "assets/avatars/avatar-1.svg",
     "expires_at": 1792671240695
+  },
+  {
+    "token": "54d1812d71b09f7b918fff043f7412c9abb23727c1ecec21227f1d2a7f4e9c64",
+    "user_id": "u_1790081115006_539590bc",
+    "username": "Nad",
+    "role": "user",
+    "avatar": "assets/avatars/avatar-1.svg",
+    "expires_at": 1792673115012
   }
 ]
