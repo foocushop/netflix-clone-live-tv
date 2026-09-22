@@ -6160,5 +6160,13 @@
     "role": "user",
     "avatar": "assets/avatars/avatar-1.svg",
     "expires_at": 1792702706410
+  },
+  {
+    "token": "790fd50d294631ea690a8103f0cd02aa44e2811e69924191f7549c59362f0140",
+    "user_id": "u_1790113728693_43f90982",
+    "username": "Sarah1234",
+    "role": "user",
+    "avatar": "assets/avatars/avatar-1.svg",
+    "expires_at": 1792705728699
   }
 ]
