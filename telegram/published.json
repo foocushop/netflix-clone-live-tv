@@ -184,14 +184,32 @@
       "episode_num": 23,
       "title": "Avant-première - La Villa - Saison 11 Episode 23 du 23 septembre 2026",
       "published_at": "2026-09-18T15:06:00.782Z",
-      "hd_published": false,
-      "sd_published": false,
-      "telegram_msg_id": 195,
-      "telegram_msg_id_hd": null,
-      "telegram_msg_id_sd": null,
+      "hd_published": true,
+      "sd_published": true,
+      "telegram_msg_id": 210,
+      "telegram_msg_id_hd": 210,
+      "telegram_msg_id_sd": 211,
       "telegram_msg_id_tf1": 195,
       "tf1_announced": true,
-      "tf1_announced_at": "2026-09-18T15:06:00.782Z"
+      "tf1_announced_at": "2026-09-18T15:06:00.782Z",
+      "published_at_hd": "2026-09-23T16:57:34.170Z",
+      "file_ref_hd": {
+        "id": "5881935395221937686",
+        "access_hash": "5439453632672980582",
+        "file_reference": "BgAAAACb4XaoAAAA0mq0BP3TFWTyNOGiaCpLMJG+bGAs",
+        "mime_type": "video/mp4",
+        "size": 1098465995,
+        "dc_id": 4
+      },
+      "published_at_sd": "2026-09-23T17:09:29.067Z",
+      "file_ref_sd": {
+        "id": "5881935395221937691",
+        "access_hash": "-7469858747580246231",
+        "file_reference": "BgAAAACb4XaoAAAA02q0B8iqEWBdSKIcuZ3ctiTtWUp8",
+        "mime_type": "video/mp4",
+        "size": 457628042,
+        "dc_id": 4
+      }
     },
     {
       "id": "80628668-3f87-4faa-b488-cb7b5dc47d02",
@@ -682,9 +700,9 @@
       "title": "Les Apprentis Aventuriers (2016) - S09E16 - Épisode 16",
       "published_at": "2026-09-23T16:28:41.992Z",
       "hd_published": true,
-      "sd_published": false,
+      "sd_published": true,
       "telegram_msg_id_hd": 38,
-      "telegram_msg_id_sd": null,
+      "telegram_msg_id_sd": 39,
       "file_ref_hd": {
         "id": "5882181767430938823",
         "access_hash": "-1465097229357089044",
@@ -693,9 +711,17 @@
         "size": 1634069212,
         "dc_id": 4
       },
-      "file_ref_sd": null,
+      "file_ref_sd": {
+        "id": "5882181767430938833",
+        "access_hash": "-6924175090388226224",
+        "file_reference": "BgAAAADk2LnoAAAAJ2q0AW/0Tm7Rv7Ik9B3qRJqLteeV",
+        "mime_type": "video/mp4",
+        "size": 562025857,
+        "dc_id": 4
+      },
       "published_at_hd": "2026-09-23T16:28:41.992Z",
-      "telegram_msg_id": 38
+      "telegram_msg_id": 38,
+      "published_at_sd": "2026-09-23T16:42:23.529Z"
     }
   ],
   "series_test_s1": [

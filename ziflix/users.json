@@ -7941,5 +7941,18 @@
     "last_ip": "41.243.254.89",
     "created_at": "2026-09-23T14:39:44.163Z",
     "last_login": "2026-09-23T14:39:44.163Z"
+  },
+  {
+    "id": "u_1790184650120_88aaa8e3",
+    "username": "Kaout73",
+    "password_hash": "47eb1179f1f24188d303260a31aa1508808a2c860bcdab01bfa8dda52ce4c810087a5652346d183fa355695c77d170bf999465307cd1c0dee255c4b0b99b39d5",
+    "salt": "b1bf4065a9e5b292376ecc8ce81868f9",
+    "avatar": "assets/avatars/avatar-1.svg",
+    "role": "user",
+    "banned": false,
+    "ip": "2a01:cb1e:45:2411:d061:3dd6:31a9:ecc3",
+    "last_ip": "2a01:cb1e:45:2411:d061:3dd6:31a9:ecc3",
+    "created_at": "2026-09-23T17:30:50.120Z",
+    "last_login": "2026-09-23T17:30:50.120Z"
   }
 ]
