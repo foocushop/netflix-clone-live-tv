@@ -6208,5 +6208,13 @@
     "role": "user",
     "avatar": "assets/avatars/avatar-1.svg",
     "expires_at": 1792733174078
+  },
+  {
+    "token": "e18de1b047150376ef7b912a02cb5e3c88312eacfcb848b88a4934d22ea55c64",
+    "user_id": "u_1790151373625_b23015cd",
+    "username": "Lavidaloca",
+    "role": "user",
+    "avatar": "assets/avatars/avatar-2.svg",
+    "expires_at": 1792743373635
   }
 ]

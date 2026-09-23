@@ -7850,5 +7850,18 @@
     "last_ip": "41.202.207.148",
     "created_at": "2026-09-23T04:41:07.026Z",
     "last_login": "2026-09-23T04:41:07.026Z"
+  },
+  {
+    "id": "u_1790151373625_b23015cd",
+    "username": "Lavidaloca",
+    "password_hash": "4d5c87e540faba1506fb5d1b2252886b016648f1bae6c5412c5a03397d73094640a776eb354eb54cfcd561af6229a97e235ec01437ff2a6f674456984cdabac3",
+    "salt": "513b8a88af085e64df9ff46bcabd833e",
+    "avatar": "assets/avatars/avatar-2.svg",
+    "role": "user",
+    "banned": false,
+    "ip": "2.86.221.75",
+    "last_ip": "2.86.221.75",
+    "created_at": "2026-09-23T08:16:13.626Z",
+    "last_login": "2026-09-23T08:16:13.626Z"
   }
 ]
