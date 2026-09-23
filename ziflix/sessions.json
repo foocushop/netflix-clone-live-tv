@@ -6248,5 +6248,13 @@
     "role": "user",
     "avatar": "assets/avatars/avatar-9.svg",
     "expires_at": 1792758675050
+  },
+  {
+    "token": "08f4a46379a006ffaacc21f3f20935ba6bef8d6bc0024487416e15bbc7e1759d",
+    "user_id": "u_1789248472330_c9fd5c5d",
+    "username": "LoloFaya",
+    "role": "user",
+    "avatar": "assets/avatars/avatar-1.svg",
+    "expires_at": 1792759925159
   }
 ]
