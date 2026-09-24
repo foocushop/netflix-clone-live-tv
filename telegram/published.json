@@ -281,9 +281,9 @@
       "title": "La Villa des cœurs brisés (2015) - S11E25 - Episode 25",
       "published_at": "2026-09-24T11:28:12.349Z",
       "hd_published": true,
-      "sd_published": false,
+      "sd_published": true,
       "telegram_msg_id_hd": 212,
-      "telegram_msg_id_sd": null,
+      "telegram_msg_id_sd": 213,
       "file_ref_hd": {
         "id": "5884136205183885997",
         "access_hash": "8819798341847512347",
@@ -292,9 +292,17 @@
         "size": 1719887175,
         "dc_id": 4
       },
-      "file_ref_sd": null,
+      "file_ref_sd": {
+        "id": "5884136205183886008",
+        "access_hash": "4577093780493213752",
+        "file_reference": "BgAAAACb4XaoAAAA1Wq1DOtFaXTXbEhhKriPYBPi9Mw7",
+        "mime_type": "video/mp4",
+        "size": 488110801,
+        "dc_id": 4
+      },
       "published_at_hd": "2026-09-24T11:28:12.349Z",
-      "telegram_msg_id": 212
+      "telegram_msg_id": 212,
+      "published_at_sd": "2026-09-24T11:43:39.270Z"
     }
   ],
   "series_9066_s9": [
