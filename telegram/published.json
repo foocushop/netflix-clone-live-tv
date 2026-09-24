@@ -303,6 +303,35 @@
       "published_at_hd": "2026-09-24T11:28:12.349Z",
       "telegram_msg_id": 212,
       "published_at_sd": "2026-09-24T11:43:39.270Z"
+    },
+    {
+      "id": "485070",
+      "episode_num": 26,
+      "title": "La Villa des cœurs brisés (2015) - S11E26 - Episode 26",
+      "published_at": "2026-09-24T21:13:22.728Z",
+      "hd_published": true,
+      "sd_published": true,
+      "telegram_msg_id_hd": 215,
+      "telegram_msg_id_sd": 216,
+      "file_ref_hd": {
+        "id": "5884136205183886230",
+        "access_hash": "1210384271997029894",
+        "file_reference": "BgAAAACb4XaoAAAA12q1knJMTMaw5wOeB/zyy5sNfAfA",
+        "mime_type": "video/mp4",
+        "size": 1082829149,
+        "dc_id": 4
+      },
+      "file_ref_sd": {
+        "id": "5884136205183886237",
+        "access_hash": "-5281826788384136692",
+        "file_reference": "BgAAAACb4XaoAAAA2Gq1lv8ILexHOGY3jRs3I0huPS4U",
+        "mime_type": "video/mp4",
+        "size": 476344844,
+        "dc_id": 4
+      },
+      "published_at_hd": "2026-09-24T21:13:22.728Z",
+      "telegram_msg_id": 215,
+      "published_at_sd": "2026-09-24T21:32:47.254Z"
     }
   ],
   "series_9066_s9": [
