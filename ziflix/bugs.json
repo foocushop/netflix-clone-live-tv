@@ -1,5 +1,24 @@
 [
   {
+    "id": "bug_1790291556332_1c072c",
+    "user_id": "u_1790207011505_0c361119",
+    "username": "samia",
+    "avatar": "assets/avatars/avatar-9.svg",
+    "category": "playback",
+    "title": "Signalement : Les cinquante (2022) S1E4",
+    "description": "ca charge beaucoup help me please",
+    "media_id": "xtream_series_6717",
+    "media_title": "Les cinquante (2022)",
+    "season": 1,
+    "episode": 4,
+    "episode_id": null,
+    "device_info": "PC Windows • Chrome",
+    "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/153.0.0.0 Safari/537.36",
+    "url": "https://ziablo.xyz/telerealite",
+    "status": "open",
+    "created_at": "2026-09-24T23:12:36.333Z"
+  },
+  {
     "id": "bug_1790282460963_666396",
     "user_id": "u_1789498731772_0390241b",
     "username": "Luciee.m",
