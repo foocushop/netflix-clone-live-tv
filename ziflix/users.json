@@ -8084,5 +8084,18 @@
     "last_ip": "2001:4278:1d:2aaf:1004:8cfa:f8e4:749d",
     "created_at": "2026-09-24T10:43:42.576Z",
     "last_login": "2026-09-24T10:43:42.576Z"
+  },
+  {
+    "id": "u_1790255262299_9528063f",
+    "username": "atem",
+    "password_hash": "28b6a6cd5e692ffe2a3e297a96a15ae049d9e4dfba2730bb90492bff08167e980e44796cd579a979c9c958f1c61a5c09275f11973dee4328d9b6aeae3f728d9a",
+    "salt": "a1f485ed701c0a84fb91183861dc5217",
+    "avatar": "assets/avatars/avatar-1.svg",
+    "role": "user",
+    "banned": false,
+    "ip": "41.231.61.130",
+    "last_ip": "41.231.61.130",
+    "created_at": "2026-09-24T13:07:42.299Z",
+    "last_login": "2026-09-24T13:07:42.299Z"
   }
 ]
