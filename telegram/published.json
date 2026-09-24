@@ -274,6 +274,27 @@
         "size": 421087615,
         "dc_id": 4
       }
+    },
+    {
+      "id": "484893",
+      "episode_num": 25,
+      "title": "La Villa des cœurs brisés (2015) - S11E25 - Episode 25",
+      "published_at": "2026-09-24T11:28:12.349Z",
+      "hd_published": true,
+      "sd_published": false,
+      "telegram_msg_id_hd": 212,
+      "telegram_msg_id_sd": null,
+      "file_ref_hd": {
+        "id": "5884136205183885997",
+        "access_hash": "8819798341847512347",
+        "file_reference": "BgAAAACb4XaoAAAA1Gq1CUy9qcbY8cs0uE1ugmSsOaIn",
+        "mime_type": "video/mp4",
+        "size": 1719887175,
+        "dc_id": 4
+      },
+      "file_ref_sd": null,
+      "published_at_hd": "2026-09-24T11:28:12.349Z",
+      "telegram_msg_id": 212
     }
   ],
   "series_9066_s9": [

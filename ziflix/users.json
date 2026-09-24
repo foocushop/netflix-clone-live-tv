@@ -8071,5 +8071,18 @@
     "last_ip": "41.83.149.185",
     "created_at": "2026-09-24T04:16:11.916Z",
     "last_login": "2026-09-24T04:16:11.916Z"
+  },
+  {
+    "id": "u_1790246622576_e27bf30b",
+    "username": "angi",
+    "password_hash": "9be31f0d633cf6b381830879355dc47152ff86132b47eb51a1ef3138622e7499dc2e7239c3c0bfdadf9e5380c7d6d2575f72ea725e53b496f0ee4e40836b5cc3",
+    "salt": "c43336b634d1cfc5b90c2406fcc4a434",
+    "avatar": "assets/avatars/avatar-1.svg",
+    "role": "user",
+    "banned": false,
+    "ip": "2001:4278:1d:2aaf:1004:8cfa:f8e4:749d",
+    "last_ip": "2001:4278:1d:2aaf:1004:8cfa:f8e4:749d",
+    "created_at": "2026-09-24T10:43:42.576Z",
+    "last_login": "2026-09-24T10:43:42.576Z"
   }
 ]
