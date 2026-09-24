@@ -6544,5 +6544,13 @@
     "role": "user",
     "avatar": "assets/avatars/avatar-1.svg",
     "expires_at": 1792847262306
+  },
+  {
+    "token": "39f2920879a91cabaddb1341bd1e456cdb17655bfc6056add09b51141aa54ebb",
+    "user_id": "u_1789505655862_86f8e7e8",
+    "username": "Aissatou",
+    "role": "user",
+    "avatar": "assets/avatars/avatar-1.svg",
+    "expires_at": 1792849759225
   }
 ]
