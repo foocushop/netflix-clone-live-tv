@@ -7977,9 +7977,9 @@
     "role": "user",
     "banned": false,
     "ip": "2a0d:e487:69f:e83:3090:cc10:3e9:6d94",
-    "last_ip": "2a0d:e487:69f:e83:3090:cc10:3e9:6d94",
+    "last_ip": "2a0d:e487:149e:d9e7:10e7:5e98:9aa8:25a0",
     "created_at": "2026-09-23T17:56:55.844Z",
-    "last_login": "2026-09-23T17:56:55.844Z"
+    "last_login": "2026-09-24T15:19:18.502Z"
   },
   {
     "id": "u_1790187834994_8ed99933",
@@ -8097,5 +8097,18 @@
     "last_ip": "41.231.61.130",
     "created_at": "2026-09-24T13:07:42.299Z",
     "last_login": "2026-09-24T13:07:42.299Z"
+  },
+  {
+    "id": "u_1790263829495_4eb6a9ad",
+    "username": "dada",
+    "password_hash": "85767a0d6d8bacf2c6b501fbb73b00398319037c9e10de667d6ed1572d7f40a7d6401533db577456f07f56443f0f2de77b6f4ed4158b59db6fc77c712e590373",
+    "salt": "f41d2294e69ffffb8adae99e31b1d69c",
+    "avatar": "assets/avatars/avatar-4.svg",
+    "role": "user",
+    "banned": false,
+    "ip": "2001:ac8:25:316:4ed6:4229:8bad:9",
+    "last_ip": "2001:ac8:25:316:4ed6:4229:8bad:9",
+    "created_at": "2026-09-24T15:30:29.495Z",
+    "last_login": "2026-09-24T15:30:29.495Z"
   }
 ]
