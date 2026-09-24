@@ -8045,5 +8045,18 @@
     "last_ip": "2a02:1811:341d:3400:e0f8:2516:bb8:158a",
     "created_at": "2026-09-23T23:43:31.505Z",
     "last_login": "2026-09-23T23:43:31.505Z"
+  },
+  {
+    "id": "u_1790219939373_37ad6e3e",
+    "username": "Add",
+    "password_hash": "0ff878c9fdd9a90b21b9c9c6b139c29e53c8e6d19835e022cd71ea8d9886e80aa4aa681299d7ef8e29834bd283d590b363fbdc2cbaf9cf8ea23f896d99acd0c3",
+    "salt": "bba8de310a5b3218dcf3badae60d199a",
+    "avatar": "assets/avatars/avatar-1.svg",
+    "role": "user",
+    "banned": false,
+    "ip": "2001:4278:1f:cdac:4ddb:6f9c:ae83:4403",
+    "last_ip": "2001:4278:1f:cdac:4ddb:6f9c:ae83:4403",
+    "created_at": "2026-09-24T03:18:59.373Z",
+    "last_login": "2026-09-24T03:18:59.374Z"
   }
 ]
