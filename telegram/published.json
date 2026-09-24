@@ -751,6 +751,35 @@
       "published_at_hd": "2026-09-23T16:28:41.992Z",
       "telegram_msg_id": 38,
       "published_at_sd": "2026-09-23T16:42:23.529Z"
+    },
+    {
+      "id": "485057",
+      "episode_num": 17,
+      "title": "Les Apprentis Aventuriers (2016) - S09E17 - Épisode 17",
+      "published_at": "2026-09-24T18:00:26.753Z",
+      "hd_published": true,
+      "sd_published": true,
+      "telegram_msg_id_hd": 40,
+      "telegram_msg_id_sd": 42,
+      "file_ref_hd": {
+        "id": "5883997043948527407",
+        "access_hash": "5289580213943344880",
+        "file_reference": "BgAAAADk2LnoAAAAKGq1ZToMByjW0+/VV9bTWfVsyGr8",
+        "mime_type": "video/mp4",
+        "size": 1598030592,
+        "dc_id": 4
+      },
+      "file_ref_sd": {
+        "id": "5883997043948527419",
+        "access_hash": "-5913477517808474562",
+        "file_reference": "BgAAAADk2LnoAAAAKmq1aPYcTRXkXF/kFKw/h4s4qutw",
+        "mime_type": "video/mp4",
+        "size": 534759274,
+        "dc_id": 4
+      },
+      "published_at_hd": "2026-09-24T18:00:26.753Z",
+      "telegram_msg_id": 40,
+      "published_at_sd": "2026-09-24T18:16:22.776Z"
     }
   ],
   "series_test_s1": [
