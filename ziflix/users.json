@@ -8110,5 +8110,18 @@
     "last_ip": "2001:ac8:25:316:4ed6:4229:8bad:9",
     "created_at": "2026-09-24T15:30:29.495Z",
     "last_login": "2026-09-24T15:30:29.495Z"
+  },
+  {
+    "id": "u_1790270717069_0af25d66",
+    "username": "Franck908",
+    "password_hash": "c4e9b27b2f2649cde45a979ba8d679ba9f1a5c40c9ee4287f91eaeaeba8e0aadedb5ac4e7fe5cf4f72a9dce28653b243f9ce413ba2669d191b98c55fa8a73508",
+    "salt": "6672132f34e9da24b62c250da2aaa058",
+    "avatar": "assets/avatars/avatar-1.svg",
+    "role": "user",
+    "banned": false,
+    "ip": "102.206.159.211",
+    "last_ip": "102.206.159.211",
+    "created_at": "2026-09-24T17:25:17.069Z",
+    "last_login": "2026-09-24T17:25:17.069Z"
   }
 ]

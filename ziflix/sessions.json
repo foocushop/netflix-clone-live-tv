@@ -6568,5 +6568,13 @@
     "role": "user",
     "avatar": "assets/avatars/avatar-4.svg",
     "expires_at": 1792855829503
+  },
+  {
+    "token": "6416e593116ba870f007d0f47a2f77398fcf6ee6197e1af26e6cb0394211ec34",
+    "user_id": "u_1790270717069_0af25d66",
+    "username": "Franck908",
+    "role": "user",
+    "avatar": "assets/avatars/avatar-1.svg",
+    "expires_at": 1792862717076
   }
 ]
