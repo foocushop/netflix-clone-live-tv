@@ -6520,5 +6520,13 @@
     "role": "user",
     "avatar": "assets/avatars/avatar-1.svg",
     "expires_at": 1792815371925
+  },
+  {
+    "token": "1e16fd2cd77ded92cd0e015d55799ee6212dba644f01749696634f9db7bcd819",
+    "user_id": "u_1789347408215_ff350695",
+    "username": "«Mãe15",
+    "role": "user",
+    "avatar": "assets/avatars/avatar-7.svg",
+    "expires_at": 1792835745989
   }
 ]
