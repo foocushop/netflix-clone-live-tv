@@ -8058,5 +8058,18 @@
     "last_ip": "2001:4278:1f:cdac:4ddb:6f9c:ae83:4403",
     "created_at": "2026-09-24T03:18:59.373Z",
     "last_login": "2026-09-24T03:18:59.374Z"
+  },
+  {
+    "id": "u_1790223371915_196c4640",
+    "username": "Tacha",
+    "password_hash": "1a6e7c508441129b20c152df73214a260c7941bce6df4eb4fc425d57a0443afac75cd1395f71d02bfbf92a5a7cbde13e36cd8e7b2d57040694cf44200faadb7c",
+    "salt": "a67367ccdfe85114435869ea32691a3a",
+    "avatar": "assets/avatars/avatar-1.svg",
+    "role": "user",
+    "banned": false,
+    "ip": "41.83.149.185",
+    "last_ip": "41.83.149.185",
+    "created_at": "2026-09-24T04:16:11.916Z",
+    "last_login": "2026-09-24T04:16:11.916Z"
   }
 ]
