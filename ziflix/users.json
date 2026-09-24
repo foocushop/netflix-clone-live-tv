@@ -3951,7 +3951,7 @@
     "role": "user",
     "banned": false,
     "created_at": "2026-09-15T15:15:47.669Z",
-    "last_login": "2026-09-23T22:23:14.932Z",
+    "last_login": "2026-09-23T23:41:04.641Z",
     "ip": "196.168.116.116",
     "last_ip": "156.38.84.201"
   },
@@ -8019,5 +8019,31 @@
     "last_ip": "2001:4278:1d:2aaf:100c:cf81:37c3:25f3",
     "created_at": "2026-09-23T22:15:14.257Z",
     "last_login": "2026-09-23T22:15:14.257Z"
+  },
+  {
+    "id": "u_1790206870411_773e718a",
+    "username": "Amy diaw niang",
+    "password_hash": "13e8e7900a2ee5e9de5007519f5a1094da539d61f7fbeb1c8221cef994ee09e2160f24dc8564b747edb59c996b4edd79bbb19c92b8aef14293d6e1e4f40860d4",
+    "salt": "b9ce4e188a15ce95cec4ca971a26f447",
+    "avatar": "assets/avatars/avatar-6.svg",
+    "role": "user",
+    "banned": false,
+    "ip": "41.83.138.103",
+    "last_ip": "41.83.138.103",
+    "created_at": "2026-09-23T23:41:10.411Z",
+    "last_login": "2026-09-23T23:41:10.411Z"
+  },
+  {
+    "id": "u_1790207011505_0c361119",
+    "username": "samia",
+    "password_hash": "a1e1385ea441073af933d1596a257f60cca040fcfbdf412e10ca38ac2590aca1e2387fce02a74ff20078f2695930477e109fa984f483ede5279f7d045a8ff487",
+    "salt": "47a227fb36e4bfdcdd150967fe8de4fc",
+    "avatar": "assets/avatars/avatar-9.svg",
+    "role": "user",
+    "banned": false,
+    "ip": "2a02:1811:341d:3400:e0f8:2516:bb8:158a",
+    "last_ip": "2a02:1811:341d:3400:e0f8:2516:bb8:158a",
+    "created_at": "2026-09-23T23:43:31.505Z",
+    "last_login": "2026-09-23T23:43:31.505Z"
   }
 ]
