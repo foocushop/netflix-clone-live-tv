@@ -3626,9 +3626,9 @@
     "role": "user",
     "banned": false,
     "created_at": "2026-09-15T07:43:21.541Z",
-    "last_login": "2026-09-15T07:55:55.303Z",
+    "last_login": "2026-09-25T21:36:04.873Z",
     "ip": "169.159.211.140",
-    "last_ip": "169.159.211.140"
+    "last_ip": "2c0f:e00:6dc:f500:b857:fe2:9b1b:e354"
   },
   {
     "id": "u_1789458375796_7b6e49db",
@@ -10761,6 +10761,36 @@
     "last_ip": "2001:4278:24:3570:fd61:ab3d:ecc2:512b",
     "created_at": "2026-09-25T21:19:59.072Z",
     "last_login": "2026-09-25T21:19:59.072Z",
+    "watch_credit_seconds": 1200,
+    "welcome_seen": false
+  },
+  {
+    "id": "u_1790371977779_54eab48d",
+    "username": "Sisoooo",
+    "password_hash": "d2bfafd5726766f1d38114ab1ac3ca93dfa5fc895791309a876daaa84275f90eb7b1640bea14a7e2d4384e352ea4f7d09ea681e17433cba4649332030a580f58",
+    "salt": "48d29beb2a93abb3c8aa966a81e9e275",
+    "avatar": "assets/avatars/avatar-1.svg",
+    "role": "user",
+    "banned": false,
+    "ip": "102.244.33.24",
+    "last_ip": "102.244.33.24",
+    "created_at": "2026-09-25T21:32:57.780Z",
+    "last_login": "2026-09-25T21:32:57.780Z",
+    "watch_credit_seconds": 1200,
+    "welcome_seen": false
+  },
+  {
+    "id": "u_1790372175414_c3c19f89",
+    "username": "meryemaffiane55@gmail.com",
+    "password_hash": "262c88616cc54d033f2e05717a3d9f75a1678f7548ab2476fde8b5553e6b36a8ce0682c1d05f31994d30dcc02dc40070fbda005079de8f5bd0da896050aa6e49",
+    "salt": "aca4416e22f75ee9ba298bce931919e0",
+    "avatar": "assets/avatars/avatar-1.svg",
+    "role": "user",
+    "banned": false,
+    "ip": "105.101.45.131",
+    "last_ip": "105.101.45.131",
+    "created_at": "2026-09-25T21:36:15.414Z",
+    "last_login": "2026-09-25T21:36:15.414Z",
     "watch_credit_seconds": 1200,
     "welcome_seen": false
   }
