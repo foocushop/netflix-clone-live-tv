@@ -7236,9 +7236,9 @@
     "role": "user",
     "banned": false,
     "ip": "2001:42c0:8150:5800:b5c8:4385:2b50:e584",
-    "last_ip": "2001:42c0:8164:e600:1591:ca15:77b9:388f",
+    "last_ip": "2001:42c0:8164:e600:a4a5:a129:5342:2f19",
     "created_at": "2026-09-19T09:05:59.273Z",
-    "last_login": "2026-09-25T06:28:04.446Z"
+    "last_login": "2026-09-25T16:14:51.968Z"
   },
   {
     "id": "u_1789814009759_e079c487",
@@ -9138,9 +9138,9 @@
     "role": "user",
     "banned": false,
     "ip": "2001:861:e3d8:510:44ff:6179:1af7:504d",
-    "last_ip": "2001:861:e3d8:510:44ff:6179:1af7:504d",
+    "last_ip": "2a01:e0a:a2d:5d20:e49e:4468:7045:b43a",
     "created_at": "2026-09-24T20:37:44.480Z",
-    "last_login": "2026-09-24T21:21:09.392Z",
+    "last_login": "2026-09-25T16:26:50.144Z",
     "watch_credit_seconds": 1200,
     "welcome_seen": false
   },
@@ -10371,6 +10371,21 @@
     "last_ip": "2a01:cb08:82df:9500:b449:5d9:7c13:b973",
     "created_at": "2026-09-25T15:22:42.199Z",
     "last_login": "2026-09-25T15:22:42.199Z",
+    "watch_credit_seconds": 1200,
+    "welcome_seen": false
+  },
+  {
+    "id": "u_1790353086144_ca606183",
+    "username": "Amandine16",
+    "password_hash": "a80b5b5738e1c58314b1017ca054a34d7ac6a520c7bb113792586e3016686d9f1695987238759c1875e318f591610d8dd347ee0e905c7ca72f43f253356541f0",
+    "salt": "6c772b8421e158ee34f67d90b797bd7d",
+    "avatar": "assets/avatars/avatar-1.svg",
+    "role": "user",
+    "banned": false,
+    "ip": "109.128.194.117",
+    "last_ip": "109.128.194.117",
+    "created_at": "2026-09-25T16:18:06.144Z",
+    "last_login": "2026-09-25T16:18:06.144Z",
     "watch_credit_seconds": 1200,
     "welcome_seen": false
   }
