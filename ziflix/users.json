@@ -774,9 +774,9 @@
     "role": "user",
     "banned": false,
     "created_at": "2026-09-12T22:39:52.634Z",
-    "last_login": "2026-09-14T13:47:22.890Z",
+    "last_login": "2026-09-25T19:56:13.352Z",
     "ip": "2a01:e0a:a2d:5d20:2161:3871:8dc0:6125",
-    "last_ip": "2a01:e0a:a2d:5d20:2161:3871:8dc0:6125"
+    "last_ip": "2a01:e0a:a2d:5d20:183f:317d:42e:e395"
   },
   {
     "id": "u_1789254943636_e8d76557",
@@ -1021,9 +1021,9 @@
     "role": "user",
     "banned": false,
     "created_at": "2026-09-13T08:34:49.620Z",
-    "last_login": "2026-09-25T14:39:18.557Z",
+    "last_login": "2026-09-25T20:29:40.435Z",
     "ip": "2a01:cb19:9f5b:5d00:462d:f3:359c:772f",
-    "last_ip": "2a04:cec0:10f6:ec0f:0:1d:8b61:5501"
+    "last_ip": "2a04:cec0:10e5:1fb:0:21:1f82:7d01"
   },
   {
     "id": "u_1789288731180_853bf238",
@@ -3665,9 +3665,9 @@
     "role": "user",
     "banned": false,
     "created_at": "2026-09-15T07:54:29.824Z",
-    "last_login": "2026-09-24T19:37:58.286Z",
+    "last_login": "2026-09-25T20:20:06.556Z",
     "ip": "2a01:e0a:1076:8bb0:49a6:6112:899c:8145",
-    "last_ip": "2a01:e0a:1076:8bb0:79b8:cdfc:aa6d:77ef"
+    "last_ip": "2a0d:e487:45f:69ea:dd93:ef0e:a8:e8c6"
   },
   {
     "id": "u_1789458871928_f79a6798",
@@ -8486,7 +8486,7 @@
     "ip": "154.124.58.15",
     "last_ip": "154.124.58.15",
     "created_at": "2026-09-24T18:38:14.127Z",
-    "last_login": "2026-09-24T18:38:44.924Z"
+    "last_login": "2026-09-25T20:31:58.738Z"
   },
   {
     "id": "u_1790275132735_801e1dda",
@@ -9138,9 +9138,9 @@
     "role": "user",
     "banned": false,
     "ip": "2001:861:e3d8:510:44ff:6179:1af7:504d",
-    "last_ip": "2001:861:e3d8:510:188f:e5ba:fa32:913",
+    "last_ip": "2001:861:e3d8:510:a4e6:4815:e309:82a9",
     "created_at": "2026-09-24T20:37:44.480Z",
-    "last_login": "2026-09-25T19:30:16.321Z",
+    "last_login": "2026-09-25T20:03:04.268Z",
     "watch_credit_seconds": 1200,
     "welcome_seen": false
   },
@@ -10536,6 +10536,111 @@
     "last_ip": "2a02:a03f:c330:7200:7714:1aac:d06d:e2a2",
     "created_at": "2026-09-25T19:36:47.283Z",
     "last_login": "2026-09-25T19:36:47.283Z",
+    "watch_credit_seconds": 1200,
+    "welcome_seen": false
+  },
+  {
+    "id": "u_1790365508693_e904fb71",
+    "username": "vanessaraz",
+    "password_hash": "d9859229d50256ecdccf737460f4b45215fa4dff6dc680e527422a4835b23af302137deb6925018b76db1a7bd05d7eb79881794e8621fc1e15cff2999a47613b",
+    "salt": "fb6014bea079ced68821e81740c8a1a5",
+    "avatar": "assets/avatars/avatar-1.svg",
+    "role": "user",
+    "banned": false,
+    "ip": "2a01:cb06:804f:925b:95fd:4c4f:5a30:d306",
+    "last_ip": "2a01:cb06:804f:925b:95fd:4c4f:5a30:d306",
+    "created_at": "2026-09-25T19:45:08.694Z",
+    "last_login": "2026-09-25T19:45:08.694Z",
+    "watch_credit_seconds": 1200,
+    "welcome_seen": false
+  },
+  {
+    "id": "u_1790366586322_08d1c29a",
+    "username": "angelicacetoute",
+    "password_hash": "4f8534ba25edb475f67aad5290790d38d6b7df4638d29710acb5bf6934634b82466c3927405c6e4e2746b1fd07cfbf7d3cb8cedf3701927803085cc536f14c0d",
+    "salt": "af79cf69a6cdc6fdd094735c997d283d",
+    "avatar": "assets/avatars/avatar-1.svg",
+    "role": "user",
+    "banned": false,
+    "ip": "198.200.86.3",
+    "last_ip": "198.200.86.3",
+    "created_at": "2026-09-25T20:03:06.322Z",
+    "last_login": "2026-09-25T20:03:06.322Z",
+    "watch_credit_seconds": 1200,
+    "welcome_seen": false
+  },
+  {
+    "id": "u_1790366786308_787fb0ee",
+    "username": "Loyce, lolo",
+    "password_hash": "a61428d4d87351f8ee99c675b6dd3d92055f6389b5b8dcaec49255998f74e2a0b28b961fd3fb373e40bbb976e19b3c01fe4a54c6d12d236d7553da66b02b59f5",
+    "salt": "d978a17e030533d4ef18dd4ed44e8f84",
+    "avatar": "assets/avatars/avatar-1.svg",
+    "role": "user",
+    "banned": false,
+    "ip": "102.129.81.45",
+    "last_ip": "102.129.81.45",
+    "created_at": "2026-09-25T20:06:26.308Z",
+    "last_login": "2026-09-25T20:06:26.308Z",
+    "watch_credit_seconds": 1200,
+    "welcome_seen": false
+  },
+  {
+    "id": "u_1790366865672_f04a25a1",
+    "username": "Myaar",
+    "password_hash": "ff6de430387022d0cd554ab4cc57956540473533500d12d8db2ccabde7a52543249d52748225a32b13a73d3ddf8e0e1b078d3f1f7539419bd736773d776050ab",
+    "salt": "c2049c65336de54c1d2f0847e0323ffd",
+    "avatar": "assets/avatars/avatar-1.svg",
+    "role": "user",
+    "banned": false,
+    "ip": "2605:59c0:5f34:f508:d133:96bb:4039:d3b3",
+    "last_ip": "2605:59c0:5f34:f508:d133:96bb:4039:d3b3",
+    "created_at": "2026-09-25T20:07:45.672Z",
+    "last_login": "2026-09-25T20:07:45.672Z",
+    "watch_credit_seconds": 1200,
+    "welcome_seen": false
+  },
+  {
+    "id": "u_1790367516704_4721eb20",
+    "username": "frahsarah45@gmail.com",
+    "password_hash": "1292eba833ef85f85b713f31f148e7546b645081e935f0614b46c6b61236803ba12cb79a1ceb100d54b74190edc8f9c3c656dd3ff559d51e6efb076bc3d39299",
+    "salt": "37a5dd8b3457dc53f308c9ee7f354ab4",
+    "avatar": "assets/avatars/avatar-1.svg",
+    "role": "user",
+    "banned": false,
+    "ip": "41.108.86.204",
+    "last_ip": "41.108.86.204",
+    "created_at": "2026-09-25T20:18:36.704Z",
+    "last_login": "2026-09-25T20:18:36.704Z",
+    "watch_credit_seconds": 1200,
+    "welcome_seen": false
+  },
+  {
+    "id": "u_1790368546992_8cbc5b20",
+    "username": "lil",
+    "password_hash": "786b11681b2bca6cd42729269c8aacdab99a1840690a62a38ea08d486308be484817016f0e42fee62c5e24a9534509d90c70e00ff71e178726530b4cd110c848",
+    "salt": "259d3f7c199e9783035287502db7ff22",
+    "avatar": "assets/avatars/avatar-7.svg",
+    "role": "user",
+    "banned": false,
+    "ip": "2a0d:e487:124f:741a:35a0:274c:89b5:30a5",
+    "last_ip": "2a0d:e487:124f:741a:35a0:274c:89b5:30a5",
+    "created_at": "2026-09-25T20:35:46.992Z",
+    "last_login": "2026-09-25T20:35:46.992Z",
+    "watch_credit_seconds": 1200,
+    "welcome_seen": false
+  },
+  {
+    "id": "u_1790368653834_5fc83b2d",
+    "username": "Dija",
+    "password_hash": "fd64a3c323654d0a05ae76b637ee8d60e022627bfdbf5a03a8de5ff6b87bdfeba371ec9f56a0c16594d54f01c704da939708c39142a60009844987439918fa45",
+    "salt": "d02a617a973b09b28ea2e436ad4fb837",
+    "avatar": "assets/avatars/avatar-1.svg",
+    "role": "user",
+    "banned": false,
+    "ip": "41.214.3.188",
+    "last_ip": "41.214.3.188",
+    "created_at": "2026-09-25T20:37:33.834Z",
+    "last_login": "2026-09-25T20:37:33.834Z",
     "watch_credit_seconds": 1200,
     "welcome_seen": false
   }
