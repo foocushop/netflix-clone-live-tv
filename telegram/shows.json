@@ -10,7 +10,8 @@
     "enabled": true,
     "source_priority": "foxbleu",
     "tf1_program_slug": "la-villa-des-coeurs-brises",
-    "tf1_channel_slug": "tfx"
+    "tf1_channel_slug": "tfx",
+    "delayed_release": true
   },
   {
     "id": "series_9066_s9",
@@ -21,6 +22,7 @@
     "template": "<b>{titre}</b> {emoji} Saison {saison}\n\nÉpisode {episode}",
     "channel_id": "-1003839408616",
     "enabled": true,
-    "source_priority": "foxbleu"
+    "source_priority": "foxbleu",
+    "delayed_release": true
   }
 ]
