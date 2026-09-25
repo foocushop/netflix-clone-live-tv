@@ -464,9 +464,9 @@
     "role": "user",
     "banned": false,
     "created_at": "2026-09-12T20:08:35.158Z",
-    "last_login": "2026-09-14T21:04:02.324Z",
+    "last_login": "2026-09-25T16:40:11.456Z",
     "ip": "154.254.58.130",
-    "last_ip": "154.254.58.130"
+    "last_ip": "105.107.184.224"
   },
   {
     "id": "u_1789243792846_f6a02592",
@@ -7834,9 +7834,9 @@
     "role": "user",
     "banned": false,
     "ip": "2a0d:e487:128f:159a:84ca:494e:110e:2e3c",
-    "last_ip": "2a0d:e487:128f:159a:84ca:494e:110e:2e3c",
+    "last_ip": "176.183.185.39",
     "created_at": "2026-09-23T03:49:54.993Z",
-    "last_login": "2026-09-23T03:49:54.993Z"
+    "last_login": "2026-09-25T16:56:09.851Z"
   },
   {
     "id": "u_1790138467026_dfddcb4f",
@@ -9138,9 +9138,9 @@
     "role": "user",
     "banned": false,
     "ip": "2001:861:e3d8:510:44ff:6179:1af7:504d",
-    "last_ip": "2a01:e0a:a2d:5d20:e49e:4468:7045:b43a",
+    "last_ip": "2001:861:e3d8:510:188f:e5ba:fa32:913",
     "created_at": "2026-09-24T20:37:44.480Z",
-    "last_login": "2026-09-25T16:26:50.144Z",
+    "last_login": "2026-09-25T16:47:26.591Z",
     "watch_credit_seconds": 1200,
     "welcome_seen": false
   },
@@ -10386,6 +10386,21 @@
     "last_ip": "109.128.194.117",
     "created_at": "2026-09-25T16:18:06.144Z",
     "last_login": "2026-09-25T16:18:06.144Z",
+    "watch_credit_seconds": 1200,
+    "welcome_seen": false
+  },
+  {
+    "id": "u_1790355307049_09869645",
+    "username": "francoissabiche",
+    "password_hash": "85d4266e3f6ac3f19762b8de8dbcc2023351e9530d59d0149422f92d5d2ee0add0eaf5df2930a999de25d93d0f3c11cdea28abf16814317250050e8c3ec031a0",
+    "salt": "7d477d6d7e0ac03c195b2c8e74f1dceb",
+    "avatar": "assets/avatars/avatar-1.svg",
+    "role": "user",
+    "banned": false,
+    "ip": "2a01:cb08:82c8:1900:5c09:f136:37b2:2613",
+    "last_ip": "2a01:cb08:82c8:1900:5c09:f136:37b2:2613",
+    "created_at": "2026-09-25T16:55:07.049Z",
+    "last_login": "2026-09-25T16:55:07.049Z",
     "watch_credit_seconds": 1200,
     "welcome_seen": false
   }
