@@ -3951,9 +3951,9 @@
     "role": "user",
     "banned": false,
     "created_at": "2026-09-15T15:15:47.669Z",
-    "last_login": "2026-09-25T23:41:57.377Z",
+    "last_login": "2026-09-26T18:37:35.741Z",
     "ip": "196.168.116.116",
-    "last_ip": "156.38.84.201"
+    "last_ip": "2c0f:f0f8:201:6700:5a9:e3f2:5fbf:a002"
   },
   {
     "id": "u_1789485497175_51adfaa6",
@@ -4692,9 +4692,9 @@
     "role": "user",
     "banned": false,
     "created_at": "2026-09-15T18:39:05.378Z",
-    "last_login": "2026-09-21T20:02:33.951Z",
+    "last_login": "2026-09-26T18:39:12.541Z",
     "ip": "2a01:e0a:cae:90d0:64d2:13d1:246f:1fe7",
-    "last_ip": "2a01:e0a:cae:90d0:85a:5829:edab:be73"
+    "last_ip": "2a01:e0a:cae:90d0:804b:410e:fb4c:5891"
   },
   {
     "id": "u_1789497686212_baccebfc",
@@ -11331,6 +11331,51 @@
     "last_ip": "2605:b100:d41:6b36:801:c936:8936:6e1",
     "created_at": "2026-09-26T18:29:34.970Z",
     "last_login": "2026-09-26T18:29:34.970Z",
+    "watch_credit_seconds": 1200,
+    "welcome_seen": false
+  },
+  {
+    "id": "u_1790447911928_f20fc323",
+    "username": "Sam28",
+    "password_hash": "63b2637eb8bcb60867a5e5f20e322e1273fe5815b9036a58884a6d72c8639a192d92ca3dc31c6385e3cd336a0d4752c4f3175c826ed6435962f07712c238885a",
+    "salt": "3f3fd2b6aa18b0411f460635d3e8b669",
+    "avatar": "assets/avatars/avatar-3.svg",
+    "role": "user",
+    "banned": false,
+    "ip": "41.208.141.30",
+    "last_ip": "41.208.141.30",
+    "created_at": "2026-09-26T18:38:31.928Z",
+    "last_login": "2026-09-26T18:38:31.928Z",
+    "watch_credit_seconds": 1200,
+    "welcome_seen": false
+  },
+  {
+    "id": "u_1790448978830_f59b7133",
+    "username": "Wendd",
+    "password_hash": "3d87eba405581ee636501eb8312c54e22aa4433f885c8167cfcfc71912bab94d5ea6ed0b30247545bc4c57a02863b2e8fc133e813afb106ba756946fb94fc13b",
+    "salt": "c63ef310a0c73290cb7ce77709f9f732",
+    "avatar": "assets/avatars/avatar-1.svg",
+    "role": "user",
+    "banned": false,
+    "ip": "129.0.205.109",
+    "last_ip": "129.0.205.109",
+    "created_at": "2026-09-26T18:56:18.830Z",
+    "last_login": "2026-09-26T18:56:18.830Z",
+    "watch_credit_seconds": 1200,
+    "welcome_seen": false
+  },
+  {
+    "id": "u_1790451199901_dddfc03a",
+    "username": "Sarah33555363",
+    "password_hash": "158f46a4afe457bd28c4302cc82e75adf08c39d8adf6b3c11254668599d9ef407799f4912c494a5c3da7b32f7192dc00e6a728782dd470b9485782b8d123b1d3",
+    "salt": "6c128535c9c992a576be299edd262195",
+    "avatar": "assets/avatars/avatar-1.svg",
+    "role": "user",
+    "banned": false,
+    "ip": "102.129.82.245",
+    "last_ip": "102.129.82.245",
+    "created_at": "2026-09-26T19:33:19.901Z",
+    "last_login": "2026-09-26T19:33:19.901Z",
     "watch_credit_seconds": 1200,
     "welcome_seen": false
   }
