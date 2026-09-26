@@ -8912,5 +8912,13 @@
     "role": "user",
     "avatar": "assets/avatars/avatar-9.svg",
     "expires_at": 1792971717384
+  },
+  {
+    "token": "4b8bb1f19019b10d5296fa854637f3b11d9bcff14bc2ac4bfe0f1afbd196abb0",
+    "user_id": "u_1790297338050_c3eadbfb",
+    "username": "gabe418qc",
+    "role": "user",
+    "avatar": "assets/avatars/avatar-3.svg",
+    "expires_at": 1792977642307
   }
 ]
