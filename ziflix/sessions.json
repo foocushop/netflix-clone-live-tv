@@ -9010,14 +9010,6 @@
     "expires_at": 1793024283937
   },
   {
-    "token": "7eadcaf442d11a203d0431a6c0487f83aaedc919ce50d82425ee37d69637e6c5",
-    "user_id": "u_1789311667862_dacf0880",
-    "username": "fffbdfb",
-    "role": "premium",
-    "avatar": "assets/avatars/avatar-1.svg",
-    "expires_at": 1793024736484
-  },
-  {
     "token": "dd0135f66dd341ec8b147b4abaf70678feb6bc58e7dd241ab55ef904b31d88f4",
     "user_id": "u_1790433126779_1cb28e16",
     "username": "Loulou",
@@ -9032,5 +9024,29 @@
     "role": "premium",
     "avatar": "assets/avatars/avatar-1.svg",
     "expires_at": 1793027934652
+  },
+  {
+    "token": "f97065f419e505f16d2264fcc863d1b335707db8215caaf47de30c3cac786138",
+    "user_id": "u_1789320689632_f001f73c",
+    "username": "dvff",
+    "role": "user",
+    "avatar": "assets/avatars/avatar-1.svg",
+    "expires_at": 1793029740735
+  },
+  {
+    "token": "0e9de459faebde6457947bd2f3b2236664c3291597a401670aad87680b079ba8",
+    "user_id": "u_admin",
+    "username": "admin",
+    "role": "admin",
+    "avatar": "assets/avatars/avatar-1.svg",
+    "expires_at": 1793029773424
+  },
+  {
+    "token": "25a2cee6b040a936f0f452a1ec86509554fa922bb5784ce19a888e1f5282efa9",
+    "user_id": "u_1790438957619_02f57481",
+    "username": "qwerty123",
+    "role": "user",
+    "avatar": "assets/avatars/avatar-1.svg",
+    "expires_at": 1793030957627
   }
 ]
