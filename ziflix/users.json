@@ -10415,7 +10415,7 @@
     "ip": "85.90.17.189",
     "last_ip": "85.90.17.189",
     "created_at": "2026-09-25T18:28:24.490Z",
-    "last_login": "2026-09-25T18:28:24.490Z",
+    "last_login": "2026-09-26T12:42:42.644Z",
     "watch_credit_seconds": 1200,
     "welcome_seen": false
   },
@@ -11136,6 +11136,36 @@
     "last_ip": "2a01:e0a:907:cd10:e5c3:9cd:65e:4316",
     "created_at": "2026-09-26T11:43:32.227Z",
     "last_login": "2026-09-26T11:43:32.227Z",
+    "watch_credit_seconds": 1200,
+    "welcome_seen": false
+  },
+  {
+    "id": "u_1790426730263_142c9874",
+    "username": "Lovely touf",
+    "password_hash": "87b79a95cb132ac4f3bc68a860bb3a7025204ab9334589ea74f7740b029c75b6694a8afe86e27921688b773ac1b5eb10e1c36a8fae030e872a7edf098a877f29",
+    "salt": "24fc961b11f8f35d4b97a79dca5569ac",
+    "avatar": "assets/avatars/avatar-1.svg",
+    "role": "user",
+    "banned": false,
+    "ip": "41.82.177.34",
+    "last_ip": "41.82.177.34",
+    "created_at": "2026-09-26T12:45:30.263Z",
+    "last_login": "2026-09-26T12:45:30.263Z",
+    "watch_credit_seconds": 1200,
+    "welcome_seen": false
+  },
+  {
+    "id": "u_1790429087164_b1811dfd",
+    "username": "magicienmechant",
+    "password_hash": "7ab739a402daf7b891c24c6d6e8af01371c6486d4bc72584bef581c31b81e3569a9fd4472f49d8b900a894eae82555600716f688ca462825ef0444c64390a52e",
+    "salt": "f0e6a450a3a85d5e8a3437cafb05431f",
+    "avatar": "assets/avatars/avatar-3.svg",
+    "role": "user",
+    "banned": false,
+    "ip": "102.129.75.9",
+    "last_ip": "102.129.75.9",
+    "created_at": "2026-09-26T13:24:47.164Z",
+    "last_login": "2026-09-26T13:24:47.164Z",
     "watch_credit_seconds": 1200,
     "welcome_seen": false
   }
