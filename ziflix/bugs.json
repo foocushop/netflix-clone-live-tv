@@ -1,5 +1,24 @@
 [
   {
+    "id": "bug_1790423255577_038e51",
+    "user_id": "u_1790423012227_982fe2d5",
+    "username": "Ghoud7",
+    "avatar": "assets/avatars/avatar-2.svg",
+    "category": "other",
+    "title": "Signalement : American Horror Story (2011) S13E1",
+    "description": "Série en anglais",
+    "media_id": "xtream_series_106",
+    "media_title": "American Horror Story (2011)",
+    "season": 13,
+    "episode": 1,
+    "episode_id": null,
+    "device_info": "iPhone (iOS) • Safari",
+    "user_agent": "Mozilla/5.0 (iPhone; CPU iPhone OS 18_7 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/26.5.2 Mobile/15E148 Safari/604.1",
+    "url": "https://www.ziablo.xyz/",
+    "status": "open",
+    "created_at": "2026-09-26T11:47:35.577Z"
+  },
+  {
     "id": "bug_1790384129040_f186aa",
     "user_id": "u_1789498731772_0390241b",
     "username": "Luciee.m",
