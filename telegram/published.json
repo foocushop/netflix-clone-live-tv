@@ -332,6 +332,35 @@
       "published_at_hd": "2026-09-24T21:13:22.728Z",
       "telegram_msg_id": 215,
       "published_at_sd": "2026-09-24T21:32:47.254Z"
+    },
+    {
+      "id": "485470",
+      "episode_num": 27,
+      "title": "La Villa des cœurs brisés (2015) - S11E27 - Episode 27",
+      "published_at": "2026-09-25T23:38:21.453Z",
+      "hd_published": true,
+      "sd_published": true,
+      "telegram_msg_id_hd": 221,
+      "telegram_msg_id_sd": 222,
+      "file_ref_hd": {
+        "id": "5888974649051587971",
+        "access_hash": "-5203068145332515593",
+        "file_reference": "BgAAAACb4XaoAAAA3Wq3Be1fI20kkz1Yd6w9IK0YAlIL",
+        "mime_type": "video/x-matroska",
+        "size": 1060202934,
+        "dc_id": 4
+      },
+      "file_ref_sd": {
+        "id": "5888974649051587973",
+        "access_hash": "8039689811155065953",
+        "file_reference": "BgAAAACb4XaoAAAA3mq3BkjJadZ7CVSEPAOvrqw7ctAC",
+        "mime_type": "video/mp4",
+        "size": 426575908,
+        "dc_id": 4
+      },
+      "published_at_hd": "2026-09-25T23:38:21.453Z",
+      "telegram_msg_id": 221,
+      "published_at_sd": "2026-09-25T23:39:52.680Z"
     }
   ],
   "series_9066_s9": [
