@@ -653,7 +653,7 @@
     "username": "ok.",
     "password_hash": "f1365abe3edbf54c62e7fe14acb5b426126741d0fd0b81e30f709308512d83d9b56dcccb0a1c7f55b62966a85e6c58237894ad5889dccb3748debbd80f74ab79",
     "salt": "c6e113a30a102eab492da105caa1fd1a",
-    "avatar": "assets/avatars/avatar-1.svg",
+    "avatar": "assets/avatars/avatar-2.svg",
     "role": "user",
     "banned": false,
     "created_at": "2026-09-12T21:36:08.705Z",
@@ -11091,6 +11091,21 @@
     "last_ip": "2c0f:ecf0:5c5:e000:34c2:12f8:6f66:5b37",
     "created_at": "2026-09-25T23:09:59.236Z",
     "last_login": "2026-09-25T23:09:59.236Z",
+    "watch_credit_seconds": 1200,
+    "welcome_seen": false
+  },
+  {
+    "id": "u_1790393408043_581a2b28",
+    "username": "KetsiaM",
+    "password_hash": "92d9381efead0cc5902247b8cb0b715ce96a24d86b7d7cd4a1741eac0a734be9cf32d5fe6f6ea26ba10249a3528c60f90af9a91b23f24bc688f17fb4f47d7bca",
+    "salt": "a39f4cdc3e803d20adfb39e12b81bc57",
+    "avatar": "assets/avatars/avatar-1.svg",
+    "role": "user",
+    "banned": false,
+    "ip": "2600:100f:b214:7f6a:692d:e020:18d7:9255",
+    "last_ip": "2600:100f:b214:7f6a:692d:e020:18d7:9255",
+    "created_at": "2026-09-26T03:30:08.043Z",
+    "last_login": "2026-09-26T03:30:08.043Z",
     "watch_credit_seconds": 1200,
     "welcome_seen": false
   }
