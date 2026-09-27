@@ -9768,9 +9768,9 @@
     "role": "user",
     "banned": false,
     "ip": "41.82.174.214",
-    "last_ip": "41.82.174.214",
+    "last_ip": "41.82.174.192",
     "created_at": "2026-09-25T01:59:43.773Z",
-    "last_login": "2026-09-25T01:59:43.773Z",
+    "last_login": "2026-09-27T14:59:10.189Z",
     "watch_credit_seconds": 1200,
     "welcome_seen": false
   },
@@ -11483,5 +11483,34 @@
     "last_login": "2026-09-27T13:02:28.921Z",
     "watch_credit_seconds": 1200,
     "welcome_seen": false
+  },
+  {
+    "id": "u_1790520612472_437d5b03",
+    "username": "mhdak47",
+    "password_hash": "f47238b0ebd194c0047c475c4a53dfbd7c013b793d11aaddcd1b301aff809643580ea172414d471c040bb1b9121c1ea23afb5727e0f27a3f92bbde63f66d918e",
+    "salt": "3718c862907ae42d643917bc67edd7d2",
+    "avatar": "assets/avatars/avatar-1.svg",
+    "role": "user",
+    "banned": false,
+    "ip": "105.109.89.85",
+    "last_ip": "105.109.89.85",
+    "created_at": "2026-09-27T14:50:12.472Z",
+    "last_login": "2026-09-27T14:50:12.472Z",
+    "watch_credit_seconds": 1200,
+    "welcome_seen": false
+  },
+  {
+    "id": "tg_5514712683",
+    "telegram_id": "5514712683",
+    "username": "GrandJD",
+    "first_name": "GrandJD",
+    "last_name": "",
+    "avatar": "https://t.me/i/userpic/320/dtvcmczh3iOJfUR8WX0vp7Z2AhmvAId2kJlWZLBaJTTu8SBEZ6qapRu23kd-95D5.svg",
+    "role": "user",
+    "banned": false,
+    "created_at": "2026-09-27T14:46:08.109Z",
+    "last_login": "2026-09-27T14:47:36.041Z",
+    "ip": "127.0.0.1",
+    "last_ip": "2001:4278:28:a837:294f:8a20:269d:dd03"
   }
 ]
