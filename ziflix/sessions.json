@@ -9018,14 +9018,6 @@
     "expires_at": 1793025126792
   },
   {
-    "token": "5b203889feca7b247f1f4cf4f9fbd7cc8b1567184bb7a5cb3f363825cfa78aae",
-    "user_id": "u_1789311549836_20fcd33e",
-    "username": "hdhdj",
-    "role": "premium",
-    "avatar": "assets/avatars/avatar-1.svg",
-    "expires_at": 1793027934652
-  },
-  {
     "token": "f97065f419e505f16d2264fcc863d1b335707db8215caaf47de30c3cac786138",
     "user_id": "u_1789320689632_f001f73c",
     "username": "dvff",
@@ -9232,5 +9224,21 @@
     "role": "user",
     "avatar": "assets/avatars/avatar-2.svg",
     "expires_at": 1793056741615
+  },
+  {
+    "token": "a1bcba0b38053dc81e2f7f10140ff2b831e75234a60cb067d9e9884242b11f06",
+    "user_id": "u_1790469740396_64b2700b",
+    "username": "Yamina_93300@outlook.fr",
+    "role": "user",
+    "avatar": "assets/avatars/avatar-1.svg",
+    "expires_at": 1793061740436
+  },
+  {
+    "token": "9498c8f46633979957ec259bfc4f3927e8bd169ef7ff358a57171a171da9739f",
+    "user_id": "u_admin",
+    "username": "admin",
+    "role": "admin",
+    "avatar": "assets/avatars/avatar-1.svg",
+    "expires_at": 1793064448267
   }
 ]

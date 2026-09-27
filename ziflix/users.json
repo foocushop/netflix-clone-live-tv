@@ -8,9 +8,9 @@
     "role": "admin",
     "banned": false,
     "created_at": "2026-09-12T00:18:32.081Z",
-    "last_login": "2026-09-26T15:49:33.378Z",
+    "last_login": "2026-09-27T01:27:28.258Z",
     "is_premium": true,
-    "last_ip": "2001:4278:17:436f:6589:9da1:79fd:5f06",
+    "last_ip": "41.208.137.219",
     "ip": "2001:4278:19:1293:c4e1:d8d8:aa15:a9fc"
   },
   {
@@ -11436,6 +11436,21 @@
     "last_ip": "71.162.175.250",
     "created_at": "2026-09-26T23:19:01.557Z",
     "last_login": "2026-09-26T23:19:01.557Z",
+    "watch_credit_seconds": 1200,
+    "welcome_seen": false
+  },
+  {
+    "id": "u_1790469740396_64b2700b",
+    "username": "Yamina_93300@outlook.fr",
+    "password_hash": "5d131d511a570242c1dabdd3fb95116e092b398b7109c733d55de8c81f040ae543361a81d0f5df965542cff56b4bbabd194cd8292a6eacc8ec699f79a8409a3f",
+    "salt": "43eed0a10ffda45fea988f3d29367a63",
+    "avatar": "assets/avatars/avatar-1.svg",
+    "role": "user",
+    "banned": false,
+    "ip": "129.45.15.206",
+    "last_ip": "129.45.15.206",
+    "created_at": "2026-09-27T00:42:20.396Z",
+    "last_login": "2026-09-27T00:42:20.396Z",
     "watch_credit_seconds": 1200,
     "welcome_seen": false
   }
