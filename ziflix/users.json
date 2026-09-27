@@ -11468,5 +11468,20 @@
     "last_login": "2026-09-27T10:58:18.012Z",
     "watch_credit_seconds": 1200,
     "welcome_seen": false
+  },
+  {
+    "id": "u_1790514148921_d7cbe550",
+    "username": "moha1998",
+    "password_hash": "d1f0dc38f029949f6cd1d0eb4002386aa4c2b3e4aab5ad17bdf1c9b6bacebedada035de4e4c9cf76df646f612f5c3636136454e789428eea9b88a888eef5c211",
+    "salt": "6cd4b4cbb85cd2e9b4f5b1022b0a4598",
+    "avatar": "assets/avatars/avatar-1.svg",
+    "role": "user",
+    "banned": false,
+    "ip": "102.164.189.113",
+    "last_ip": "102.164.189.113",
+    "created_at": "2026-09-27T13:02:28.921Z",
+    "last_login": "2026-09-27T13:02:28.921Z",
+    "watch_credit_seconds": 1200,
+    "welcome_seen": false
   }
 ]
