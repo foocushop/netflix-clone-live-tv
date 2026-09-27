@@ -5904,7 +5904,7 @@
     "created_at": "2026-09-16T19:14:11.751Z",
     "last_login": "2026-09-16T19:14:11.751Z",
     "ip": "2001:4278:19:654d:5585:8f34:fc43:1af8",
-    "last_ip": "2001:4278:19:654d:5585:8f34:fc43:1af8"
+    "last_ip": "2001:4278:28:7300:70ab:c423:4586:d7c6"
   },
   {
     "id": "u_1789586901628_0de71113",
@@ -9768,9 +9768,9 @@
     "role": "user",
     "banned": false,
     "ip": "41.82.174.214",
-    "last_ip": "41.82.174.192",
+    "last_ip": "41.82.174.214",
     "created_at": "2026-09-25T01:59:43.773Z",
-    "last_login": "2026-09-27T14:59:10.189Z",
+    "last_login": "2026-09-25T01:59:43.773Z",
     "watch_credit_seconds": 1200,
     "welcome_seen": false
   },
@@ -11509,8 +11509,37 @@
     "role": "user",
     "banned": false,
     "created_at": "2026-09-27T14:46:08.109Z",
-    "last_login": "2026-09-27T14:47:36.041Z",
+    "last_login": "2026-09-27T15:56:28.541Z",
     "ip": "127.0.0.1",
     "last_ip": "2001:4278:28:a837:294f:8a20:269d:dd03"
+  },
+  {
+    "id": "u_1790524530950_6bedf647",
+    "username": "aksasmehdi62@gmail.com",
+    "password_hash": "f4d1eeafe9f7479397f5c7972afb93235567037284bf15fa6b00b22530214ac4a820547822838255329a1f2f0433a14c72b26e5e33f34a9ab03784bd528f8ac4",
+    "salt": "5d9cccf9af7ad4f8b6ea372505a81f52",
+    "avatar": "assets/avatars/avatar-1.svg",
+    "role": "user",
+    "banned": false,
+    "ip": "105.109.89.85",
+    "last_ip": "105.109.89.85",
+    "created_at": "2026-09-27T15:55:30.950Z",
+    "last_login": "2026-09-27T15:55:30.950Z",
+    "watch_credit_seconds": 1200,
+    "welcome_seen": false
+  },
+  {
+    "id": "tg_1661892692",
+    "telegram_id": "1661892692",
+    "username": "Gankpai",
+    "first_name": "M8🇫🇷Gako",
+    "last_name": "",
+    "avatar": "https://t.me/i/userpic/320/1XKaPpCsOCNFZx6z7NowiXrD5xGpaanQNhiPZARYqU8.svg",
+    "role": "user",
+    "banned": false,
+    "created_at": "2026-09-27T15:24:55.301Z",
+    "last_login": "2026-09-27T15:24:55.301Z",
+    "ip": "41.208.137.219",
+    "last_ip": "41.208.137.219"
   }
 ]
