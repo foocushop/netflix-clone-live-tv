@@ -9240,5 +9240,13 @@
     "role": "admin",
     "avatar": "assets/avatars/avatar-1.svg",
     "expires_at": 1793064448267
+  },
+  {
+    "token": "e7dde4c85c1af978d40d162665f0a43e9076bec9e481ac05271e86443e431dc0",
+    "user_id": "u_1790338913234_a35c958d",
+    "username": "Serenakck",
+    "role": "user",
+    "avatar": "assets/avatars/avatar-1.svg",
+    "expires_at": 1793090473363
   }
 ]
