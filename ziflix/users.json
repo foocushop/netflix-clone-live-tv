@@ -7236,9 +7236,9 @@
     "role": "user",
     "banned": false,
     "ip": "2001:42c0:8150:5800:b5c8:4385:2b50:e584",
-    "last_ip": "2001:42c0:8159:7c00:6d25:eefc:bdd9:56d3",
+    "last_ip": "2001:42c0:811f:7400:d080:b3ee:f952:4a4",
     "created_at": "2026-09-19T09:05:59.273Z",
-    "last_login": "2026-09-26T23:08:06.403Z"
+    "last_login": "2026-09-28T23:21:58.074Z"
   },
   {
     "id": "u_1789814009759_e079c487",
@@ -10565,7 +10565,7 @@
     "ip": "198.200.86.3",
     "last_ip": "198.200.86.3",
     "created_at": "2026-09-25T20:03:06.322Z",
-    "last_login": "2026-09-25T20:03:06.322Z",
+    "last_login": "2026-09-28T23:50:57.730Z",
     "watch_credit_seconds": 1200,
     "welcome_seen": false
   },
@@ -20656,6 +20656,21 @@
     "last_ip": "2605:59ca:8263:6800:344c:bea0:f8c:f87a",
     "created_at": "2026-09-28T22:13:11.591Z",
     "last_login": "2026-09-28T22:15:05.731Z",
+    "watch_credit_seconds": 1200,
+    "welcome_seen": false
+  },
+  {
+    "id": "u_1790637397836_de07cbd3",
+    "username": "Bigss1",
+    "password_hash": "5bfac5157d5c450f8f34e8fe88d720d297c10eca97e6ee272aac13165dec965ca0a37d9479e0f8e4aa94cce56ec5a925842c3d382954ec5f9ccfe3a40a45f160",
+    "salt": "af80c48419b2c760bd158995c39b5980",
+    "avatar": "assets/avatars/avatar-1.svg",
+    "role": "user",
+    "banned": false,
+    "ip": "154.124.71.162",
+    "last_ip": "154.124.71.162",
+    "created_at": "2026-09-28T23:16:37.836Z",
+    "last_login": "2026-09-28T23:16:37.836Z",
     "watch_credit_seconds": 1200,
     "welcome_seen": false
   }
