@@ -67,11 +67,14 @@ export async function handleStream(request, env, ctx) {
   }
 
   // 3. Construction de l'URL initiale Xtream Codes (inconnue du client)
-  const upstreamUrl = `http://${host}:${port}/${streamType}/${encodeURIComponent(user)}/${encodeURIComponent(pass)}/${streamId}.${extension}`;
+  const isHttps = port == 443 || String(host).startsWith('https://');
+  const cleanHost = String(host).replace(/^https?:\/\//, '');
+  const portPart = (port == 80 || port == 443) ? '' : `:${port}`;
+  const upstreamUrl = `${isHttps ? 'https' : 'http'}://${cleanHost}${portPart}/${streamType}/${encodeURIComponent(user)}/${encodeURIComponent(pass)}/${streamId}.${extension}`;
 
   // 4. Préparation des en-têtes à transmettre
   const upstreamHeaders = new Headers();
-  upstreamHeaders.set('User-Agent', 'IPTVSmartersPro/1.0.0 (Linux; Android 12)');
+  upstreamHeaders.set('User-Agent', 'VLC/3.0.18 LibVLC/3.0.18');
   upstreamHeaders.set('Accept', '*/*');
 
   // Transmission transparente du Range s'il est fourni par le lecteur client

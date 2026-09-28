@@ -18,10 +18,10 @@ LOG_LEVEL = "info"
 
 [[kv_namespaces]]
 binding = "CATALOG_KV"
-id = "ziflix_catalog_kv"
-preview_id = "ziflix_catalog_kv_preview"
+id = "92f6da25e1d7408fa5d666ae8fccf453"
+preview_id = "8eec76f36dbe455385a29bfbac8db3ab"
 
 [[kv_namespaces]]
 binding = "SERIES_CACHE"
-id = "ziflix_series_cache"
-preview_id = "ziflix_series_cache_preview"
+id = "a9ae6e8c6a574b2cb197eb9122fb3391"
+preview_id = "9c2fc6bb85b6417baf0efa2a945ea80f"
