@@ -25,17 +25,31 @@ export async function handleCatalog(request, env, ctx) {
       catalogData = await env.CATALOG_KV.get('catalog', { type: 'json' });
     }
 
-    // 2. Si non présent en KV, charger le catalogue statique intégré ou fallback
+    // 2. Si non présent en KV, tenter le fallback vers le catalogue statique Pages
     if (!catalogData) {
-      // Structure par défaut ou proxy vers l'origine
-      catalogData = {
-        categories: [
-          { id: 'c_top_regardes', name: 'Nouveautés & Les Plus Regardés', slug: 'top-regardes' },
-          { id: 'c_trends', name: 'Tendances actuelles', slug: 'tendances' },
-          { id: 'c_series', name: 'Séries & Épisodes', slug: 'series' }
-        ],
-        movies: []
-      };
+      try {
+        const staticCatalogUrl = `${url.origin}/data/catalog.json`;
+        const staticRes = await fetch(staticCatalogUrl, { signal: request.signal });
+        if (staticRes.ok) {
+          catalogData = await staticRes.json();
+          if (env.CATALOG_KV && catalogData && ctx && typeof ctx.waitUntil === 'function') {
+            ctx.waitUntil(env.CATALOG_KV.put('catalog', JSON.stringify(catalogData), { expirationTtl: 86400 }));
+          }
+        }
+      } catch (staticErr) {
+        secureLog.warn('Échec du fallback catalogue statique', staticErr, env);
+      }
+
+      if (!catalogData) {
+        catalogData = {
+          categories: [
+            { id: 'c_top_regardes', name: 'Nouveautés & Les Plus Regardés', slug: 'top-regardes' },
+            { id: 'c_trends', name: 'Tendances actuelles', slug: 'tendances' },
+            { id: 'c_series', name: 'Séries & Épisodes', slug: 'series' }
+          ],
+          movies: []
+        };
+      }
     }
 
     let items = catalogData.movies || [];

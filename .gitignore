@@ -28,3 +28,4 @@ data/cache_xmltv.xml.gz
 target/
 *.exe
 data/xtream_users.json
+static/data/
