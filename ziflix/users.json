@@ -6020,9 +6020,9 @@
     "role": "user",
     "banned": false,
     "created_at": "2026-09-16T21:59:42.020Z",
-    "last_login": "2026-09-18T21:02:23.532Z",
+    "last_login": "2026-09-28T10:45:51.338Z",
     "ip": "41.223.118.38",
-    "last_ip": "41.216.87.46"
+    "last_ip": "45.215.234.107"
   },
   {
     "id": "u_1789598750554_63bbb87e",
@@ -17792,6 +17792,21 @@
     "last_ip": "41.216.86.45",
     "created_at": "2026-09-28T09:57:32.030Z",
     "last_login": "2026-09-28T09:57:32.030Z",
+    "watch_credit_seconds": 1200,
+    "welcome_seen": false
+  },
+  {
+    "id": "u_1790592210115_dca2da39",
+    "username": "Zahrah210",
+    "password_hash": "0983a66c6e2ba495f8bf33adde3f70d4b48946685f4fd91ac7cbbdb94f84a85bdbe67b536e543f4c00043bc4f1553f654cbbc134dd8cc32b3a778fcb7b234769",
+    "salt": "fa989574747510ce36fd43fa3d1e10c2",
+    "avatar": "assets/avatars/avatar-1.svg",
+    "role": "user",
+    "banned": false,
+    "ip": "105.235.158.41",
+    "last_ip": "105.235.158.41",
+    "created_at": "2026-09-28T10:43:30.115Z",
+    "last_login": "2026-09-28T10:43:30.115Z",
     "watch_credit_seconds": 1200,
     "welcome_seen": false
   }

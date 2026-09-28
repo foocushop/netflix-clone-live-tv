@@ -9456,5 +9456,21 @@
     "role": "user",
     "avatar": "assets/avatars/avatar-1.svg",
     "expires_at": 1793181452134
+  },
+  {
+    "token": "4fa6e0acae56ba8894d9744c7c40a4cc9beff2582931106ae2af815da6b6ee19",
+    "user_id": "u_1790592210115_dca2da39",
+    "username": "Zahrah210",
+    "role": "user",
+    "avatar": "assets/avatars/avatar-1.svg",
+    "expires_at": 1793184210153
+  },
+  {
+    "token": "6597ceaaa9b118d875388bd8c1c83b17a48ebc327a336ff812b3bae1e4ebf2d0",
+    "user_id": "u_1789595982020_f64fc25c",
+    "username": "rachelmukasa08@gmail.com",
+    "role": "user",
+    "avatar": "assets/avatars/avatar-1.svg",
+    "expires_at": 1793184351383
   }
 ]
