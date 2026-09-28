@@ -5291,9 +5291,9 @@
     "role": "user",
     "banned": false,
     "created_at": "2026-09-15T21:04:21.091Z",
-    "last_login": "2026-09-15T21:04:21.091Z",
+    "last_login": "2026-09-28T18:13:40.390Z",
     "ip": "2a02:1210:6e1f:4700:c11d:cd9b:d87e:8cc7",
-    "last_ip": "2a02:1210:6e1f:4700:c11d:cd9b:d87e:8cc7"
+    "last_ip": "2a02:1210:6e1f:4700:edca:8b2d:94ab:a5a3"
   },
   {
     "id": "u_1789506765958_bc209179",
@@ -19422,5 +19422,20 @@
     "last_login": "2026-09-28T16:33:31.912Z",
     "ip": "2001:4278:22:afb8:9d01:b07b:460:8d1f",
     "last_ip": "2001:4278:22:afb8:9d01:b07b:460:8d1f"
+  },
+  {
+    "id": "u_1790617117921_3c32cc5c",
+    "username": "Samiaaaa98",
+    "password_hash": "6351aec5b3bc515cbdfbd4bcc69b8233dae9a4b895d5ddf101cff7759652498ea2e5805541e72e373a3cd70567e691a19edad5daee552182304e2fe89c09c377",
+    "salt": "252798b71768a3a7dced9ec9bf0240b3",
+    "avatar": "assets/avatars/avatar-1.svg",
+    "role": "user",
+    "banned": false,
+    "ip": "2a02:9130:fd16:4be8:75d1:4036:1153:ff49",
+    "last_ip": "2a02:9130:fd16:4be8:75d1:4036:1153:ff49",
+    "created_at": "2026-09-28T17:38:37.921Z",
+    "last_login": "2026-09-28T17:38:37.921Z",
+    "watch_credit_seconds": 1200,
+    "welcome_seen": false
   }
 ]
