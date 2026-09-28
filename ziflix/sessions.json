@@ -9488,5 +9488,13 @@
     "role": "user",
     "avatar": "assets/avatars/avatar-1.svg",
     "expires_at": 1793200061987
+  },
+  {
+    "token": "b66c385f233c8613338b94ba5fe237cf39d0459803dbd67c6b57782d040b1d6e",
+    "user_id": "u_1790610440981_600c4a33",
+    "username": "dan97",
+    "role": "user",
+    "avatar": "assets/avatars/avatar-1.svg",
+    "expires_at": 1793202441034
   }
 ]
