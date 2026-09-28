@@ -1,0 +1,46 @@
+[
+  {
+    "id": 9066,
+    "series_id": 9066,
+    "title": "Les Apprentis Aventuriers",
+    "name": "Les Apprentis Aventuriers (2016)",
+    "cover": "https://image.tmdb.org/t/p/w600_and_h900_bestv2/pWS1TD3VGHRZx9u3B9iInmPGAlR.jpg",
+    "backdrop": "assets/shows/apprentis_s9_banner.jpg",
+    "emoji": "",
+    "enabled": true,
+    "order": 1
+  },
+  {
+    "id": 6715,
+    "series_id": 6715,
+    "title": "La Villa des Cœurs Brisés",
+    "name": "La Villa des Cœurs Brisés (2015)",
+    "cover": "https://image.tmdb.org/t/p/w600_and_h900_bestv2/dbpKVXkOk35HYq0Q731ZnMvmcfF.jpg",
+    "backdrop": "assets/shows/villa_s11_banner.jpg",
+    "emoji": "",
+    "enabled": true,
+    "order": 2
+  },
+  {
+    "id": 5572,
+    "series_id": 5572,
+    "title": "Koh-Lanta",
+    "name": "Koh-Lanta (2001)",
+    "cover": "https://image.tmdb.org/t/p/w600_and_h900_bestv2/wP2UMXAQrQBKVEyIlcKG4AMYRyz.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/7mJAZW29Yi09vqNdRVYC1nfj10z.jpg",
+    "emoji": "",
+    "enabled": true,
+    "order": 3
+  },
+  {
+    "id": 6717,
+    "series_id": 6717,
+    "title": "Les Cinquante",
+    "name": "Les cinquante (2022)",
+    "cover": "https://image.tmdb.org/t/p/w600_and_h900_bestv2/3qUdS94KmIt0TSKQ1BJXqclzbGx.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/tcC8sfJqOoiWnmPYKTvJqebVkMQ.jpg",
+    "emoji": "",
+    "enabled": true,
+    "order": 4
+  }
+]

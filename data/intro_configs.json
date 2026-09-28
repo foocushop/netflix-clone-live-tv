@@ -1,0 +1,17 @@
+{
+  "configs": [
+    {
+      "id": "intro_68628_11",
+      "media_id": "68628",
+      "media_title": "La Villa des Cœurs Brisés",
+      "media_type": "series",
+      "season_number": 11,
+      "intro_start": 0,
+      "intro_end": 90,
+      "formatted_start": "00:00",
+      "formatted_end": "01:30",
+      "auto_skip": false,
+      "updated_at": "2026-09-24T17:00:22.973Z"
+    }
+  ]
+}

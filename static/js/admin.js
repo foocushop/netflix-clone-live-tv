@@ -46,6 +46,9 @@ class NetflixAdmin {
     this.adminCommentsList = document.getElementById('adminCommentsList');
     this.adminCommentsCount = document.getElementById('adminCommentsCount');
     this.adminUsersRefreshBtn = document.getElementById('adminUsersRefreshBtn');
+    this.adminSecurityAlertsList = document.getElementById('adminSecurityAlertsList');
+    this.adminSecurityAlertsCount = document.getElementById('adminSecurityAlertsCount');
+    this.adminSecurityRefreshBtn = document.getElementById('adminSecurityRefreshBtn');
 
     // Signalements de Bugs ZIFLIX
     this.adminBugsTableBody = document.getElementById('adminBugsTableBody');
@@ -62,6 +65,8 @@ class NetflixAdmin {
 
     this.initEvents();
     this.initVidmolyEvents();
+    this.initTmaEvents();
+    this.initIntroEvents();
   }
 
   getAuthPassword() {
@@ -250,11 +255,19 @@ class NetflixAdmin {
       this.xtreamUsersRefreshBtn.addEventListener('click', () => this.loadXtreamUsers(true));
     }
 
+    if (this.adminSecurityRefreshBtn) {
+      this.adminSecurityRefreshBtn.addEventListener('click', () => {
+        this.loadSecurityAlerts();
+        this.showToast('🛡️ Alertes de sécurité actualisées');
+      });
+    }
+
     if (this.adminUsersRefreshBtn) {
       this.adminUsersRefreshBtn.addEventListener('click', () => {
         this.loadCommunityUsers();
         this.loadCommunityComments();
         this.loadReportedBugs();
+        this.loadSecurityAlerts();
         this.showToast('👥 Modération actualisée');
       });
     }
@@ -305,9 +318,13 @@ class NetflixAdmin {
     this.loadCommunityUsers();
     this.loadCommunityComments();
     this.loadReportedBugs();
+    this.loadSecurityAlerts();
     this.startClusterPolling();
     this.loadVidmolyStatus();
+    this.loadTmaRealityShows();
     this.loadVidmolySeries();
+    this.loadIntroConfigs();
+    this.populateIntroMediaSelect();
   }
 
   openAuthModal() {
@@ -461,6 +478,8 @@ class NetflixAdmin {
         this.allMovies = json.data;
         this.updateCounts();
         this.applyFilters();
+        this.populateIntroMediaSelect();
+        this.loadIntroConfigs();
       }
     } catch (e) {
       console.error('Erreur chargement catalogue admin', e);
@@ -1430,6 +1449,112 @@ class NetflixAdmin {
   }
 
   // ================= MODÉRATION COMMUNAUTÉ & UTILISATEURS ZIFLIX =================
+
+  // ================= BOUCLIER ANTI-TROLL & AUTO-BANNISSEMENTS IP =================
+  async loadSecurityAlerts() {
+    if (!this.adminSecurityAlertsList) return;
+    try {
+      const headers = this.getAdminHeaders();
+      const res = await fetch('/api/admin/security/alerts', { headers });
+      const json = await res.json();
+      if (json.success && Array.isArray(json.alerts)) {
+        if (this.adminSecurityAlertsCount) {
+          this.adminSecurityAlertsCount.textContent = json.alerts.length;
+        }
+        if (json.alerts.length === 0) {
+          this.adminSecurityAlertsList.innerHTML = '<div style="color: #888; font-size: 0.8rem; font-style: italic; padding: 12px; text-align: center; background: rgba(0,0,0,0.2); border-radius: 6px;">🛡️ Aucune tentative malveillante détectée. Le bouclier anti-troll veille en continu.</div>';
+          return;
+        }
+        this.adminSecurityAlertsList.innerHTML = '';
+        json.alerts.forEach(alert => {
+          const item = document.createElement('div');
+          item.style.cssText = 'background: rgba(18,18,18,0.75); border: 1px solid rgba(229,9,20,0.35); border-radius: 8px; padding: 10px 14px; display: flex; justify-content: space-between; align-items: center; gap: 12px; font-size: 0.82rem; transition: background 0.15s ease;';
+          
+          const isBanned = alert.status === 'banned';
+          const timeStr = alert.timestamp ? new Date(alert.timestamp).toLocaleString('fr-FR', { dateStyle: 'short', timeStyle: 'short' }) : '-';
+          const safeName = this.escapeHtml(alert.attempted_name || 'Inconnu');
+          const safeIp = this.escapeHtml(alert.ip || '');
+          const safeSubnet = alert.subnet ? this.escapeHtml(alert.subnet) : '';
+          const safeReason = this.escapeHtml(alert.reason || alert.category || 'Tentative hostile');
+          
+          item.innerHTML = `
+            <div style="display: flex; flex-direction: column; gap: 4px; flex: 1; min-width: 0;">
+              <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
+                <span style="color: #ff4444; font-size: 0.95rem;">🚫</span>
+                <strong style="color: #ff5555; font-size: 0.84rem; letter-spacing: 0.2px;">Ce nom-là a été banni avec cette adresse IP :</strong>
+                <span style="color: #fff; background: rgba(229,9,20,0.25); border: 1px solid rgba(229,9,20,0.5); padding: 2px 8px; border-radius: 4px; font-family: monospace; font-weight: 700; font-size: 0.84rem;">${safeName}</span>
+                <span style="color: #bbb;">avec l'adresse IP :</span>
+                <span style="color: #ff9999; font-family: monospace; font-weight: 600; background: rgba(0,0,0,0.6); padding: 2px 7px; border-radius: 4px; border: 1px solid rgba(255,255,255,0.12);">${safeIp}</span>
+                ${safeSubnet ? `<span style="color: #888; font-size: 0.72rem;">(Sous-réseau: ${safeSubnet})</span>` : ''}
+              </div>
+              <div style="display: flex; align-items: center; gap: 10px; font-size: 0.74rem; color: #888; flex-wrap: wrap;">
+                <span>🕒 ${timeStr}</span>
+                <span>• Motif: <em style="color: #ddd;">${safeReason}</em></span>
+                <span style="padding: 1px 7px; border-radius: 3px; font-weight: 700; font-size: 0.68rem; ${isBanned ? 'background: rgba(229,9,20,0.3); color: #ff6666; border: 1px solid rgba(229,9,20,0.5);' : 'background: rgba(46,204,113,0.2); color: #2ecc71; border: 1px solid rgba(46,204,113,0.4);'}">
+                  ${isBanned ? '🚫 IP Bloquée' : '✅ IP Débannie'}
+                </span>
+              </div>
+            </div>
+            <div style="display: flex; gap: 8px; align-items: center; flex-shrink: 0;">
+              ${isBanned ? `
+                <button type="button" class="btn-admin btn-admin-secondary btn-sm" style="font-size: 0.72rem; padding: 4px 10px; background: rgba(255,255,255,0.08); border-color: rgba(255,255,255,0.2);" onclick="window.netflixAdmin.unbanIpFromAlert('${safeIp}', '${alert.id}')" title="Débannir cette adresse IP">
+                  🔓 Débannir IP
+                </button>
+              ` : ''}
+              <button type="button" class="btn-admin btn-admin-secondary btn-sm" style="font-size: 0.72rem; padding: 4px 8px; color: #888; background: transparent; border-color: rgba(255,255,255,0.1);" onclick="window.netflixAdmin.clearSecurityAlert('${alert.id}')" title="Masquer l'alerte">
+                🗑️
+              </button>
+            </div>
+          `;
+          this.adminSecurityAlertsList.appendChild(item);
+        });
+      }
+    } catch (e) {
+      console.error('Erreur chargement alertes sécurité:', e);
+    }
+  }
+
+  async unbanIpFromAlert(ip, alertId) {
+    if (!confirm(`Confirmer le débannissement de l'adresse IP ${ip} ?`)) return;
+    try {
+      const headers = this.getAdminHeaders();
+      headers['Content-Type'] = 'application/json';
+      const res = await fetch('/api/admin/security/unban-ip', {
+        method: 'POST',
+        headers,
+        body: JSON.stringify({ ip, alertId })
+      });
+      const json = await res.json();
+      if (json.success) {
+        this.showToast(`✅ Adresse IP ${ip} débannie`);
+        this.loadSecurityAlerts();
+      } else {
+        this.showToast(json.error || 'Erreur lors du débannissement', true);
+      }
+    } catch (e) {
+      this.showToast('Erreur réseau', true);
+    }
+  }
+
+  async clearSecurityAlert(alertId) {
+    try {
+      const headers = this.getAdminHeaders();
+      headers['Content-Type'] = 'application/json';
+      const res = await fetch('/api/admin/security/clear-alert', {
+        method: 'POST',
+        headers,
+        body: JSON.stringify({ alertId })
+      });
+      const json = await res.json();
+      if (json.success) {
+        this.loadSecurityAlerts();
+      }
+    } catch (e) {
+      this.showToast('Erreur réseau', true);
+    }
+  }
+
+
   getAdminHeaders() {
     const headers = { 'Content-Type': 'application/json' };
     const token = localStorage.getItem('ziflix_auth_token');
@@ -1606,7 +1731,7 @@ class NetflixAdmin {
             <div style="font-size: 0.68rem; color: #666;">${c.createdAt ? new Date(c.createdAt).toLocaleString('fr-FR') : ''}</div>
           `;
           item.querySelector('.ban-comment-user-btn')?.addEventListener('click', async () => {
-            await this.banCommentUserAdmin(c.id, c.userId || c.user_id, c.username, c.ip);
+            await this.banCommentUser(c.id, c.userId || c.user_id, c.username, c.ip);
           });
           item.querySelector('.delete-comment-btn')?.addEventListener('click', async () => {
             await this.deleteCommentAdmin(c.id);
@@ -1794,8 +1919,10 @@ class NetflixAdmin {
         try {
           const seasons = JSON.parse(selectedOpt.dataset.seasons || '[]');
           seasonSelect.innerHTML = seasons.map(s => `<option value="${s}">Saison ${s}</option>`).join('');
-          if (seasons.includes('10')) seasonSelect.value = '10';
-          else if (seasons.length > 0) seasonSelect.value = seasons[seasons.length - 1];
+          if (seasons.length > 0) {
+            const sorted = seasons.slice().sort((a, b) => parseInt(a, 10) - parseInt(b, 10));
+            seasonSelect.value = sorted[sorted.length - 1];
+          }
           this.updateVidmolyAutoPublishUI();
           this.loadVidmolyEpisodes();
         } catch (e) {}
@@ -1922,10 +2049,9 @@ class NetflixAdmin {
       if (firstReality) {
         select.value = firstReality.series_id;
         seasonSelect.innerHTML = firstReality.seasons.map(s => `<option value="${s}">Saison ${s}</option>`).join('');
-        if (firstReality.seasons.includes('10')) {
-          seasonSelect.value = '10';
-        } else if (firstReality.seasons.length > 0) {
-          seasonSelect.value = firstReality.seasons[firstReality.seasons.length - 1];
+        if (firstReality.seasons.length > 0) {
+          const sorted = firstReality.seasons.slice().sort((a, b) => parseInt(a, 10) - parseInt(b, 10));
+          seasonSelect.value = sorted[sorted.length - 1];
         }
         this.loadVidmolyEpisodes();
       }
@@ -1957,6 +2083,17 @@ class NetflixAdmin {
     const seasonSelect = document.getElementById('vidmolySeasonSelect');
     const btn = document.getElementById('vidmolyToggleAutoPublishBtn');
     const badge = document.getElementById('vidmolyAutoPublishBadge');
+    const summaryContainer = document.getElementById('vidmolyActiveAutoPubSummary');
+
+    const rules = this._autoPublishRules || {};
+    if (summaryContainer) {
+      const activeList = Object.values(rules).filter(r => r && r.enabled);
+      if (activeList.length === 0) {
+        summaryContainer.innerHTML = '<span style="color: #aaa; font-size: 0.8rem; font-style: italic;">Aucune saison en auto-publication</span>';
+      } else {
+        summaryContainer.innerHTML = activeList.map(r => `<span style="background: rgba(46,125,50,0.25); border: 1px solid rgba(129,199,132,0.4); color: #81c784; padding: 2px 8px; border-radius: 10px; font-size: 0.75rem; font-weight: 700;">🟢 ${this.escapeHtml(r.seriesTitle || 'Série')} S${r.season}</span>`).join(' ');
+      }
+    }
 
     const seriesId = seriesSelect?.value;
     const season = seasonSelect?.value;
@@ -1977,29 +2114,28 @@ class NetflixAdmin {
     }
 
     const ruleKey = `${seriesId}_${season}`;
-    const rules = this._autoPublishRules || {};
     const rule = rules[ruleKey];
     const isEnabled = !!(rule && rule.enabled);
 
     if (btn) {
       btn.disabled = false;
       if (isEnabled) {
-        btn.textContent = '✅ Auto-pub ACTIVE — Désactiver';
+        btn.textContent = `✅ Auto-pub ACTIVE pour S${season} — Désactiver`;
         btn.style.background = '#2e7d32';
         btn.style.color = '#fff';
       } else {
-        btn.textContent = '⚙️ Activer l\'auto-publication';
+        btn.textContent = `⚡ Activer l'auto-publication pour S${season}`;
         btn.style.background = '#b71c1c';
         btn.style.color = '#fff';
       }
     }
     if (badge) {
       if (isEnabled) {
-        badge.textContent = '🟢 AUTO-PUB ACTIVE';
+        badge.textContent = `🟢 AUTO-PUB ACTIVE (S${season})`;
         badge.style.background = 'rgba(46,125,50,0.25)';
         badge.style.color = '#81c784';
       } else {
-        badge.textContent = '⛔ Auto-pub inactive';
+        badge.textContent = `⛔ Auto-pub inactive (S${season})`;
         badge.style.background = 'rgba(255,255,255,0.07)';
         badge.style.color = '#aaa';
       }
@@ -2040,7 +2176,7 @@ class NetflixAdmin {
         const msg = newEnabled
           ? `✅ Auto-publication activée pour la Saison ${season} de ${seriesTitle}.`
           : `⛔ Auto-publication désactivée pour la Saison ${season}.`;
-        this.showAdminToast(msg);
+        this.showToast(msg);
       } else {
         alert('Erreur : ' + (data.error || 'Erreur inconnue'));
       }
@@ -2120,12 +2256,22 @@ class NetflixAdmin {
             isDuplicate = true;
           } else if (v.status === 'converting' || v.status === 'uploading') {
             badge = '<span style="background: #f57f17; color: #fff; padding: 4px 10px; border-radius: 4px; font-size: 0.75rem; font-weight: 700; display: inline-block;">🟡 En cours d\'encodage</span>';
-            action = '<span style="color: #ffb74d; font-size: 0.8rem; font-weight: 500;">Traitement Cloud Vidmoly...</span>';
+            const embedHref = v.fileCode ? `https://vidmoly.org/embed-${v.fileCode}.html` : ((v.embedUrl || '').replace(/vidmoly\.(me|biz|net|to)/g, 'vidmoly.org').replace(/embed-embed-/g, 'embed-'));
+            if (embedHref) {
+              action = `<a href="${embedHref}" target="_blank" style="color: #ffb74d; text-decoration: none; font-size: 0.8rem; font-weight: 600;">🔗 Voir embed (Encodage)</a>`;
+            } else {
+              action = '<span style="color: #ffb74d; font-size: 0.8rem; font-weight: 500;">Traitement Cloud Vidmoly...</span>';
+            }
             isDuplicate = true;
             hasActiveTransfers = true;
           } else if (v.status === 'sending') {
             badge = '<span style="background: #e65100; color: #fff; padding: 4px 10px; border-radius: 4px; font-size: 0.75rem; font-weight: 700; display: inline-block;">🟠 En cours d\'envoi sur le serveur Vidmoly</span>';
-            action = '<span style="color: #ff9800; font-size: 0.8rem; font-weight: 500;">Transfert vers Vidmoly...</span>';
+            const embedHref = v.fileCode ? `https://vidmoly.org/embed-${v.fileCode}.html` : '';
+            if (embedHref) {
+              action = `<a href="${embedHref}" target="_blank" style="color: #ff9800; text-decoration: none; font-size: 0.8rem; font-weight: 600;">🔗 Voir embed (Envoi)</a>`;
+            } else {
+              action = '<span style="color: #ff9800; font-size: 0.8rem; font-weight: 500;">Transfert vers Vidmoly...</span>';
+            }
             isDuplicate = true;
             hasActiveTransfers = true;
           } else if (v.status === 'downloading') {
@@ -2142,7 +2288,12 @@ class NetflixAdmin {
             hasActiveTransfers = true;
           } else if (v.status === 'queued') {
             badge = '<span style="background: #4a148c; color: #fff; padding: 4px 10px; border-radius: 4px; font-size: 0.75rem; display: inline-block;">🟣 En file d\'attente</span>';
-            action = '<span style="color: #ba68c8; font-size: 0.8rem; font-weight: 600;">En attente de son tour (Transfert actif)</span>';
+            const embedHref = v.fileCode ? `https://vidmoly.org/embed-${v.fileCode}.html` : '';
+            if (embedHref) {
+              action = `<a href="${embedHref}" target="_blank" style="color: #ba68c8; text-decoration: none; font-size: 0.8rem; font-weight: 600;">🔗 Voir embed (Prêt)</a>`;
+            } else {
+              action = '<span style="color: #ba68c8; font-size: 0.8rem; font-weight: 600;">En attente de son tour (Transfert actif)</span>';
+            }
             isDuplicate = true;
             hasActiveTransfers = true;
           } else if (v.status === 'error') {
@@ -2320,7 +2471,7 @@ class NetflixAdmin {
       const res = await fetch('/api/admin/vidmoly/upload', {
         method: 'POST',
         headers,
-        body: JSON.stringify({ episodes: payloadEpisodes, allowDuplicates })
+        body: JSON.stringify({ episodes: payloadEpisodes, allowDuplicates, isPriority: true })
       });
       const data = await res.json();
       if (data.success) {
@@ -2387,6 +2538,427 @@ class NetflixAdmin {
       }
     } catch (e) {
       this.showToast('Erreur lors de la vérification', true);
+    }
+  }
+
+
+
+  // =============== GESTION DES TIMERS DE SAUT D'INTRO (SKIP INTRO) ===============
+
+  initIntroEvents() {
+    this.introMediaSelect = document.getElementById('introMediaSelect');
+    this.introSeasonSelect = document.getElementById('introSeasonSelect');
+    this.introSeasonGroup = document.getElementById('introSeasonGroup');
+    this.addIntroConfigForm = document.getElementById('addIntroConfigForm');
+    this.introConfigsTableBody = document.getElementById('introConfigsTableBody');
+    this.introConfigsCount = document.getElementById('introConfigsCount');
+    this.introConfigsRefreshBtn = document.getElementById('introConfigsRefreshBtn');
+    this.cachedIntroConfigs = [];
+
+    if (this.introMediaSelect) {
+      this.introMediaSelect.addEventListener('change', () => this.handleIntroMediaChange());
+    }
+
+    if (this.introConfigsRefreshBtn) {
+      this.introConfigsRefreshBtn.addEventListener('click', () => this.loadIntroConfigs());
+    }
+
+    if (this.addIntroConfigForm) {
+      this.addIntroConfigForm.addEventListener('submit', (e) => this.handleIntroSubmit(e));
+    }
+  }
+
+  populateIntroMediaSelect() {
+    if (!this.introMediaSelect) return;
+    const currentVal = this.introMediaSelect.value;
+    const movies = Array.isArray(this.allMovies) ? this.allMovies : [];
+
+    const isReality = (m) => {
+      const cats = Array.isArray(m.categories) ? m.categories.map(c => String(c).toLowerCase()) : [];
+      const title = String(m.title || '').toLowerCase();
+      return cats.some(c => c.includes('télé-réalité') || c.includes('telerealite') || c.includes('realite')) ||
+             title.includes('villa') || title.includes('apprentis') || title.includes('marseillais') ||
+             String(m.id) === '68628' || String(m.tmdb_id) === '68628' || String(m.series_id) === '6715';
+    };
+
+    const realityList = movies.filter(m => isReality(m));
+    const seriesList = movies.filter(m => m.media_type === 'series' && !isReality(m));
+    const movieList = movies.filter(m => (m.media_type === 'movie' || !m.media_type) && !m.is_live);
+
+    let html = '<option value="">-- Choisir un programme --</option>';
+
+    if (realityList.length > 0) {
+      html += '<optgroup label="⭐ TÉLÉ-RÉALITÉS">';
+      realityList.forEach(m => {
+        const seasons = (m.seasons || []).map(s => parseInt(s.season_number, 10)).filter(n => !isNaN(n));
+        html += `<option value="${this.escapeHtml(m.id)}" data-type="series" data-title="${this.escapeHtml(m.title)}" data-seasons='${JSON.stringify(seasons)}'>⭐ ${this.escapeHtml(m.title)}</option>`;
+      });
+      html += '</optgroup>';
+    }
+
+    if (seriesList.length > 0) {
+      html += '<optgroup label="📺 SÉRIES TV">';
+      seriesList.forEach(m => {
+        const seasons = (m.seasons || []).map(s => parseInt(s.season_number, 10)).filter(n => !isNaN(n));
+        html += `<option value="${this.escapeHtml(m.id)}" data-type="series" data-title="${this.escapeHtml(m.title)}" data-seasons='${JSON.stringify(seasons)}'>📺 ${this.escapeHtml(m.title)}</option>`;
+      });
+      html += '</optgroup>';
+    }
+
+    if (movieList.length > 0) {
+      html += '<optgroup label="🎬 FILMS">';
+      movieList.slice(0, 100).forEach(m => {
+        html += `<option value="${this.escapeHtml(m.id)}" data-type="movie" data-title="${this.escapeHtml(m.title)}" data-seasons='[]'>🎬 ${this.escapeHtml(m.title)}</option>`;
+      });
+      html += '</optgroup>';
+    }
+
+    this.introMediaSelect.innerHTML = html;
+    if (currentVal) this.introMediaSelect.value = currentVal;
+    this.handleIntroMediaChange();
+  }
+
+  handleIntroMediaChange() {
+    if (!this.introMediaSelect || !this.introSeasonSelect) return;
+    const selectedOpt = this.introMediaSelect.selectedOptions[0];
+    if (!selectedOpt || !selectedOpt.value) {
+      this.introSeasonSelect.innerHTML = '<option value="all">Toutes les saisons (Général)</option>';
+      return;
+    }
+
+    let seasons = [];
+    try {
+      seasons = JSON.parse(selectedOpt.getAttribute('data-seasons') || '[]');
+    } catch(e) {}
+
+    const mediaType = selectedOpt.getAttribute('data-type') || 'series';
+
+    if (mediaType === 'movie') {
+      this.introSeasonSelect.innerHTML = '<option value="all">Film (Général)</option>';
+      if (this.introSeasonGroup) this.introSeasonGroup.style.display = 'none';
+    } else {
+      if (this.introSeasonGroup) this.introSeasonGroup.style.display = 'block';
+      let html = '<option value="all">Toutes les saisons (Général)</option>';
+      if (Array.isArray(seasons) && seasons.length > 0) {
+        seasons.forEach(s => {
+          const sNum = typeof s === 'object' ? s.season_number : s;
+          html += `<option value="${sNum}">Saison ${sNum}</option>`;
+        });
+      } else {
+        for (let i = 1; i <= 15; i++) {
+          html += `<option value="${i}">Saison ${i}</option>`;
+        }
+      }
+      this.introSeasonSelect.innerHTML = html;
+    }
+  }
+
+  async loadIntroConfigs() {
+    if (!this.introConfigsTableBody) return;
+    try {
+      const res = await fetch(`${this.apiBase()}/api/admin/intro-configs`, {
+        headers: this.authHeaders()
+      });
+      const data = await res.json();
+      if (data.success && Array.isArray(data.configs)) {
+        this.cachedIntroConfigs = data.configs;
+        if (this.introConfigsCount) this.introConfigsCount.textContent = data.configs.length;
+        this.renderIntroConfigs();
+      }
+    } catch(e) {
+      console.warn('[Admin Intro] Erreur chargement:', e);
+    }
+  }
+
+  renderIntroConfigs() {
+    if (!this.introConfigsTableBody) return;
+    if (!this.cachedIntroConfigs || this.cachedIntroConfigs.length === 0) {
+      this.introConfigsTableBody.innerHTML = `
+        <tr>
+          <td colspan="5" style="text-align: center; padding: 24px; color: var(--admin-text-muted);">
+            Aucun timer d'intro configuré pour le moment.<br>
+            <span style="font-size: 0.8rem;">Choisissez un programme ci-dessus et définissez la fin de l'intro (ex: 01:25) pour activer le bouton Netflix.</span>
+          </td>
+        </tr>
+      `;
+      return;
+    }
+
+    this.introConfigsTableBody.innerHTML = this.cachedIntroConfigs.map(c => {
+      const seasonLabel = (c.season_number === 'all' || !c.season_number) ? 'Toutes les saisons' : `Saison ${c.season_number}`;
+      const modeLabel = c.auto_skip 
+        ? '<span style="color: #64b5f6; font-weight: 700;">⚡ Saut Automatique</span>' 
+        : '<span style="color: #e50914; font-weight: 700;">⏭ Bouton "Passer l\'intro"</span>';
+
+      return `
+        <tr style="border-bottom: 1px solid rgba(255,255,255,0.04);">
+          <td style="padding: 12px 14px; font-weight: 700; color: #fff;">
+            ${this.escapeHtml(c.media_title || c.media_id)}
+          </td>
+          <td style="padding: 12px 14px; text-align: center; color: var(--admin-text-secondary); font-size: 0.85rem;">
+            ${seasonLabel}
+          </td>
+          <td style="padding: 12px 14px; text-align: center;">
+            <code style="background: rgba(229,9,20,0.15); color: #ff5252; padding: 3px 8px; border-radius: 4px; font-weight: 700; border: 1px solid rgba(229,9,20,0.3);">
+              ${c.formatted_start || '00:00'} ➔ ${c.formatted_end} (${c.intro_end}s)
+            </code>
+          </td>
+          <td style="padding: 12px 14px; text-align: center; font-size: 0.85rem;">
+            ${modeLabel}
+          </td>
+          <td style="padding: 12px 14px; text-align: right;">
+            <button type="button" class="btn-admin btn-admin-outline btn-sm" onclick="window.netflixAdmin.deleteIntroConfig('${this.escapeHtml(c.id)}')" style="color: #ff5252; border-color: rgba(255,82,82,0.3);" title="Supprimer ce timer">
+              🗑️ Supprimer
+            </button>
+          </td>
+        </tr>
+      `;
+    }).join('');
+  }
+
+  async handleIntroSubmit(e) {
+    if (e) e.preventDefault();
+    const mediaOpt = this.introMediaSelect ? this.introMediaSelect.selectedOptions[0] : null;
+    if (!mediaOpt || !mediaOpt.value) {
+      this.showToast('Veuillez sélectionner un programme', true);
+      return;
+    }
+
+    const mediaId = mediaOpt.value;
+    const mediaTitle = mediaOpt.getAttribute('data-title') || mediaOpt.textContent.replace(/^[⭐📺🎬]s*/, '');
+    const mediaType = mediaOpt.getAttribute('data-type') || 'series';
+    const seasonNumber = this.introSeasonSelect ? this.introSeasonSelect.value : 'all';
+    const introStart = document.getElementById('introStartInput')?.value || '00:00';
+    const introEnd = document.getElementById('introEndInput')?.value || '';
+    const autoSkip = document.getElementById('introAutoSkipInput')?.checked || false;
+
+    if (!introEnd) {
+      this.showToast('Veuillez indiquer le timer de fin d\'intro (ex: 01:25 ou 85)', true);
+      return;
+    }
+
+    try {
+      const res = await fetch(`${this.apiBase()}/api/admin/intro-configs`, {
+        method: 'POST',
+        headers: this.authHeaders({ 'Content-Type': 'application/json' }),
+        body: JSON.stringify({
+          media_id: mediaId,
+          media_title: mediaTitle,
+          media_type: mediaType,
+          season_number: seasonNumber,
+          intro_start: introStart,
+          intro_end: introEnd,
+          auto_skip: autoSkip
+        })
+      });
+
+      const data = await res.json();
+      if (data.success) {
+        this.showToast('✔ Timer d\'intro enregistré avec succès !');
+        if (document.getElementById('introEndInput')) document.getElementById('introEndInput').value = '';
+        this.loadIntroConfigs();
+      } else {
+        this.showToast(data.error || 'Erreur lors de l\'enregistrement', true);
+      }
+    } catch(err) {
+      this.showToast('Erreur réseau lors de l\'enregistrement', true);
+    }
+  }
+
+  async deleteIntroConfig(id) {
+    if (!confirm('Êtes-vous sûr de vouloir supprimer ce timer d\'intro ?')) return;
+    try {
+      const res = await fetch(`${this.apiBase()}/api/admin/intro-configs`, {
+        method: 'DELETE',
+        headers: this.authHeaders({ 'Content-Type': 'application/json' }),
+        body: JSON.stringify({ id })
+      });
+      const data = await res.json();
+      if (data.success) {
+        this.showToast('✔ Configuration d\'intro supprimée');
+        this.loadIntroConfigs();
+      } else {
+        this.showToast(data.error || 'Erreur suppression', true);
+      }
+    } catch(err) {
+      this.showToast('Erreur réseau suppression', true);
+    }
+  }
+
+
+  initTmaEvents() {
+    const searchInput = document.getElementById('tmaShowsSearchInput');
+    if (searchInput) {
+      searchInput.addEventListener('input', (e) => {
+        const q = e.target.value.toLowerCase().trim();
+        const cards = document.querySelectorAll('.tma-show-card');
+        cards.forEach(c => {
+          const title = (c.dataset.title || '').toLowerCase();
+          c.style.display = (!q || title.includes(q)) ? 'flex' : 'none';
+        });
+      });
+    }
+
+    const refreshBtn = document.getElementById('tmaRefreshShowsBtn');
+    if (refreshBtn) {
+      refreshBtn.addEventListener('click', () => {
+        this.loadTmaRealityShows();
+      });
+    }
+
+    const saveBtn = document.getElementById('tmaSaveShowsBtn');
+    if (saveBtn) {
+      saveBtn.addEventListener('click', () => {
+        this.saveTmaRealityShows();
+      });
+    }
+  }
+
+  async loadTmaRealityShows() {
+    const grid = document.getElementById('tmaShowsGrid');
+    if (!grid) return;
+    grid.innerHTML = '<div style="color: #90a4ae; padding: 20px; text-align: center; grid-column: 1 / -1;">Chargement des télé-réalités...</div>';
+
+    try {
+      const res = await fetch('/api/admin/tma-reality-shows', {
+        headers: this.getAdminHeaders()
+      });
+      const json = await res.json();
+      if (!json.success) {
+        grid.innerHTML = `<div style="color: #ff5252; padding: 20px; text-align: center; grid-column: 1 / -1;">Erreur: ${json.error || 'Impossible de charger la liste'}</div>`;
+        return;
+      }
+
+      this.tmaAvailableShows = json.available || [];
+      this.renderTmaShows(this.tmaAvailableShows);
+    } catch (e) {
+      grid.innerHTML = `<div style="color: #ff5252; padding: 20px; text-align: center; grid-column: 1 / -1;">Erreur réseau: ${e.message}</div>`;
+    }
+  }
+
+  renderTmaShows(shows) {
+    const grid = document.getElementById('tmaShowsGrid');
+    if (!grid) return;
+    grid.innerHTML = '';
+
+    if (!shows || shows.length === 0) {
+      grid.innerHTML = '<div style="color: #90a4ae; padding: 20px; text-align: center; grid-column: 1 / -1;">Aucune télé-réalité détectée dans le cache.</div>';
+      return;
+    }
+
+    shows.forEach(show => {
+      const card = document.createElement('div');
+      card.className = 'tma-show-card';
+      card.dataset.id = show.id;
+      card.dataset.title = show.title || show.name;
+      card.style.cssText = `
+        background: ${show.is_selected ? 'rgba(0, 136, 204, 0.15)' : '#121824'};
+        border: 1px solid ${show.is_selected ? 'rgba(0, 136, 204, 0.5)' : 'rgba(255, 255, 255, 0.08)'};
+        border-radius: 8px;
+        padding: 10px;
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        transition: all 0.2s ease;
+      `;
+
+      const poster = show.cover || 'assets/hero/live-tv-banner.webp';
+      card.innerHTML = `
+        <div style="display: flex; gap: 10px; align-items: center;">
+          <input type="checkbox" class="tma-show-cb" data-id="${show.id}" ${show.is_selected ? 'checked' : ''} style="width: 18px; height: 18px; cursor: pointer; accent-color: #0088cc;">
+          <img src="${poster}" alt="${this.escapeHtml(show.title)}" style="width: 48px; height: 68px; object-fit: cover; border-radius: 4px; background: #000; flex-shrink: 0;" onerror="this.src='assets/hero/live-tv-banner.webp'">
+          <div style="flex: 1; min-width: 0;">
+            <div style="color: #fff; font-weight: 700; font-size: 0.88rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;" title="${this.escapeHtml(show.title)}">
+              ${this.escapeHtml(show.title)}
+            </div>
+            <div style="font-size: 0.75rem; color: #90a4ae; margin-top: 3px;">
+              ${show.seasons_count} saison(s) • ${show.episodes_count} ép.
+            </div>
+            <div style="font-size: 0.72rem; color: #29b6f6; margin-top: 2px;">
+              ID: ${show.id}
+            </div>
+          </div>
+        </div>
+      `;
+
+      const cb = card.querySelector('.tma-show-cb');
+      cb.addEventListener('change', () => {
+        show.is_selected = cb.checked;
+        card.style.background = cb.checked ? 'rgba(0, 136, 204, 0.15)' : '#121824';
+        card.style.borderColor = cb.checked ? 'rgba(0, 136, 204, 0.5)' : 'rgba(255, 255, 255, 0.08)';
+        this.updateTmaSelectedCount();
+      });
+
+      grid.appendChild(card);
+    });
+
+    this.updateTmaSelectedCount();
+  }
+
+  updateTmaSelectedCount() {
+    const checked = document.querySelectorAll('.tma-show-cb:checked');
+    const counter = document.getElementById('tmaSelectedCount');
+    if (counter) counter.textContent = checked.length;
+  }
+
+  async saveTmaRealityShows() {
+    const saveBtn = document.getElementById('tmaSaveShowsBtn');
+    const statusEl = document.getElementById('tmaSaveStatus');
+    if (saveBtn) {
+      saveBtn.disabled = true;
+      saveBtn.textContent = 'Enregistrement...';
+    }
+
+    try {
+      const checkedBoxes = Array.from(document.querySelectorAll('.tma-show-cb:checked'));
+      const shows = checkedBoxes.map((cb, idx) => {
+        const id = parseInt(cb.dataset.id, 10);
+        const orig = (this.tmaAvailableShows || []).find(s => s.id === id);
+        return {
+          id,
+          series_id: id,
+          title: orig?.title || orig?.name || `Série ${id}`,
+          name: orig?.name || orig?.title || `Série ${id}`,
+          cover: orig?.cover || '',
+          backdrop: orig?.backdrop || orig?.cover || '',
+          enabled: true,
+          order: idx + 1
+        };
+      });
+
+      const res = await fetch('/api/admin/tma-reality-shows', {
+        method: 'POST',
+        headers: this.getAdminHeaders({ 'Content-Type': 'application/json' }),
+        body: JSON.stringify({ shows })
+      });
+      const json = await res.json();
+
+      if (json.success) {
+        if (statusEl) {
+          statusEl.style.display = 'block';
+          statusEl.style.color = '#46d369';
+          statusEl.textContent = '✅ ' + (json.message || 'Enregistré avec succès !');
+          setTimeout(() => { if (statusEl) statusEl.style.display = 'none'; }, 4000);
+        }
+        this.showToast('✅ Configuration Telegram Mini App enregistrée !');
+      } else {
+        if (statusEl) {
+          statusEl.style.display = 'block';
+          statusEl.style.color = '#ff5252';
+          statusEl.textContent = '❌ Erreur: ' + (json.error || 'Échec');
+        }
+      }
+    } catch (e) {
+      if (statusEl) {
+        statusEl.style.display = 'block';
+        statusEl.style.color = '#ff5252';
+        statusEl.textContent = '❌ Erreur réseau: ' + e.message;
+      }
+    } finally {
+      if (saveBtn) {
+        saveBtn.disabled = false;
+        saveBtn.textContent = '💾 Enregistrer pour Telegram';
+      }
     }
   }
 

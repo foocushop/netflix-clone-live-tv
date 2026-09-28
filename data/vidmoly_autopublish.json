@@ -4,20 +4,20 @@
     "seriesTitle": "La Villa des cœurs brisés (2015)",
     "season": "11",
     "enabled": true,
-    "updatedAt": 1789425618754
+    "updatedAt": 1789851417611
   },
   "6715_10": {
     "seriesId": "6715",
     "seriesTitle": "La Villa des cœurs brisés (2015)",
     "season": "10",
-    "enabled": true,
-    "updatedAt": 1789566285311
+    "enabled": false,
+    "updatedAt": 1789851417611
   },
   "9066_9": {
     "seriesId": "9066",
     "seriesTitle": "Les Apprentis Aventuriers (2016)",
     "season": "9",
     "enabled": true,
-    "updatedAt": 1789566331387
+    "updatedAt": 1789851417611
   }
 }

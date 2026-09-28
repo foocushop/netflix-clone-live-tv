@@ -7,3 +7,12 @@ data/.github_token
 data/cache_xmltv.xml.gz
 data/xtream_users.json
 data/backup/
+
+*.bak*
+*.temp*
+*.test
+backups/
+data/cache/
+data/*.bak*
+static/**/*.bak*
+lib/*.bak*

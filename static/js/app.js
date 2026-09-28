@@ -7,6 +7,7 @@ class NetflixApp {
   constructor() {
     this.catalogData = null;
     this.currentHero = null;
+    this.myListItems = [];
     this.myList = this.loadMyList();
     this.player = new NetflixPlayer();
     this.admin = new NetflixAdmin();
@@ -58,6 +59,9 @@ class NetflixApp {
 
   normalizeImageUrl(url) {
     if (!url) return '';
+    if (typeof url === 'string' && url.includes('image.tmdb.org/t/p/original/')) {
+      url = url.replace('/t/p/original/', '/t/p/w780/');
+    }
     if (url.startsWith('/api/proxy-image') || url.includes('/api/proxy-image')) return url;
     if (url.startsWith('http://') || url.includes('logo.smrtp2.com') || url.includes('logoipro2.com')) {
       const baseUrl = window.API_BASE || '';
@@ -146,6 +150,8 @@ class NetflixApp {
   }
 
   initEvents() {
+    
+    // PWA Service Worker disabled
     // Défilement optimisé du header
     let scrollTicking = false;
     window.addEventListener('scroll', () => {
@@ -163,17 +169,17 @@ class NetflixApp {
     }, { passive: true });
 
     // Hero buttons
-    this.heroPlayBtn.addEventListener('click', () => {
+    this.heroPlayBtn && this.heroPlayBtn.addEventListener('click', () => {
       if (this.currentHero) this.player.open(this.currentHero);
     });
 
-    this.heroMoreInfoBtn.addEventListener('click', () => {
+    this.heroMoreInfoBtn && this.heroMoreInfoBtn.addEventListener('click', () => {
       if (this.currentHero) this.openModal(this.currentHero);
     });
 
     // Recherche
     let searchDebounce = null;
-    this.searchInput.addEventListener('input', (e) => {
+    this.searchInput && this.searchInput.addEventListener('input', (e) => {
       clearTimeout(searchDebounce);
       const query = e.target.value.trim();
       searchDebounce = setTimeout(() => {
@@ -186,12 +192,12 @@ class NetflixApp {
     });
 
     // Modal
-    this.modalCloseBtn.addEventListener('click', () => this.closeModal());
-    this.modalBackdrop.addEventListener('click', (e) => {
+    this.modalCloseBtn && this.modalCloseBtn.addEventListener('click', () => this.closeModal());
+    this.modalBackdrop && this.modalBackdrop.addEventListener('click', (e) => {
       if (e.target === this.modalBackdrop) this.closeModal();
     });
 
-    this.modalPlayBtn.addEventListener('click', () => {
+    this.modalPlayBtn && this.modalPlayBtn.addEventListener('click', () => {
       if (this.currentModalMovie) {
         let s = null;
         let e = null;
@@ -224,9 +230,9 @@ class NetflixApp {
       });
     }
 
-    this.modalListBtn.addEventListener('click', () => {
+    this.modalListBtn && this.modalListBtn.addEventListener('click', () => {
       if (this.currentModalMovie) {
-        this.toggleMyList(this.currentModalMovie.id);
+        this.toggleMyList(this.currentModalMovie);
         this.updateModalListButton();
       }
     });
@@ -339,8 +345,25 @@ class NetflixApp {
 
   async loadCatalog(isInitialSplashLoad = false) {
     try {
+      // 1. Rendu instantané 0ms depuis le cache de session (Expérience instantanée sur Mobile)
+      if (isInitialSplashLoad && !this.catalogData) {
+        try {
+          const cachedStr = sessionStorage.getItem('ziflix_catalog_cache');
+          if (cachedStr) {
+            const cached = JSON.parse(cachedStr);
+            if (cached && cached.hero && cached.rows) {
+              this.catalogData = cached;
+              this.originalHero = cached.hero;
+              this.setupHero(cached.hero);
+              this.renderCatalog(cached);
+              this.dismissSplash();
+            }
+          }
+        } catch (e) {}
+      }
+
       const baseUrl = window.API_BASE || '';
-      const res = await fetch(`${baseUrl}/api/catalog?_t=${Date.now()}`, {
+      const res = await fetch(`${baseUrl}/api/catalog`, {
         headers: this.getAuthHeaders(),
         credentials: 'include'
       });
@@ -348,21 +371,27 @@ class NetflixApp {
         this.handleLogout();
         return;
       }
+      if (res.status === 304) {
+        if (isInitialSplashLoad) this.dismissSplash();
+        return;
+      }
       const json = await res.json();
       if (json.success && json.data) {
         this.catalogData = json.data;
-        const allMovies = [];
-        const seen = new Set();
-        (json.data.rows || []).forEach(r => {
-          (r.movies || []).forEach(m => {
-            if (!seen.has(m.id)) {
-              seen.add(m.id);
-              allMovies.push(m);
-            }
+        const allMovies = json.data.movies || [];
+        if (allMovies.length === 0) {
+          const seen = new Set();
+          (json.data.rows || []).forEach(r => {
+            (r.movies || []).forEach(m => {
+              if (!seen.has(m.id)) {
+                seen.add(m.id);
+                allMovies.push(m);
+              }
+            });
           });
-        });
-        if (json.data.hero && !seen.has(json.data.hero.id)) {
-          allMovies.unshift(json.data.hero);
+          if (json.data.hero && !seen.has(json.data.hero.id)) {
+            allMovies.unshift(json.data.hero);
+          }
         }
         this.catalogData.movies = allMovies;
 
@@ -374,10 +403,16 @@ class NetflixApp {
           this.applyFilter(initialFilter, false);
         }
 
-        // Si chargement initial avec splash, attendre le chargement de l'image de fond
-        // et des premières cartes pour éviter tout écran noir ou affichage incomplet
+        try {
+          sessionStorage.setItem('ziflix_catalog_cache', JSON.stringify({
+            hero: json.data.hero,
+            rows: json.data.rows,
+            movies: allMovies
+          }));
+        } catch (e) {}
+
+        // Déverrouillage immédiat du splash (plus d'attente bloquante 1.6s sur images distantes)
         if (isInitialSplashLoad) {
-          await this.preloadHeroImage(json.data.hero);
           this.dismissSplash();
         }
       } else if (isInitialSplashLoad) {
@@ -514,18 +549,8 @@ class NetflixApp {
     }
 
     // Ligne "Ma Liste" si elle contient des titres
-    try {
-      const myListMovies = this.getMyListMovies();
-      if (myListMovies && myListMovies.length > 0) {
-        const myRow = this.buildRowElement({
-          category: { name: "Ma Liste", slug: "my-list" },
-          movies: myListMovies
-        });
-        if (myRow) fragment.appendChild(myRow);
-      }
-    } catch (e) {
-      console.warn('[ZIFLIX] Erreur my list:', e);
-    }
+    // Ma Liste uniquement dans onglet Dédié
+
 
     // Carrousels de catégories
     if (data && data.rows && data.rows.length > 0) {
@@ -641,21 +666,38 @@ class NetflixApp {
 
     // Événements sur la carte
     card.addEventListener('click', (e) => {
+      // 1. Bouton "Ma Liste"
       if (e.target.closest('.list-btn')) {
         e.stopPropagation();
-        this.toggleMyList(movie.id);
+        this.toggleMyList(movie);
         const btn = card.querySelector('.list-btn');
-        btn.textContent = this.myList.includes(movie.id) ? '✓' : '+';
+        const isFav = this.isFavorite(movie);
+        if (btn) {
+          btn.textContent = isFav ? '✓' : '+';
+          btn.title = isFav ? 'Retirer de ma liste' : 'Ajouter à ma liste';
+        }
         return;
       }
+
+      // 2. Bouton "Plus d'infos" (⌄) : LE SEUL qui doit ouvrir la fiche détaillée (modal)
+      if (e.target.closest('.info-btn')) {
+        e.stopPropagation();
+        this.openModal(movie);
+        return;
+      }
+
+      // 3. TOUT AUTRE CLIC SUR LA CARTE (affiche, titre, overlay, play-btn) :
+      // DÉMARRAGE IMMÉDIAT EN 1 CLIC (0 clic intermédiaire !)
+      e.stopPropagation();
+
+      // Chaîne Live
       if (isChannel || movie.is_xtream) {
-        // Clic direct pour lancer la chaîne de télévision sans détour
         this.player.open(movie, 1);
         return;
       }
-      if (movie.is_xtream_series || (movie.id && String(movie.id).startsWith('xtream_series_'))) {
-        e.stopPropagation();
-        const isPlay = !!e.target.closest('.play-btn');
+
+      // Séries Xtream (Télé-Réalité & séries officielles)
+      if (movie.is_xtream_series || (movie.id && String(movie.id).startsWith('xtream_series_')) || movie.series_id) {
         const seriesId = movie.series_id || parseInt(String(movie.id).replace('xtream_series_', ''), 10);
         this.openTeleRealiteSeries({
           series_id: seriesId,
@@ -665,15 +707,18 @@ class NetflixApp {
           plot: movie.overview,
           genre: (movie.categories || []).join(' / '),
           year: movie.release_year || 2025
-        }, isPlay);
+        }, true);
         return;
       }
-      if (e.target.closest('.play-btn')) {
-        e.stopPropagation();
-        this.player.open(movie);
-      } else if (e.target.closest('.info-btn') || !e.target.closest('.card-actions')) {
-        this.openModal(movie);
+
+      // Séries catalogue multi-saisons
+      if (movie.media_type === 'series' || (Array.isArray(movie.seasons) && movie.seasons.length > 0)) {
+        this.player.open(movie, 1);
+        return;
       }
+
+      // Film (Xtream ou catalogue) : Démarrage direct
+      this.player.open(movie, 1);
     });
 
     return card;
@@ -695,7 +740,7 @@ class NetflixApp {
       let cleaned = String(b)
         .replace(/1080p FHD Natif/gi, '1080p FHD')
         .replace(/1080p FHD Direct/gi, '1080p FHD')
-        .replace(/💎 Xtream VIP/gi, '1080p FHD')
+        .replace(/1080p FHD/gi, '1080p FHD')
         .replace(/Saisons Complètes/gi, 'Saisons Intégrales')
         .trim();
       if (cleaned && !cleanBadges.includes(cleaned)) cleanBadges.push(cleaned);
@@ -852,6 +897,16 @@ class NetflixApp {
       card.setAttribute('title', `Lancer ${this.currentModalMovie.title} - Saison ${this.selectedModalSeason}, Épisode ${ep.episode_number}`);
 
       const thumbUrl = ep.still_url || this.currentModalMovie.backdrop_url || this.currentModalMovie.poster_url;
+      let epTitleClean = ep.title || ("Épisode " + ep.episode_number);
+      if (/s\d+e\d+/i.test(epTitleClean) || epTitleClean.toLowerCase().includes('apprentis') || epTitleClean.toLowerCase().includes('villa') || (this.currentModalMovie && this.currentModalMovie.title && epTitleClean.includes(this.currentModalMovie.title))) {
+        const m = epTitleClean.match(/épisode\s*(\d+)/i) || epTitleClean.match(/episode\s*(\d+)/i);
+        epTitleClean = m ? ("Épisode " + m[1]) : ("Épisode " + ep.episode_number);
+      } else if (/^épisode\s*\d+\s*[-:]/i.test(epTitleClean)) {
+        const m = epTitleClean.match(/^épisode\s*(\d+)\s*[-:]\s*(.+)$/i);
+        if (m && (m[2].toLowerCase().includes('apprentis') || m[2].toLowerCase().includes('2018') || m[2].toLowerCase().includes('2016') || (this.currentModalMovie && this.currentModalMovie.title && m[2].includes(this.currentModalMovie.title)))) {
+          epTitleClean = "Épisode " + m[1];
+        }
+      }
 
       card.innerHTML = `
         <div class="modal-episode-num">${ep.episode_number}</div>
@@ -863,7 +918,7 @@ class NetflixApp {
         </div>
         <div class="modal-episode-details">
           <div class="modal-episode-top">
-            <span class="modal-episode-title">${ep.title}</span>
+            <span class="modal-episode-title">${epTitleClean}</span>
             <span class="modal-episode-duration">${ep.duration || '45 min'}</span>
           </div>
           <p class="modal-episode-overview">${ep.overview || 'Aucune description disponible pour cet épisode.'}</p>
@@ -892,31 +947,148 @@ class NetflixApp {
     document.body.classList.remove('modal-open');
   }
 
-  updateModalListButton() {
-    if (!this.currentModalMovie) return;
-    const isSaved = this.myList.includes(this.currentModalMovie.id);
-    this.modalListBtn.innerHTML = isSaved ? '✓ Dans ma liste' : '+ Ajouter à ma liste';
+  isFavorite(movieOrChannel) {
+    if (!movieOrChannel) return false;
+    const id = String(movieOrChannel.id || movieOrChannel.stream_id || '');
+    if (!id) return false;
+    return (this.myList && this.myList.includes(id)) || 
+           (Array.isArray(this.myListItems) && this.myListItems.some(x => String(x.id) === id));
   }
 
-  toggleMyList(id) {
-    if (this.myList.includes(id)) {
-      this.myList = this.myList.filter(item => item !== id);
+  updateModalListButton() {
+    if (!this.currentModalMovie || !this.modalListBtn) return;
+    const isSaved = this.isFavorite(this.currentModalMovie);
+    this.modalListBtn.innerHTML = isSaved ? '✓ Dans ma liste' : '+ Ajouter à ma liste';
+    this.modalListBtn.classList.toggle('active', isSaved);
+  }
+
+  toggleMyList(movieOrChannel) {
+    if (!movieOrChannel) return;
+    let itemObj = null;
+
+    if (typeof movieOrChannel === 'string' || typeof movieOrChannel === 'number') {
+      const id = String(movieOrChannel);
+      itemObj = (this.myListItems || []).find(x => String(x.id) === id);
+      if (!itemObj && this.catalogData && this.catalogData.rows) {
+        for (const r of this.catalogData.rows) {
+          const found = r.movies.find(m => String(m.id) === id);
+          if (found) { itemObj = found; break; }
+        }
+      }
+      if (!itemObj) itemObj = { id: id, title: 'Titre' };
     } else {
-      this.myList.push(id);
+      itemObj = movieOrChannel;
     }
-    localStorage.setItem('netflix_my_list', JSON.stringify(this.myList));
+
+    const id = String(itemObj.id || itemObj.stream_id || '');
+    if (!id) return;
+
+    const isLive = !!(itemObj.is_live || itemObj.media_type === 'channel' || id.startsWith('xtream_'));
+    const cleanItem = {
+      id: id,
+      title: itemObj.title || itemObj.name || 'Sans titre',
+      media_type: isLive ? 'channel' : (itemObj.media_type || 'movie'),
+      poster_url: this.normalizeImageUrl(itemObj.poster_url || itemObj.icon || itemObj.backdrop_url || ''),
+      backdrop_url: this.normalizeImageUrl(itemObj.backdrop_url || itemObj.poster_url || itemObj.icon || ''),
+      stream_id: itemObj.stream_id || null,
+      stream_url: itemObj.stream_url || (isLive && itemObj.stream_id ? ('/api/stream/xtream?stream_id=' + itemObj.stream_id) : ''),
+      is_live: isLive,
+      is_xtream: !!(itemObj.is_xtream || id.startsWith('xtream_')),
+      category_name: itemObj.category_name || (isLive ? 'Chaîne TV' : ''),
+      match_score: itemObj.match_score || 99,
+      age_rating: itemObj.age_rating || 'Tous publics'
+    };
+
+    if (!Array.isArray(this.myListItems)) this.myListItems = [];
+    const existingIdx = this.myListItems.findIndex(x => String(x.id) === id);
+    let inList = false;
+
+    if (existingIdx !== -1) {
+      this.myListItems.splice(existingIdx, 1);
+      this.myList = this.myList.filter(item => String(item) !== id);
+      inList = false;
+      this.showToast('Retiré de Ma Liste : ' + cleanItem.title);
+    } else {
+      this.myListItems.unshift(cleanItem);
+      if (!this.myList.includes(id)) this.myList.unshift(id);
+      inList = true;
+      this.showToast('Ajouté à Ma Liste : ' + cleanItem.title);
+    }
+
+    try {
+      localStorage.setItem('netflix_my_list_items', JSON.stringify(this.myListItems));
+      localStorage.setItem('netflix_my_list', JSON.stringify(this.myList));
+    } catch (e) {}
+
+    // Synchronisation Cloud avec l\'API
+    fetch('/api/favorites/toggle', {
+      method: 'POST',
+      headers: this.getAuthHeaders({ 'Content-Type': 'application/json' }),
+      body: JSON.stringify({ item: cleanItem })
+    }).catch(err => console.warn('[Favorites Sync Error]', err));
+
+    this.updateModalListButton();
+    if (this.player && typeof this.player.updatePlayerFavoriteUI === 'function') {
+      this.player.updatePlayerFavoriteUI();
+    }
+
+    // Mettre à jour tous les boutons cœurs sur la page
+    document.querySelectorAll('[data-id="' + id + '"] .fav-btn').forEach(btn => {
+      btn.classList.toggle('active', inList);
+      btn.innerHTML = inList ? '♥' : '♡';
+      btn.title = inList ? 'Retirer de ma liste' : 'Ajouter à ma liste';
+    });
+
+    // Si on est actuellement sur la vue "Ma Liste", rafraîchir immédiatement
+    const currentFilter = this.detectRouteFilter();
+    if (currentFilter === 'my-list') {
+      this.applyFilter('my-list', false);
+    }
   }
 
   loadMyList() {
+    let items = [];
+    let ids = [];
     try {
-      const saved = localStorage.getItem('netflix_my_list');
-      return saved ? JSON.parse(saved) : [];
-    } catch {
-      return [];
-    }
+      const savedItems = localStorage.getItem('netflix_my_list_items');
+      if (savedItems) items = JSON.parse(savedItems);
+    } catch (e) {}
+    try {
+      const savedIds = localStorage.getItem('netflix_my_list');
+      if (savedIds) ids = JSON.parse(savedIds);
+    } catch (e) {}
+
+    this.myListItems = Array.isArray(items) ? items : [];
+    this.myList = Array.isArray(ids) ? ids : this.myListItems.map(x => String(x.id));
+
+    // Synchronisation en tâche de fond avec le serveur
+    fetch('/api/favorites', { headers: this.getAuthHeaders() })
+      .then(r => r.json())
+      .then(data => {
+        if (data && data.success && Array.isArray(data.favorites)) {
+          const serverItems = data.favorites;
+          const merged = [...this.myListItems];
+          serverItems.forEach(sItem => {
+            const exists = merged.some(m => String(m.id) === String(sItem.id));
+            if (!exists) merged.push(sItem);
+          });
+          this.myListItems = merged;
+          this.myList = this.myListItems.map(x => String(x.id));
+          try {
+            localStorage.setItem('netflix_my_list_items', JSON.stringify(this.myListItems));
+            localStorage.setItem('netflix_my_list', JSON.stringify(this.myList));
+          } catch (e) {}
+        }
+      })
+      .catch(() => {});
+
+    return this.myList;
   }
 
   getMyListMovies() {
+    if (Array.isArray(this.myListItems) && this.myListItems.length > 0) {
+      return this.myListItems;
+    }
     if (!this.catalogData || !this.catalogData.rows) return [];
     const all = [];
     const seen = new Set();
@@ -1048,20 +1220,20 @@ class NetflixApp {
         .slice(0, 18);
 
       this.renderRow({
-        category: { name: "🔥 Les Plus Regardés sur ZIFLIX (Top Tendances)", slug: "top-regardes" },
+        category: { name: "Les Plus Regardés sur ZIFLIX", slug: "top-regardes" },
         movies: topWatched
       });
 
       if (recentMovies.length > 0) {
         this.renderRow({
-          category: { name: "✨ Nouveautés & Sorties Récentes (2025 - 2026)", slug: "nouveautes" },
+          category: { name: "Nouveautés & Sorties Récentes", slug: "nouveautes" },
           movies: recentMovies
         });
       }
 
       if (popularSeries.length > 0) {
         this.renderRow({
-          category: { name: "📺 Séries en Cours les Plus Suivies", slug: "series-populaires" },
+          category: { name: "Séries Populaires", slug: "series-populaires" },
           movies: popularSeries
         });
       }
@@ -1071,10 +1243,30 @@ class NetflixApp {
     if (filter === 'my-list') {
       if (this.originalHero) this.setupHero(this.originalHero);
       this.catalogRowsContainer.innerHTML = '';
-      this.renderRow({
-        category: { name: "Ma Liste", slug: "my-list" },
-        movies: this.getMyListMovies()
-      });
+      const myMovies = this.getMyListMovies();
+      if (!myMovies || myMovies.length === 0) {
+        this.catalogRowsContainer.innerHTML = '<div style="text-align: center; padding: 90px 20px; color: #888;"><h2 style="font-size: 1.6rem; color: #fff; margin-bottom: 8px;">Votre liste est vide</h2><p style="font-size: 0.95rem; color: #aaa; max-width: 460px; margin: 0 auto 24px;">Ajoutez vos films, séries et chaînes de télévision favorites pour les retrouver ici en un clic !</p><button class="btn btn-primary" onclick="window.netflixApp.applyFilter(\'all\')" style="padding: 10px 24px; border-radius: 20px; background: #e50914; border: none; color: #fff; font-weight: 700; cursor: pointer;">Explorer le catalogue</button></div>';
+        return;
+      }
+
+      const tvChannels = myMovies.filter(m => m.media_type === 'channel' || m.is_live);
+      const vodMedia = myMovies.filter(m => m.media_type !== 'channel' && !m.is_live);
+
+      if (tvChannels.length > 0 && vodMedia.length > 0) {
+        this.renderRow({
+          category: { name: "Chaînes TV Favorites (" + tvChannels.length + ")", slug: "fav-channels" },
+          movies: tvChannels
+        });
+        this.renderRow({
+          category: { name: "Films & Séries Favoris (" + vodMedia.length + ")", slug: "fav-vod" },
+          movies: vodMedia
+        });
+      } else {
+        this.renderRow({
+          category: { name: "Ma Liste (" + myMovies.length + ")", slug: "my-list" },
+          movies: myMovies
+        });
+      }
       return;
     }
 
@@ -1204,6 +1396,7 @@ class NetflixApp {
     const secureIcon = this.normalizeImageUrl(channel.icon) || 'assets/hero/live-tv-banner.webp';
     const fallbackSvg = this.getChannelFallbackSvg(channel.name);
 
+    const isFav = this.isFavorite('xtream_' + channel.stream_id);
     const movieObj = {
       id: `xtream_${channel.stream_id}`,
       title: channel.name,
@@ -1228,11 +1421,12 @@ class NetflixApp {
       <div class="card-overlay">
         <div class="card-title">${channel.name}</div>
         <div class="card-tags">
-          <span style="color: #00d2ff; font-weight: 800;">💎 XTREAM</span>
+          <span style="color: #00d2ff; font-weight: 800;">XTREAM DIRECT</span>
           <span>${channel.category_name}</span>
         </div>
         <div class="card-actions">
           <button class="action-circle-btn play-btn" title="Lecture en direct">▶</button>
+          <button class="action-circle-btn fav-btn ${isFav ? 'active' : ''}" title="${isFav ? 'Retirer de ma liste' : 'Ajouter à ma liste'}">${isFav ? '♥' : '♡'}</button>
         </div>
       </div>
     `;
@@ -1245,6 +1439,18 @@ class NetflixApp {
     }
 
     card.addEventListener('click', (e) => {
+      if (e.target.closest('.fav-btn')) {
+        e.stopPropagation();
+        this.toggleMyList(movieObj);
+        const btn = card.querySelector('.fav-btn');
+        const nowFav = this.isFavorite(movieObj);
+        if (btn) {
+          btn.classList.toggle('active', nowFav);
+          btn.innerHTML = nowFav ? '♥' : '♡';
+          btn.title = nowFav ? 'Retirer de ma liste' : 'Ajouter à ma liste';
+        }
+        return;
+      }
       e.stopPropagation();
       this.player.open(movieObj, 1);
     });
@@ -1255,8 +1461,8 @@ class NetflixApp {
   async showXtreamView() {
     this.catalogRowsContainer.innerHTML = `
       <div style="text-align: center; padding: 60px 20px; color: #888;">
-        <div style="font-size: 2.2rem; margin-bottom: 12px; color: #00d2ff;">💎</div>
-        <div style="font-size: 1.15rem; color: #fff; font-weight: 600;">Chargement des 1 268 chaînes françaises Xtream...</div>
+        <div style="font-size: 1.5rem; margin-bottom: 12px; font-weight: bold; color: #e50914;">ZIFLIX</div>
+        <div style="font-size: 1.15rem; color: #fff; font-weight: 600;">Chargement des chaînes Xtream & Sports...</div>
         <div style="font-size: 0.9rem; color: #888; margin-top: 6px;">Indexation des flux UHD, FHD, HEVC, HD et SD...</div>
       </div>
     `;
@@ -1264,7 +1470,7 @@ class NetflixApp {
     if (!this.xtreamChannels) {
       try {
         const baseUrl = window.API_BASE || '';
-        const res = await fetch(`${baseUrl}/api/xtream/channels?limit=1500`, {
+        const res = await fetch(`${baseUrl}/api/xtream/channels?limit=3500`, {
           headers: this.getAuthHeaders(),
           credentials: 'include'
         });
@@ -1303,7 +1509,7 @@ class NetflixApp {
         is_xtream: true,
         stream_url: `/api/stream/xtream?stream_id=${featured.stream_id}`,
         player_type: 'direct_hls',
-        quality_badges: ['💎 Xtream Direct VIP', featured.quality_badge, 'Anti-Saccades Turbo']
+        quality_badges: ['1080p FHD', featured.quality_badge, 'Anti-Saccades Turbo']
       });
     }
 
@@ -1438,7 +1644,7 @@ class NetflixApp {
         moreCard.style.border = '1px dashed #00d2ff';
         moreCard.style.cursor = 'pointer';
         moreCard.innerHTML = `
-          <div style="font-size: 2rem; margin-bottom: 8px; color: #00d2ff;">➕</div>
+          <div style="font-size: 1.8rem; margin-bottom: 8px; color: #e50914;">+</div>
           <div style="font-weight: 700; color: #fff; text-align: center; padding: 0 10px;">Voir toutes les ${channels.length} chaînes</div>
           <div style="font-size: 0.8rem; color: #00d2ff; margin-top: 4px;">${catName}</div>
         `;
@@ -1550,21 +1756,43 @@ class NetflixApp {
 
     card.addEventListener('click', async (e) => {
       e.stopPropagation();
-      const isPlay = !!e.target.closest('.play-btn');
-      await this.openTeleRealiteSeries(show, isPlay);
+      if (e.target.closest('.info-btn')) {
+        await this.openTeleRealiteSeries(show, false);
+      } else {
+        await this.openTeleRealiteSeries(show, true);
+      }
     });
 
     return card;
   }
 
   async openTeleRealiteSeries(show, directPlay = false) {
+    const pickEpisode = (seasons) => {
+      const valid = (seasons || []).filter(s => Array.isArray(s.episodes) && s.episodes.length > 0);
+      if (valid.length === 0) return { sNum: 1, epNum: 1 };
+
+      const showKey = 'netflix_ep_' + (show.series_id || show.id);
+      try {
+        const saved = JSON.parse(localStorage.getItem(showKey));
+        if (saved && saved.season && saved.episode) {
+          const sExists = valid.some(s => parseInt(s.season_number, 10) === parseInt(saved.season, 10));
+          if (sExists) return { sNum: parseInt(saved.season, 10), epNum: parseInt(saved.episode, 10) };
+        }
+      } catch (e) {}
+
+      const sorted = [...valid].sort((a, b) => parseInt(b.season_number, 10) - parseInt(a.season_number, 10));
+      const targetSeason = sorted[0] || valid[0];
+      const sNum = parseInt(targetSeason.season_number, 10);
+      const eps = targetSeason.episodes || [];
+      const epNum = (eps[0] && (eps[0].episode_number || eps[0].episode_num)) ? (eps[0].episode_number || eps[0].episode_num) : 1;
+      return { sNum, epNum };
+    };
+
     // 1. Accélération immédiate : si la fiche et les saisons sont déjà en mémoire
     const cached = this.telerealiteSeriesCache.get(show.series_id);
     if (cached) {
       if (directPlay) {
-        const validSeasons = (cached.seasons || []).filter(s => Array.isArray(s.episodes) && s.episodes.length > 0);
-        const sNum = validSeasons[0] ? validSeasons[0].season_number : null;
-        const epNum = (validSeasons[0]?.episodes?.[0]) ? validSeasons[0].episodes[0].episode_number : null;
+        const { sNum, epNum } = pickEpisode(cached.seasons);
         this.player.open(cached, 1, sNum, epNum);
       } else {
         this.openModal(cached);
@@ -1574,7 +1802,7 @@ class NetflixApp {
 
     // 2. Retour visuel instantané pour rassurer l'utilisateur pendant le chargement
     if (directPlay) {
-      this.player.showLoader(`⚡ Connexion aux épisodes de ${show.name} (💎 Xtream VIP)...`);
+      this.player.showLoader(`⚡ Connexion aux épisodes de ${show.name} (1080p FHD)...`);
       this.player.overlay.classList.add('active');
       this.player.showControls();
       this.player.resetSteps();
@@ -1620,9 +1848,7 @@ class NetflixApp {
       }
 
       if (directPlay) {
-        const validSeasons = (seriesObj.seasons || []).filter(s => Array.isArray(s.episodes) && s.episodes.length > 0);
-        const sNum = validSeasons[0] ? validSeasons[0].season_number : null;
-        const epNum = (validSeasons[0]?.episodes?.[0]) ? validSeasons[0].episodes[0].episode_number : null;
+        const { sNum, epNum } = pickEpisode(seriesObj.seasons);
         this.player.setStep(1, 'done', `1. ${seriesObj.seasons.length} saison(s) chargée(s) avec succès`);
         this.player.open(seriesObj, 1, sNum, epNum);
       } else {
@@ -1644,21 +1870,24 @@ class NetflixApp {
   async showTeleRealiteView() {
     this.catalogRowsContainer.innerHTML = `
       <div style="text-align: center; padding: 60px 20px; color: #888;">
-        <div style="font-size: 2.2rem; margin-bottom: 12px; color: #e50914;">📺</div>
-        <div style="font-size: 1.15rem; color: #fff; font-weight: 600;">Chargement des 221 séries de Télé-Réalité Xtream...</div>
+        <div style="font-size: 1.3rem; margin-bottom: 12px; font-weight: bold; color: #e50914;">ZIFLIX DIRECT</div>
+        <div style="font-size: 1.15rem; color: #fff; font-weight: 600;">Chargement des 223 séries de Télé-Réalité...</div>
         <div style="font-size: 0.9rem; color: #888; margin-top: 6px;">Vraies saisons, vrais épisodes en 1080p Full HD...</div>
       </div>
     `;
 
-    if (!this.telerealiteShows) {
+    if (!this.telerealiteShows || this.telerealiteShows.length === 0) {
       try {
         const stored = sessionStorage.getItem('telerealite_shows_cache');
         if (stored) {
-          this.telerealiteShows = JSON.parse(stored);
+          const parsed = JSON.parse(stored);
+          if (Array.isArray(parsed) && parsed.length > 0) {
+            this.telerealiteShows = parsed;
+          }
         }
       } catch (e) {}
 
-      if (!this.telerealiteShows) {
+      if (!this.telerealiteShows || this.telerealiteShows.length === 0) {
         try {
           const baseUrl = window.API_BASE || '';
           const res = await fetch(`${baseUrl}/api/xtream/telerealite?limit=300`, {
@@ -1666,7 +1895,7 @@ class NetflixApp {
             credentials: 'include'
           });
           const json = await res.json();
-          if (json.success && json.data) {
+          if (json && json.success && Array.isArray(json.data) && json.data.length > 0) {
             this.telerealiteShows = json.data;
             try { sessionStorage.setItem('telerealite_shows_cache', JSON.stringify(json.data)); } catch (e) {}
           }
@@ -1676,17 +1905,29 @@ class NetflixApp {
       }
     }
 
+    if (!this.telerealiteShows || this.telerealiteShows.length === 0) {
+      this.catalogRowsContainer.innerHTML = `
+        <div style="text-align: center; padding: 60px 20px; color: #888;">
+          <div style="font-size: 2.2rem; margin-bottom: 12px; color: #e50914;">⚠️</div>
+          <div style="font-size: 1.15rem; color: #fff; font-weight: 600;">Impossible de charger le catalogue Télé-Réalité pour le moment.</div>
+          <p style="font-size: 0.9rem; color: #aaa; margin: 8px auto 16px;">Veuillez vérifier votre connexion ou réactualiser la page.</p>
+          <button class="btn btn-primary" style="padding: 10px 24px; background: #e50914; border: none; color: #fff; border-radius: 20px; cursor: pointer; font-weight: bold;" onclick="delete window.netflixApp.telerealiteShows; sessionStorage.removeItem('telerealite_shows_cache'); window.netflixApp.showTeleRealiteView();">Réessayer 🔄</button>
+        </div>
+      `;
+      return;
+    }
+
     if (!this.telerealiteInitialized) {
       this.initTeleRealiteEvents();
       this.telerealiteInitialized = true;
     }
 
     // Configurer le Hero Banner avec une émission phare
-    const featured = this.telerealiteShows ? (
+    const featured = (
       this.telerealiteShows.find(s => s.name.toLowerCase().includes('la villa')) ||
       this.telerealiteShows.find(s => s.year === 2026) ||
       this.telerealiteShows[0]
-    ) : null;
+    );
 
     if (featured) {
       this.setupHero({
@@ -1697,7 +1938,7 @@ class NetflixApp {
         poster_url: featured.cover,
         media_type: 'series',
         is_xtream_series: true,
-        quality_badges: ['📺 1080p FHD Natif', 'Saisons Complètes', '💎 Xtream VIP']
+        quality_badges: ['1080p FHD Natif', 'Saisons Complètes', '1080p FHD']
       });
       if (this.heroPlayBtn) {
         this.heroPlayBtn.onclick = () => {
@@ -1761,10 +2002,10 @@ class NetflixApp {
     // Si recherche active ou filtre spécifique : afficher en carrousel direct des résultats
     if (q || filter !== 'all') {
       const filterLabels = {
-        '2026': '✨ Nouveautés 2026',
-        '2025': '🔥 Saisons 2025',
+        '2026': 'Nouveautés 2026',
+        '2025': 'Saisons 2025',
         'villa': '❤️ La Villa des Cœurs Brisés & Séduction',
-        'competition': '🏆 Compétition & Survie'
+        'competition': 'Compétition & Survie'
       };
       const title = q ? `Résultats pour "${q}" (${filtered.length})` : `${filterLabels[filter] || 'Sélection'} (${filtered.length})`;
       this.renderTeleRealiteRow(title, filtered);
@@ -1789,9 +2030,9 @@ class NetflixApp {
       this.renderTeleRealiteRow(`❤️ Romance, La Villa & Séduction (${sVilla.length})`, sVilla);
     }
     if (sCompetition.length > 0) {
-      this.renderTeleRealiteRow(`🏆 Compétition, Stratégie & Survie (${sCompetition.length})`, sCompetition);
+      this.renderTeleRealiteRow(`Compétition, Stratégie & Survie (${sCompetition.length})`, sCompetition);
     }
-    this.renderTeleRealiteRow(`📺 Toutes les Émissions de Télé-Réalité (${filtered.length})`, filtered);
+    this.renderTeleRealiteRow(`Toutes les Émissions de Télé-Réalité (${filtered.length})`, filtered);
   }
 
   renderTeleRealiteRow(title, shows) {
@@ -2075,6 +2316,21 @@ class NetflixApp {
       const isVipUser = !!(user && (user.role === 'vip' || user.is_vip));
       localStorage.setItem('ziflix_is_vip', isVipUser ? 'true' : 'false');
       localStorage.setItem('ziflix_is_admin', (user && user.role === 'admin') ? 'true' : 'false');
+
+      const prevUserId = localStorage.getItem('ziflix_current_user_id');
+      if (user && user.id && user.id !== prevUserId) {
+        localStorage.setItem('ziflix_current_user_id', user.id);
+        const userAccepted = localStorage.getItem('ziflix_welcome_accepted_' + user.id);
+        if (userAccepted !== 'true') {
+          localStorage.removeItem('ziflix_welcome_accepted');
+          const now = Date.now();
+          const currentExp = parseInt(localStorage.getItem('ziflix_watch_expires_at') || '0', 10);
+          if (isNaN(currentExp) || currentExp <= now) {
+            localStorage.setItem('ziflix_watch_expires_at', String(now + 1200 * 1000));
+            localStorage.setItem('ziflix_watch_credit', '1200');
+          }
+        }
+      }
     } catch (e) {}
 
     const headerProfileImg = document.getElementById('headerProfileImg');
@@ -2115,6 +2371,7 @@ class NetflixApp {
     } else {
       if (welcomeModal) welcomeModal.style.display = '';
       if (navTimer) navTimer.style.display = 'inline-flex';
+      if (zeroModal) zeroModal.classList.add('hidden');
       if (!this.authGateModal || this.authGateModal.classList.contains('hidden')) {
         this.checkWelcomeTimerModal();
       }
@@ -2204,9 +2461,26 @@ class NetflixApp {
 
       if (json.success && json.token && json.user) {
         localStorage.setItem('ziflix_auth_token', json.token);
+
+        // NOUVEAU COMPTE : Réinitialiser pour ce profil et accorder immédiatement 20 minutes offertes (1200s) sans pub
+        const now = Date.now();
+        const initial20Min = 1200;
+        localStorage.setItem('ziflix_current_user_id', json.user.id);
+        localStorage.setItem('ziflix_watch_expires_at', String(now + initial20Min * 1000));
+        localStorage.setItem('ziflix_watch_credit', String(initial20Min));
+        localStorage.removeItem('ziflix_welcome_accepted');
+        localStorage.setItem('ziflix_welcome_accepted_' + json.user.id, 'false');
+
+        // Masquer immédiatement tout modal zéro crédit hérité
+        const zeroModal = document.getElementById('zeroCreditHomeModal');
+        if (zeroModal) zeroModal.classList.add('hidden');
+
         this.setCurrentUser(json.user);
         this.unlockApp();
-        this.showToast(`🎉 Profil ZIFLIX créé ! Bon visionnage ${json.user.username} !`);
+
+        // Afficher directement le modal de félicitations d'accueil 20 min sans pub
+        this.checkWelcomeTimerModal(true);
+        this.showToast(`Profil ZIFLIX créé ! Félicitations, vos 20 minutes offertes sans pub sont activées.`);
       } else {
         if (this.registerError) {
           this.registerError.textContent = json.error || 'Erreur lors de la création du profil.';
@@ -2242,9 +2516,17 @@ class NetflixApp {
     localStorage.removeItem('ziflix_user');
     localStorage.removeItem('ziflix_is_vip');
     localStorage.removeItem('ziflix_is_admin');
+    localStorage.removeItem('ziflix_current_user_id');
+    localStorage.removeItem('ziflix_welcome_accepted');
+    localStorage.removeItem('ziflix_watch_expires_at');
+    localStorage.removeItem('ziflix_watch_credit');
     this.currentUser = null;
     this.catalogData = null;
     if (this.catalogRowsContainer) this.catalogRowsContainer.innerHTML = '';
+    const welcomeToast = document.getElementById('welcomeTimerModal');
+    if (welcomeToast) welcomeToast.classList.add('hidden');
+    const zeroModal = document.getElementById('zeroCreditHomeModal');
+    if (zeroModal) zeroModal.classList.add('hidden');
     this.showAuthGate();
     this.showToast('Vous avez été déconnecté.');
   }
@@ -2260,7 +2542,7 @@ class NetflixApp {
       if (modalUsername) modalUsername.textContent = this.currentUser.username || 'Membre';
       if (modalRole) {
         if (this.currentUser.role === 'admin') {
-          modalRole.textContent = '👑 Administrateur';
+          modalRole.textContent = 'Administrateur';
         } else if (this.currentUser.role === 'vip' || this.currentUser.is_vip) {
           modalRole.innerHTML = '<span style="color: #ffd700; font-weight: bold;">⭐ VIP (Illimité & Sans pub)</span>';
         } else {
@@ -2434,8 +2716,8 @@ class NetflixApp {
       });
       const json = await res.json();
       if (json.success) {
-        this.showToast(`🚫 Utilisateur "${username}" et son adresse IP ont été bannis`);
-        this.loadComments(mediaId);
+        this.showToast(`Utilisateur "${username}" et son adresse IP ont été bannis`);
+        this.loadModalComments(mediaId);
       } else {
         this.showToast(json.error || 'Erreur lors du bannissement', true);
       }
@@ -2672,7 +2954,7 @@ class NetflixApp {
     const rowEl = document.createElement('div');
     rowEl.className = 'movie-row continue-watching-row';
     rowEl.innerHTML = `
-      <h2 class="row-title"><span>▶️</span> Reprendre la lecture</h2>
+      <h2 class="row-title">Reprendre la lecture</h2>
       <div class="row-slider-container">
         <button class="slider-arrow left" aria-label="Défiler à gauche">‹</button>
         <div class="row-slider"></div>
@@ -2833,8 +3115,10 @@ class NetflixApp {
           localStorage.setItem('ziflix_watch_expires_at', String(newExp));
           return Math.min(3600, legacy);
         }
-        const accepted = localStorage.getItem('ziflix_welcome_accepted');
-        if (!accepted) return 900;
+        const currentUserId = (this.currentUser && this.currentUser.id) ? this.currentUser.id : localStorage.getItem('ziflix_current_user_id');
+        const userAccepted = currentUserId ? localStorage.getItem('ziflix_welcome_accepted_' + currentUserId) : null;
+        const accepted = userAccepted === 'true' || (userAccepted === null && localStorage.getItem('ziflix_welcome_accepted') === 'true');
+        if (!accepted) return 1200;
         return 0;
       }
       const exp = parseInt(expStr, 10);
@@ -2868,12 +3152,25 @@ class NetflixApp {
 
     if (this.navWatchTimerBtn && !this.navWatchTimerBtn._hasListener) {
       this.navWatchTimerBtn._hasListener = true;
-      this.navWatchTimerBtn.addEventListener('click', (e) => {
-        e.preventDefault();
-        e.stopPropagation();
-        if (this.player && typeof this.player.rechargeWatchCredit === 'function') {
+      const onBtnRecharge = (e) => {
+        if (e) {
+          try { e.preventDefault(); } catch (err) {}
+          try { e.stopPropagation(); } catch (err) {}
+        }
+        if (typeof window.rechargeWatchCreditDirect === "function") {
+          window.rechargeWatchCreditDirect(e);
+        } else if (window.netflixPlayer && typeof window.netflixPlayer.rechargeWatchCredit === "function") {
+          window.netflixPlayer.rechargeWatchCredit(false);
+        } else if (this.player && typeof this.player.rechargeWatchCredit === "function") {
           this.player.rechargeWatchCredit(false);
         }
+      };
+      this.navWatchTimerBtn.onclick = onBtnRecharge;
+      this.navWatchTimerBtn.addEventListener("click", onBtnRecharge);
+      this.navWatchTimerBtn.addEventListener("pointerdown", (e) => { if(e) e.stopPropagation(); });
+      this.navWatchTimerBtn.addEventListener("touchend", (e) => {
+        if (e) e.preventDefault();
+        onBtnRecharge(e);
       });
     }
 
@@ -2964,9 +3261,17 @@ class NetflixApp {
     if (this.authGateModal && !this.authGateModal.classList.contains('hidden')) return;
     if (document.getElementById('netflixPlayer')?.classList.contains('active')) return;
 
-    // Si l'utilisateur n'a pas encore validé l'offre de bienvenue, lui laisser voir le welcome modal
-    const accepted = localStorage.getItem('ziflix_welcome_accepted');
-    if (!accepted) return;
+    // Si l'utilisateur n'a pas encore validé l'offre de bienvenue, lui laisser voir le welcome modal et masquer le zéro crédit
+    const currentUserId = (this.currentUser && this.currentUser.id) ? this.currentUser.id : localStorage.getItem('ziflix_current_user_id');
+    const userAccepted = currentUserId ? localStorage.getItem('ziflix_welcome_accepted_' + currentUserId) : null;
+    const globalAccepted = localStorage.getItem('ziflix_welcome_accepted');
+    const isAccepted = userAccepted === 'true' || (userAccepted === null && globalAccepted === 'true');
+
+    if (!isAccepted) {
+      modal.classList.add('hidden');
+      this.checkWelcomeTimerModal();
+      return;
+    }
 
     const credit = this.getWatchCredit();
 
@@ -3000,7 +3305,7 @@ class NetflixApp {
     }
   }
 
-  checkWelcomeTimerModal() {
+  checkWelcomeTimerModal(force = false) {
     if (this.isVipOrAdmin()) {
       const modal = document.getElementById('welcomeTimerModal');
       if (modal) modal.classList.add('hidden');
@@ -3015,44 +3320,47 @@ class NetflixApp {
     if (this.authGateModal && !this.authGateModal.classList.contains('hidden')) return;
     if (document.getElementById('netflixPlayer')?.classList.contains('active')) return;
 
-    const accepted = localStorage.getItem('ziflix_welcome_accepted');
-    if (!accepted) {
-      // S'assurer que le modal zéro crédit est masqué tant que l'offre 15 min est présentée
+    const currentUserId = (this.currentUser && this.currentUser.id) ? this.currentUser.id : localStorage.getItem('ziflix_current_user_id');
+    const userAccepted = currentUserId ? localStorage.getItem('ziflix_welcome_accepted_' + currentUserId) : null;
+    const globalAccepted = localStorage.getItem('ziflix_welcome_accepted');
+    const isAccepted = userAccepted === 'true' || (userAccepted === null && globalAccepted === 'true');
+
+    if (!isAccepted || force) {
+      // S'assurer que le modal zéro crédit est strictement masqué
       const zeroModal = document.getElementById('zeroCreditHomeModal');
       if (zeroModal) zeroModal.classList.add('hidden');
 
       modal.classList.remove('hidden');
 
-      const dismiss = () => {
+      const onAccept = (e) => {
+        if (e) {
+          e.preventDefault();
+          e.stopPropagation();
+        }
         localStorage.setItem('ziflix_welcome_accepted', 'true');
+        if (currentUserId) {
+          localStorage.setItem('ziflix_welcome_accepted_' + currentUserId, 'true');
+        }
         modal.classList.add('hidden');
+
+        const now = Date.now();
+        const currentExp = parseInt(localStorage.getItem('ziflix_watch_expires_at') || '0', 10);
+        let remaining = (!isNaN(currentExp) && currentExp > now) ? Math.floor((currentExp - now) / 1000) : 0;
+        if (remaining < 1200) {
+          remaining = 1200;
+          localStorage.setItem('ziflix_watch_expires_at', String(now + 1200 * 1000));
+          localStorage.setItem('ziflix_watch_credit', '1200');
+        }
+        if (this.player && typeof this.player.updateTimerDisplays === 'function') {
+          this.player.updateTimerDisplays(remaining);
+        }
+        this.updateHomeTimerDisplay(remaining);
+        this.showToast('Félicitations ! Vos 20 minutes offertes sans pub sont activées.');
       };
 
-      acceptBtn.addEventListener('click', () => {
-        dismiss();
-        const now = Date.now();
-        const exp = now + 900 * 1000; // 15 minutes offertes (900s)
-        localStorage.setItem('ziflix_watch_expires_at', String(exp));
-        localStorage.setItem('ziflix_watch_credit', '900');
-        if (this.player && typeof this.player.updateTimerDisplays === 'function') {
-          this.player.updateTimerDisplays(900);
-        }
-        this.updateHomeTimerDisplay(900);
-        this.showToast('⏱ 15 minutes offertes activées. Bon visionnage !');
-      }, { once: true });
-
+      acceptBtn.onclick = onAccept;
       if (dismissBtn) {
-        dismissBtn.addEventListener('click', () => {
-          dismiss();
-          const now = Date.now();
-          const exp = now + 900 * 1000; // 15 minutes offertes (900s)
-          localStorage.setItem('ziflix_watch_expires_at', String(exp));
-          localStorage.setItem('ziflix_watch_credit', '900');
-          if (this.player && typeof this.player.updateTimerDisplays === 'function') {
-            this.player.updateTimerDisplays(900);
-          }
-          this.updateHomeTimerDisplay(900);
-        }, { once: true });
+        dismissBtn.onclick = onAccept;
       }
     } else {
       modal.classList.add('hidden');

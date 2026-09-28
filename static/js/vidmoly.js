@@ -1008,12 +1008,6 @@ async function resolveVidmolyStream(fileCode) {
       return { status: 'pending', message: 'Flux vidéo pas encore disponible' };
     }
 
-    // Protection Nœud Temporaire d'Encodage Vidmoly (vm-enc)
-    if (directStreamUrl.includes('vm-enc')) {
-      console.log(`[Vidmoly Resolver] ⏳ Nœud temporaire d'encodage détecté (vm-enc) pour ${fileCode}. En cours de finalisation.`);
-      return { status: 'converting', message: "En cours de finalisation d'encodage (nœud vm-enc)" };
-    }
-
     const resolved = {
       status: 'ready',
       streamUrl: directStreamUrl,
@@ -1029,51 +1023,15 @@ async function resolveVidmolyStream(fileCode) {
   }
 }
 
-// 6. Récupérateur & Réécriveur de Playlist HLS (.m3u8) Vidmoly (Optimisé avec Cache Disque Persistant)
-function invalidateVidmolyCache(fileCode) {
-  if (!fileCode) return;
-  resolvedStreamsCache.delete(fileCode);
-  resolvedPlaylistsCache.delete(fileCode);
-  try {
-    const diskCacheFile = path.join('/tmp', 'vidmoly_hls_cache', fileCode + '.json');
-    if (fs.existsSync(diskCacheFile)) {
-      fs.unlinkSync(diskCacheFile);
-    }
-  } catch (e) {}
-}
-
+// 6. Récupérateur & Réécriveur de Playlist HLS (.m3u8) Vidmoly
 async function getVidmolyHlsPlaylist(fileCode) {
   if (!fileCode) throw new Error('Code de fichier Vidmoly manquant');
 
-  // 1. Vérification Cache Mémoire (3h) (Rejette les flux temporaires vm-enc)
   const cached = resolvedPlaylistsCache.get(fileCode);
-  if (cached && (Date.now() - cached.timestamp < 3 * 60 * 60 * 1000)) {
-    if (cached.data && cached.data.playlist && !cached.data.playlist.includes('vm-enc')) {
-      return cached.data;
-    } else {
-      resolvedPlaylistsCache.delete(fileCode);
-    }
+  if (cached && (Date.now() - cached.timestamp < 2 * 60 * 60 * 1000)) {
+    return cached.data;
   }
 
-  // 2. Vérification Cache Disque Persistant (/tmp/vidmoly_hls_cache/) (Rejette vm-enc)
-  const diskCacheDir = path.join('/tmp', 'vidmoly_hls_cache');
-  const diskCacheFile = path.join(diskCacheDir, fileCode + '.json');
-  try {
-    if (!fs.existsSync(diskCacheDir)) fs.mkdirSync(diskCacheDir, { recursive: true });
-    if (fs.existsSync(diskCacheFile)) {
-      const diskData = JSON.parse(fs.readFileSync(diskCacheFile, 'utf8'));
-      if (diskData && diskData.data && (Date.now() - (diskData.timestamp || 0) < 3 * 60 * 60 * 1000)) {
-        if (diskData.data.playlist && !diskData.data.playlist.includes('vm-enc')) {
-          resolvedPlaylistsCache.set(fileCode, { timestamp: diskData.timestamp, data: diskData.data });
-          return diskData.data;
-        } else {
-          try { fs.unlinkSync(diskCacheFile); } catch (e) {}
-        }
-      }
-    }
-  } catch (diskErr) {}
-
-  // 3. Résolution du flux distant
   const resolved = await resolveVidmolyStream(fileCode);
   if (!resolved || resolved.status !== 'ready' || !resolved.streamUrl) {
     return resolved;
@@ -1082,7 +1040,7 @@ async function getVidmolyHlsPlaylist(fileCode) {
   const masterUrl = resolved.streamUrl;
   const masterRes = await fetchHttpWarp(masterUrl);
   if (masterRes.statusCode !== 200 || !masterRes.text) {
-    throw new Error('Vidmoly master m3u8 HTTP ' + masterRes.statusCode);
+    throw new Error(`Vidmoly master m3u8 HTTP ${masterRes.statusCode}`);
   }
 
   const subLine = masterRes.text.split('\n').map(l => l.trim()).find(l => l.startsWith('http'));
@@ -1095,19 +1053,30 @@ async function getVidmolyHlsPlaylist(fileCode) {
     }
   }
 
-  // Réécriture directe et ultra-rapide des URLs vers le proxy segment local (Zéro requête de probe bloquante)
+  // Tester si le CDN est accessible via le serveur proxy
+  // Si le 1er segment retourne 403, les URLs CDN sont directes (le navigateur les charge lui-même)
+  const firstSegLine = playlistToRewrite.split('\n').find(l => l.trim().startsWith('http'));
+  let useDirectUrls = false;
+  if (firstSegLine) {
+    try {
+      const testRes = await fetchHttpWarp(firstSegLine.trim(), { 'Range': 'bytes=0-1' });
+      if (testRes.statusCode === 403 || testRes.statusCode === 401) {
+        useDirectUrls = true; // CDN bloque le proxy serveur → URLs directes pour le navigateur
+        console.log(`[Vidmoly] CDN bloque le proxy (${testRes.statusCode}) pour ${fileCode}, URLs directes activées`);
+      }
+    } catch(testErr) { /* ignorer */ }
+  }
+
   const rewrittenPlaylist = playlistToRewrite.split('\n').map(line => {
     const trimmed = line.trim();
     if (trimmed.startsWith('http')) {
-      return '/api/stream/vidmoly-segment?url=' + encodeURIComponent(trimmed) + '&file_code=' + encodeURIComponent(fileCode);
+      if (useDirectUrls) {
+        return trimmed; // URL CDN directe - le navigateur la charge lui-même
+      }
+      return `/api/stream/vidmoly-segment?url=${encodeURIComponent(trimmed)}&file_code=${encodeURIComponent(fileCode)}`;
     }
     return line;
   }).join('\n');
-
-  if (rewrittenPlaylist.includes('vm-enc')) {
-    console.warn(`[Vidmoly HLS] ⚠️ Playlist contenant vm-enc détectée pour ${fileCode}. Rejet pour éviter mise en tampon infinie.`);
-    return { status: 'converting', message: "En cours de finalisation d'encodage (nœud vm-enc)" };
-  }
 
   const result = {
     status: 'ready',
@@ -1116,10 +1085,6 @@ async function getVidmolyHlsPlaylist(fileCode) {
   };
 
   resolvedPlaylistsCache.set(fileCode, { timestamp: Date.now(), data: result });
-  try {
-    fs.writeFileSync(diskCacheFile, JSON.stringify({ timestamp: Date.now(), data: result }), 'utf8');
-  } catch (e) {}
-
   return result;
 }
 
@@ -1247,7 +1212,6 @@ async function verifyVidmolyEpisodeDuration(fileCode) {
 }
 
 module.exports = {
-  invalidateVidmolyCache,
   verifyVidmolyEpisodeDuration,
   markEpisodeDead,
   reconcileStuckEpisodes,

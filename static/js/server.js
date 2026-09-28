@@ -37,32 +37,6 @@ const PORT = process.env.PORT || 8080;
 const DATA_FILE = path.join(__dirname, 'data', 'catalog.json');
 const CLUSTER_NODES_FILE = path.join(__dirname, 'data', 'cluster_nodes.json');
 
-// ================= COMPATIBILITÉ CODEC & SÉRIES 4K DV -> 1080P FHD =================
-const SERIES_ALIAS_MAP = {
-  '7290': '1974' // Mercredi (2022) 4K DV -> Mercredi (2022) 1080p
-};
-
-const HEVC_DV_TO_1080P_MAP = {
-  // Mercredi Saison 1 (4K DV -> 1080p)
-  '428833': '207687',
-  '428834': '207688',
-  '428835': '207689',
-  '428836': '207690',
-  '428837': '207691',
-  '428838': '207692',
-  '428839': '207693',
-  '428840': '207694',
-  // Mercredi Saison 2 (4K DV -> 1080p)
-  '428841': '380398',
-  '428842': '380399',
-  '428843': '380400',
-  '428844': '380401',
-  '428845': '383693',
-  '428846': '383694',
-  '428847': '383695',
-  '428848': '383696'
-};
-
 // Assurer l'existence du dossier data
 if (!fs.existsSync(path.join(__dirname, 'data'))) {
   fs.mkdirSync(path.join(__dirname, 'data'), { recursive: true });
@@ -584,174 +558,6 @@ function buildSameChannelVariantIndex() {
 buildSameChannelVariantIndex();
 
 // Catalogue complet des séries Télé-Réalité Xtream (Catégorie 947)
-
-// Catalogue complet des Films et Séries Françaises Xtream (FoxBleu)
-let XTREAM_FR_VOD_CATEGORIES = [];
-let XTREAM_FR_VOD_STREAMS = [];
-let XTREAM_FR_SERIES_CATEGORIES = [];
-let XTREAM_FR_SERIES = [];
-
-try {
-  const vodCatP = path.join(__dirname, 'data', 'cache', 'xtream_fr_vod_categories.json');
-  if (fs.existsSync(vodCatP)) XTREAM_FR_VOD_CATEGORIES = JSON.parse(fs.readFileSync(vodCatP, 'utf8'));
-
-  const vodStreamsP = path.join(__dirname, 'data', 'cache', 'xtream_fr_vod_streams.json');
-  if (fs.existsSync(vodStreamsP)) XTREAM_FR_VOD_STREAMS = JSON.parse(fs.readFileSync(vodStreamsP, 'utf8'));
-
-  const serCatP = path.join(__dirname, 'data', 'cache', 'xtream_fr_series_categories.json');
-  if (fs.existsSync(serCatP)) XTREAM_FR_SERIES_CATEGORIES = JSON.parse(fs.readFileSync(serCatP, 'utf8'));
-
-  const serStreamsP = path.join(__dirname, 'data', 'cache', 'xtream_fr_series.json');
-  if (fs.existsSync(serStreamsP)) XTREAM_FR_SERIES = JSON.parse(fs.readFileSync(serStreamsP, 'utf8'));
-
-  console.log('[Xtream VOD/Séries] Chargé en mémoire: ' + XTREAM_FR_VOD_CATEGORIES.length + ' catégories films, ' + XTREAM_FR_VOD_STREAMS.length + ' films, ' + XTREAM_FR_SERIES_CATEGORIES.length + ' catégories séries, ' + XTREAM_FR_SERIES.length + ' séries françaises.');
-} catch (e) {
-  console.warn('[Xtream VOD/Séries] Erreur chargement caches:', e.message);
-}
-
-// Cache mémoire et utilitaire haute performance pour la durée réelle des films VOD (Xtream)
-const xtreamVodDurationCache = new Map();
-
-function formatSecondsToHms(sec) {
-  if (!sec || isNaN(sec) || sec <= 0) return '00:00';
-  const h = Math.floor(sec / 3600);
-  const m = Math.floor((sec % 3600) / 60);
-  const s = Math.floor(sec % 60);
-  if (h > 0) {
-    return String(h).padStart(2, '0') + ':' + String(m).padStart(2, '0') + ':' + String(s).padStart(2, '0');
-  }
-  return String(m).padStart(2, '0') + ':' + String(s).padStart(2, '0');
-}
-
-function parseDurationToSecs(dur) {
-  if (!dur) return 0;
-  if (typeof dur === 'number') return dur;
-  const str = String(dur).trim();
-  if (/^\d+$/.test(str)) return parseInt(str, 10);
-  const parts = str.match(/^(?:(\d+):)?(\d+):(\d+)$/);
-  if (parts) {
-    const h = parseInt(parts[1] || '0', 10);
-    const m = parseInt(parts[2] || '0', 10);
-    const s = parseInt(parts[3] || '0', 10);
-    return h * 3600 + m * 60 + s;
-  }
-  const hm = str.match(/(?:(\d+)\s*h)?\s*(?:(\d+)\s*m)?/i);
-  if (hm && (hm[1] || hm[2])) {
-    const h = parseInt(hm[1] || '0', 10);
-    const m = parseInt(hm[2] || '0', 10);
-    return h * 3600 + m * 60;
-  }
-  return 0;
-}
-
-function findEpisodeDurationSecs(episodeId) {
-  if (!episodeId) return 0;
-  const sKey = String(episodeId);
-  if (typeof xtreamVodDurationCache !== 'undefined' && xtreamVodDurationCache.has(sKey)) {
-    const cached = xtreamVodDurationCache.get(sKey);
-    if (cached && cached.duration_secs) return cached.duration_secs;
-  }
-  try {
-    const cacheDir = path.join(__dirname, 'data', 'cache');
-    if (fs.existsSync(cacheDir)) {
-      const files = fs.readdirSync(cacheDir);
-      for (const f of files) {
-        if (f.startsWith('series_') && f.endsWith('.json')) {
-          const raw = fs.readFileSync(path.join(cacheDir, f), 'utf8');
-          if (raw.includes(sKey)) {
-            const data = JSON.parse(raw);
-            const epsMap = data.episodes || {};
-            for (const sNum of Object.keys(epsMap)) {
-              for (const ep of (epsMap[sNum] || [])) {
-                if (String(ep.id) === sKey || String(ep.episode_id) === sKey) {
-                  const d = parseInt(ep.info?.duration_secs || 0, 10) || (ep.info?.duration ? parseDurationToSecs(ep.info.duration) : 0);
-                  if (d > 0) {
-                    if (typeof xtreamVodDurationCache !== 'undefined') {
-                      xtreamVodDurationCache.set(sKey, { duration_secs: d, duration: (typeof formatSecondsToHms === 'function' ? formatSecondsToHms(d) : '') });
-                    }
-                    return d;
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
-    }
-  } catch(e) {}
-  return 0;
-}
-
-function getXtreamVodDuration(streamId) {
-  if (!streamId) return Promise.resolve(null);
-  const sKey = String(streamId);
-  if (xtreamVodDurationCache.has(sKey)) {
-    return Promise.resolve(xtreamVodDurationCache.get(sKey));
-  }
-  return new Promise((resolve) => {
-    const url = 'http://' + XTREAM_CONFIG.host + ':' + XTREAM_CONFIG.port + '/player_api.php?username=' + XTREAM_CONFIG.username + '&password=' + XTREAM_CONFIG.password + '&action=get_vod_info&vod_id=' + sKey;
-    const req = http.get(url, { timeout: 4000 }, (res) => {
-      let data = '';
-      res.on('data', chunk => data += chunk);
-      res.on('end', () => {
-        try {
-          const json = JSON.parse(data);
-          let durSecs = parseInt(json.info?.duration_secs || json.info?.runtime || 0, 10);
-          if (!durSecs && json.info?.duration) {
-            durSecs = parseDurationToSecs(json.info.duration);
-          }
-          const durFormatted = json.info?.duration || (durSecs > 0 ? formatSecondsToHms(durSecs) : null);
-          const resObj = {
-            duration_secs: durSecs > 0 ? durSecs : null,
-            duration: durFormatted
-          };
-          if (resObj.duration_secs) {
-            xtreamVodDurationCache.set(sKey, resObj);
-          }
-          resolve(resObj);
-        } catch (e) {
-          resolve(null);
-        }
-      });
-    });
-    req.on('error', () => resolve(null));
-    req.on('timeout', () => {
-      try { req.destroy(); } catch (e) {}
-      resolve(null);
-    });
-  });
-}
-
-function normalizeSearchTitle(raw) {
-  return cleanTitleString(raw)
-    .replace(/\s*\(\s*4K.*?\)/gi, '')
-    .replace(/\s*4K.*$/gi, '')
-    .replace(/\s*DV\b/gi, '')
-    .toLowerCase()
-    .trim();
-}
-
-function cleanTitleString(raw) {
-  return (raw || '')
-    .replace(/\s*\(\d{4}\)/g, '')
-    .replace(/\s*\[.*?\]/g, '')
-    .replace(/\s*\(VFQ?\)/gi, '')
-    .replace(/\s*\(VOSTFR\)/gi, '')
-    .replace(/\s*\(MULTI\)/gi, '')
-    .replace(/\s*\(TRUEFRENCH\)/gi, '')
-    .replace(/\s*\(FRENCH\)/gi, '')
-    .replace(/\s*\|.*?\|/g, '')
-    .replace(/\s*4K\s*UHD/gi, '')
-    .replace(/\s*1080p/gi, '')
-    .replace(/[\uD800-\uDBFF][\uDC00-\uDFFF]|[\u25A0-\u27BF]|[ⓋⒹⓈⓇ║|•\-]+/gu, '')
-    .trim();
-}
-
-function extractYearFromTitle(raw, fallback = 2025) {
-  const m = (raw || '').match(/\b(19\d{2}|20\d{2})\b/);
-  return m ? parseInt(m[1]) : fallback;
-}
-
 let XTREAM_TELEREALITE_CATALOG = [];
 try {
   const trPath = path.join(__dirname, 'data', 'xtream_telerealite_catalog.json');
@@ -839,7 +645,7 @@ function resolveStreamMediaInfo(streamId, type = 'channel', customName = '') {
 
 // ================= LIMITATEUR DE VISIONNAGES SIMULTANÉS (2 MAX PAR IP) =================
 const MAX_CONCURRENT_STREAMS_PER_IP = 2;
-const STREAM_SESSION_TTL_MS = 180000; // 3 minutes sans requête = visionnage inactif (coussin anti-coupure HLS)
+const STREAM_SESSION_TTL_MS = 14000; // 14 secondes sans requête/chunk = visionnage inactif
 const STREAM_LIMIT_POLICY = 'kill_oldest'; // 'kill_oldest' : tue le plus ancien pour laisser tourner les 2 | 'block_new' : bloque le 3ème
 
 // Map: clientIp -> Map<mediaKey, SessionObject>
@@ -989,9 +795,15 @@ function createStreamSessionObject(clientIp, mediaKey, mediaId, type, name, now,
       }
       session.resSockets.clear();
 
-      // Ne JAMAIS tuer FFmpeg au timeout du Stream Limiter :
-      // Le remuxage en tâche de fond doit se poursuivre pour produire un VOD complet sur disque.
-      // Les sessions HLS inactives sont nettoyées après 3 minutes d'inactivité par xtreamHlsSessions.
+      if (type === 'series') {
+        const hlsSess = xtreamHlsSessions.get(String(mediaId));
+        if (hlsSess && hlsSess.proc) {
+          try {
+            hlsSess.proc.kill('SIGTERM');
+            console.log('[Stream Limiter] Processus FFmpeg pour épisode ' + mediaId + ' arrêté (flux révoqué).');
+          } catch (e) {}
+        }
+      }
     }
   };
 
@@ -1231,7 +1043,6 @@ const xtreamManifestCache = new Map();
 const xtreamLiveSequences = new Map();
 // Cache d'adresses Edge directes pour les épisodes séries Xtream VOD (TTL 10 min pour éviter les re-redirections après pause)
 const xtreamSeriesEdgeCache = new Map();
-const xtreamMovieEdgeCache = new Map();
 
 // Cache en mémoire des codes Vidmoly morts (404/supprimés) pour bascule instantanée 0ms vers Xtream HLS
 const deadVidmolyCodes = new Set();
@@ -1379,48 +1190,6 @@ function fetchXtreamJson(targetUrl, timeoutMs = 12000, retry = 0) {
   });
 }
 
-
-function resolveXtreamMovieEdgeUrl(streamId, ext = 'mp4') {
-  const cacheKey = `${streamId}_${ext}`;
-  const cached = xtreamMovieEdgeCache.get(cacheKey);
-  if (cached && cached.expiresAt > Date.now()) {
-    return Promise.resolve(cached.url);
-  }
-  const originUrl = 'http://' + XTREAM_CONFIG.host + ':' + XTREAM_CONFIG.port + '/movie/' + XTREAM_CONFIG.username + '/' + XTREAM_CONFIG.password + '/' + streamId + '.' + ext;
-  return xtreamProxyManager.deduplicate('edge_movie_' + cacheKey, () => {
-    return new Promise((resolve) => {
-      const agent = getXtreamAgent(originUrl, true, true);
-      const req = http.get(originUrl, {
-        agent,
-        headers: {
-          'User-Agent': 'IPTVSmartersPro/1.0',
-          'Range': 'bytes=0-100'
-        },
-        timeout: 3500
-      }, (res) => {
-        try { res.destroy(); } catch (e) {}
-        const loc = res.headers.location;
-        if (loc) {
-          const nextUrl = loc.startsWith('http') ? loc : new URL(loc, originUrl).href;
-          xtreamMovieEdgeCache.set(cacheKey, { url: nextUrl, expiresAt: Date.now() + 10 * 60 * 1000 });
-          xtreamProxyManager.reportSuccess();
-          return resolve(nextUrl);
-        }
-        resolve(originUrl);
-      });
-      req.on('error', (err) => {
-        xtreamProxyManager.reportFailure(err.message);
-        resolve(originUrl);
-      });
-      req.on('timeout', () => {
-        req.destroy();
-        xtreamProxyManager.reportFailure('Timeout');
-        resolve(originUrl);
-      });
-    });
-  });
-}
-
 function resolveXtreamSeriesEdgeUrl(episodeId, ext = 'mkv') {
   const cacheKey = `${episodeId}_${ext}`;
   const cached = xtreamSeriesEdgeCache.get(cacheKey);
@@ -1476,9 +1245,6 @@ setInterval(() => {
   }
   for (const [k, v] of xtreamEdgeCache.entries()) {
     if (v.expiresAt <= now) xtreamEdgeCache.delete(k);
-  }
-  for (const [k, v] of xtreamMovieEdgeCache.entries()) {
-    if (v.expiresAt <= now) xtreamMovieEdgeCache.delete(k);
   }
   for (const [k, v] of xtreamSeriesEdgeCache.entries()) {
     if (v.expiresAt <= now) xtreamSeriesEdgeCache.delete(k);
@@ -3082,7 +2848,6 @@ function sendResponse(req, res, statusCode, contentType, bodyData, extraHeaders 
 // Caches pré-compressés en mémoire (0ms, 0 CPU en production)
 let cachedCatalogBuffer = null;
 let cachedCatalogGzip = null;
-let cachedCatalogEtag = null;
 let cachedXtreamChannelsPayload = null;
 let cachedXtreamChannelsGzip = null;
 let cachedXtreamTelePayload = null;
@@ -3091,7 +2856,6 @@ let cachedXtreamTeleGzip = null;
 function invalidateCatalogCache() {
   cachedCatalogBuffer = null;
   cachedCatalogGzip = null;
-  cachedCatalogEtag = null;
 }
 
 function formatXtreamSeasonsList(rawData) {
@@ -3229,7 +2993,6 @@ function checkAndAutoPublishEpisodes(seriesId, freshData) {
 
 function updateCatalogSeriesSeasons(seriesId, rawXtreamData) {
   try {
-    if (typeof SERIES_ALIAS_MAP !== 'undefined' && SERIES_ALIAS_MAP[String(seriesId)]) seriesId = SERIES_ALIAS_MAP[String(seriesId)];
     const sList = formatXtreamSeasonsList(rawXtreamData);
     if (!sList || sList.length === 0) return;
 
@@ -3258,7 +3021,6 @@ function updateCatalogSeriesSeasons(seriesId, rawXtreamData) {
 }
 
 function fetchFreshSeriesFromXtream(seriesId, onDone) {
-  if (typeof SERIES_ALIAS_MAP !== 'undefined' && SERIES_ALIAS_MAP[String(seriesId)]) seriesId = SERIES_ALIAS_MAP[String(seriesId)];
   const apiUrl = `http://${XTREAM_CONFIG.host}:${XTREAM_CONFIG.port}/player_api.php?username=${XTREAM_CONFIG.username}&password=${XTREAM_CONFIG.password}&action=get_series_info&series_id=${seriesId}`;
   const promise = xtreamProxyManager.deduplicate('series_' + seriesId, () => {
     return new Promise((resolve, reject) => {
@@ -3876,48 +3638,6 @@ loadZiflixSessions();
 loadZiflixBugs();
 loadZiflixBannedIps();
 loadZiflixSecurityAlerts();
-// ================= SYSTÈME DE FAVORIS (MA LISTE) MULTI-SOURCES =================
-const FAVORITES_LOCAL = path.join(__dirname, 'data', 'favorites.json');
-const FAVORITES_BACKUP = path.join(SYSTEM_PERSISTENT_DIR, 'favorites.json');
-let ZIFLIX_FAVORITES = {};
-
-function loadZiflixFavorites() {
-  try {
-    if (fs.existsSync(FAVORITES_LOCAL)) {
-      ZIFLIX_FAVORITES = JSON.parse(fs.readFileSync(FAVORITES_LOCAL, 'utf8'));
-    } else if (fs.existsSync(FAVORITES_BACKUP)) {
-      ZIFLIX_FAVORITES = JSON.parse(fs.readFileSync(FAVORITES_BACKUP, 'utf8'));
-    }
-  } catch (e) {
-    console.error('[ZIFLIX Favorites] Erreur lecture favoris:', e.message);
-    ZIFLIX_FAVORITES = {};
-  }
-}
-
-function saveZiflixFavorites() {
-  try {
-    const dir = path.dirname(FAVORITES_LOCAL);
-    if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
-    fs.writeFileSync(FAVORITES_LOCAL, JSON.stringify(ZIFLIX_FAVORITES, null, 2), 'utf8');
-  } catch (e) {
-    console.error('[ZIFLIX Favorites] Erreur sauvegarde locale:', e.message);
-  }
-  try {
-    const bDir = path.dirname(FAVORITES_BACKUP);
-    if (!fs.existsSync(bDir)) fs.mkdirSync(bDir, { recursive: true });
-    fs.writeFileSync(FAVORITES_BACKUP, JSON.stringify(ZIFLIX_FAVORITES, null, 2), 'utf8');
-  } catch (e) {}
-}
-
-function getFavoritesKey(req) {
-  const user = getAuthUser(req);
-  if (user && user.id) return 'user_' + user.id;
-  const clientIp = getClientIp(req);
-  return 'ip_' + clientIp;
-}
-
-loadZiflixFavorites();
-
 setTimeout(() => {
   scanAndAutoBanExistingTrolls();
 }, 2500);
@@ -4071,48 +3791,90 @@ async function handlePlayerApi(req, res, q) {
 
   // CAS 4 : Catégories VOD (Films)
   if (action === 'get_vod_categories') {
-    const vodCats = (Array.isArray(XTREAM_FR_VOD_CATEGORIES) && XTREAM_FR_VOD_CATEGORIES.length > 0)
-      ? XTREAM_FR_VOD_CATEGORIES
-      : (catalog.categories || []).map((c, i) => ({ category_id: String(i + 10), category_name: c.name, parent_id: 0 }));
+    const vodCats = (catalog.categories || []).filter(c => !['sports_fr', 'ppv_combat', 'sports_extreme', 'tnt_fr', 'telerealite'].includes(c.slug)).map((c, i) => ({
+      category_id: String(i + 10),
+      category_name: c.name,
+      parent_id: 0
+    }));
     res.writeHead(200, { 'Content-Type': 'application/json; charset=utf-8', 'Access-Control-Allow-Origin': '*' });
     return res.end(JSON.stringify(vodCats));
   }
 
-  // CAS 5 : Films VOD (Catalogue complet français)
+  // CAS 5 : Films VOD
   if (action === 'get_vod_streams') {
-    const catId = q.category_id ? String(q.category_id) : null;
-    let list = (Array.isArray(XTREAM_FR_VOD_STREAMS) && XTREAM_FR_VOD_STREAMS.length > 0) ? XTREAM_FR_VOD_STREAMS : [];
-    if (catId) {
-      list = list.filter(m => String(m.category_id) === catId || (Array.isArray(m.category_ids) && m.category_ids.map(String).includes(catId)));
-    }
+    const movies = (catalog.movies || []).filter(m => m.media_type !== 'channel' && m.media_type !== 'series' && !m.is_live && !m.is_xtream_series);
+    const result = movies.map((m, idx) => ({
+      num: idx + 1,
+      name: m.title,
+      stream_type: "movie",
+      stream_id: m.id || m.tmdb_id,
+      stream_icon: m.poster_url || "",
+      rating: m.match_score ? (m.match_score / 10).toFixed(1) : "8.5",
+      rating_5based: m.match_score ? (m.match_score / 20).toFixed(1) : "4.3",
+      added: "1725000000",
+      category_id: "10",
+      container_extension: "mp4"
+    }));
     res.writeHead(200, { 'Content-Type': 'application/json; charset=utf-8', 'Access-Control-Allow-Origin': '*' });
-    return res.end(JSON.stringify(list));
+    return res.end(JSON.stringify(result));
   }
 
   // CAS 6 : Catégories Séries
   if (action === 'get_series_categories') {
-    const seriesCats = (Array.isArray(XTREAM_FR_SERIES_CATEGORIES) && XTREAM_FR_SERIES_CATEGORIES.length > 0)
-      ? XTREAM_FR_SERIES_CATEGORIES
-      : [
-        { category_id: "947", category_name: "Télé-Réalité & Divertissement", parent_id: 0 },
-        { category_id: "948", category_name: "Séries Tendances", parent_id: 0 }
-      ];
+    const seriesCats = [
+      { category_id: "947", category_name: "Télé-Réalité & Divertissement", parent_id: 0 },
+      { category_id: "948", category_name: "Séries Tendances", parent_id: 0 }
+    ];
     res.writeHead(200, { 'Content-Type': 'application/json; charset=utf-8', 'Access-Control-Allow-Origin': '*' });
     return res.end(JSON.stringify(seriesCats));
   }
 
-  // CAS 7 : Liste des Séries (Catalogue complet français)
+  // CAS 7 : Liste des Séries
   if (action === 'get_series') {
-    const catId = q.category_id ? String(q.category_id) : null;
-    let list = (Array.isArray(XTREAM_FR_SERIES) && XTREAM_FR_SERIES.length > 0) ? XTREAM_FR_SERIES : XTREAM_TELEREALITE_CATALOG;
-    if (catId) {
-      list = list.filter(s => String(s.category_id) === catId || (Array.isArray(s.category_ids) && s.category_ids.map(String).includes(catId)));
-    }
+    const result = XTREAM_TELEREALITE_CATALOG.map((s, idx) => ({
+      num: idx + 1,
+      name: s.name,
+      series_id: s.series_id,
+      cover: s.cover || "",
+      plot: s.plot || "",
+      cast: s.cast || "",
+      director: "",
+      genre: s.genre || "Télé-Réalité",
+      releaseDate: String(s.year || "2025"),
+      last_modified: "1725000000",
+      rating: s.rating || "8.5",
+      rating_5based: "4.3",
+      backdrop_path: [s.backdrop || ""],
+      youtube_trailer: "",
+      episode_run_time: s.episode_run_time || "45",
+      category_id: String(s.category_id || "947")
+    }));
     res.writeHead(200, { 'Content-Type': 'application/json; charset=utf-8', 'Access-Control-Allow-Origin': '*' });
-    return res.end(JSON.stringify(list));
+    return res.end(JSON.stringify(result));
   }
 
-  // CAS 8 : Détails d'une Série
+  // CAS 8 : Détails d'une Série (Saisons et Épisodes)
+  
+function enrichSeriesWithVidmoly(seriesData) {
+  if (!seriesData || !seriesData.episodes) return seriesData;
+  try {
+    const vidmolyMap = vidmoly ? vidmoly.getEpisodesMap() : {};
+    for (const sKey of Object.keys(seriesData.episodes)) {
+      const epList = seriesData.episodes[sKey];
+      if (Array.isArray(epList)) {
+        for (const ep of epList) {
+          const vEntry = vidmolyMap[String(ep.id)];
+          if (vEntry && vEntry.fileCode && vEntry.status === 'ready') {
+            ep.vidmoly_file_code = vEntry.fileCode;
+            ep.vidmoly_embed_url = `https://vidmoly.org/embed-${vEntry.fileCode}.html`;
+          }
+        }
+      }
+    }
+  } catch (e) {}
+  return seriesData;
+}
+
   if (action === 'get_series_info') {
     const seriesId = String(q.series_id || '');
     if (!seriesId) {
@@ -4384,26 +4146,19 @@ const server = http.createServer(async (req, res) => {
       } else if (type === 'series') {
         const extMatch = fileWithExt.match(/\.([a-zA-Z0-9]+)$/);
         const ext = extMatch ? extMatch[1] : 'mkv';
-        let episodeId = fileWithExt.replace(/\.[a-zA-Z0-9]+$/, '');
-        if (typeof HEVC_DV_TO_1080P_MAP !== 'undefined' && HEVC_DV_TO_1080P_MAP[String(episodeId)]) episodeId = HEVC_DV_TO_1080P_MAP[String(episodeId)];
+        const episodeId = fileWithExt.replace(/\.[a-zA-Z0-9]+$/, '');
         parsedUrl.query.episode_id = episodeId;
         parsedUrl.query.ext = ext;
         pathname = '/api/stream/xtream-series';
         trackStreamingSession(req, res, episodeId, 'series');
       } else if (type === 'movie') {
-        const extMatch = fileWithExt.match(/\.([a-zA-Z0-9]+)$/);
-        const ext = extMatch ? extMatch[1] : 'mp4';
         const movieId = fileWithExt.replace(/\.[a-zA-Z0-9]+$/, '');
-        const catMovie = (catalog.movies || []).find(m => m.id === movieId || m.tmdb_id === movieId || String(m.stream_id) === movieId);
-        if (catMovie && catMovie.video_url && !catMovie.video_url.includes('/api/stream/xtream-movie')) {
+        const catMovie = (catalog.movies || []).find(m => m.id === movieId || m.tmdb_id === movieId);
+        if (catMovie && catMovie.video_url) {
           trackStreamingSession(req, res, movieId, 'movie', catMovie.title);
           res.writeHead(302, { 'Location': catMovie.video_url, 'Access-Control-Allow-Origin': '*' });
           return res.end();
         }
-        parsedUrl.query.stream_id = movieId;
-        parsedUrl.query.ext = ext;
-        pathname = '/api/stream/xtream-movie-stream';
-        trackStreamingSession(req, res, movieId, 'movie');
       }
     }
   }
@@ -4491,23 +4246,6 @@ const server = http.createServer(async (req, res) => {
     return res.end(JSON.stringify({ success: true, configs: introConfigs }));
   }
 
-    // ── ROUTE CLIENT DEBUG (CAPTURE ERREURS NAVIGATEUR) ──
-  if (pathname === '/api/client-debug' && req.method === 'POST') {
-    let body = '';
-    req.on('data', chunk => { body += chunk; });
-    req.on('end', () => {
-      try {
-        const d = JSON.parse(body);
-        console.log('[CLIENT-DEBUG ' + d.type + ']', JSON.stringify(d.data));
-      } catch (e) {
-        console.log('[CLIENT-DEBUG RAW]', body);
-      }
-      res.writeHead(204, { 'Access-Control-Allow-Origin': '*' });
-      res.end();
-    });
-    return;
-  }
-
   // ================= API REST =================
   if (pathname === '/api/catalog' && req.method === 'GET') {
     const authUser = getAuthUser(req);
@@ -4517,21 +4255,9 @@ const server = http.createServer(async (req, res) => {
     }
 
     if (!cachedCatalogBuffer) {
-      function cleanMovieForCatalog(m) {
-        if (!m) return m;
-        const { seasons, ...rest } = m;
-        if (seasons && Array.isArray(seasons)) {
-          rest.total_seasons = seasons.length;
-          rest.total_episodes = seasons.reduce((acc, s) => acc + (s.episodes ? s.episodes.length : 0), 0);
-        }
-        return rest;
-      }
-
-      const cleanedMovies = catalog.movies.map(cleanMovieForCatalog);
-      const hero = cleanMovieForCatalog(catalog.movies.find(m => m.is_hero) || catalog.movies[0]);
-
+      const hero = catalog.movies.find(m => m.is_hero) || catalog.movies[0];
       const rows = catalog.categories.map(cat => {
-        let catMovies = cleanedMovies.filter(m =>
+        let catMovies = catalog.movies.filter(m =>
           m.categories.some(c =>
             c.toLowerCase().includes(cat.name.toLowerCase()) ||
             cat.name.toLowerCase().includes(c.toLowerCase()) ||
@@ -4539,29 +4265,17 @@ const server = http.createServer(async (req, res) => {
           )
         );
         if (catMovies.length === 0 && (cat.slug === 'top-regardes' || cat.id === 'c_top_regardes')) {
-          catMovies = [...cleanedMovies]
+          catMovies = [...catalog.movies]
             .filter(m => m.media_type !== 'channel')
-            .sort((a, b) => (b.match_score || 0) - (a.match_score || 0));
+            .sort((a, b) => (b.match_score || 0) - (a.match_score || 0))
+            .slice(0, 24);
         }
-        // Plafonnage à 36 cartes par rangée (vitesse d'affichage mobile maximale, fluidité 60fps)
-        return { category: cat, movies: catMovies.slice(0, 36) };
+        return { category: cat, movies: catMovies };
       }).filter(r => r.movies.length > 0);
 
-      const jsonStr = JSON.stringify({ success: true, data: { hero, rows, movies: cleanedMovies } });
+      const jsonStr = JSON.stringify({ success: true, data: { hero, rows } });
       cachedCatalogBuffer = Buffer.from(jsonStr, 'utf8');
-      cachedCatalogGzip = zlib.gzipSync(cachedCatalogBuffer, { level: 6 });
-      cachedCatalogEtag = '"' + crypto.createHash('md5').update(cachedCatalogBuffer).digest('hex') + '"';
-    }
-
-    const clientEtag = (req.headers['if-none-match'] || '').replace(/^W\//i, '').replace(/"/g, '');
-    const cleanEtag = (cachedCatalogEtag || '').replace(/^W\//i, '').replace(/"/g, '');
-    if (clientEtag && clientEtag === cleanEtag) {
-      res.writeHead(304, {
-        'ETag': cachedCatalogEtag,
-        'Cache-Control': 'public, max-age=60, stale-while-revalidate=300',
-        'Access-Control-Allow-Origin': '*'
-      });
-      return res.end();
+      cachedCatalogGzip = zlib.gzipSync(cachedCatalogBuffer);
     }
 
     const acceptEncoding = (req.headers['accept-encoding'] || '').toLowerCase();
@@ -4570,8 +4284,7 @@ const server = http.createServer(async (req, res) => {
         'Content-Type': 'application/json',
         'Content-Encoding': 'gzip',
         'Content-Length': cachedCatalogGzip.length,
-        'ETag': cachedCatalogEtag,
-        'Cache-Control': 'public, max-age=60, stale-while-revalidate=300',
+        'Cache-Control': 'no-cache, must-revalidate',
         'Access-Control-Allow-Origin': '*'
       });
       res.end(cachedCatalogGzip);
@@ -4579,8 +4292,7 @@ const server = http.createServer(async (req, res) => {
       res.writeHead(200, {
         'Content-Type': 'application/json',
         'Content-Length': cachedCatalogBuffer.length,
-        'ETag': cachedCatalogEtag,
-        'Cache-Control': 'public, max-age=60, stale-while-revalidate=300',
+        'Cache-Control': 'no-cache, must-revalidate',
         'Access-Control-Allow-Origin': '*'
       });
       res.end(cachedCatalogBuffer);
@@ -4590,9 +4302,9 @@ const server = http.createServer(async (req, res) => {
 
   if (pathname === '/api/movies' && req.method === 'GET') {
     const authUser = getAuthUser(req);
-    if (authUser && authUser.is_banned) {
-      res.writeHead(403, { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' });
-      return res.end(JSON.stringify({ success: false, error: 'Accès restreint.' }));
+    if (!authUser || authUser.is_banned) {
+      res.writeHead(401, { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' });
+      return res.end(JSON.stringify({ success: false, error: 'Accès réservé aux membres ZIFLIX.' }));
     }
     res.writeHead(200, { 'Content-Type': 'application/json' });
     res.end(JSON.stringify({ success: true, data: catalog.movies }));
@@ -4607,44 +4319,11 @@ const server = http.createServer(async (req, res) => {
     }
     const id = pathname.replace('/api/movies/', '');
     let movie = catalog.movies.find(m => m.id === id);
-    
-    if (!movie && id.startsWith('xtream_vod_')) {
-      const vId = parseInt(id.replace('xtream_vod_', ''), 10);
-      const vMovie = Array.isArray(XTREAM_FR_VOD_STREAMS) ? XTREAM_FR_VOD_STREAMS.find(m => m.stream_id === vId) : null;
-      if (vMovie) {
-        const cleanT = cleanTitleString(vMovie.name);
-        const y = extractYearFromTitle(vMovie.name, 2025);
-        movie = {
-          id: 'xtream_vod_' + vId,
-          stream_id: vId,
-          title: cleanT || vMovie.name,
-          original_title: vMovie.name,
-          poster_url: vMovie.stream_icon || '',
-          backdrop_url: vMovie.stream_icon || '',
-          overview: vMovie.plot || (cleanT + ' - Film complet disponible en 1080p FHD sur ZIFLIX.'),
-          media_type: 'movie',
-          is_xtream_movie: true,
-          container_extension: vMovie.container_extension || 'mp4',
-          video_url: '/api/stream/xtream-movie?stream_id=' + vId + '&ext=' + (vMovie.container_extension || 'mp4'),
-          release_year: y,
-          duration: '1h 50m',
-          age_rating: '12+',
-          rating: vMovie.rating ? String(vMovie.rating).slice(0, 3) : '8.2',
-          match_score: Math.min(99, Math.max(75, Math.round(parseFloat(vMovie.rating || '8.2') * 10))),
-          quality_badges: ['1080p FHD', 'Son 5.1'],
-          categories: ['Films', 'Nouveautés & Les Plus Regardés']
-        };
-      }
-    }
-
     if (!movie && id.startsWith('xtream_series_')) {
       const sId = parseInt(id.replace('xtream_series_', ''), 10);
       let sShow = Array.isArray(XTREAM_TELEREALITE_CATALOG) ? XTREAM_TELEREALITE_CATALOG.find(s => s.series_id === sId) : null;
       if (!sShow && Array.isArray(XTREAM_ANIME_CATALOG)) {
         sShow = XTREAM_ANIME_CATALOG.find(s => s.series_id === sId);
-      }
-      if (!sShow && Array.isArray(XTREAM_FR_SERIES)) {
-        sShow = XTREAM_FR_SERIES.find(s => s.series_id === sId);
       }
       if (sShow) {
         movie = {
@@ -4706,28 +4385,13 @@ const server = http.createServer(async (req, res) => {
     const terms = rawQ.split(/\s+/).filter(t => t.length > 0);
     const results = [];
     const seenTitles = new Set();
-    const seenSeriesIds = new Set();
-    const seenNormalizedTitles = new Set();
 
     // 1. Recherche dans catalog.movies (Films & Séries Netflix + Top Titres)
     for (const m of catalog.movies) {
-      const target = `${m.title} ${m.original_title || ''} ${m.release_year || m.year || ''} ${m.overview || ''} ${(m.categories || []).join(' ')} ${(m.cast || []).join(' ')}`.toLowerCase();
+      const target = `${m.title} ${m.original_title || ''} ${m.overview || ''} ${(m.categories || []).join(' ')} ${(m.cast || []).join(' ')}`.toLowerCase();
       if (terms.every(t => target.includes(t))) {
         results.push(m);
         seenTitles.add(m.title.toLowerCase());
-        seenNormalizedTitles.add(normalizeSearchTitle(m.title));
-        if (m.series_id) {
-          const sIdStr = String(m.series_id);
-          seenSeriesIds.add(sIdStr);
-          if (typeof SERIES_ALIAS_MAP !== 'undefined') {
-            for (const [k, v] of Object.entries(SERIES_ALIAS_MAP)) {
-              if (String(v) === sIdStr || String(k) === sIdStr) {
-                seenSeriesIds.add(String(k));
-                seenSeriesIds.add(String(v));
-              }
-            }
-          }
-        }
       }
     }
 
@@ -4771,14 +4435,10 @@ const server = http.createServer(async (req, res) => {
         for (const cf of cacheFiles) {
           try {
             const raw = JSON.parse(fs.readFileSync(path.join(cacheDir, cf), 'utf8'));
-            let sId = cf.replace(/^series_/, '').replace(/\.json$/, '');
-            const isAliased = (typeof SERIES_ALIAS_MAP !== 'undefined' && SERIES_ALIAS_MAP[sId]);
-            if (isAliased) sId = String(SERIES_ALIAS_MAP[sId]);
-            if (seenSeriesIds.has(sId) || isAliased) continue;
+            const sId = cf.replace(/^series_/, '').replace(/\.json$/, '');
             const name = raw.info?.name || '';
             const nameLower = name.toLowerCase();
-            const normTitle = normalizeSearchTitle(name);
-            if (seenTitles.has(nameLower) || seenNormalizedTitles.has(normTitle)) continue;
+            if (seenTitles.has(nameLower)) continue;
             const target = `${name} ${raw.info?.plot || ''} ${raw.info?.genre || ''} ${raw.info?.cast || ''}`.toLowerCase();
             if (terms.every(t => target.includes(t))) {
               results.push({
@@ -4843,71 +4503,6 @@ const server = http.createServer(async (req, res) => {
       }
     }
 
-    
-    // 3. Recherche dans XTREAM_FR_VOD_STREAMS (Films Français)
-    if (Array.isArray(XTREAM_FR_VOD_STREAMS)) {
-      for (const m of XTREAM_FR_VOD_STREAMS) {
-        if (results.length >= 36) break;
-        const t = (m.name + ' ' + (m.plot || '')).toLowerCase();
-        if (terms.every(term => t.includes(term))) {
-          const sTitle = cleanTitleString(m.name);
-          if (seenTitles.has(sTitle.toLowerCase())) continue;
-          seenTitles.add(sTitle.toLowerCase());
-          results.push({
-            id: 'xtream_vod_' + m.stream_id,
-            stream_id: m.stream_id,
-            title: sTitle,
-            original_title: m.name,
-            overview: m.plot || (sTitle + ' - Film disponible en 1080p FHD.'),
-            media_type: 'movie',
-            is_xtream_movie: true,
-            poster_url: m.stream_icon || '',
-            backdrop_url: m.stream_icon || '',
-            video_url: '/api/stream/xtream-movie?stream_id=' + m.stream_id + '&ext=' + (m.container_extension || 'mp4'),
-            release_year: extractYearFromTitle(m.name, 2025),
-            match_score: Math.min(99, Math.max(75, Math.round(parseFloat(m.rating || '8.2') * 10))),
-            quality_badges: ['1080p FHD']
-          });
-        }
-      }
-    }
-
-    // 4. Recherche dans XTREAM_FR_SERIES (Séries Françaises)
-    if (Array.isArray(XTREAM_FR_SERIES)) {
-      for (const s of XTREAM_FR_SERIES) {
-        if (results.length >= 48) break;
-        const t = (s.name + ' ' + (s.plot || '') + ' ' + (s.genre || '')).toLowerCase();
-        if (terms.every(term => t.includes(term))) {
-          let sId = String(s.series_id || '');
-          const isAliased = (typeof SERIES_ALIAS_MAP !== 'undefined' && SERIES_ALIAS_MAP[sId]);
-          if (isAliased) sId = String(SERIES_ALIAS_MAP[sId]);
-          if (seenSeriesIds.has(sId) || isAliased) continue;
-          const sTitle = cleanTitleString(s.name);
-          const normTitle = normalizeSearchTitle(s.name);
-          if (seenTitles.has(sTitle.toLowerCase()) || seenNormalizedTitles.has(normTitle)) continue;
-          if (/\b(4k|dv)\b/i.test(s.name) && seenNormalizedTitles.has(normTitle)) continue;
-          seenTitles.add(sTitle.toLowerCase());
-          seenNormalizedTitles.add(normTitle);
-          seenSeriesIds.add(sId);
-          results.push({
-            id: 'xtream_series_' + s.series_id,
-            series_id: s.series_id,
-            title: sTitle,
-            original_title: s.name,
-            overview: s.plot || (sTitle + ' - Série complète en streaming HD.'),
-            media_type: 'series',
-            is_xtream_series: true,
-            poster_url: s.cover || '',
-            backdrop_url: s.backdrop ? (Array.isArray(s.backdrop) ? s.backdrop[0] : s.backdrop) : s.cover,
-            video_url: '/api/stream/xtream-series?series_id=' + s.series_id,
-            release_year: extractYearFromTitle(s.name, parseInt(s.year || 2025)),
-            match_score: Math.min(99, Math.max(75, Math.round(parseFloat(s.rating || '8.5') * 10))),
-            quality_badges: ['1080p FHD', 'Multi-Saisons']
-          });
-        }
-      }
-    }
-
     // 3. Recherche dans XTREAM_FR_CATALOG (1 268 Chaînes Françaises Direct)
     if (results.length < 60) {
       for (const ch of XTREAM_FR_CATALOG) {
@@ -4945,100 +4540,7 @@ const server = http.createServer(async (req, res) => {
   }
 
   // ================= AUTHENTIFICATION & PROFILS UTILISATEURS ZIFLIX =================
-    if (pathname === '/api/auth/telegram' && req.method === 'POST') {
-    const clientIp = getClientIp(req);
-    let body = '';
-    req.on('data', chunk => { body += chunk; });
-    req.on('end', () => {
-      try {
-        const payload = JSON.parse(body || '{}');
-        const tgUser = payload.user || payload;
-        if (!tgUser || !tgUser.id) {
-          res.writeHead(400, { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' });
-          return res.end(JSON.stringify({ success: false, error: 'Données Telegram invalides' }));
-        }
-
-        if (typeof isIpBanned === 'function' && isIpBanned(clientIp)) {
-          res.writeHead(403, { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' });
-          return res.end(JSON.stringify({ success: false, error: 'Accès refusé : adresse IP suspendue.' }));
-        }
-
-        const tgIdStr = String(tgUser.id);
-        const userId = 'tg_' + tgIdStr;
-        let user = ZIFLIX_USERS.find(u => u.id === userId || u.telegram_id === tgIdStr);
-        if (!user) {
-          let cleanUsername = String(tgUser.username || tgUser.first_name || ('tg_' + tgIdStr.slice(-4))).trim().replace(/[^a-zA-Z0-9_\u00C0-\u00FF]/g, '_');
-          if (!cleanUsername) cleanUsername = 'user_' + tgIdStr.slice(-4);
-          if (ZIFLIX_USERS.some(u => u.username.toLowerCase() === cleanUsername.toLowerCase() && u.id !== userId)) {
-            cleanUsername = cleanUsername + '_' + tgIdStr.slice(-4);
-          }
-          user = {
-            id: userId,
-            telegram_id: tgIdStr,
-            username: cleanUsername,
-            first_name: tgUser.first_name || '',
-            last_name: tgUser.last_name || '',
-            avatar: tgUser.photo_url || 'assets/avatars/avatar-1.svg',
-            role: 'user',
-            banned: false,
-            created_at: new Date().toISOString(),
-            last_login: new Date().toISOString(),
-            ip: clientIp,
-            last_ip: clientIp
-          };
-          ZIFLIX_USERS.push(user);
-        } else {
-          if (user.banned) {
-            res.writeHead(403, { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' });
-            return res.end(JSON.stringify({ success: false, error: 'Ce compte a été suspendu.' }));
-          }
-          user.last_login = new Date().toISOString();
-          user.last_ip = clientIp;
-          if (tgUser.photo_url && (!user.avatar || user.avatar.startsWith('assets/avatars/'))) {
-            user.avatar = tgUser.photo_url;
-          }
-        }
-        saveZiflixUsers();
-
-        const token = cryptoModule.randomBytes(32).toString('hex');
-        const sessionData = {
-          token,
-          user_id: user.id,
-          username: user.username,
-          role: user.role,
-          avatar: user.avatar,
-          expires_at: Date.now() + (30 * 24 * 3600 * 1000)
-        };
-        ZIFLIX_SESSIONS.set(token, sessionData);
-        saveZiflixSessions();
-
-        const cookieStr = 'ziflix_session=' + token + '; Path=/; Max-Age=' + (30 * 24 * 3600) + '; SameSite=Lax';
-        res.writeHead(200, {
-          'Content-Type': 'application/json',
-          'Set-Cookie': cookieStr,
-          'Access-Control-Allow-Origin': '*'
-        });
-        return res.end(JSON.stringify({
-          success: true,
-          token,
-          user: {
-            id: user.id,
-            username: user.username,
-            avatar: user.avatar,
-            role: user.role,
-            is_vip: !!(user.is_vip || user.role === 'vip' || user.role === 'admin'),
-            created_at: user.created_at
-          }
-        }));
-      } catch (err) {
-        res.writeHead(500, { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' });
-        return res.end(JSON.stringify({ success: false, error: err.message }));
-      }
-    });
-    return;
-  }
-
-if (pathname === '/api/auth/register' && req.method === 'POST') {
+  if (pathname === '/api/auth/register' && req.method === 'POST') {
     const clientIp = getClientIp(req);
     const ipCheck = isIpBanned(clientIp);
     if (ipCheck) {
@@ -5098,9 +4600,7 @@ if (pathname === '/api/auth/register' && req.method === 'POST') {
           ip: clientIp,
           last_ip: clientIp,
           created_at: new Date().toISOString(),
-          last_login: new Date().toISOString(),
-          watch_credit_seconds: 1200,
-          welcome_seen: false
+          last_login: new Date().toISOString()
         };
 
         ZIFLIX_USERS.push(newUser);
@@ -5132,10 +4632,7 @@ if (pathname === '/api/auth/register' && req.method === 'POST') {
             username: newUser.username,
             avatar: newUser.avatar,
             role: newUser.role,
-            created_at: newUser.created_at,
-            watch_credit_seconds: 1200,
-            welcome_seen: false,
-            is_new_user: true
+            created_at: newUser.created_at
           }
         }));
       } catch (e) {
@@ -5343,81 +4840,6 @@ if (pathname === '/api/auth/register' && req.method === 'POST') {
     });
     return res.end(JSON.stringify({ success: true, message: 'Déconnexion réussie' }));
   }
-
-  // ================= API FAVORIS (MA LISTE : FILMS, SÉRIES, CHAÎNES TV) =================
-  if (pathname === '/api/favorites' && req.method === 'GET') {
-    const key = getFavoritesKey(req);
-    const list = Array.isArray(ZIFLIX_FAVORITES[key]) ? ZIFLIX_FAVORITES[key] : [];
-    res.writeHead(200, {
-      'Content-Type': 'application/json',
-      'Access-Control-Allow-Origin': '*',
-      'Cache-Control': 'no-store'
-    });
-    return res.end(JSON.stringify({ success: true, count: list.length, favorites: list }));
-  }
-
-  if (pathname === '/api/favorites/toggle' && req.method === 'POST') {
-    let body = '';
-    req.on('data', chunk => body += chunk);
-    req.on('end', () => {
-      try {
-        const payload = JSON.parse(body || '{}');
-        const item = payload.item;
-        if (!item || !item.id) {
-          res.writeHead(400, { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' });
-          return res.end(JSON.stringify({ success: false, error: 'Élément invalide (id requis)' }));
-        }
-
-        const key = getFavoritesKey(req);
-        if (!Array.isArray(ZIFLIX_FAVORITES[key])) {
-          ZIFLIX_FAVORITES[key] = [];
-        }
-
-        const list = ZIFLIX_FAVORITES[key];
-        const existingIdx = list.findIndex(x => String(x.id) === String(item.id));
-        let inList = false;
-
-        if (existingIdx !== -1) {
-          list.splice(existingIdx, 1);
-          inList = false;
-        } else {
-          const cleanItem = {
-            id: String(item.id),
-            title: item.title || item.name || 'Sans titre',
-            media_type: item.media_type || (item.is_live ? 'channel' : 'movie'),
-            poster_url: item.poster_url || item.icon || item.backdrop_url || '',
-            backdrop_url: item.backdrop_url || item.poster_url || '',
-            stream_id: item.stream_id || null,
-            stream_url: item.stream_url || '',
-            is_live: !!item.is_live,
-            is_xtream: !!item.is_xtream,
-            category_name: item.category_name || '',
-            added_at: Date.now()
-          };
-          list.unshift(cleanItem);
-          inList = true;
-        }
-
-        saveZiflixFavorites();
-
-        res.writeHead(200, {
-          'Content-Type': 'application/json',
-          'Access-Control-Allow-Origin': '*'
-        });
-        return res.end(JSON.stringify({
-          success: true,
-          inList,
-          count: list.length,
-          favorites: list
-        }));
-      } catch (e) {
-        res.writeHead(400, { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' });
-        return res.end(JSON.stringify({ success: false, error: 'Corps JSON invalide' }));
-      }
-    });
-    return;
-  }
-
 
   // ================= SYSTÈME DE COMMENTAIRES ZIFLIX =================
   if (pathname === '/api/comments' && req.method === 'GET') {
@@ -6838,110 +6260,6 @@ if (pathname === '/api/auth/register' && req.method === 'POST') {
   }
 
   
-  // ================= ROUTES TÉLÉ-RÉALITÉS TELEGRAM MINI APP =================
-  if (pathname === '/api/admin/tma-reality-shows' && req.method === 'GET') {
-    const tmaPath = path.join(__dirname, 'data', 'tma_reality_shows.json');
-    let selected = [];
-    try {
-      if (fs.existsSync(tmaPath)) {
-        selected = JSON.parse(fs.readFileSync(tmaPath, 'utf8'));
-      }
-    } catch (e) {}
-
-    const selectedIds = new Set(selected.map(s => parseInt(s.id || s.series_id, 10)));
-    const cacheDir = path.join(__dirname, 'data', 'cache');
-    const available = [];
-
-    try {
-      const files = fs.readdirSync(cacheDir);
-      files.forEach(f => {
-        if (f.startsWith('series_') && f.endsWith('.json')) {
-          try {
-            const id = parseInt(f.replace('series_', '').replace('.json', ''), 10);
-            const d = JSON.parse(fs.readFileSync(path.join(cacheDir, f), 'utf8'));
-            const name = d.info?.name || d.title || '';
-            const epsMap = d.episodes || {};
-            const seasonKeys = Object.keys(epsMap);
-            let totalEps = 0;
-            seasonKeys.forEach(s => totalEps += (epsMap[s]?.length || 0));
-
-            const genre = (d.info?.genre || '').toLowerCase();
-            const lower = name.toLowerCase();
-            const isReality = genre.includes('reality') || genre.includes('télé-réalité') ||
-              lower.includes('villa') || lower.includes('apprentis') || lower.includes('koh-lanta') ||
-              lower.includes('cinquante') || lower.includes('anges') || lower.includes('marseillais') ||
-              lower.includes('ch\'tis') || lower.includes('secret story') || lower.includes('traîtres') ||
-              lower.includes('frenchie shore') || lower.includes('star academy') ||
-              lower.includes('tentation') || lower.includes('bataille') || lower.includes('amour est dans le pré');
-
-            if ((isReality || selectedIds.has(id)) && totalEps > 0) {
-              const selItem = selected.find(s => parseInt(s.id || s.series_id, 10) === id);
-              available.push({
-                id,
-                series_id: id,
-                title: selItem?.title || name.replace(/\s*\(\d{4}\)$/, '').trim(),
-                name,
-                cover: selItem?.cover || d.info?.cover || d.info?.movie_image || '',
-                backdrop: selItem?.backdrop || d.info?.backdrop_path?.[0] || d.info?.cover || '',
-                seasons_count: seasonKeys.length,
-                episodes_count: totalEps,
-                seasons: seasonKeys,
-                is_selected: selectedIds.has(id),
-                order: selItem?.order || 999
-              });
-            }
-          } catch(e) {}
-        }
-      });
-    } catch (e) {}
-
-    available.sort((a, b) => {
-      if (a.is_selected && !b.is_selected) return -1;
-      if (!a.is_selected && b.is_selected) return 1;
-      if (a.is_selected && b.is_selected) return (a.order || 999) - (b.order || 999);
-      return a.title.localeCompare(b.title);
-    });
-
-    res.writeHead(200, { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' });
-    return res.end(JSON.stringify({ success: true, selected, available }));
-  }
-
-  if (pathname === '/api/admin/tma-reality-shows' && req.method === 'POST') {
-    let body = '';
-    req.on('data', chunk => body += chunk);
-    req.on('end', () => {
-      try {
-        const payload = JSON.parse(body || '{}');
-        const shows = Array.isArray(payload.shows) ? payload.shows : [];
-        const cleanShows = shows.map((s, idx) => ({
-          id: parseInt(s.id || s.series_id, 10),
-          series_id: parseInt(s.id || s.series_id, 10),
-          title: String(s.title || '').trim(),
-          name: String(s.name || s.title || '').trim(),
-          cover: String(s.cover || ''),
-          backdrop: String(s.backdrop || s.cover || ''),
-          emoji: s.emoji || '',
-          enabled: s.enabled !== false,
-          order: idx + 1
-        })).filter(s => !isNaN(s.id));
-
-        const tmaPath = path.join(__dirname, 'data', 'tma_reality_shows.json');
-        fs.writeFileSync(tmaPath, JSON.stringify(cleanShows, null, 2), 'utf8');
-
-        res.writeHead(200, { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' });
-        return res.end(JSON.stringify({
-          success: true,
-          message: `${cleanShows.length} télé-réalités enregistrées pour l'application Telegram !`,
-          shows: cleanShows
-        }));
-      } catch (e) {
-        res.writeHead(500, { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' });
-        return res.end(JSON.stringify({ success: false, error: e.message }));
-      }
-    });
-    return;
-  }
-
   // ================= ROUTES VIDMOLY AUTO-PUBLISH =================
   if (pathname === '/api/admin/vidmoly/autopublish' && req.method === 'GET') {
     const rules = getAutoPublishRules();
@@ -7185,62 +6503,6 @@ if (pathname === '/api/auth/register' && req.method === 'POST') {
         return await extractChannelMultiProvider(id || tmdbId, serverNum);
       }
 
-      
-      // ── Cas spécial : Films Xtream VOD (100% Français VF) ──
-      const queryStreamId = parsedUrl.query.stream_id;
-      let matchedXtreamStream = null;
-      if (isMovie && Array.isArray(XTREAM_FR_VOD_STREAMS)) {
-        if (queryStreamId) {
-          matchedXtreamStream = XTREAM_FR_VOD_STREAMS.find(m => String(m.stream_id) === String(queryStreamId));
-        } else if (catalogMovie && catalogMovie.stream_id) {
-          matchedXtreamStream = XTREAM_FR_VOD_STREAMS.find(m => String(m.stream_id) === String(catalogMovie.stream_id));
-        } else if (id && String(id).startsWith('xtream_vod_')) {
-          const sId = String(id).replace('xtream_vod_', '');
-          matchedXtreamStream = XTREAM_FR_VOD_STREAMS.find(m => String(m.stream_id) === sId);
-        } else if (catalogMovie && catalogMovie.is_xtream_movie) {
-          matchedXtreamStream = XTREAM_FR_VOD_STREAMS.find(m => String(m.stream_id) === String(catalogMovie.id));
-        } else {
-          // Recherche intelligente par titre dans les 15 577 films français Xtream
-          const searchNorm = (titleToSearch || '').toLowerCase().replace(/[^a-z0-9]/g, '');
-          if (searchNorm && searchNorm.length >= 3) {
-            matchedXtreamStream = XTREAM_FR_VOD_STREAMS.find(m => {
-              const mNorm = (m.name || '').toLowerCase().replace(/[^a-z0-9]/g, '');
-              return mNorm === searchNorm || mNorm.startsWith(searchNorm) || (searchNorm.length > 5 && mNorm.includes(searchNorm));
-            });
-          }
-        }
-      }
-
-      if (matchedXtreamStream && isMovie) {
-        const sId = matchedXtreamStream.stream_id;
-        const ext = matchedXtreamStream.container_extension || (catalogMovie ? catalogMovie.container_extension : 'mkv') || 'mkv';
-        const isVostfr = (matchedXtreamStream.name || '').toLowerCase().includes('vostfr') || String(matchedXtreamStream.category_id) === '971';
-        const movieTitle = catalogMovie ? catalogMovie.title : cleanTitleString(matchedXtreamStream.name);
-        const streamUrl = `/api/stream/xtream-movie-hls/${sId}/master.m3u8?ext=${ext}`;
-        const subUrl = `/api/stream/subtitles?id=${sId}&type=movie&ext=${ext}`;
-        const vodInfo = await getXtreamVodDuration(sId);
-        const durSecs = vodInfo?.duration_secs || (catalogMovie ? parseDurationToSecs(catalogMovie.duration) : null);
-        const durFormatted = vodInfo?.duration || (catalogMovie ? catalogMovie.duration : null);
-        return {
-          success: true,
-          server: serverNum,
-          server_name: 'Serveur ' + serverNum + (isVostfr ? ' (Xtream 1080p FHD VOSTFR)' : ' (Xtream 1080p FHD HLS)'),
-          hoster: isVostfr ? 'Xtream Cloud VOSTFR' : 'Xtream Cloud VOD Français',
-          quality: '1080p FHD',
-          title: movieTitle,
-          duration: durFormatted || durSecs,
-          duration_secs: durSecs,
-          duration_formatted: durFormatted,
-          stream_url: streamUrl,
-          raw_stream_url: streamUrl,
-          subtitles_url: subUrl,
-          player_type: 'direct_hls',
-          is_embed: false,
-          sources_count: 3,
-          lang: isVostfr ? 'vostfr' : 'vf'
-        };
-      }
-
       // ── Priorité absolue : Épisode Vidmoly (vidmoly_episodes.json lookup) ──
       // Si l'ID correspond directement à un épisode dans vidmoly_episodes.json, servir le HLS Vidmoly
       if (type === 'episode' || type === 'vidmoly') {
@@ -7428,81 +6690,31 @@ if (pathname === '/api/auth/register' && req.method === 'POST') {
       }
 
       if (lang === 'vf') {
-        // Tentative 1 : Recherche préalable dans la bibliothèque française Xtream VOD (VF puis VOSTFR)
-        if (isMovie && Array.isArray(XTREAM_FR_VOD_STREAMS)) {
-          const searchNorm = (titleToSearch || '').toLowerCase().replace(/[^a-z0-9]/g, '');
-          if (searchNorm && searchNorm.length >= 3) {
-            let foundX = XTREAM_FR_VOD_STREAMS.find(m => {
-              const mName = (m.name || '').toLowerCase();
-              if (mName.includes('vostfr') || mName.includes('vost')) return false;
-              const mNorm = mName.replace(/[^a-z0-9]/g, '');
-              return mNorm === searchNorm || mNorm.startsWith(searchNorm) || (searchNorm.length > 5 && mNorm.includes(searchNorm));
-            });
-            // Si pas de VF directe, chercher en VOSTFR ! (Demande utilisateur : VOSTFR avec sous-titres)
-            let isVostfrFound = false;
-            if (!foundX) {
-              foundX = XTREAM_FR_VOD_STREAMS.find(m => {
-                const mNorm = (m.name || '').toLowerCase().replace(/[^a-z0-9]/g, '');
-                return mNorm === searchNorm || mNorm.startsWith(searchNorm) || (searchNorm.length > 5 && mNorm.includes(searchNorm));
-              });
-              if (foundX) isVostfrFound = true;
-            }
-            if (foundX) {
-              const sId = foundX.stream_id;
-              const ext = foundX.container_extension || 'mkv';
-              const sUrl = `/api/stream/xtream-movie-hls/${sId}/master.m3u8?ext=${ext}`;
-              const subUrl = `/api/stream/subtitles?id=${sId}&type=movie&ext=${ext}`;
-              const vodInfo = await getXtreamVodDuration(sId);
-              const durSecs = vodInfo?.duration_secs || null;
-              const durFormatted = vodInfo?.duration || null;
-              return {
-                success: true,
-                server: serverNum,
-                server_name: 'Serveur ' + serverNum + (isVostfrFound ? ' (Xtream 1080p FHD VOSTFR)' : ' (Xtream 1080p FHD HLS)'),
-                hoster: isVostfrFound ? 'Xtream Cloud VOSTFR' : 'Xtream Cloud VOD Français',
-                quality: '1080p FHD',
-                title: cleanTitleString(foundX.name),
-                duration: durFormatted || durSecs,
-                duration_secs: durSecs,
-                duration_formatted: durFormatted,
-                stream_url: sUrl,
-                raw_stream_url: sUrl,
-                subtitles_url: subUrl,
-                player_type: 'direct_hls',
-                is_embed: false,
-                sources_count: 3,
-                lang: isVostfrFound ? 'vostfr' : 'vf'
-              };
-            }
-          }
-        }
-
         try {
           return await extractFrenchStream(titleToSearch, isMovie, season, episode, serverIndex);
         } catch (frenchErr) {
-          console.warn(`[Extract API] VF indisponible pour "${titleToSearch}" :`, frenchErr.message);
-          // Si le média a une URL vidéo directe configurée (sans scrapers anglais/asiatiques)
-          if (catalogMovie && catalogMovie.video_url && !catalogMovie.video_url.includes('vidsrc') && !catalogMovie.video_url.includes('2embed') && !catalogMovie.video_url.includes('multiembed')) {
-            const fallbackUrl = catalogMovie.video_url;
-            return {
-              success: true,
-              server: serverNum,
-              server_name: `Serveur ${serverNum} (Direct VF HD)`,
-              title: catalogMovie.title,
-              stream_url: fallbackUrl,
-              raw_stream_url: fallbackUrl,
-              sources_count: 1,
-              lang: 'vf',
-              warning: 'Flux HD direct'
-            };
+          console.warn(`[Extract API] VF indisponible pour "${titleToSearch}", secours VO :`, frenchErr.message);
+          try {
+            const fallbackVo = await extractDirectStream(tmdbId, isMovie, season, episode, serverIndex);
+            fallbackVo.warning = 'VF temporairement indisponible, bascule automatique sur VO';
+            return fallbackVo;
+          } catch (voErr) {
+            if (catalogMovie && (catalogMovie.video_url || (catalogMovie.sources && catalogMovie.sources.hls))) {
+              const fallbackUrl = catalogMovie.video_url || catalogMovie.sources.hls;
+              return {
+                success: true,
+                server: serverNum,
+                server_name: `Serveur ${serverNum} (Direct VF HD)`,
+                title: catalogMovie.title,
+                stream_url: fallbackUrl,
+                raw_stream_url: fallbackUrl,
+                sources_count: 1,
+                lang: 'vf',
+                warning: 'Flux HD direct'
+              };
+            }
+            throw voErr;
           }
-          // RÈGLE D'OR : Ne JAMAIS basculer sur VO (anglais/japonais/coréen) sans consentement explicite de l'utilisateur
-          return {
-            success: false,
-            error: `Ce média n'est actuellement pas disponible en version française (VF).`,
-            title: titleToSearch,
-            lang: 'vf'
-          };
         }
       } else {
         try {
@@ -7546,15 +6758,11 @@ if (pathname === '/api/auth/register' && req.method === 'POST') {
           hoster: result.hoster || null,
           quality: result.quality || null,
           title: result.title,
-          duration: result.duration || null,
-          duration_secs: result.duration_secs || null,
-          duration_formatted: result.duration_formatted || null,
           player_type: result.player_type || 'direct_hls',
           is_embed: !!result.is_embed,
           embed_url: result.embed_url || null,
           stream_url: proxiedStreamUrl,
           raw_stream_url: result.stream_url,
-          subtitles_url: result.subtitles_url || null,
           sources_count: result.sources_count || 1,
           lang: result.lang || lang,
           warning: result.warning || null,
@@ -7654,8 +6862,6 @@ if (pathname === '/api/auth/register' && req.method === 'POST') {
           'Content-Type': 'application/vnd.apple.mpegurl',
           'Access-Control-Allow-Origin': '*',
           'Access-Control-Allow-Headers': '*',
-          'Access-Control-Expose-Headers': 'X-Total-Duration, Content-Length',
-          'X-Total-Duration': String(typeof expectedDuration !== 'undefined' ? expectedDuration : 0),
           'Cache-Control': 'no-cache, no-store'
         });
         res.end(outputBody);
@@ -7825,9 +7031,9 @@ if (pathname === '/api/auth/register' && req.method === 'POST') {
   // Retourne les séries de télé-réalité authentiques avec auto-actualisation
   if (pathname === '/api/xtream/telerealite' && req.method === 'GET') {
     const authUser = getAuthUser(req);
-    if (authUser && authUser.is_banned) {
-      res.writeHead(403, { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' });
-      return res.end(JSON.stringify({ success: false, error: 'Accès restreint.' }));
+    if (!authUser || authUser.is_banned) {
+      res.writeHead(401, { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' });
+      return res.end(JSON.stringify({ success: false, error: 'Accès réservé aux membres ZIFLIX.' }));
     }
     const q = (parsedUrl.query.q || '').toString().toLowerCase().trim();
     const limit = parseInt(parsedUrl.query.limit, 10) || 300;
@@ -7871,8 +7077,7 @@ if (pathname === '/api/auth/register' && req.method === 'POST') {
       res.writeHead(401, { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' });
       return res.end(JSON.stringify({ success: false, message: 'Accès réservé aux membres ZIFLIX.' }));
     }
-    let seriesId = parsedUrl.query.series_id || parsedUrl.query.id;
-    if (typeof SERIES_ALIAS_MAP !== 'undefined' && SERIES_ALIAS_MAP[String(seriesId)]) seriesId = SERIES_ALIAS_MAP[String(seriesId)];
+    const seriesId = parsedUrl.query.series_id || parsedUrl.query.id;
     const forceRefresh = (parsedUrl.query.refresh === '1' || parsedUrl.query.refresh === 'true');
 
     if (!seriesId) {
@@ -7904,18 +7109,13 @@ if (pathname === '/api/auth/register' && req.method === 'POST') {
           const streamUrl = `/api/stream/xtream-series?episode_id=${epId}&ext=${ext}`;
           const vEntry = vidmolyMap[String(epId)];
           const vidmolyFileCode = (vEntry && vEntry.fileCode && vEntry.status === 'ready') ? vEntry.fileCode : null;
-          const epDurSecs = parseInt(ep.info?.duration_secs || 0, 10) || (ep.info?.duration ? parseDurationToSecs(ep.info.duration) : 0);
-          const epDurFormatted = ep.info?.duration || (epDurSecs > 0 ? formatSecondsToHms(epDurSecs) : '45m');
-          if (epDurSecs > 0) { xtreamVodDurationCache.set(String(epId), { duration_secs: epDurSecs, duration: epDurFormatted }); }
           return {
             id: epId,
             episode_id: epId,
             episode_number: epNum,
             title: ep.title || `Épisode ${epNum}`,
             overview: ep.info?.plot || ep.info?.overview || '',
-            duration: epDurFormatted,
-            duration_secs: epDurSecs,
-            info: ep.info,
+            duration: ep.info?.duration || '45m',
             video_url: streamUrl,
             still_url: ep.info?.movie_image || rawData.info?.cover || '',
             video: ep.info?.video || {},
@@ -7937,23 +7137,14 @@ if (pathname === '/api/auth/register' && req.method === 'POST') {
         });
       });
 
-      let tmaShow = null;
-      try {
-        const tmaPath = path.join(__dirname, 'data', 'tma_reality_shows.json');
-        if (fs.existsSync(tmaPath)) {
-          const tmaList = JSON.parse(fs.readFileSync(tmaPath, 'utf8'));
-          tmaShow = tmaList.find(s => String(s.id || s.series_id) === String(seriesId));
-        }
-      } catch(e) {}
-
       const seriesObj = {
         success: true,
         series_id: seriesId,
         id: `xtream_series_${seriesId}`,
         tmdb_id: rawData.info?.tmdb || `xtream_series_${seriesId}`,
-        title: tmaShow?.title || rawData.info?.name || 'Série Xtream',
-        poster_url: tmaShow?.cover || rawData.info?.cover || '',
-        backdrop_url: tmaShow?.backdrop || (Array.isArray(rawData.info?.backdrop_path) && rawData.info.backdrop_path[0]) || rawData.info?.cover || '',
+        title: rawData.info?.name || 'Série Xtream',
+        poster_url: rawData.info?.cover || '',
+        backdrop_url: (Array.isArray(rawData.info?.backdrop_path) && rawData.info.backdrop_path[0]) || rawData.info?.cover || '',
         overview: rawData.info?.plot || '',
         rating: parseFloat(rawData.info?.rating || 7.5),
         release_year: parseInt(rawData.info?.releaseDate || rawData.info?.release_date || 2025, 10) || 2025,
@@ -8092,8 +7283,6 @@ const EC3_AUDIO_CHANNELS = new Set([
           'Content-Type': 'application/vnd.apple.mpegurl',
           'Access-Control-Allow-Origin': '*',
           'Access-Control-Allow-Headers': '*',
-          'Access-Control-Expose-Headers': 'X-Total-Duration, Content-Length',
-          'X-Total-Duration': String(typeof expectedDuration !== 'undefined' ? expectedDuration : 0),
           'Cache-Control': 'no-cache, no-store, must-revalidate',
           'X-Xtream-Cache': 'HIT-RAM',
           'Pragma': 'no-cache',
@@ -8601,90 +7790,70 @@ const EC3_AUDIO_CHANNELS = new Set([
   // ================= ROUTE PROXY STREAMING VOD SÉRIES XTREAM HLS (Safari / Apple / Web HLS) =================
   // Remuxage ultra-performant à la volée MKV -> HLS (.m3u8 + segments MPEG-TS)
   // Résout définitivement l'incompatibilité Safari / iOS (black screen sur MKV ou MP4 chunked)
-  if ((pathname.startsWith('/api/stream/xtream-series-hls') || pathname.startsWith('/api/stream/xtream-movie-hls')) && (req.method === 'GET' || req.method === 'HEAD')) {
+  if (pathname.startsWith('/api/stream/xtream-series-hls') && (req.method === 'GET' || req.method === 'HEAD')) {
     const authUser = getRequestAuth(req, parsedUrl);
     if (!authUser || authUser.is_banned) {
       res.writeHead(401, { 'Content-Type': 'text/plain; charset=utf-8', 'Access-Control-Allow-Origin': '*' });
       return res.end('Accès refusé : Session ZIFLIX requise');
     }
 
-    const isMovieHls = pathname.startsWith('/api/stream/xtream-movie-hls');
-    const subPath = pathname.replace(/^\/api\/stream\/xtream-(?:series|movie)-hls\/?/, '');
+    const subPath = pathname.replace(/^\/api\/stream\/xtream-series-hls\/?/, '');
     const pathParts = subPath.split('/').filter(Boolean);
-    let episodeId = pathParts[0] || (isMovieHls ? (parsedUrl.query.stream_id || parsedUrl.query.id) : parsedUrl.query.episode_id);
+    let episodeId = pathParts[0] || parsedUrl.query.episode_id;
     let resource = pathParts[pathParts.length - 1] || 'playlist.m3u8';
     if (pathParts[0] && pathParts[0].includes('.')) {
-      episodeId = (isMovieHls ? (parsedUrl.query.stream_id || parsedUrl.query.id) : parsedUrl.query.episode_id) || pathParts[0].split('.')[0];
+      episodeId = parsedUrl.query.episode_id || pathParts[0].split('.')[0];
       resource = pathParts[0];
     }
 
     if (!episodeId) {
       res.writeHead(400, { 'Content-Type': 'text/plain', 'Access-Control-Allow-Origin': '*' });
-      return res.end(isMovieHls ? 'Paramètre stream_id manquant pour HLS film' : 'Paramètre episode_id manquant pour HLS');
-    }
-
-    if (!isMovieHls && typeof HEVC_DV_TO_1080P_MAP !== 'undefined' && HEVC_DV_TO_1080P_MAP[String(episodeId)]) {
-      const remappedEp = HEVC_DV_TO_1080P_MAP[String(episodeId)];
-      if (pathParts[0] && HEVC_DV_TO_1080P_MAP[pathParts[0]] && resource.endsWith('.m3u8')) {
-        const newPath = pathname.replace(`/xtream-series-hls/${pathParts[0]}`, `/xtream-series-hls/${remappedEp}`);
-        res.writeHead(302, {
-          'Location': `${newPath}${parsedUrl.search || ''}`,
-          'Access-Control-Allow-Origin': '*'
-        });
-        return res.end();
-      }
-      episodeId = remappedEp;
+      return res.end('Paramètre episode_id manquant pour HLS');
     }
 
     const isManifest = resource.endsWith('.m3u8');
     const limitCheck = checkAndRegisterStream(req, res, {
       mediaId: episodeId,
-      type: isMovieHls ? 'movie' : 'series',
+      type: 'series',
       isInitialIntent: isManifest,
-      name: isMovieHls ? ('Film #' + episodeId) : ('Série Épisode #' + episodeId)
+      name: 'Série Épisode #' + episodeId
     });
     if (!limitCheck.allowed) {
       res.writeHead(429, { 'Content-Type': 'text/plain; charset=utf-8', 'Access-Control-Allow-Origin': '*', 'Retry-After': '10' });
       return res.end(limitCheck.message);
     }
 
-    trackStreamingSession(req, res, episodeId, isMovieHls ? 'movie_hls' : 'series_hls');
+    trackStreamingSession(req, res, episodeId, 'series_hls');
 
-    if (!isMovieHls) {
-      try {
-        const _epMap = vidmoly ? vidmoly.getEpisodesMap() : {};
-        const _vEntry = _epMap[String(episodeId)];
-        if (_vEntry && _vEntry.status === 'dead') {
-          triggerVidmolyAutoHeal(episodeId);
-        }
-      } catch(e) {}
-    }
+    // Auto-réparation silencieuse en tâche de fond si l'épisode est marqué mort sur Vidmoly
+    try {
+      const _epMap = vidmoly ? vidmoly.getEpisodesMap() : {};
+      const _vEntry = _epMap[String(episodeId)];
+      if (_vEntry && _vEntry.status === 'dead') {
+        triggerVidmolyAutoHeal(episodeId);
+      }
+    } catch(e) {}
 
     const ext = parsedUrl.query.ext || 'mkv';
-    const sessionKey = isMovieHls ? `movie_${episodeId}` : String(episodeId);
-    const originUrl = isMovieHls
-      ? `http://${XTREAM_CONFIG.host}:${XTREAM_CONFIG.port}/movie/${XTREAM_CONFIG.username}/${XTREAM_CONFIG.password}/${episodeId}.${ext}`
-      : `http://${XTREAM_CONFIG.host}:${XTREAM_CONFIG.port}/series/${XTREAM_CONFIG.username}/${XTREAM_CONFIG.password}/${episodeId}.${ext}`;
+    const cacheKey = `${episodeId}_${ext}`;
+    const originUrl = `http://${XTREAM_CONFIG.host}:${XTREAM_CONFIG.port}/series/${XTREAM_CONFIG.username}/${XTREAM_CONFIG.password}/${episodeId}.${ext}`;
+    const cachedEdge = xtreamSeriesEdgeCache.get(cacheKey);
+    const hasCachedEdge = !!(cachedEdge && cachedEdge.expiresAt > Date.now());
+    // Sécurité absolue : Zéro mise en cache de jetons éphémères (évite 509 Bandwidth Limit Exceeded)
     const initialUrl = originUrl;
 
-    const hlsDir = path.join('/tmp', 'ziflix_hls', sessionKey);
+    // CAS VIDMOLY CLOUD : Vidmoly protège les flux bruts contre le hotlink (403 Forbidden).
+    // Les requêtes HLS directes sont donc délivrées par le moteur FoxBleu local FHD garanti sans coupure.
+    // L'embed iframe officiel reste disponible pour l'affichage tiers sans consommation serveur.
+
+    const hlsDir = path.join('/tmp', 'ziflix_hls', String(episodeId));
     const playlistPath = path.join(hlsDir, 'playlist.m3u8');
 
     // 1. Requête pour un segment .ts
     if (resource.endsWith('.ts')) {
       const segFile = path.join(hlsDir, resource);
-      const session = xtreamHlsSessions.get(sessionKey);
+      const session = xtreamHlsSessions.get(String(episodeId));
       if (session) session.lastAccess = Date.now();
-      // Rafraîchir l'activité Stream Limiter sur chaque téléchargement de segment .ts
-      try {
-        const clientIp = getClientIp(req);
-        const ipMap = ipStreamSessions.get(clientIp);
-        if (ipMap) {
-          const lKey = (isMovieHls ? 'movie' : 'series') + '_' + episodeId;
-          const lSess = ipMap.get(lKey);
-          if (lSess) lSess.lastActivityAt = Date.now();
-        }
-      } catch (e) {}
 
       const serveSegment = () => {
         if (fs.existsSync(segFile)) {
@@ -8734,43 +7903,9 @@ const EC3_AUDIO_CHANNELS = new Set([
     }
 
     // 2. Requête pour la playlist M3U8
-    let startTime = parseFloat(parsedUrl.query.start || parsedUrl.query.time || 0) || 0;
-    // Pour les séries (20-45m), remuxer toujours depuis 00:00 pour une intégrité VOD totale
-    if (!isMovieHls) {
-      startTime = 0;
-    } else if (startTime < 300) {
-      startTime = 0;
-    }
+    const startTime = parseFloat(parsedUrl.query.start || parsedUrl.query.time || 0) || 0;
     const seg0 = path.join(hlsDir, 'seg_0000.ts');
-    let session = xtreamHlsSessions.get(sessionKey);
-
-    // Calcul de la durée attendue réelle (pour éviter les coupures IPTV amont à 59m)
-    let expectedDuration = 0;
-    if (isMovieHls) {
-      if (xtreamVodDurationCache.has(String(episodeId))) {
-        expectedDuration = xtreamVodDurationCache.get(String(episodeId))?.duration_secs || 0;
-      }
-      if (!expectedDuration) {
-        const catMovie = (catalog.movies || []).find(m => m.id === String(episodeId) || m.tmdb_id === String(episodeId) || String(m.stream_id) === String(episodeId));
-        if (catMovie && catMovie.duration) {
-          expectedDuration = parseDurationToSecs(catMovie.duration);
-        }
-      }
-      if (!expectedDuration) {
-        expectedDuration = 8400; // 140 min fallback pour film long-métrage
-      }
-    } else {
-      if (xtreamVodDurationCache.has(String(episodeId))) {
-        expectedDuration = xtreamVodDurationCache.get(String(episodeId))?.duration_secs || 0;
-      }
-      if (!expectedDuration) {
-        expectedDuration = findEpisodeDurationSecs(episodeId);
-      }
-      if (!expectedDuration) {
-        expectedDuration = 1420; // 23-25 min fallback série
-      }
-    }
-    const minCompleteDuration = Math.max(300, expectedDuration - 45);
+    let session = xtreamHlsSessions.get(String(episodeId));
 
     // Détection de playlist sur disque
     let isTruncatedPlaylist = false;
@@ -8790,49 +7925,25 @@ const EC3_AUDIO_CHANNELS = new Set([
           existingFirstSegNum = parseInt(firstSegMatch[1], 10);
         }
         if (existingContent.includes('#EXT-X-ENDLIST')) {
-          // VOD complète UNIQUEMENT si la durée atteint minCompleteDuration ou 85% de la durée attendue
-          if (dur >= minCompleteDuration || dur >= expectedDuration * 0.85) {
-            isFullCompletePlaylist = true;
-          } else {
-            console.warn('[Xtream HLS] Playlist tronquée détectée pour ' + sessionKey + ' (' + dur.toFixed(0) + 's < ' + minCompleteDuration + 's, attendu: ' + expectedDuration + 's). Purge et régénération.');
+          if (dur < 600) {
             isTruncatedPlaylist = true;
-            try {
-              if (fs.existsSync(hlsDir)) {
-                fs.rmSync(hlsDir, { recursive: true, force: true });
-              }
-            } catch(e) {}
-            xtreamHlsSessions.delete(sessionKey);
-            session = null;
+          } else {
+            isFullCompletePlaylist = true;
           }
         }
       } catch (e) {}
     }
 
-    // Calcul précis du point temporel de la session
-    const sessionStartSec = (session && typeof session.startTime === 'number')
-      ? session.startTime
-      : (existingFirstSegNum > 0 ? (existingFirstSegNum * 4) : 0);
-    const sessionEndSec = sessionStartSec + existingPlaylistDuration;
+    // Une session doit être redémarrée si :
+    // 1. La playlist est corrompue/tronquée (< 600s avec ENDLIST)
+    // 2. Le point demandé précède le premier segment présent sur disque
+    // 3. OU si le point demandé dépasse largement ce qui a été généré (> 60s au-delà) et que l'épisode n'est pas encore complet
+    const isSeekingBeforeFirstSeg = existingFirstSegNum > 0 && (startTime < existingFirstSegNum * 3);
+    const isSeekingBeyondBuffer = startTime > 0 && !isFullCompletePlaylist && (startTime > existingPlaylistDuration + (existingFirstSegNum * 4) + 60);
+    const isDifferentStart = (isSeekingBeforeFirstSeg || (session && isSeekingBeyondBuffer && Math.abs((session.startTime || 0) - startTime) > 5));
+    const isBrokenSession = (session && session.isDone && (!fs.existsSync(playlistPath) || isTruncatedPlaylist)) || (!session && isTruncatedPlaylist);
 
-    // Détection rigoureuse d'un seek utilisateur réel
-    const hasExplicitStart = (parsedUrl.query.start !== undefined || parsedUrl.query.time !== undefined);
-    const requestedStart = hasExplicitStart ? parseFloat(parsedUrl.query.start || parsedUrl.query.time || 0) : -1;
-
-    let isDifferentStart = false;
-    if (hasExplicitStart && requestedStart >= 0) {
-      const isSameAsSessionStart = Math.abs(requestedStart - sessionStartSec) <= 15;
-      const isInExistingBuffer = (requestedStart >= sessionStartSec && requestedStart <= sessionEndSec + 15);
-      const isWithinExistingHistory = (sessionStartSec === 0 && requestedStart < sessionEndSec);
-
-      if (!isSameAsSessionStart && !isInExistingBuffer && !isWithinExistingHistory) {
-        if (requestedStart < sessionStartSec - 15 || requestedStart > sessionEndSec + 45) {
-          isDifferentStart = true;
-        }
-      }
-    }
-
-    if (isDifferentStart && !isFullCompletePlaylist) {
-      console.log('[Xtream HLS Seek] Reinitialisation session ' + sessionKey + ' : saut demande a ' + requestedStart + 's (actuel: ' + sessionStartSec + 's -> ' + sessionEndSec.toFixed(0) + 's)');
+    if ((isDifferentStart || isBrokenSession) && !isFullCompletePlaylist) {
       if (session && session.proc) {
         try { session.proc.kill('SIGTERM'); } catch (e) {}
         try { session.proc.kill('SIGKILL'); } catch (e) {}
@@ -8842,7 +7953,7 @@ const EC3_AUDIO_CHANNELS = new Set([
           fs.rmSync(hlsDir, { recursive: true, force: true });
         }
       } catch (e) {}
-      xtreamHlsSessions.delete(sessionKey);
+      xtreamHlsSessions.delete(String(episodeId));
       session = null;
     }
 
@@ -8853,15 +7964,12 @@ const EC3_AUDIO_CHANNELS = new Set([
       const ffmpegArgs = ['-v', 'warning'];
       if (!isLocalFile) {
         ffmpegArgs.push(
-          '-probesize', '350000',
-          '-analyzeduration', '500000',
-          '-fpsprobesize', '0',
-          '-fflags', '+nobuffer+discardcorrupt',
+          '-probesize', '1048576',
+          '-analyzeduration', '1000000',
+          '-fflags', '+nobuffer+fastseek+discardcorrupt',
           '-reconnect', '1',
           '-reconnect_streamed', '1',
-          '-reconnect_at_eof', '1',
-          '-rw_timeout', '15000000',
-          '-reconnect_delay_max', '2',
+          '-reconnect_delay_max', '3',
           '-reconnect_on_network_error', '1',
           '-reconnect_on_http_error', '4xx,5xx',
           '-user_agent', 'VLC/3.0.18 LibVLC/3.0.18'
@@ -8875,24 +7983,20 @@ const EC3_AUDIO_CHANNELS = new Set([
         );
       }
       ffmpegArgs.push(
-        '-sn', '-dn',
         '-i', streamSourceUrl,
-        '-map', '0:v:0',
-        '-map', '0:a:0?',
         '-c:v', 'copy',
         '-c:a', 'aac',
         '-b:a', '128k',
         '-ac', '2',
-        '-threads', '0',
         '-sn',
         '-f', 'hls',
-        '-hls_time', '3',
-        '-hls_init_time', '1.8',
+        '-hls_time', '4',
+        '-hls_init_time', '1',
         '-hls_list_size', '0',
         '-hls_playlist_type', 'event'
       );
       if (startTime > 0) {
-        const startNum = Math.floor(startTime / 4);
+        const startNum = Math.floor(startTime / 2);
         ffmpegArgs.push(
           '-hls_start_number_source', 'generic',
           '-start_number', startNum.toString()
@@ -8903,10 +8007,12 @@ const EC3_AUDIO_CHANNELS = new Set([
         playlistPath
       );
 
-      console.log('[Xtream HLS FFmpeg cmd]: ffmpeg ' + ffmpegArgs.join(' '));
       const proc = spawn('ffmpeg', ffmpegArgs, { stdio: ['ignore', 'ignore', 'pipe'] });
       proc.stderr.on('data', (chunk) => {
-        console.warn('[Xtream HLS FFmpeg]: ' + chunk.toString().trim());
+        const text = chunk.toString();
+        if (text.includes('Error') || text.includes('HTTP error')) {
+          console.warn(`[Xtream HLS FFmpeg]: ${text.trim()}`);
+        }
       });
       session = {
         proc,
@@ -8917,32 +8023,23 @@ const EC3_AUDIO_CHANNELS = new Set([
         createdAt: Date.now(),
         isDone: false
       };
-      xtreamHlsSessions.set(sessionKey, session);
+      xtreamHlsSessions.set(String(episodeId), session);
 
       proc.on('close', (code) => {
-        console.log('[Xtream HLS FFmpeg proc close code]:', code);
         session.isDone = true;
         session.proc = null;
-        session.exitCode = code;
         if (fs.existsSync(playlistPath)) {
           try {
             let content = fs.readFileSync(playlistPath, 'utf8');
-            let dur = 0;
-            const re = /#EXTINF:([0-9.]+)/g;
-            let m;
-            while ((m = re.exec(content)) !== null) dur += parseFloat(m[1]);
-            // Fin naturelle normale du flux si durée complète atteinte
-            if (code === 0 && (dur >= minCompleteDuration || dur >= expectedDuration * 0.85)) {
-              session.isFullComplete = true;
-              if (!content.includes('#EXT-X-ENDLIST')) {
-                content = content.trimEnd() + '\n#EXT-X-ENDLIST\n';
+            if (content.includes('#EXT-X-ENDLIST')) {
+              let dur = 0;
+              const re = /#EXTINF:([0-9.]+)/g;
+              let m;
+              while ((m = re.exec(content)) !== null) dur += parseFloat(m[1]);
+              if (dur < 600) {
+                content = content.replace(/#EXT-X-ENDLIST\r?\n?/g, '');
+                fs.writeFileSync(playlistPath, content);
               }
-              content = content.replace(/#EXT-X-PLAYLIST-TYPE:EVENT/g, '#EXT-X-PLAYLIST-TYPE:VOD');
-              fs.writeFileSync(playlistPath, content, 'utf8');
-            } else if (content.includes('#EXT-X-ENDLIST') && dur < minCompleteDuration) {
-              // Coupure anormale : retirer le faux ENDLIST
-              content = content.replace(/#EXT-X-ENDLIST\r?\n?/g, '');
-              fs.writeFileSync(playlistPath, content, 'utf8');
             }
           } catch (e) {}
         }
@@ -8955,34 +8052,16 @@ const EC3_AUDIO_CHANNELS = new Set([
     }
 
     if (!session && !isFullCompletePlaylist) {
-      const internalStreamUrl = isMovieHls
-        ? `http://127.0.0.1:${PORT}/movie/admin/1965/${episodeId}.${ext}?raw=1`
-        : `http://127.0.0.1:${PORT}/series/admin/1965/${episodeId}.${ext}?raw=1`;
+      const internalStreamUrl = `http://127.0.0.1:${PORT}/series/admin/1965/${episodeId}.${ext}?raw=1`;
       spawnHlsProc(internalStreamUrl);
     } else if (session) {
       session.lastAccess = Date.now();
-      const isSufficientDuration = isMovieHls
-        ? (existingPlaylistDuration >= Math.min(5400, expectedDuration * 0.85))
-        : (existingPlaylistDuration >= Math.min(1150, expectedDuration * 0.85));
-
-      if (session.isDone && (session.isFullComplete || isFullCompletePlaylist || isSufficientDuration || session.exitCode === 0)) {
-        isFullCompletePlaylist = true;
-      } else if (session.isDone && !isFullCompletePlaylist && !isSufficientDuration && (session.recoveryAttempts || 0) < 2) {
-        session.recoveryAttempts = (session.recoveryAttempts || 0) + 1;
-        console.log(`[Xtream HLS Recovery #${session.recoveryAttempts}] Reconnexion FFmpeg pour ${sessionKey} (généré: ${existingPlaylistDuration.toFixed(0)}s / attendu: ${expectedDuration}s)`);
-        const internalStreamUrl = isMovieHls
-          ? `http://127.0.0.1:${PORT}/movie/admin/1965/${episodeId}.${ext}?raw=1`
-          : `http://127.0.0.1:${PORT}/series/admin/1965/${episodeId}.${ext}?raw=1`;
-        const resumeSec = (session && typeof session.startTime === 'number') ? (session.startTime + existingPlaylistDuration - 4) : (existingPlaylistDuration - 4);
-        startTime = Math.max(0, resumeSec);
-        spawnHlsProc(internalStreamUrl);
-      }
     }
 
     // Attendre que la playlist et le premier segment soient prêts (Optimisation ultra-réactive)
     let waited = 0;
-    const maxWait = 28000;
-    const pollInterval = 50;
+    const maxWait = 9000;
+    const pollInterval = 100;
 
     const checkReady = () => {
       if (fs.existsSync(playlistPath)) {
@@ -8993,12 +8072,8 @@ const EC3_AUDIO_CHANNELS = new Set([
             const firstSegPath = path.join(hlsDir, segMatches[0]);
             if (fs.existsSync(firstSegPath)) {
               const s = fs.statSync(firstSegPath);
-              let totalReadyDur = 0;
-              const reDur = /#EXTINF:([0-9.]+)/g;
-              let mDur;
-              while ((mDur = reDur.exec(content)) !== null) totalReadyDur += parseFloat(mDur[1]);
-              // Démarrage instantané ultra-fluide : dès que le premier segment est prêt (>1500 bytes) ou >= 1.2s de flux
-              if (s.size > 1500 || totalReadyDur >= 1.2 || segMatches.length >= 1 || (session && session.isDone) || isFullCompletePlaylist) return true;
+              // Démarrage ultra-rapide (< 1.2s) : Dès que le 1er segment dépasse 25 Ko ou que la session est prête
+              if (s.size > 25000 || (session && session.isDone) || isFullCompletePlaylist) return true;
             }
           }
         } catch (e) {}
@@ -9012,7 +8087,7 @@ const EC3_AUDIO_CHANNELS = new Set([
 
     const waitTimer = setInterval(() => {
       waited += pollInterval;
-      session = session || xtreamHlsSessions.get(sessionKey);
+      session = session || xtreamHlsSessions.get(String(episodeId));
       if (checkReady()) {
         clearInterval(waitTimer);
         sendPlaylist();
@@ -9042,14 +8117,13 @@ const EC3_AUDIO_CHANNELS = new Set([
       try {
         let content = fs.readFileSync(playlistPath, 'utf8');
         if (content.includes('#EXT-X-ENDLIST')) {
-          if (session && !session.isDone) {
+          let dur = 0;
+          const re = /#EXTINF:([0-9.]+)/g;
+          let m;
+          while ((m = re.exec(content)) !== null) dur += parseFloat(m[1]);
+          if (dur < 600 || (session && !session.isDone)) {
             content = content.replace(/#EXT-X-ENDLIST\r?\n?/g, '');
-          } else {
-            content = content.replace(/#EXT-X-PLAYLIST-TYPE:EVENT/g, '#EXT-X-PLAYLIST-TYPE:VOD');
           }
-        } else if (isFullCompletePlaylist || (session && (session.isFullComplete || session.exitCode === 0))) {
-          content = content.trimEnd() + '\n#EXT-X-ENDLIST\n';
-          content = content.replace(/#EXT-X-PLAYLIST-TYPE:EVENT/g, '#EXT-X-PLAYLIST-TYPE:VOD');
         }
         const authCookie = req.headers.cookie?.match(/(?:^|;\s*)ziflix_session=([^;]+)/)?.[1];
         const authToken = parsedUrl.query.auth_token || parsedUrl.query.token || req.headers['x-auth-token'] || (authCookie ? decodeURIComponent(authCookie) : '');
@@ -9060,8 +8134,6 @@ const EC3_AUDIO_CHANNELS = new Set([
           'Content-Type': 'application/vnd.apple.mpegurl',
           'Access-Control-Allow-Origin': '*',
           'Access-Control-Allow-Headers': '*',
-          'Access-Control-Expose-Headers': 'X-Total-Duration, Content-Length',
-          'X-Total-Duration': String(typeof expectedDuration !== 'undefined' ? expectedDuration : 0),
           'Cache-Control': 'no-cache, no-store, must-revalidate',
           'Pragma': 'no-cache',
           'Expires': '0'
@@ -9434,13 +8506,6 @@ if (!isValidToken) {
       if (upstreamRes.headers['content-range']) respHeaders['Content-Range'] = upstreamRes.headers['content-range'];
       if (upstreamRes.headers['accept-ranges']) respHeaders['Accept-Ranges'] = upstreamRes.headers['accept-ranges'];
 
-      if (upstreamRes.statusCode === 403 || upstreamRes.statusCode === 404) {
-        if (vmFileCode && vidmoly && vidmoly.invalidateVidmolyCache) {
-          console.warn(`[Vidmoly Segment] Upstream HTTP ${upstreamRes.statusCode} sur ${targetUrl.substring(0, 80)} -> Invalidation automatique cache pour ${vmFileCode}`);
-          vidmoly.invalidateVidmolyCache(vmFileCode);
-        }
-      }
-
       res.writeHead(upstreamRes.statusCode, respHeaders);
       if (req.method === 'HEAD') {
         upstreamRes.destroy();
@@ -9466,236 +8531,35 @@ if (!isValidToken) {
   // ================= ROUTE PROXY STREAMING VOD SÉRIES XTREAM (/api/stream/xtream-series) =================
   // Support complet des requêtes HTTP Range (206 Partial Content), mise en cache Edge 0ms,
   // pool Keep-Alive persistant et débit maximal anti-buffering
-  
-  // ── ROUTE STREAMING FILM XTREAM (/api/stream/xtream-movie) ──
-  // ================= ROUTE EXTRACTION SOUS-TITRES FRANÇAIS EN DIRECT (/api/stream/subtitles) =================
-  if (pathname === '/api/stream/subtitles' && (req.method === 'GET' || req.method === 'HEAD')) {
-    const streamId = parsedUrl.query.stream_id || parsedUrl.query.id;
-    const type = parsedUrl.query.type || 'movie';
-    const ext = parsedUrl.query.ext || 'mkv';
-
-    if (!streamId) {
-      res.writeHead(200, { 'Content-Type': 'text/vtt; charset=utf-8', 'Access-Control-Allow-Origin': '*' });
-      return res.end("WEBVTT\n\n");
-    }
-
-    const subDir = path.join('/tmp', 'ziflix_subtitles');
-    if (!fs.existsSync(subDir)) fs.mkdirSync(subDir, { recursive: true });
-    const subFile = path.join(subDir, `${type}_${streamId}.vtt`);
-
-    const serveVtt = () => {
-      if (fs.existsSync(subFile)) {
-        try {
-          const content = fs.readFileSync(subFile, 'utf8');
-          res.writeHead(200, {
-            'Content-Type': 'text/vtt; charset=utf-8',
-            'Access-Control-Allow-Origin': '*',
-            'Cache-Control': 'public, max-age=86400'
-          });
-          return res.end(content);
-        } catch (e) {}
-      }
-      return false;
-    };
-
-    if (serveVtt()) return;
-
-    const originUrl = (type === 'movie')
-      ? `http://${XTREAM_CONFIG.host}:${XTREAM_CONFIG.port}/movie/${XTREAM_CONFIG.username}/${XTREAM_CONFIG.password}/${streamId}.${ext}`
-      : `http://${XTREAM_CONFIG.host}:${XTREAM_CONFIG.port}/series/${XTREAM_CONFIG.username}/${XTREAM_CONFIG.password}/${streamId}.${ext}`;
-
-    const ffmpegSub = spawn('ffmpeg', [
-      '-v', 'error',
-      '-user_agent', 'IPTVSmartersPro/1.0',
-      '-i', originUrl,
-      '-map', '0:s:m:language:fre?',
-      '-map', '0:s:0?',
-      '-c:s', 'webvtt',
-      '-f', 'webvtt',
-      subFile
-    ]);
-
-    const subTimeout = setTimeout(() => {
-      try { ffmpegSub.kill('SIGKILL'); } catch (e) {}
-      if (!res.headersSent) {
-        fs.writeFileSync(subFile, "WEBVTT\n\n", 'utf8');
-        serveVtt();
-      }
-    }, 6000);
-
-    ffmpegSub.on('close', () => {
-      clearTimeout(subTimeout);
-      if (fs.existsSync(subFile) && fs.statSync(subFile).size > 10) {
-        serveVtt();
-      } else {
-        fs.writeFileSync(subFile, "WEBVTT\n\n", 'utf8');
-        serveVtt();
-      }
-    });
-
-    ffmpegSub.on('error', () => {
-      clearTimeout(subTimeout);
-      res.writeHead(200, { 'Content-Type': 'text/vtt; charset=utf-8', 'Access-Control-Allow-Origin': '*' });
-      res.end("WEBVTT\n\n");
-    });
-    return;
-  }
-
-  if (pathname === '/api/stream/xtream-movie' && (req.method === 'GET' || req.method === 'HEAD')) {
+  if (pathname === '/api/stream/xtream-series' && (req.method === 'GET' || req.method === 'HEAD')) {
     const authUser = getRequestAuth(req, parsedUrl);
     if (!authUser || authUser.is_banned) {
       res.writeHead(401, { 'Content-Type': 'text/plain; charset=utf-8', 'Access-Control-Allow-Origin': '*' });
       return res.end('Accès refusé : Session ZIFLIX requise');
     }
-    const streamId = parsedUrl.query.stream_id;
+    const episodeId = parsedUrl.query.episode_id;
     const ext = parsedUrl.query.ext || 'mkv';
-    if (!streamId) {
-      res.writeHead(400, { 'Content-Type': 'text/plain', 'Access-Control-Allow-Origin': '*' });
-      return res.end('stream_id manquant');
-    }
-    trackStreamingSession(req, res, streamId, 'movie');
-
-    // Bascule universelle HLS 100% HTTPS (Zero Mixed Content, support complet MKV/MP4 et audio AAC)
-    const token = parsedUrl.query.auth_token || req.headers['x-auth-token'] || '';
-    const tokenParam = token ? `&auth_token=${encodeURIComponent(token)}` : '';
-    const startSec = parseFloat(parsedUrl.query.start || parsedUrl.query.time || 0) || 0;
-    const startParam = startSec > 0 ? `&start=${startSec}` : '';
-
-    res.writeHead(307, {
-      'Location': `/api/stream/xtream-movie-hls/${streamId}/playlist.m3u8?ext=${ext}${tokenParam}${startParam}`,
-      'Access-Control-Allow-Origin': '*',
-      'Access-Control-Allow-Headers': '*'
-    });
-    return res.end();
-  }
-
-  // ── ROUTE API EXPLORATEUR XTREAM VOD WEB (/api/xtream/vod) ──
-  if (pathname === '/api/xtream/vod' && req.method === 'GET') {
-    const authUser = getAuthUser(req);
-    if (!authUser || authUser.is_banned) {
-      res.writeHead(401, { 'Content-Type': 'application/json' });
-      return res.end(JSON.stringify({ success: false, error: 'Accès réservé aux membres.' }));
-    }
-    const catId = parsedUrl.query.category_id || 'all';
-    const query = (parsedUrl.query.q || '').toLowerCase().trim();
-    const page = parseInt(parsedUrl.query.page) || 1;
-    const limit = Math.min(100, parseInt(parsedUrl.query.limit) || 60);
-
-    let list = Array.isArray(XTREAM_FR_VOD_STREAMS) ? XTREAM_FR_VOD_STREAMS : [];
-    if (catId && catId !== 'all') {
-      list = list.filter(m => String(m.category_id) === catId || (Array.isArray(m.category_ids) && m.category_ids.map(String).includes(catId)));
-    }
-    if (query) {
-      list = list.filter(m => m.name.toLowerCase().includes(query) || (m.plot && m.plot.toLowerCase().includes(query)));
-    }
-    const total = list.length;
-    const paginated = list.slice((page - 1) * limit, page * limit).map(m => ({
-      id: 'xtream_vod_' + m.stream_id,
-      stream_id: m.stream_id,
-      title: cleanTitleString(m.name),
-      original_title: m.name,
-      poster_url: m.stream_icon || '',
-      backdrop_url: m.stream_icon || '',
-      overview: m.plot || (cleanTitleString(m.name) + ' - Film disponible en 1080p FHD sur ZIFLIX.'),
-      media_type: 'movie',
-      is_xtream_movie: true,
-      container_extension: m.container_extension || 'mp4',
-      release_year: extractYearFromTitle(m.name, 2025),
-      rating: m.rating ? String(m.rating).slice(0, 3) : '8.2',
-      quality_badges: ['1080p FHD']
-    }));
-
-    res.writeHead(200, { 'Content-Type': 'application/json; charset=utf-8' });
-    return res.end(JSON.stringify({
-      success: true,
-      data: paginated,
-      total,
-      page,
-      categories: XTREAM_FR_VOD_CATEGORIES
-    }));
-  }
-
-  // ── ROUTE API EXPLORATEUR XTREAM SÉRIES WEB (/api/xtream/series) ──
-  if (pathname === '/api/xtream/series' && req.method === 'GET') {
-    const authUser = getAuthUser(req);
-    if (!authUser || authUser.is_banned) {
-      res.writeHead(401, { 'Content-Type': 'application/json' });
-      return res.end(JSON.stringify({ success: false, error: 'Accès réservé aux membres.' }));
-    }
-    const catId = parsedUrl.query.category_id || 'all';
-    const query = (parsedUrl.query.q || '').toLowerCase().trim();
-    const page = parseInt(parsedUrl.query.page) || 1;
-    const limit = Math.min(100, parseInt(parsedUrl.query.limit) || 60);
-
-    let list = Array.isArray(XTREAM_FR_SERIES) ? XTREAM_FR_SERIES : [];
-    if (catId && catId !== 'all') {
-      list = list.filter(s => String(s.category_id) === catId || (Array.isArray(s.category_ids) && s.category_ids.map(String).includes(catId)));
-    }
-    if (query) {
-      list = list.filter(s => s.name.toLowerCase().includes(query) || (s.plot && s.plot.toLowerCase().includes(query)));
-    }
-    const total = list.length;
-    const paginated = list.slice((page - 1) * limit, page * limit).map(s => ({
-      id: 'xtream_series_' + s.series_id,
-      series_id: s.series_id,
-      title: cleanTitleString(s.name),
-      original_title: s.name,
-      poster_url: s.cover || '',
-      backdrop_url: s.backdrop ? (Array.isArray(s.backdrop) ? s.backdrop[0] : s.backdrop) : s.cover,
-      overview: s.plot || (cleanTitleString(s.name) + ' - Série complète en streaming HD sur ZIFLIX.'),
-      media_type: 'series',
-      is_xtream_series: true,
-      release_year: extractYearFromTitle(s.name, parseInt(s.year || 2025)),
-      rating: s.rating ? String(s.rating).slice(0, 3) : '8.5',
-      quality_badges: ['1080p FHD', 'Multi-Saisons']
-    }));
-
-    res.writeHead(200, { 'Content-Type': 'application/json; charset=utf-8' });
-    return res.end(JSON.stringify({
-      success: true,
-      data: paginated,
-      total,
-      page,
-      categories: XTREAM_FR_SERIES_CATEGORIES
-    }));
-  }
-
-  if ((pathname === '/api/stream/xtream-series' || pathname === '/api/stream/xtream-movie-stream') && (req.method === 'GET' || req.method === 'HEAD')) {
-    const authUser = getRequestAuth(req, parsedUrl);
-    if (!authUser || authUser.is_banned) {
-      res.writeHead(401, { 'Content-Type': 'text/plain; charset=utf-8', 'Access-Control-Allow-Origin': '*' });
-      return res.end('Accès refusé : Session ZIFLIX requise');
-    }
-    const isMovie = pathname.includes('movie');
-    let episodeId = isMovie ? (parsedUrl.query.stream_id || parsedUrl.query.id) : parsedUrl.query.episode_id;
-    if (!isMovie && typeof HEVC_DV_TO_1080P_MAP !== 'undefined' && HEVC_DV_TO_1080P_MAP[String(episodeId)]) {
-      episodeId = HEVC_DV_TO_1080P_MAP[String(episodeId)];
-      parsedUrl.query.episode_id = episodeId;
-    }
-    const ext = parsedUrl.query.ext || (isMovie ? 'mp4' : 'mkv');
 
     if (!episodeId) {
       res.writeHead(400, { 'Content-Type': 'text/plain', 'Access-Control-Allow-Origin': '*' });
-      return res.end(isMovie ? 'Paramètre stream_id manquant' : 'Paramètre episode_id manquant');
+      return res.end('Paramètre episode_id manquant');
     }
 
     const isInitial = !req.headers['range'] || req.headers['range'] === 'bytes=0-';
     const limitCheck = checkAndRegisterStream(req, res, {
       mediaId: episodeId,
-      type: isMovie ? 'movie' : 'series',
+      type: 'series',
       isInitialIntent: isInitial,
-      name: isMovie ? ('Film #' + episodeId) : ('Série Épisode #' + episodeId)
+      name: 'Série Épisode #' + episodeId
     });
     if (!limitCheck.allowed) {
       res.writeHead(429, { 'Content-Type': 'text/plain; charset=utf-8', 'Access-Control-Allow-Origin': '*', 'Retry-After': '10' });
       return res.end(limitCheck.message);
     }
 
-    trackStreamingSession(req, res, episodeId, isMovie ? 'movie' : 'series');
+    trackStreamingSession(req, res, episodeId, 'series');
 
-    const originUrl = isMovie
-      ? `http://${XTREAM_CONFIG.host}:${XTREAM_CONFIG.port}/movie/${XTREAM_CONFIG.username}/${XTREAM_CONFIG.password}/${episodeId}.${ext}`
-      : `http://${XTREAM_CONFIG.host}:${XTREAM_CONFIG.port}/series/${XTREAM_CONFIG.username}/${XTREAM_CONFIG.password}/${episodeId}.${ext}`;
+    const originUrl = `http://${XTREAM_CONFIG.host}:${XTREAM_CONFIG.port}/series/${XTREAM_CONFIG.username}/${XTREAM_CONFIG.password}/${episodeId}.${ext}`;
     // SÉCURITÉ ABSOLUE ANTI-COUPURE 30S :
     // Zéro mise en cache de jetons Edge CDN éphémères (évite HTTP 509 Bandwidth Limit Exceeded)
     const initialUrl = originUrl;
@@ -9763,9 +8627,8 @@ if (!isValidToken) {
         if (upstreamRes.statusCode >= 400 && isEdgeAttempt) {
           try { upstreamRes.destroy(); } catch (e) {}
           cleanupListeners();
-          if (isMovie) xtreamMovieEdgeCache.delete(cacheKey);
-          else xtreamSeriesEdgeCache.delete(cacheKey);
-          console.log(`[Xtream ${isMovie ? "Movie" : "Series"} Edge Fallback] Edge CDN a renvoyé HTTP ${upstreamRes.statusCode}. Récupération immédiate d'un nouveau jeton depuis foxbleu.org...`);
+          xtreamSeriesEdgeCache.delete(cacheKey);
+          console.log(`[Xtream Series Edge Fallback] Edge CDN a renvoyé HTTP ${upstreamRes.statusCode}. Récupération immédiate d'un nouveau jeton depuis foxbleu.org...`);
           return pipeSeriesStream(originUrl, 0, false, 0);
         }
 

@@ -954,23 +954,110 @@ body {
   position: fixed;
   top: 0;
   left: 0;
-  width: 100vw;
-  height: 100vh;
+  right: 0;
+  bottom: 0;
+  width: 100%;
+  height: 100%;
   background: #000;
   z-index: 9999;
   display: none;
   overflow: hidden;
   margin: 0;
   padding: 0;
+  touch-action: manipulation;
 }
 
 .netflix-player-overlay.active {
   display: block;
 }
 
+html.player-open,
+body.player-open {
+  overflow: hidden !important;
+  touch-action: manipulation !important;
+}
+
+/* ================= RÈGLES DE PLEIN ÉCRAN NATIF (MOBILE ANDROID & DESKTOP) ================= */
+:fullscreen,
+::backdrop {
+  background-color: #000 !important;
+}
+
+.netflix-player-overlay:fullscreen,
+.netflix-player-overlay:-webkit-full-screen {
+  position: fixed !important;
+  top: 0 !important;
+  left: 0 !important;
+  right: 0 !important;
+  bottom: 0 !important;
+  width: 100% !important;
+  height: 100% !important;
+  max-width: 100% !important;
+  max-height: 100% !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  background: #000 !important;
+  overflow: hidden !important;
+  z-index: 2147483647 !important;
+}
+
+.netflix-player-overlay:fullscreen .player-media-container,
+.netflix-player-overlay:-webkit-full-screen .player-media-container {
+  position: absolute !important;
+  top: 0 !important;
+  left: 0 !important;
+  right: 0 !important;
+  bottom: 0 !important;
+  width: 100% !important;
+  height: 100% !important;
+  background: #000 !important;
+  overflow: hidden !important;
+}
+
+.netflix-player-overlay:fullscreen .netflix-video,
+.netflix-player-overlay:-webkit-full-screen .netflix-video {
+  position: absolute !important;
+  top: 0 !important;
+  left: 0 !important;
+  right: 0 !important;
+  bottom: 0 !important;
+  width: 100% !important;
+  height: 100% !important;
+  max-width: 100% !important;
+  max-height: 100% !important;
+  object-fit: contain !important;
+  background: #000 !important;
+  transform: none !important;
+  will-change: auto !important;
+}
+
+.netflix-player-overlay:fullscreen .player-top-bar,
+.netflix-player-overlay:-webkit-full-screen .player-top-bar {
+  position: absolute !important;
+  top: 0 !important;
+  left: 0 !important;
+  right: 0 !important;
+  width: 100% !important;
+  padding-top: max(12px, env(safe-area-inset-top)) !important;
+  padding-left: max(16px, env(safe-area-inset-left)) !important;
+  padding-right: max(16px, env(safe-area-inset-right)) !important;
+}
+
+.netflix-player-overlay:fullscreen .netflix-bottom-controls,
+.netflix-player-overlay:-webkit-full-screen .netflix-bottom-controls {
+  position: absolute !important;
+  bottom: 0 !important;
+  left: 0 !important;
+  right: 0 !important;
+  width: 100% !important;
+  padding-bottom: max(16px, env(safe-area-inset-bottom)) !important;
+  padding-left: max(20px, env(safe-area-inset-left)) !important;
+  padding-right: max(20px, env(safe-area-inset-right)) !important;
+}
+
 /* ================= BARRE SUPÉRIEURE FLOTTANTE NETFLIX (TOUJOURS ACCESSIBLE) ================= */
 .player-top-bar {
-  position: fixed;
+  position: absolute;
   top: 0;
   left: 0;
   right: 0;
@@ -1296,20 +1383,33 @@ body {
   -webkit-appearance: none;
   background: rgba(20, 20, 24, 0.92);
   color: #fff;
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  padding: 7px 34px 7px 14px;
+  border: 1px solid rgba(255, 255, 255, 0.25);
   border-radius: 6px;
-  font-size: 0.85rem;
-  font-weight: 600;
+  font-size: 0.82rem;
+  font-weight: 700;
   cursor: pointer;
   outline: none;
-  min-width: 105px;
   transition: all 0.2s ease;
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
   background-repeat: no-repeat;
-  background-position: right 12px center;
-  background-size: 11px 11px;
   backdrop-filter: blur(8px);
+}
+
+#playerSeasonSelect {
+  width: auto;
+  min-width: unset;
+  max-width: fit-content;
+  padding: 6px 18px 6px 8px;
+  background-position: right 6px center;
+  background-size: 8px 8px;
+}
+
+#playerEpisodeSelect {
+  width: auto;
+  min-width: unset;
+  padding: 6px 20px 6px 8px;
+  background-position: right 6px center;
+  background-size: 8px 8px;
 }
 
 .player-select:hover {
@@ -1327,13 +1427,16 @@ body {
   position: absolute;
   top: 0;
   left: 0;
-  width: 100vw;
-  height: 100vh;
+  right: 0;
+  bottom: 0;
+  width: 100%;
+  height: 100%;
   background: #000;
   overflow: hidden;
   margin: 0;
   padding: 0;
   z-index: 1;
+  touch-action: manipulation;
 }
 
 /* Fond cinématographique anti-écran noir ultra-léger pendant le préchargement */
@@ -1341,8 +1444,10 @@ body {
   position: absolute;
   top: 0;
   left: 0;
-  width: 100vw;
-  height: 100vh;
+  right: 0;
+  bottom: 0;
+  width: 100%;
+  height: 100%;
   background-size: cover;
   background-position: center center;
   background-repeat: no-repeat;
@@ -1362,22 +1467,26 @@ body {
   position: absolute;
   top: 0;
   left: 0;
-  width: 100vw;
-  height: 100vh;
+  right: 0;
+  bottom: 0;
+  width: 100%;
+  height: 100%;
   object-fit: contain;
-  background: #000; /* Requis pour DirectScanout / Overlay matériel GPU zéro-copie sous Windows/Chrome */
+  background: #000;
   z-index: 2;
   display: block;
-  transform: translateZ(0); /* Plan de composition GPU dédié */
-  will-change: transform;
+  transform: none;
+  touch-action: manipulation;
 }
 
 .netflix-iframe {
   position: absolute;
   top: 0;
   left: 0;
-  width: 100vw;
-  height: 100vh;
+  right: 0;
+  bottom: 0;
+  width: 100%;
+  height: 100%;
   border: none;
   background: #000;
   z-index: 2;
@@ -1874,16 +1983,28 @@ body {
 
 /* Ligne des Contrôles */
 .netflix-controls-row {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  width: 100%;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  width: 100% !important;
+  flex-wrap: nowrap !important;
 }
 
 .controls-left, .controls-center, .controls-right {
-  display: flex;
-  align-items: center;
-  gap: 16px;
+  display: flex !important;
+  align-items: center !important;
+  gap: 16px !important;
+  flex-wrap: nowrap !important;
+}
+
+.controls-right {
+  display: flex !important;
+  align-items: center !important;
+  gap: 12px !important;
+  flex-wrap: nowrap !important;
+  flex-shrink: 0 !important;
+  white-space: nowrap !important;
+  margin-left: auto !important;
 }
 
 .ctrl-btn {
@@ -3324,7 +3445,7 @@ button:focus-visible {
     -webkit-line-clamp: 2 !important;
   }
 
-  /* 8. Lecteur Vidéo Mobile (Commandes Épurées & Ergonomiques) */
+  /* 8. Lecteur Vidéo Mobile (Commandes Épurées, Centrées & Ergonomiques) */
   .player-top-bar {
     padding: calc(8px + env(safe-area-inset-top)) 10px 8px 10px !important;
     gap: 8px !important;
@@ -3333,6 +3454,15 @@ button:focus-visible {
     box-sizing: border-box !important;
     width: 100% !important;
     max-width: 100vw !important;
+    display: flex !important;
+    align-items: center !important;
+    flex-wrap: nowrap !important;
+    overflow-x: auto !important;
+    -webkit-overflow-scrolling: touch !important;
+    scrollbar-width: none !important;
+  }
+  .player-top-bar::-webkit-scrollbar {
+    display: none !important;
   }
 
   .player-back-btn {
@@ -3344,7 +3474,67 @@ button:focus-visible {
     border-radius: 50% !important;
   }
 
+  /* Timer Pub en haut sur mobile : Placé directement à côté du bouton retour */
+  .player-top-bar .player-watch-timer {
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 6px !important;
+    background: rgba(20, 20, 26, 0.92) !important;
+    border: 1px solid rgba(255, 255, 255, 0.25) !important;
+    border-radius: 18px !important;
+    padding: 3px 8px !important;
+    font-size: 0.78rem !important;
+    margin: 0 !important;
+    flex-shrink: 0 !important;
+    backdrop-filter: blur(8px) !important;
+    -webkit-backdrop-filter: blur(8px) !important;
+  }
+  .player-top-bar #playerWatchTimer[style*="display: none"] {
+    display: none !important;
+  }
+
+  /* Bouton Plus (+20m) : Rouge Netflix très visible et tactile */
+  .player-top-bar .player-watch-timer-btn,
+  .player-watch-timer-btn {
+    background: #e50914 !important;
+    color: #ffffff !important;
+    font-size: 0.72rem !important;
+    padding: 2px 8px !important;
+    border-radius: 10px !important;
+    font-weight: 800 !important;
+    margin-left: 2px !important;
+    border: none !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    cursor: pointer !important;
+    box-shadow: 0 1px 4px rgba(229, 9, 20, 0.4) !important;
+    opacity: 1 !important;
+  }
+  .player-top-bar .player-watch-timer-btn:active,
+  .player-watch-timer-btn:active {
+    transform: scale(0.92) !important;
+  }
+
   .player-comments-toggle-btn {
+    width: 36px !important;
+    height: 36px !important;
+    padding: 0 !important;
+    margin-left: auto !important;
+    border-radius: 50% !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    flex-shrink: 0 !important;
+    font-size: 1rem !important;
+  }
+
+  .player-comments-toggle-btn .comments-toggle-label,
+  .player-report-bug-btn .report-bug-label {
+    display: none !important;
+  }
+
+  .player-report-bug-btn {
     width: 36px !important;
     height: 36px !important;
     padding: 0 !important;
@@ -3357,17 +3547,14 @@ button:focus-visible {
     font-size: 1rem !important;
   }
 
-  .player-comments-toggle-btn .comments-toggle-label {
-    display: none !important;
-  }
-
   .player-header-info {
     display: none !important;
   }
 
+  /* Sélecteur Saisons (S1, S10) & Épisodes (E1, E20) ultra-compacts : zéro disparition sous 460px */
   .player-episode-box {
-    gap: 8px !important;
-    margin-left: auto !important;
+    gap: 4px !important;
+    margin-left: 0 !important;
     display: flex !important;
     align-items: center !important;
     flex-shrink: 0 !important;
@@ -3375,42 +3562,82 @@ button:focus-visible {
   }
 
   .player-select {
-    padding: 5px 28px 5px 10px !important;
-    font-size: 0.76rem !important;
-    font-weight: 600 !important;
-    min-width: 86px !important;
-    max-width: 125px !important;
-    height: 34px !important;
+    padding: 4px 18px 4px 6px !important;
+    font-size: 0.74rem !important;
+    font-weight: 700 !important;
+    height: 32px !important;
     border-radius: 6px !important;
     flex-shrink: 0 !important;
     text-overflow: ellipsis !important;
-    background-size: 10px 10px !important;
-    background-position: right 9px center !important;
+    background-size: 8px 8px !important;
+    background-position: right 5px center !important;
+  }
+
+  #playerSeasonSelect {
+    width: auto !important;
+    min-width: unset !important;
+    max-width: fit-content !important;
+    padding: 4px 14px 4px 6px !important;
+    background-position: right 4px center !important;
+    background-size: 7px 7px !important;
+  }
+
+  #playerEpisodeSelect {
+    width: auto !important;
+    min-width: unset !important;
+    max-width: 110px !important;
+    padding: 4px 16px 4px 6px !important;
+    background-position: right 4px center !important;
+    background-size: 7px 7px !important;
   }
 
   .player-meta-display,
   .player-lang-box,
-  .player-server-wrapper {
+  .player-server-wrapper,
+  .quality-control-wrapper {
     display: none !important;
   }
 
+  /* Contrôles Inférieurs Mobile : Aérés, Épurés et Parfaitement Équilibrés */
   .netflix-bottom-controls {
     width: 100% !important;
     max-width: 100vw !important;
     box-sizing: border-box !important;
-    padding: 6px 8px calc(8px + env(safe-area-inset-bottom)) 8px !important;
+    padding: 6px 12px calc(12px + env(safe-area-inset-bottom)) 12px !important;
     gap: 4px !important;
-    background: linear-gradient(0deg, rgba(0, 0, 0, 0.96) 0%, rgba(0, 0, 0, 0.75) 75%, transparent 100%) !important;
-    overflow: hidden !important;
+    background: linear-gradient(0deg, rgba(0, 0, 0, 0.96) 0%, rgba(0, 0, 0, 0.78) 75%, transparent 100%) !important;
+    overflow: visible !important;
+    display: flex !important;
+    flex-direction: column !important;
+  }
+
+  /* Minuteur du lecteur (00:00 / 45:00) : Au-dessus de la timeline sur mobile, zéro chevauchement avec -10s */
+  .netflix-bottom-controls > .time-readout {
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 4px !important;
+    font-size: 0.72rem !important;
+    font-weight: 600 !important;
+    color: #e5e5e5 !important;
+    letter-spacing: 0.3px !important;
+    background: rgba(0, 0, 0, 0.45) !important;
+    padding: 2px 7px !important;
+    border-radius: 4px !important;
+    margin-bottom: 2px !important;
+    align-self: flex-start !important;
+    width: auto !important;
+    z-index: 5 !important;
   }
 
   .netflix-scrubber-container {
-    height: 24px !important;
-    padding: 8px 0 !important;
+    height: 20px !important;
+    padding: 6px 0 !important;
+    width: 100% !important;
   }
 
   .scrubber-track {
     height: 4px !important;
+    border-radius: 2px !important;
   }
 
   .scrubber-thumb {
@@ -3418,108 +3645,175 @@ button:focus-visible {
     height: 14px !important;
   }
 
+  /* Ligne de boutons : flex-wrap strictement interdit (nowrap) pour empêcher tout retour à la ligne sous 744px */
   .netflix-controls-row {
     display: flex !important;
     align-items: center !important;
     justify-content: space-between !important;
+    flex-wrap: nowrap !important;
+    position: relative !important;
     width: 100% !important;
-    max-width: 100% !important;
+    height: 46px !important;
     box-sizing: border-box !important;
-    gap: 4px !important;
   }
 
+  /* Zone Gauche : Uniquement Volume / Mute (34px, 100% libéré pour le -10s) */
   .controls-left {
     display: flex !important;
     align-items: center !important;
-    gap: 4px !important;
-    flex-shrink: 1 !important;
-    min-width: 0 !important;
+    flex-wrap: nowrap !important;
+    gap: 8px !important;
+    flex-shrink: 0 !important;
+    z-index: 5 !important;
+    width: auto !important;
   }
 
-  .play-pause-btn {
-    width: 36px !important;
-    height: 36px !important;
-    padding: 6px !important;
+  .volume-container {
+    display: inline-flex !important;
+    align-items: center !important;
+  }
+
+  .volume-container #ctrlVolumeBtn {
+    width: 34px !important;
+    height: 34px !important;
+    border-radius: 50% !important;
+    background: rgba(255, 255, 255, 0.12) !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    padding: 0 !important;
+    color: #fff !important;
+    border: none !important;
     flex-shrink: 0 !important;
   }
 
-  .jump-btn {
-    width: 32px !important;
-    height: 32px !important;
-    padding: 2px !important;
-    flex-shrink: 0 !important;
-  }
-
-  .volume-container,
+  .volume-slider-wrapper,
   .speed-control-wrapper {
     display: none !important;
   }
 
+  /* Zone Centrale : Le Trio de Lecture [ ↺ 10s ] [ ▶ / ❚❚ ] [ 10s ↻ ] Parfaitement Centré */
   .controls-center {
+    position: absolute !important;
+    left: 50% !important;
+    top: 50% !important;
+    transform: translate(-50%, -50%) !important;
     display: flex !important;
     align-items: center !important;
     justify-content: center !important;
-    min-width: 0 !important;
-    flex: 1 1 auto !important;
+    flex-wrap: nowrap !important;
+    gap: 14px !important;
+    z-index: 10 !important;
+    pointer-events: auto !important;
+    width: auto !important;
   }
 
   .controls-center .ctrl-media-title {
     display: none !important;
   }
 
-  .time-readout {
-    font-size: 0.68rem !important;
-    font-weight: 600 !important;
-    margin-left: 2px !important;
-    white-space: nowrap !important;
+  .controls-center .play-pause-btn {
+    width: 44px !important;
+    height: 44px !important;
+    min-width: 44px !important;
+    min-height: 44px !important;
+    border-radius: 50% !important;
+    background: rgba(255, 255, 255, 0.22) !important;
+    border: 1.5px solid rgba(255, 255, 255, 0.45) !important;
+    color: #ffffff !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    padding: 0 !important;
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.6) !important;
+    transition: transform 0.15s ease, background 0.15s ease !important;
+    -webkit-tap-highlight-color: transparent !important;
     flex-shrink: 0 !important;
   }
 
+  .controls-center .play-pause-btn:active {
+    transform: scale(0.92) !important;
+    background: rgba(229, 9, 20, 0.85) !important;
+  }
+
+  .controls-center .jump-btn {
+    width: 36px !important;
+    height: 36px !important;
+    min-width: 36px !important;
+    min-height: 36px !important;
+    border-radius: 50% !important;
+    background: rgba(0, 0, 0, 0.4) !important;
+    border: 1px solid rgba(255, 255, 255, 0.22) !important;
+    color: #f0f0f0 !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    padding: 0 !important;
+    transition: transform 0.15s ease !important;
+    -webkit-tap-highlight-color: transparent !important;
+    flex-shrink: 0 !important;
+  }
+
+  .controls-center .jump-btn:active {
+    transform: scale(0.9) !important;
+    border-color: rgba(255, 255, 255, 0.5) !important;
+  }
+
+  /* Zone Droite : Épisode Suivant & Plein Écran (nowrap strict, ne retournent JAMAIS à la ligne) */
   .controls-right {
     display: flex !important;
     align-items: center !important;
-    gap: 4px !important;
+    flex-wrap: nowrap !important;
+    gap: 8px !important;
     margin-left: auto !important;
     flex-shrink: 0 !important;
+    z-index: 5 !important;
+    white-space: nowrap !important;
   }
 
   .next-ep-btn {
     height: 32px !important;
-    width: 32px !important;
-    padding: 0 !important;
+    padding: 4px 10px !important;
+    border-radius: 16px !important;
+    background: rgba(255, 255, 255, 0.12) !important;
+    border: 1px solid rgba(255, 255, 255, 0.2) !important;
     display: inline-flex !important;
     align-items: center !important;
     justify-content: center !important;
+    color: #fff !important;
     flex-shrink: 0 !important;
+    white-space: nowrap !important;
+    gap: 5px !important;
+    font-size: 0.74rem !important;
+    font-weight: 700 !important;
   }
 
   .next-ep-btn .next-ep-label {
-    display: none !important;
-  }
-
-  .quality-btn {
-    padding: 4px 6px !important;
-    font-size: 0.68rem !important;
-    height: 32px !important;
-    flex-shrink: 0 !important;
+    display: inline !important;
   }
 
   #ctrlFullscreenBtn {
     display: inline-flex !important;
     align-items: center !important;
     justify-content: center !important;
-    width: 36px !important;
-    height: 36px !important;
-    min-width: 36px !important;
-    min-height: 36px !important;
-    padding: 6px !important;
+    width: 38px !important;
+    height: 38px !important;
+    min-width: 38px !important;
+    min-height: 38px !important;
+    padding: 0 !important;
     border-radius: 50% !important;
-    background: rgba(255, 255, 255, 0.18) !important;
+    background: rgba(255, 255, 255, 0.2) !important;
     border: 1px solid rgba(255, 255, 255, 0.35) !important;
+    color: #fff !important;
     touch-action: manipulation !important;
     -webkit-tap-highlight-color: transparent !important;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4) !important;
     flex-shrink: 0 !important;
-    margin-right: 2px !important;
+  }
+
+  #ctrlFullscreenBtn:active {
+    transform: scale(0.92) !important;
+    background: rgba(255, 255, 255, 0.35) !important;
   }
 
   /* 9. Footer sur Mobile */
@@ -3534,14 +3828,17 @@ button:focus-visible {
   }
 }
 
-@media (max-width: 480px) {
-  .next-ep-btn .next-ep-label {
-    display: none !important;
-  }
+@media (max-width: 520px) {
   .next-ep-btn {
-    width: 36px !important;
+    width: 34px !important;
+    height: 34px !important;
+    min-width: 34px !important;
+    border-radius: 50% !important;
     padding: 0 !important;
     justify-content: center !important;
+  }
+  .next-ep-btn .next-ep-label {
+    display: none !important;
   }
   .time-readout {
     font-size: 0.68rem !important;
@@ -3549,7 +3846,7 @@ button:focus-visible {
 }
 
 /* Optimisation pour téléphones en mode Paysage (Landscape) */
-@media (max-height: 500px) and (orientation: landscape) {
+@media (max-height: 620px) and (orientation: landscape) {
   .player-top-bar {
     padding: 6px calc(14px + env(safe-area-inset-right)) 6px calc(14px + env(safe-area-inset-left)) !important;
   }
@@ -5749,3 +6046,480 @@ button:focus-visible {
   }
 }
 
+
+
+/* ================= BADGE FLOTTANT ACTIVER LE SON (AUTOPLAY MUTED RECOVERY) ================= */
+.player-unmute-badge {
+  position: absolute;
+  top: 76px;
+  left: 20px;
+  z-index: 95;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(229, 9, 20, 0.95);
+  color: #ffffff;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  padding: 8px 16px;
+  border-radius: 24px;
+  font-size: 0.85rem;
+  font-weight: 700;
+  letter-spacing: 0.2px;
+  cursor: pointer;
+  box-shadow: 0 4px 18px rgba(0, 0, 0, 0.75);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1), background 0.2s ease, box-shadow 0.2s ease;
+  pointer-events: auto;
+  animation: pulse-unmute 2s infinite ease-in-out;
+}
+
+@keyframes pulse-unmute {
+  0%, 100% {
+    box-shadow: 0 4px 18px rgba(0, 0, 0, 0.75);
+    transform: scale(1);
+  }
+  50% {
+    box-shadow: 0 6px 24px rgba(229, 9, 20, 0.65);
+    transform: scale(1.04);
+  }
+}
+
+.player-unmute-badge:hover {
+  background: #ff0f1a;
+  transform: scale(1.06);
+}
+
+.player-unmute-badge:active {
+  transform: scale(0.96);
+}
+
+.player-unmute-badge.hidden {
+  display: none !important;
+}
+
+@media (max-width: 820px) {
+  .player-unmute-badge {
+    top: 66px;
+    left: 14px;
+    padding: 6px 14px;
+    font-size: 0.8rem;
+    gap: 6px;
+  }
+}
+
+
+/* ================= BOUTON PASSER L'INTRO (NETFLIX STYLE) ================= */
+.netflix-skip-intro-btn {
+  position: absolute;
+  bottom: 125px;
+  right: 36px;
+  z-index: 1500 !important;
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  background: rgba(20, 20, 20, 0.88);
+  color: #ffffff;
+  border: 1.5px solid rgba(255, 255, 255, 0.65);
+  border-radius: 6px;
+  padding: 10px 22px;
+  font-family: inherit;
+  font-size: 0.95rem;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  cursor: pointer !important;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  user-select: none;
+  pointer-events: auto !important;
+}
+
+.netflix-skip-intro-btn * {
+  pointer-events: none !important;
+  cursor: pointer !important;
+}
+
+.netflix-skip-intro-btn:hover {
+  background: rgba(229, 9, 20, 0.95);
+  border-color: #e50914;
+  transform: translateY(-2px) scale(1.03);
+  box-shadow: 0 6px 24px rgba(229, 9, 20, 0.5);
+  cursor: pointer !important;
+}
+
+.netflix-player-overlay.user-idle .netflix-skip-intro-btn {
+  cursor: pointer !important;
+  pointer-events: auto !important;
+}
+
+.netflix-skip-intro-btn:active {
+  transform: translateY(0) scale(0.98);
+}
+
+.netflix-skip-intro-btn.hidden {
+  display: none !important;
+}
+
+@media (max-width: 768px) {
+  .netflix-skip-intro-btn {
+    bottom: 105px;
+    right: 18px;
+    padding: 8px 16px;
+    font-size: 0.85rem;
+  }
+}
+
+/* Sous-titres (CC) */
+.subtitles-btn {
+  font-size: 0.82rem;
+  font-weight: 700;
+  padding: 4px 8px;
+  border-radius: 4px;
+  border: 1px solid rgba(255, 255, 255, 0.28);
+  background: rgba(255, 255, 255, 0.08);
+  color: #fff;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.subtitles-btn:hover {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+.subtitles-btn.active {
+  background: rgba(229, 9, 20, 0.25) !important;
+  border-color: #e50914 !important;
+  color: #e50914 !important;
+}
+
+/* Netflix-style Subtitle cues */
+video::cue {
+  background: rgba(0, 0, 0, 0.8) !important;
+  color: #ffffff !important;
+  font-family: 'Netflix Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif !important;
+  font-size: 1.15rem !important;
+  font-weight: 600 !important;
+  line-height: 1.4 !important;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.95) !important;
+  padding: 4px 8px !important;
+  border-radius: 4px !important;
+}
+
+
+/* ================= NOUVEAUX COMPOSANTS UX (PiP, AirPlay, Double-Tap, Épisode Suivant, Favoris TV, Genre Chips) ================= */
+
+/* 1. Boutons du Player (PiP, AirPlay, Favori) */
+.ctrl-btn.pip-btn.active {
+  color: #e50914 !important;
+}
+.ctrl-btn.airplay-btn {
+  margin-right: 4px;
+}
+.player-fav-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(255, 255, 255, 0.12);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: #fff;
+  padding: 6px 14px;
+  border-radius: 20px;
+  cursor: pointer;
+  font-size: 0.82rem;
+  font-weight: 600;
+  transition: all 0.2s ease;
+  backdrop-filter: blur(8px);
+}
+.player-fav-btn:hover {
+  background: rgba(255, 255, 255, 0.25);
+  transform: translateY(-1px);
+}
+.player-fav-btn.active {
+  background: rgba(229, 9, 20, 0.35);
+  border-color: #e50914;
+  color: #ff4d4d;
+}
+.player-fav-btn.active .icon-fav-heart {
+  fill: #e50914;
+  stroke: #e50914;
+}
+
+/* 2. Double-Tap Mobile Seek Ripple (±10s) */
+.player-doubletap-indicator {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 40%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+  z-index: 50;
+  transition: opacity 0.3s ease;
+}
+.player-doubletap-indicator.left {
+  left: 0;
+  border-radius: 0 100% 100% 0 / 0 50% 50% 0;
+  background: radial-gradient(circle at left center, rgba(255, 255, 255, 0.22) 0%, rgba(255, 255, 255, 0.05) 60%, transparent 100%);
+}
+.player-doubletap-indicator.right {
+  right: 0;
+  border-radius: 100% 0 0 100% / 50% 0 0 50%;
+  background: radial-gradient(circle at right center, rgba(255, 255, 255, 0.22) 0%, rgba(255, 255, 255, 0.05) 60%, transparent 100%);
+}
+.player-doubletap-indicator.hidden {
+  display: none !important;
+}
+.doubletap-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  animation: doubleTapBounce 0.45s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+.doubletap-icon {
+  font-size: 2.2rem;
+  filter: drop-shadow(0 2px 8px rgba(0, 0, 0, 0.8));
+}
+.doubletap-text {
+  font-size: 1rem;
+  font-weight: 800;
+  color: #fff;
+  letter-spacing: 1px;
+  text-shadow: 0 2px 6px rgba(0, 0, 0, 0.9);
+}
+@keyframes doubleTapBounce {
+  0% { transform: scale(0.6); opacity: 0; }
+  50% { transform: scale(1.15); opacity: 1; }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+/* 3. Carte flottante Netflix "Épisode suivant" */
+.next-ep-countdown-card {
+  position: absolute;
+  bottom: 85px;
+  right: 28px;
+  width: 320px;
+  max-width: calc(100vw - 40px);
+  background: rgba(20, 20, 20, 0.94);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  border-radius: 12px;
+  padding: 12px;
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  box-shadow: 0 12px 35px rgba(0, 0, 0, 0.85);
+  backdrop-filter: blur(16px);
+  z-index: 65;
+  animation: nextCardSlideUp 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+  transition: opacity 0.3s, transform 0.3s;
+}
+.next-ep-countdown-card.hidden {
+  display: none !important;
+}
+@keyframes nextCardSlideUp {
+  from { opacity: 0; transform: translateY(20px) scale(0.95); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+.next-ep-card-preview {
+  position: relative;
+  width: 96px;
+  height: 60px;
+  flex-shrink: 0;
+  border-radius: 8px;
+  overflow: hidden;
+  background: #000;
+}
+.next-ep-card-preview img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.next-ep-card-play-now {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: rgba(229, 9, 20, 0.9);
+  border: none;
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: transform 0.2s;
+}
+.next-ep-card-play-now:hover {
+  transform: translate(-50%, -50%) scale(1.15);
+  background: #e50914;
+}
+.next-ep-card-details {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.next-ep-card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.next-ep-card-badge {
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: #e50914;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+.next-ep-card-badge b, .next-ep-card-badge span {
+  color: #fff;
+  font-weight: 800;
+}
+.next-ep-card-close {
+  background: transparent;
+  border: none;
+  color: #888;
+  font-size: 0.9rem;
+  cursor: pointer;
+  padding: 2px 6px;
+  border-radius: 4px;
+}
+.next-ep-card-close:hover {
+  color: #fff;
+  background: rgba(255, 255, 255, 0.1);
+}
+.next-ep-card-title {
+  font-size: 0.88rem;
+  font-weight: 700;
+  color: #fff;
+  margin: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.next-ep-card-sub {
+  font-size: 0.75rem;
+  color: #aaa;
+}
+
+/* 5. Bouton favoris sur les cartes de chaînes TV et films */
+.action-circle-btn.fav-btn {
+  background: rgba(20, 20, 20, 0.75);
+  border: 1px solid rgba(255, 255, 255, 0.35);
+  color: #fff;
+  font-size: 1.15rem;
+  line-height: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+}
+.action-circle-btn.fav-btn:hover {
+  background: rgba(255, 255, 255, 0.25);
+  border-color: #fff;
+  transform: scale(1.15);
+}
+.action-circle-btn.fav-btn.active {
+  background: rgba(229, 9, 20, 0.35);
+  border-color: #e50914;
+  color: #ff3344;
+}
+
+@media (max-width: 768px) {
+  .next-ep-countdown-card {
+    bottom: 75px;
+    right: 12px;
+    left: 12px;
+    width: auto;
+  }
+  .player-top-bar .player-fav-btn .player-fav-label {
+    display: none;
+  }
+}
+
+
+/* ================= CORRECTIONS CLIC NAVBAR & TÉLÉ-RÉALITÉ ================= */
+.nav-watch-timer {
+  position: relative !important;
+  z-index: 120 !important;
+  pointer-events: auto !important;
+}
+
+.nav-watch-timer-btn {
+  position: relative !important;
+  z-index: 121 !important;
+  pointer-events: auto !important;
+  cursor: pointer !important;
+}
+
+.nav-link[data-filter="telerealite"],
+.mobile-sub-pill[data-filter="telerealite"] {
+  position: relative !important;
+  z-index: 120 !important;
+  pointer-events: auto !important;
+  cursor: pointer !important;
+}
+
+/* ================= ISOLATION TOTALE & PRIORITÉ CLIC TIMER ACCUEIL ================= */
+.header-right {
+  position: relative !important;
+  z-index: 105 !important;
+}
+.nav-watch-timer {
+  position: relative !important;
+  z-index: 9999 !important;
+  pointer-events: auto !important;
+  cursor: default !important;
+}
+.nav-watch-timer-btn {
+  position: relative !important;
+  z-index: 10000 !important;
+  pointer-events: auto !important;
+  cursor: pointer !important;
+  -webkit-user-select: none !important;
+  user-select: none !important;
+}
+.nav-watch-timer-btn:active:not(:disabled) {
+  transform: scale(0.94) !important;
+}
+
+/* OPTIMISATIONS HAUTE PERFORMANCE MOBILE */
+@media (max-width: 768px) {
+  *, *::before, *::after {
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+  }
+  .bottom-nav {
+    background: #121212 !important;
+    border-top: 1px solid rgba(255, 255, 255, 0.08) !important;
+  }
+  .header {
+    background: #141414 !important;
+  }
+  .details-modal {
+    background: rgba(0, 0, 0, 0.94) !important;
+  }
+  .modal-container {
+    background: #181818 !important;
+  }
+  .movie-row {
+    contain: layout style;
+  }
+  .movie-card {
+    contain: layout style;
+    content-visibility: auto;
+    contain-intrinsic-size: 210px 310px;
+  }
+  html, body, .catalog-rows {
+    -webkit-overflow-scrolling: touch;
+  }
+}

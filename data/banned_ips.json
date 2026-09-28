@@ -46,5 +46,85 @@
     "user_id": "u_1789651890714_73dbe3dc",
     "username": "Mouhamad Diedhiou",
     "banned_at": "2026-09-17T19:59:50.095Z"
+  },
+  {
+    "ip": "2a01:cb19:9f5b:5d00:ec88:8ce4:7906:530b",
+    "subnet": "2a01:cb19:9f5b:5d00",
+    "reason": "Bouclier Anti-Troll (Usurpation d'identite) : \"diedhiou\"",
+    "user_id": null,
+    "username": "Mouhamad Diedhiou 12",
+    "banned_at": "2026-09-17T20:39:20.583Z"
+  },
+  {
+    "ip": "80.240.101.192",
+    "subnet": null,
+    "reason": "Bouclier Anti-Troll (Usurpation d'identite) : \"diedhiou\"",
+    "user_id": null,
+    "username": "Mouhamad Diedhiou 12 (Derniere IP active)",
+    "banned_at": "2026-09-17T20:41:42.482Z"
+  },
+  {
+    "ip": "80.240.101.109",
+    "subnet": null,
+    "reason": "Bouclier Anti-Troll (Insulte) : \"pute\"",
+    "user_id": null,
+    "username": "Gakolapute",
+    "banned_at": "2026-09-17T20:56:47.974Z"
+  },
+  {
+    "ip": "31.172.87.152",
+    "subnet": null,
+    "reason": "Bouclier Anti-Troll (Insulte) : \"pute\"",
+    "user_id": null,
+    "username": "Gakolapute",
+    "banned_at": "2026-09-17T20:57:23.914Z"
+  },
+  {
+    "ip": "82.117.225.122",
+    "subnet": null,
+    "reason": "Bouclier Anti-Troll (Insulte) : \"salope\"",
+    "user_id": null,
+    "username": "Gakolopsa: On est toujours là et en plus t'es tellement une salope que nous sommes à chaque fois sous vpn donc c'est pas notre adresse et continue ton groupe va sauter rapidement pour divulgation d'image avec des adresses",
+    "banned_at": "2026-09-17T20:58:58.244Z"
+  },
+  {
+    "ip": "87.251.69.80",
+    "subnet": null,
+    "reason": "Bouclier Anti-Troll (Insulte) : \"negro\"",
+    "user_id": null,
+    "username": "mamamoudou mange: Petite chienne de negro on est sous vpn",
+    "banned_at": "2026-09-17T21:00:56.232Z"
+  },
+  {
+    "ip": "85.234.86.126",
+    "subnet": null,
+    "reason": "Bouclier Anti-Troll (Usurpation d'identite) : \"diedhiou\"",
+    "user_id": null,
+    "username": "lopsadetelegram: Mouhamad Diedhiou de son vrai prénom la salope de chienne",
+    "banned_at": "2026-09-17T21:13:01.333Z"
+  },
+  {
+    "ip": "195.123.211.22",
+    "subnet": null,
+    "reason": "Bouclier Anti-Troll (Usurpation d'identite) : \"diedhiou\"",
+    "user_id": null,
+    "username": "Mouhamad Diedhiou11",
+    "banned_at": "2026-09-17T21:14:03.892Z"
+  },
+  {
+    "ip": "113.30.152.6",
+    "subnet": null,
+    "reason": "Bouclier Anti-Troll (Usurpation d'identite) : \"diedhiou\"",
+    "user_id": null,
+    "username": "TF1prod: Mouhamad Diedhiou continue lopsa d'internet",
+    "banned_at": "2026-09-17T22:50:13.238Z"
+  },
+  {
+    "ip": "158.69.192.77",
+    "subnet": null,
+    "reason": "Bouclier Anti-Troll (Usurpation d'identite) : \"liedjou\"",
+    "user_id": null,
+    "username": "Lesliedjou",
+    "banned_at": "2026-09-18T12:49:33.596Z"
   }
 ]

@@ -5,14 +5,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
   <title>ZIFLIX - Streaming & Télévision en Direct</title>
   <link rel="icon" type="image/svg+xml" href="assets/logos/ziflix-icon.svg">
-  <link rel="manifest" href="manifest.json">
-  <meta name="theme-color" content="#141414">
-  <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <meta name="apple-mobile-web-app-title" content="ZIFLIX">
-  <link rel="apple-touch-icon" href="assets/logos/ziflix-icon.svg">
   <link rel="preload" href="assets/logos/ziflix-logo.svg?v=4" as="image" type="image/svg+xml">
-  <link rel="stylesheet" href="css/netflix.css?v=1790516031157">
+  <link rel="stylesheet" href="css/netflix.css?v=1790264986094">
   <link rel="stylesheet" href="css/admin.css?v=1789913065559">
   <!-- Critical Zero-FOUC & Splash early styles -->
   <style>
@@ -35,36 +29,6 @@
   </style>
   <script>
     window.__ZIFLIX_SPLASH_START = Date.now();
-    function sendClientDebug(type, data) {
-      try {
-        var payload = JSON.stringify({ type: type, data: data, url: window.location.href, time: Date.now() });
-        if (navigator.sendBeacon) {
-          navigator.sendBeacon('/api/client-debug', payload);
-        } else {
-          fetch('/api/client-debug', { method: 'POST', body: payload, headers: {'Content-Type': 'application/json'} }).catch(function(){});
-        }
-      } catch (e) {}
-    }
-    // Clean all Service Workers & Caches
-    if ('serviceWorker' in navigator) {
-      navigator.serviceWorker.getRegistrations().then(function(regs) {
-        for (var r of regs) r.unregister();
-      });
-// Browser CacheStorage preserved
-    }
-    window.addEventListener('error', function(e) {
-      sendClientDebug('JS_ERROR', { msg: e.message, file: e.filename, line: e.lineno, col: e.colno, stack: e.error ? e.error.stack : null });
-    });
-    window.addEventListener('unhandledrejection', function(e) {
-      sendClientDebug('PROMISE_REJECTION', { reason: e.reason ? (e.reason.stack || e.reason.message || String(e.reason)) : null });
-    });
-    var _origConsoleError = console.error;
-    console.error = function() {
-      _origConsoleError.apply(console, arguments);
-      var args = Array.prototype.slice.call(arguments).map(function(a) { return typeof a === 'object' ? JSON.stringify(a) : String(a); }).join(' ');
-      sendClientDebug('CONSOLE_ERROR', args);
-    };
-    sendClientDebug('PAGE_LOAD', { href: window.location.href, token: !!localStorage.getItem('ziflix_auth_token') });
     setTimeout(function() {
       var sp = document.getElementById('ziflixSplash');
       var app = document.getElementById('ziflixApp');
@@ -77,74 +41,6 @@
       }
     }, 3500);
   </script>
-<script>
-window.rechargeWatchCreditDirect = function(e) {
-  if (e) {
-    try { e.preventDefault(); } catch (err) {}
-    try { e.stopPropagation(); } catch (err) {}
-  }
-  try {
-    if (typeof sendClientDebug === "function") {
-      sendClientDebug("NAV_TIMER_CLICK_DISPATCHED", { time: Date.now() });
-    }
-  } catch(err) {}
-
-  var player = window.netflixPlayer || (window.netflixApp && window.netflixApp.player) || (window.app && window.app.player);
-  if (player && typeof player.rechargeWatchCredit === "function") {
-    player.rechargeWatchCredit(false);
-    return;
-  }
-
-  var targetUrl = (Math.random() < 0.5)
-    ? "https://omg10.com/4/11820445"
-    : "https://www.profitableratecpmnetwork.com/kwnxcx7a2s?key=d43d0890cc6512eb65c08a022e42f264";
-  try {
-    var win = window.open(targetUrl, "_blank");
-    if (!win) {
-      var a = document.createElement("a");
-      a.href = targetUrl;
-      a.target = "_blank";
-      a.rel = "noopener noreferrer";
-      document.body.appendChild(a);
-      a.click();
-      a.remove();
-    }
-  } catch (err) {}
-
-  var btn = document.getElementById("navWatchTimerBtn");
-  if (btn) {
-    btn.disabled = true;
-    btn.textContent = "⏳ 5s";
-    var sec = 5;
-    var itv = setInterval(function() {
-      sec--;
-      if (sec > 0) {
-        btn.textContent = "⏳ " + sec + "s";
-      } else {
-        clearInterval(itv);
-        btn.disabled = false;
-        btn.textContent = "+20";
-        var now = Date.now();
-        var expStr = localStorage.getItem("ziflix_watch_expires_at");
-        var curExp = expStr ? parseInt(expStr, 10) : now;
-        var baseTime = (curExp > now) ? curExp : now;
-        var newExp = Math.min(now + 3600 * 1000, baseTime + 1200 * 1000);
-        localStorage.setItem("ziflix_watch_expires_at", String(newExp));
-        var rem = Math.max(0, Math.floor((newExp - now) / 1000));
-        var mins = Math.floor(rem / 60);
-        var secs = rem % 60;
-        var valEl = document.getElementById("navWatchTimerVal");
-        if (valEl) {
-          valEl.textContent = (mins < 10 ? "0" : "") + mins + ":" + (secs < 10 ? "0" : "") + secs;
-        }
-        if (window.netflixPlayer && typeof window.netflixPlayer.showToast === "function") {
-          window.netflixPlayer.showToast("+20 minutes offertes ajoutées ! (" + mins + " min au total)");
-        }
-      }
-    }, 1000);
-  }
-};
-</script>
 </head>
 <body>
 
@@ -170,10 +66,11 @@ window.rechargeWatchCreditDirect = function(e) {
         <li><a href="#" class="nav-link active" data-filter="all">Accueil</a></li>
         <li><a href="#" class="nav-link" data-filter="series">Séries</a></li>
         <li><a href="#" class="nav-link" data-filter="movie">Films</a></li>
+        <li><a href="#" class="nav-link" data-filter="nouveautes">Nouveautés les plus regardées</a></li>
         <li><a href="#" class="nav-link" data-filter="my-list">Ma liste</a></li>
         <li><a href="#" class="nav-link" data-filter="channels"><span class="live-dot-nav">●</span> Chaînes TV</a></li>
-        <li><a href="#" class="nav-link" data-filter="xtream">Xtream</a></li>
-        <li><a href="#" class="nav-link" data-filter="telerealite" onclick="if(window.netflixApp){window.netflixApp.applyFilter('telerealite', true); return false;}">Télé-Réalité</a></li>
+        <li><a href="#" class="nav-link" data-filter="xtream"><span class="xtream-badge-nav">⚡</span> Xtream</a></li>
+        <li><a href="#" class="nav-link" data-filter="telerealite"><span class="xtream-badge-nav">📺</span> TV Réalité</a></li>
       </ul>
     </div>
     <div class="header-right">
@@ -182,15 +79,15 @@ window.rechargeWatchCreditDirect = function(e) {
         <span class="nav-watch-timer-dot" aria-hidden="true">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
         </span>
-        <span class="nav-watch-timer-val" id="navWatchTimerVal">20:00</span>
-        <button type="button" class="nav-watch-timer-btn" id="navWatchTimerBtn" title="Recharger +20 min gratuites" onclick="window.rechargeWatchCreditDirect(event);">+20</button>
+        <span class="nav-watch-timer-val" id="navWatchTimerVal">15:00</span>
+        <button type="button" class="nav-watch-timer-btn" id="navWatchTimerBtn" title="Recharger +20 min gratuites">+20</button>
       </div>
       <div class="search-box">
-        <span class="search-icon"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align: middle;"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg></span>
+        <span class="search-icon">🔍</span>
         <input type="text" id="searchInput" class="search-input" placeholder="Titres, personnes, genres...">
       </div>
             <button class="nav-premium-btn" id="navPremiumBtn" style="display:none !important;" title="Abonnement VIP ZIFLIX">
-        
+        <span class="vip-crown-icon">👑</span>
         <span class="vip-btn-text" id="navVipBtnText">Passer VIP</span>
       </button>
       <div class="profile-container" id="profileContainer" tabindex="0" aria-label="Menu Profil">
@@ -199,7 +96,7 @@ window.rechargeWatchCreditDirect = function(e) {
         </div>
         <div class="profile-dropdown" id="profileDropdown">
                     <div class="dropdown-item dropdown-vip-item" id="openPremiumDropdownBtn" style="display:none !important;">
-            
+            <span style="font-size: 1.3rem;">👑</span>
             <div style="flex: 1;">
               <div style="font-weight: 700; color: #fbbf24; display: flex; align-items: center; justify-content: space-between;">
                 <span id="dropdownVipTitle">Passer VIP</span>
@@ -209,24 +106,24 @@ window.rechargeWatchCreditDirect = function(e) {
             </div>
           </div>
           <div class="dropdown-item" id="openProfileModalBtn">
-            <span style="font-size: 1.1rem; color: #aaa;">•</span>
+            <span style="font-size: 1.2rem;">👤</span>
             <div>
               <div style="font-weight: 700; color: #fff;" id="headerUsernameDisplay">Mon Profil</div>
               <div style="font-size: 0.72rem; color: #aaa;">Personnaliser l'avatar</div>
             </div>
           </div>
           <div class="dropdown-item" id="openAdminBtn">
-            <span style="font-size: 1.1rem; color: #ff5555;">•</span> 
+            <span style="font-size: 1.2rem;">⚙️</span> 
             <div>
               <div style="font-weight: 700; color: #ff5555;">Mode Administrateur</div>
               <div style="font-size: 0.72rem; color: #888;">Gérer catalogue, utilisateurs & vidéos</div>
             </div>
           </div>
           <div class="dropdown-item" id="helpCenterBtn">
-            <span style="font-size: 1.1rem; color: #aaa;">•</span> Centre d'aide
+            <span style="font-size: 1.2rem;">❓</span> Centre d'aide
           </div>
           <div class="dropdown-item" id="logoutBtn" style="color: #ff6b6b;">
-            <span style="font-size: 1.1rem; color: #ff5555;">•</span> Se déconnecter de ZIFLIX
+            <span style="font-size: 1.2rem;">🚪</span> Se déconnecter de ZIFLIX
           </div>
         </div>
       </div>
@@ -236,14 +133,15 @@ window.rechargeWatchCreditDirect = function(e) {
   <!-- ================= BARRE DE SOUS-NAVIGATION MOBILE (CATÉGORIES DÉFILANTES) ================= -->
   <nav class="mobile-sub-nav" id="mobileSubNav">
     <div class="mobile-sub-nav-scroll">
-      <a href="#" class="mobile-sub-pill nav-premium-pill" id="mobilePremiumBtn" style="display:none !important;">Passer VIP</a>
-      <a href="#" class="mobile-sub-pill nav-link active" data-filter="all">Tout</a>
-      <a href="#" class="mobile-sub-pill nav-link" data-filter="series">Séries</a>
-      <a href="#" class="mobile-sub-pill nav-link" data-filter="movie">Films</a>
+      <a href="#" class="mobile-sub-pill nav-premium-pill" id="mobilePremiumBtn" style="display:none !important;">👑 Passer VIP</a>
+      <a href="#" class="mobile-sub-pill nav-link active" data-filter="all">🍿 Tout</a>
+      <a href="#" class="mobile-sub-pill nav-link" data-filter="series">📺 Séries</a>
+      <a href="#" class="mobile-sub-pill nav-link" data-filter="movie">🎬 Films</a>
       <a href="#" class="mobile-sub-pill nav-link" data-filter="channels"><span class="live-dot-nav">●</span> TV Direct</a>
-      <a href="#" class="mobile-sub-pill nav-link" data-filter="xtream">Xtream</a>
-      <a href="#" class="mobile-sub-pill nav-link" data-filter="telerealite" onclick="if(window.netflixApp){window.netflixApp.applyFilter('telerealite', true); return false;}">Télé-Réalité</a>
-      <a href="#" class="mobile-sub-pill nav-link" data-filter="my-list">Ma Liste</a>
+      <a href="#" class="mobile-sub-pill nav-link" data-filter="xtream">💎 Xtream</a>
+      <a href="#" class="mobile-sub-pill nav-link" data-filter="telerealite">🌴 Télé-Réalité</a>
+      <a href="#" class="mobile-sub-pill nav-link" data-filter="nouveautes">✨ Nouveautés</a>
+      <a href="#" class="mobile-sub-pill nav-link" data-filter="my-list">❤️ Ma Liste</a>
     </div>
   </nav>
 
@@ -284,18 +182,18 @@ window.rechargeWatchCreditDirect = function(e) {
       <div class="xtream-filter-row">
         <span class="xtream-filter-label">Catégorie :</span>
         <div class="xtream-chips-scroll" id="xtreamCategoryChips">
-          <!-- Injecté dynamiquement par app.js?v=1790516031157 -->
+          <!-- Injecté dynamiquement par app.js -->
         </div>
       </div>
       <div class="xtream-filter-row" style="margin-top: 8px;">
         <span class="xtream-filter-label">Qualité :</span>
         <div class="xtream-chips-scroll" id="xtreamQualityChips">
           <button class="xtream-chip quality-chip active" data-quality="all">Toutes (1 268)</button>
-          <button class="xtream-chip quality-chip" data-quality="4k">4K UHD (12)</button>
-          <button class="xtream-chip quality-chip" data-quality="fhd">1080p FHD (259)</button>
-          <button class="xtream-chip quality-chip" data-quality="hevc">HEVC H.265 (173)</button>
-          <button class="xtream-chip quality-chip" data-quality="hd">720p HD (181)</button>
-          <button class="xtream-chip quality-chip" data-quality="sd">SD Bas Débit (152)</button>
+          <button class="xtream-chip quality-chip" data-quality="4k">✨ 4K / UHD (12)</button>
+          <button class="xtream-chip quality-chip" data-quality="fhd">💎 1080p FHD (259)</button>
+          <button class="xtream-chip quality-chip" data-quality="hevc">⚡ HEVC H.265 (173)</button>
+          <button class="xtream-chip quality-chip" data-quality="hd">📡 720p HD (181)</button>
+          <button class="xtream-chip quality-chip" data-quality="sd">📶 SD Bas Débit (152)</button>
         </div>
       </div>
       <div class="xtream-status-bar">
@@ -318,10 +216,10 @@ window.rechargeWatchCreditDirect = function(e) {
         <span class="xtream-filter-label">Sélection :</span>
         <div class="xtream-chips-scroll" id="telerealiteFilterChips">
           <button class="xtream-chip telerealite-chip active" data-filter="all">Toutes les émissions (221)</button>
-          <button class="xtream-chip telerealite-chip" data-filter="2026">Nouveautés 2026</button>
-          <button class="xtream-chip telerealite-chip" data-filter="2025">Saisons 2025</button>
-          <button class="xtream-chip telerealite-chip" data-filter="villa">La Villa & Romance</button>
-          <button class="xtream-chip telerealite-chip" data-filter="competition">Compétition & Survie</button>
+          <button class="xtream-chip telerealite-chip" data-filter="2026">✨ Nouveautés 2026</button>
+          <button class="xtream-chip telerealite-chip" data-filter="2025">🔥 Saisons 2025</button>
+          <button class="xtream-chip telerealite-chip" data-filter="villa">❤️ La Villa & Romance</button>
+          <button class="xtream-chip telerealite-chip" data-filter="competition">🏆 Compétition & Survie</button>
         </div>
       </div>
       <div class="xtream-status-bar">
@@ -332,7 +230,7 @@ window.rechargeWatchCreditDirect = function(e) {
 
   <!-- ================= CARROUSELS DU CATALOGUE ================= -->
   <main class="catalog-section" id="catalogRows">
-    <!-- Généré dynamiquement par app.js?v=1790516031157 -->
+    <!-- Généré dynamiquement par app.js -->
   </main>
 
   <!-- ================= MODAL DE DÉTAILS DU TITRE ================= -->
@@ -369,7 +267,7 @@ window.rechargeWatchCreditDirect = function(e) {
           <div class="detail-line">Genres : <span>Action, Sci-Fi, Suspense</span></div>
           <div class="detail-line">Ce programme est : <span>Captivant, Passionnant</span></div>
           <button type="button" class="btn-detail-report-bug" id="detailReportBugBtn" title="Signaler un problème avec cette vidéo ou cet épisode">
-            Signaler un problème
+            🚨 Signaler un problème
           </button>
         </div>
       </div>
@@ -397,7 +295,7 @@ window.rechargeWatchCreditDirect = function(e) {
       <div class="modal-comments-section" id="modalCommentsSection">
         <div class="modal-episodes-divider"></div>
         <div class="modal-comments-header">
-          <h3 class="modal-comments-heading">Avis & Commentaires (<span id="modalCommentsCount">0</span>)</h3>
+          <h3 class="modal-comments-heading">💬 Avis & Commentaires (<span id="modalCommentsCount">0</span>)</h3>
         </div>
         <div class="comment-compose-box">
           <img class="comment-author-avatar" id="commentCurrentUserAvatar" src="assets/avatars/avatar-1.svg" alt="Avatar">
@@ -424,28 +322,20 @@ window.rechargeWatchCreditDirect = function(e) {
       </button>
       <div class="player-header-info">
         <span id="playerTitle" class="player-title-display">Lecture en cours</span>
-        <span id="playerMeta" class="player-meta-display">Direct HD • Protection Anti-Pubs</span>
+        <span id="playerMeta" class="player-meta-display">Direct HD • Protection Anti-Pubs 🛡️</span>
       </div>
 
       <!-- Bouton d'ouverture des commentaires en direct -->
       <button class="player-comments-toggle-btn" id="playerCommentsToggleBtn" type="button" title="Afficher les commentaires en direct">
-        <span class="comments-toggle-label">Commentaires</span>
+        💬 <span class="comments-toggle-label">Commentaires</span>
       </button>
 
       <!-- Bouton de signalement de bug sur le lecteur -->
       <button class="player-report-bug-btn" id="playerReportBugBtn" type="button" title="Signaler un problème sur cette vidéo">
-        <span class="report-bug-label">Signaler</span>
+        🚨 <span class="report-bug-label">Signaler</span>
       </button>
 
       <!-- Sélecteur d'Épisodes (pour Séries) -->
-            <!-- Bouton Favoris (Ma Liste) dans le lecteur -->
-      <button class="player-top-btn player-fav-btn" id="playerFavBtn" type="button" title="Ajouter à Ma Liste">
-        <svg class="icon-fav-heart" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2">
-          <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
-        </svg>
-        <span class="player-fav-label">Favori</span>
-      </button>
-
       <div class="player-episode-box hidden" id="playerEpisodeBox">
         <select id="playerSeasonSelect" class="player-select" title="Saison"></select>
         <select id="playerEpisodeSelect" class="player-select" title="Épisode"></select>
@@ -462,40 +352,6 @@ window.rechargeWatchCreditDirect = function(e) {
 
       <!-- Indicateur central Play/Pause animé au clic/espace -->
       <div class="center-play-ripple" id="centerPlayRipple">▶</div>
-
-      <!-- Indicateurs de double-tap Mobile (Saut ±10s) -->
-      <div class="player-doubletap-indicator left hidden" id="doubleTapLeft">
-        <div class="doubletap-circle"></div>
-        <div class="doubletap-content">
-          <span class="doubletap-icon">⏪</span>
-          <span class="doubletap-text">10s</span>
-        </div>
-      </div>
-      <div class="player-doubletap-indicator right hidden" id="doubleTapRight">
-        <div class="doubletap-circle"></div>
-        <div class="doubletap-content">
-          <span class="doubletap-text">10s</span>
-          <span class="doubletap-icon">⏩</span>
-        </div>
-      </div>
-
-      <!-- Carte flottante "Épisode suivant" style Netflix -->
-      <div class="next-ep-countdown-card hidden" id="nextEpisodeCard">
-        <div class="next-ep-card-preview">
-          <img id="nextEpCardImg" src="assets/hero/live-tv-banner.webp" alt="Aperçu">
-          <button class="next-ep-card-play-now" id="btnNextEpNow" title="Regarder maintenant">
-            <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
-          </button>
-        </div>
-        <div class="next-ep-card-details">
-          <div class="next-ep-card-header">
-            <span class="next-ep-card-badge">Épisode suivant dans <span id="nextEpCountdown">10</span>s</span>
-            <button class="next-ep-card-close" id="btnNextEpDismiss" title="Ignorer">✕</button>
-          </div>
-          <h4 class="next-ep-card-title" id="nextEpCardTitle">Épisode suivant</h4>
-          <div class="next-ep-card-sub" id="nextEpCardSub">Saison 1 • Épisode 2</div>
-        </div>
-      </div>
 
       <!-- Lecteur Iframe de Secours (Si besoin absolu) -->
       <iframe 
@@ -631,19 +487,12 @@ window.rechargeWatchCreditDirect = function(e) {
               <span class="player-watch-timer-dot" aria-hidden="true">
                 <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
               </span>
-              <span class="player-watch-timer-val" id="playerWatchTimerVal">20:00</span>
+              <span class="player-watch-timer-val" id="playerWatchTimerVal">15:00</span>
               <button type="button" class="player-watch-timer-btn" id="playerWatchTimerBtn" title="Recharger +20 min gratuites">+20m</button>
             </div>
           </div>
 
-                    <div class="controls-right">
-            <!-- Sous-titres Français -->
-            <button class="ctrl-btn subtitles-btn hidden" id="ctrlSubtitlesBtn" title="Sous-titres Français (CC)">
-              <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor">
-                <path d="M19 4H5a2 2 0 00-2 2v12a2 2 0 002 2h14a2 2 0 002-2V6a2 2 0 00-2-2zm-8 7H9.5v-.5h-2v3h2V13H11v1a1 1 0 01-1 1H7a1 1 0 01-1-1v-4a1 1 0 011-1h3a1 1 0 011 1v1zm7 0h-1.5v-.5h-2v3h2V13H18v1a1 1 0 01-1 1h-3a1 1 0 01-1-1v-4a1 1 0 011-1h3a1 1 0 011 1v1z"/>
-              </svg>
-              <span>CC</span>
-            </button>
+          <div class="controls-right">
             <!-- Vitesse de lecture -->
             <div class="speed-control-wrapper">
               <button class="ctrl-btn speed-btn" id="ctrlSpeedBtn" title="Vitesse de lecture">1x</button>
@@ -665,20 +514,6 @@ window.rechargeWatchCreditDirect = function(e) {
             </button>
 
             <!-- Sélecteur de Qualité Vidéo (Auto pour Xtream direct, 720p pour Vidmoly Cloud) -->
-                        <!-- AirPlay (Safari / iOS / Mac) -->
-            <button class="ctrl-btn airplay-btn hidden" id="ctrlAirPlayBtn" title="AirPlay">
-              <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor">
-                <path d="M6 22h12l-6-6-6 6zM21 3H3c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h4v-2H3V5h18v12h-4v2h4c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2z"/>
-              </svg>
-            </button>
-
-            <!-- Picture-in-Picture (PiP) -->
-            <button class="ctrl-btn pip-btn" id="ctrlPipBtn" title="Incrustation vidéo (P)">
-              <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor">
-                <path d="M19 11h-8v6h8v-6zm4 8V5c0-1.1-.9-2-2-2H3c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h18c1.1 0 2-.9 2-2zm-2 0H3V5h18v14z"/>
-              </svg>
-            </button>
-
             <button class="ctrl-btn" id="ctrlFullscreenBtn" title="Plein écran (F)">
               <svg class="icon-enter-fs" id="iconEnterFs" viewBox="0 0 24 24" width="22" height="22" fill="currentColor">
                 <path d="M7 14H5v5h5v-2H7v-3zm-2-4h2V7h3V5H5v5zm12 7h-3v2h5v-5h-2v3zM14 5v2h3v3h2V5h-5z"/>
@@ -703,7 +538,7 @@ window.rechargeWatchCreditDirect = function(e) {
       <!-- Tiroir Latéral des Commentaires en Direct dans le Player ZIFLIX -->
       <div class="player-comments-drawer hidden" id="playerCommentsDrawer">
         <div class="player-drawer-header">
-          <div class="player-drawer-title">Commentaires en direct</div>
+          <div class="player-drawer-title">💬 Commentaires en direct</div>
           <button class="player-drawer-close" id="playerCommentsCloseBtn" type="button" title="Fermer">✕</button>
         </div>
         <div class="player-drawer-list" id="playerDrawerCommentsList">
@@ -1009,50 +844,7 @@ window.rechargeWatchCreditDirect = function(e) {
       </div>
 
       <!-- ================= SECTION PASSERELLE VIDMOLY CLOUD (16 To) ================= -->
-            <!-- ================= SECTION TÉLÉ-RÉALITÉS TELEGRAM MINI APP ================= -->
-      <div class="admin-cluster-container" id="adminTmaRealitySection" style="margin-bottom: 28px; border: 1px solid rgba(0, 136, 204, 0.45); background: linear-gradient(145deg, rgba(16, 24, 38, 0.95), rgba(10, 16, 26, 0.98)); border-radius: 12px; padding: 22px;">
-        <div class="cluster-header" style="border-bottom: 1px solid rgba(0, 136, 204, 0.25); padding-bottom: 14px; margin-bottom: 18px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 14px;">
-          <div class="cluster-title-wrap" style="display: flex; align-items: center; gap: 14px;">
-            <span class="cluster-icon" style="background: rgba(0, 136, 204, 0.2); color: #0088cc; padding: 10px 14px; border-radius: 10px; font-size: 1.4rem;">✈️</span>
-            <div class="cluster-title-group">
-              <h2 class="cluster-title" style="display: flex; align-items: center; gap: 10px; color: #fff; margin: 0; font-size: 1.15rem; font-weight: 700;">
-                SÉLECTION TÉLÉ-RÉALITÉS • APPLICATION TELEGRAM
-                <span style="font-size: 0.72rem; padding: 3px 9px; border-radius: 12px; background: rgba(0, 136, 204, 0.25); color: #29b6f6; border: 1px solid rgba(0, 136, 204, 0.4); font-weight: 600;">
-                  app.ziablo.xyz
-                </span>
-              </h2>
-              <p class="cluster-subtitle" style="color: #90a4ae; margin: 4px 0 0 0; font-size: 0.85rem;">
-                Cochez ou décochez les télé-réalités affichées sur l'accueil de l'application Telegram.
-              </p>
-            </div>
-          </div>
-          <div class="cluster-header-actions" style="display: flex; align-items: center; gap: 10px;">
-            <button type="button" class="btn-admin btn-admin-secondary btn-sm" id="tmaRefreshShowsBtn" style="border-color: rgba(0, 136, 204, 0.4); color: #81d4fa; cursor: pointer;">
-              🔄 Actualiser
-            </button>
-            <button type="button" class="btn-admin btn-sm" id="tmaSaveShowsBtn" style="background: #0088cc; color: #fff; font-weight: 700; box-shadow: 0 4px 14px rgba(0,136,204,0.4); cursor: pointer; padding: 7px 18px; border-radius: 6px;">
-              💾 Enregistrer pour Telegram
-            </button>
-          </div>
-        </div>
-
-        <div style="margin-bottom: 16px; display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap;">
-          <div style="flex: 1; min-width: 240px; position: relative;">
-            <input type="text" id="tmaShowsSearchInput" placeholder="🔍 Filtrer les télé-réalités (ex: Villa, Koh-Lanta, Cinquante...)" style="width: 100%; height: 38px; background: #0e1622; border: 1px solid rgba(255,255,255,0.12); border-radius: 6px; padding: 0 14px; color: #fff; font-size: 0.88rem; outline: none;">
-          </div>
-          <div style="font-size: 0.88rem; color: #90a4ae; background: rgba(0,136,204,0.1); padding: 8px 14px; border-radius: 8px; border: 1px solid rgba(0,136,204,0.25);">
-            <span id="tmaSelectedCount" style="color: #29b6f6; font-weight: 700; font-size: 1rem;">4</span> émission(s) active(s) sur Telegram
-          </div>
-        </div>
-
-        <div id="tmaShowsGrid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(210px, 1fr)); gap: 14px; max-height: 460px; overflow-y: auto; padding: 4px;">
-          <!-- Dynamically populated -->
-        </div>
-
-        <div id="tmaSaveStatus" style="margin-top: 12px; font-size: 0.88rem; font-weight: 600; display: none;"></div>
-      </div>
-
-<div class="admin-cluster-container" id="adminVidmolySection" style="margin-bottom: 28px; border: 1px solid rgba(229, 9, 20, 0.4); background: linear-gradient(145deg, rgba(20,20,32,0.95), rgba(12,12,20,0.98));">
+      <div class="admin-cluster-container" id="adminVidmolySection" style="margin-bottom: 28px; border: 1px solid rgba(229, 9, 20, 0.4); background: linear-gradient(145deg, rgba(20,20,32,0.95), rgba(12,12,20,0.98));">
         <div class="cluster-header" style="border-bottom: 1px solid rgba(255,255,255,0.08); padding-bottom: 14px; margin-bottom: 16px;">
           <div class="cluster-title-wrap">
             <span class="cluster-icon" style="font-size: 1.8rem;">☁️</span>
@@ -1953,7 +1745,7 @@ window.rechargeWatchCreditDirect = function(e) {
       <li><a href="#">Nous contacter</a></li>
     </ul>
     <div class="rust-badge">
-      Architecture Haute Performance ZIFLIX • Streaming Range 206 Ultra-Fluide
+      <span>🦀</span> Architecture Haute Performance ZIFLIX • Streaming Range 206 Ultra-Fluide
     </div>
     <p style="margin-top: 15px; font-size: 0.75rem; color: #555;">
       ZIFLIX Streaming & Live TV. Les marques, logos et visuels restent la propriété de leurs détenteurs respectifs.
@@ -2029,7 +1821,7 @@ window.rechargeWatchCreditDirect = function(e) {
     </div>
   </div>
 
-  <!-- ================= POP-UP D'ACCUEIL NETFLIX : 20 MIN DE VISIONNAGE OFFERTES SANS PUB ================= -->
+  <!-- ================= POP-UP D'ACCUEIL NETFLIX : 15 MIN DE VISIONNAGE OFFERTES SANS PUB ================= -->
   <div class="zero-credit-modal-overlay hidden" id="welcomeTimerModal">
     <div class="zero-credit-modal-card">
       <button type="button" class="zero-credit-close-btn" id="welcomeTimerDismissBtn" title="Fermer">✕</button>
@@ -2039,13 +1831,13 @@ window.rechargeWatchCreditDirect = function(e) {
           <polyline points="12 6 12 12 16 14"></polyline>
         </svg>
       </div>
-      <h3 class="zero-credit-title">FÉLICITATIONS !</h3>
+      <h3 class="zero-credit-title">15 MINUTES OFFERTES</h3>
       <p class="zero-credit-desc">
         Bienvenue sur <strong>ZIFLIX</strong> !<br>
-        Vous venez de recevoir <b>20 minutes de visionnage gratuit sans publicité</b> et sans aucune interruption.
+        Vous bénéficiez de <b>15 minutes de visionnage gratuit sans publicité</b> et sans aucune interruption.
       </p>
       <button type="button" class="zero-credit-cta-btn" id="welcomeTimerAcceptBtn">
-        ▶ COMMENCER À REGARDER (20 MIN)
+        ▶ COMMENCER À REGARDER (15 MIN)
       </button>
       <div class="zero-credit-footer">
         100% gratuit sans publicité • Rechargeable +20 min par la suite
@@ -2055,8 +1847,8 @@ window.rechargeWatchCreditDirect = function(e) {
 
   <!-- Scripts -->
   <script src="js/hls.min.js"></script>
-  <script src="js/player.js?v=1790529672208"></script>
-  <script src="js/admin.js?v=1790367850259"></script>
-  <script src="js/app.js?v=1790521077145"></script>
+  <script src="js/player.js?v=1790264986094"></script>
+  <script src="js/admin.js?v=1790264986094"></script>
+  <script src="js/app.js?v=1789913065559"></script>
 </body>
 </html>
