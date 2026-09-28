@@ -17779,5 +17779,20 @@
     "last_login": "2026-09-28T04:31:48.890Z",
     "ip": "194.230.160.131",
     "last_ip": "194.230.160.131"
+  },
+  {
+    "id": "u_1790589452030_f1098596",
+    "username": "Rachel",
+    "password_hash": "06dcd42e20a4131f7457deb9f8a46239b6a29abba4c19dfe7bb8b959f22ec2ecf07510b491026c012fb37bf9e15cea56fcfc823df8da7511681959746ba313ff",
+    "salt": "1040d7d3e235f963b0da9d9910ef761a",
+    "avatar": "assets/avatars/avatar-1.svg",
+    "role": "user",
+    "banned": false,
+    "ip": "41.216.86.45",
+    "last_ip": "41.216.86.45",
+    "created_at": "2026-09-28T09:57:32.030Z",
+    "last_login": "2026-09-28T09:57:32.030Z",
+    "watch_credit_seconds": 1200,
+    "welcome_seen": false
   }
 ]
