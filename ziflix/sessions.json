@@ -9472,5 +9472,13 @@
     "role": "user",
     "avatar": "assets/avatars/avatar-1.svg",
     "expires_at": 1793184351383
+  },
+  {
+    "token": "c2e584994a53b5096e8c9f51427a9557021934ecefc54cb0c3520cc861b504b0",
+    "user_id": "u_1790035883510_c31e3274",
+    "username": "nuevebaby",
+    "role": "user",
+    "avatar": "assets/avatars/avatar-1.svg",
+    "expires_at": 1793188957470
   }
 ]
