@@ -9568,5 +9568,13 @@
     "role": "user",
     "avatar": "assets/avatars/avatar-9.svg",
     "expires_at": 1793218363704
+  },
+  {
+    "token": "2fc78c5189af47153f4f2fc9a20f23c8539f852c31e483762139959b3f0da2de",
+    "user_id": "u_1789248461853_4b8290e7",
+    "username": "Doux",
+    "role": "user",
+    "avatar": "assets/avatars/avatar-1.svg",
+    "expires_at": 1793221874641
   }
 ]
