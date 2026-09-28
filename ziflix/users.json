@@ -18985,5 +18985,20 @@
     "last_login": "2026-09-28T14:24:36.156Z",
     "ip": "221.127.49.98",
     "last_ip": "221.127.49.98"
+  },
+  {
+    "id": "u_1790608061925_8b2462a8",
+    "username": "mimiswag",
+    "password_hash": "f0d56c27de95f68ae5ef8c470470eea75b7ac76576071eaad0e18a5b3cca6de8e008c3651a54d94e8237ecfde152e0051416e4d4fe518595e37980b3ce052828",
+    "salt": "a67ba6f312a8a2fa981d7931faed658f",
+    "avatar": "assets/avatars/avatar-1.svg",
+    "role": "user",
+    "banned": false,
+    "ip": "88.160.225.134",
+    "last_ip": "88.160.225.134",
+    "created_at": "2026-09-28T15:07:41.925Z",
+    "last_login": "2026-09-28T15:07:41.925Z",
+    "watch_credit_seconds": 1200,
+    "welcome_seen": false
   }
 ]

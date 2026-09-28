@@ -9480,5 +9480,13 @@
     "role": "user",
     "avatar": "assets/avatars/avatar-1.svg",
     "expires_at": 1793188957470
+  },
+  {
+    "token": "b6833bd13c7fd3709de029a5736b9f9f702ed45c092751cb2d8bd1a337041ee7",
+    "user_id": "u_1790608061925_8b2462a8",
+    "username": "mimiswag",
+    "role": "user",
+    "avatar": "assets/avatars/avatar-1.svg",
+    "expires_at": 1793200061987
   }
 ]
