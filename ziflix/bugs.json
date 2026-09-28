@@ -1,5 +1,24 @@
 [
   {
+    "id": "bug_1790635934293_ec53fd",
+    "user_id": "u_1790520612472_437d5b03",
+    "username": "mhdak47",
+    "avatar": "assets/avatars/avatar-1.svg",
+    "category": "episode",
+    "title": "Signalement : Les Marseillais S11E3",
+    "description": "",
+    "media_id": "xtream_series_4029",
+    "media_title": "Les Marseillais",
+    "season": 11,
+    "episode": 3,
+    "episode_id": null,
+    "device_info": "PC Windows • Chrome",
+    "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/153.0.0.0 Safari/537.36",
+    "url": "https://ziablo.xyz/",
+    "status": "open",
+    "created_at": "2026-09-28T22:52:14.293Z"
+  },
+  {
     "id": "bug_1790621693857_948e0e",
     "user_id": "u_1790621618027_481d67eb",
     "username": "Carmel",
