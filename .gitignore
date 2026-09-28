@@ -27,3 +27,4 @@ data/cache_xmltv.xml.gz
 # Fichiers binaires et builds obsolètes
 target/
 *.exe
+data/xtream_users.json
