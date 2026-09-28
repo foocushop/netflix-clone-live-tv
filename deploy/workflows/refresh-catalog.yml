@@ -1,0 +1,36 @@
+name: Refresh Xtream Catalog
+
+on:
+  schedule:
+    # Exécution automatique quotidienne à 04:00 UTC
+    - cron: '0 4 * * *'
+  workflow_dispatch: # Déclenchement manuel via l'interface GitHub
+
+jobs:
+  refresh-catalog:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Run Catalog Generator
+        env:
+          XTREAM_HOST: ${{ secrets.XTREAM_HOST }}
+          XTREAM_PORT: ${{ secrets.XTREAM_PORT }}
+          XTREAM_USER: ${{ secrets.XTREAM_USER }}
+          XTREAM_PASS: ${{ secrets.XTREAM_PASS }}
+        run: |
+          npm --prefix scripts install
+          node scripts/build-catalog.js
+
+      - name: Commit & Push updated catalog.json
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "ZIFLIX Automation Bot"
+          git add data/catalog.json frontend/data/catalog.json
+          git diff --quiet && git diff --staged --quiet || (git commit -m "chore(catalog): automated refresh of Xtream catalog [skip ci]" && git push)

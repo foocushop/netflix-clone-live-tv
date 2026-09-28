@@ -1,0 +1,24 @@
+{
+  "name": "ziflix-proxy-worker",
+  "version": "1.0.0",
+  "description": "Cloudflare Worker proxy serverless sécurisé pour ZIFLIX Streaming (Xtream Codes & Cache)",
+  "main": "src/index.js",
+  "type": "module",
+  "scripts": {
+    "dev": "wrangler dev",
+    "deploy": "wrangler deploy",
+    "tail": "wrangler tail",
+    "test": "node --test"
+  },
+  "keywords": [
+    "serverless",
+    "cloudflare-worker",
+    "xtream",
+    "streaming"
+  ],
+  "author": "ZIFLIX Architecture",
+  "license": "UNLICENSED",
+  "devDependencies": {
+    "wrangler": "^3.78.0"
+  }
+}

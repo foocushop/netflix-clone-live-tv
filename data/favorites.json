@@ -1,0 +1,32 @@
+{
+  "user_u_1789530755367_b0d6fb88": [
+    {
+      "id": "68628",
+      "title": "La Villa des Cœurs Brisés",
+      "media_type": "series",
+      "poster_url": "https://image.tmdb.org/t/p/w600_and_h900_bestv2/5xlxVueaXHxWLSoOaBVCv4s3PZV.jpg",
+      "backdrop_url": "https://image.tmdb.org/t/p/w1280/qSJmzqBvb4hGCTw9i9y0GzFLDzN.jpg",
+      "stream_id": null,
+      "stream_url": "",
+      "is_live": false,
+      "is_xtream": false,
+      "category_name": "",
+      "added_at": 1790577221075
+    }
+  ],
+  "user_u_1789730641323_291e1800": [
+    {
+      "id": "xtream_series_6715",
+      "title": "La Villa des Cœurs Brisés",
+      "media_type": "channel",
+      "poster_url": "https://image.tmdb.org/t/p/w600_and_h900_bestv2/dbpKVXkOk35HYq0Q731ZnMvmcfF.jpg",
+      "backdrop_url": "assets/shows/villa_s11_banner.jpg",
+      "stream_id": null,
+      "stream_url": "",
+      "is_live": true,
+      "is_xtream": true,
+      "category_name": "Chaîne TV",
+      "added_at": 1790592745475
+    }
+  ]
+}

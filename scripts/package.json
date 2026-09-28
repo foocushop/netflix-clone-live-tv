@@ -1,0 +1,9 @@
+{
+  "name": "ziflix-build-scripts",
+  "version": "1.0.0",
+  "description": "Scripts hors-ligne de génération de catalogue et maintenance pour ZIFLIX",
+  "type": "module",
+  "scripts": {
+    "build:catalog": "node build-catalog.js"
+  }
+}

@@ -1,0 +1,55 @@
+{
+  "name": "ZIFLIX - Streaming Gratuit Illimité",
+  "short_name": "ZIFLIX",
+  "description": "Films, séries, téléréalité et chaînes TV en direct et illimité sans coupure",
+  "start_url": "/?source=pwa",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#141414",
+  "theme_color": "#141414",
+  "icons": [
+    {
+      "src": "/assets/logos/ziflix-icon.svg",
+      "sizes": "192x192 512x512",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/assets/logos/ziflix-n.svg",
+      "sizes": "192x192 512x512",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    }
+  ],
+  "categories": [
+    "entertainment",
+    "video"
+  ],
+  "shortcuts": [
+    {
+      "name": "Chaînes TV en Direct",
+      "short_name": "TV Direct",
+      "description": "Regarder la télévision en direct",
+      "url": "/chaines",
+      "icons": [
+        {
+          "src": "/assets/logos/ziflix-icon.svg",
+          "sizes": "192x192"
+        }
+      ]
+    },
+    {
+      "name": "Ma Liste",
+      "short_name": "Ma Liste",
+      "description": "Vos films, séries et chaînes favoris",
+      "url": "/ma-liste",
+      "icons": [
+        {
+          "src": "/assets/logos/ziflix-icon.svg",
+          "sizes": "192x192"
+        }
+      ]
+    }
+  ]
+}

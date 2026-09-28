@@ -1210,7 +1210,14 @@ const xtreamSocksAgent = xtreamProxyManager.getAgent();
 
 function isFoxBleuHost(urlStr) {
   if (!urlStr) return false;
-  return urlStr.includes(XTREAM_CONFIG.host) || urlStr.includes('foxbleu.org') || urlStr.includes('192.142.27.91');
+  return urlStr.includes(XTREAM_CONFIG.host) ||
+         urlStr.includes('foxbleu.org') ||
+         urlStr.includes('192.142.') ||
+         urlStr.includes('51.68.') ||
+         urlStr.includes('51.91.') ||
+         urlStr.includes('/live/play/') ||
+         urlStr.includes('/movie/') ||
+         urlStr.includes('/series/');
 }
 
 function getXtreamAgent(urlStr, isSeries = false, forceSocks = false) {
@@ -1485,10 +1492,9 @@ setInterval(() => {
   }
   // Nettoyage automatique des sessions HLS séries inactives depuis plus de 3 minutes
   for (const [epId, session] of xtreamHlsSessions.entries()) {
-    if (now - session.lastAccess > 3 * 60 * 1000) {
+    if (now - session.lastAccess > 45 * 60 * 1000) {
       if (session.proc) {
         try { session.proc.kill('SIGTERM'); } catch (e) {}
-        try { session.proc.kill('SIGKILL'); } catch (e) {}
       }
       try {
         if (session.hlsDir && fs.existsSync(session.hlsDir)) {
@@ -1499,7 +1505,7 @@ setInterval(() => {
     }
   }
 
-  // Nettoyage automatique de TOUS les dossiers orphelins dans /tmp/ziflix_hls (> 5 min)
+  // Nettoyage automatique des dossiers orphelins dans /tmp/ziflix_hls (> 60 min)
   try {
     const hlsBase = path.join('/tmp', 'ziflix_hls');
     if (fs.existsSync(hlsBase)) {
@@ -1509,7 +1515,7 @@ setInterval(() => {
           const dirPath = path.join(hlsBase, d);
           try {
             const st = fs.statSync(dirPath);
-            if (now - st.mtimeMs > 5 * 60 * 1000) {
+            if (now - st.mtimeMs > 60 * 60 * 1000) {
               fs.rmSync(dirPath, { recursive: true, force: true });
               console.log(`[HLS Cleanup] Purge dossier HLS orphelin : ${d}`);
             }
@@ -8794,15 +8800,12 @@ const EC3_AUDIO_CHANNELS = new Set([
           if (dur >= minCompleteDuration || dur >= expectedDuration * 0.85) {
             isFullCompletePlaylist = true;
           } else {
-            console.warn('[Xtream HLS] Playlist tronquée détectée pour ' + sessionKey + ' (' + dur.toFixed(0) + 's < ' + minCompleteDuration + 's, attendu: ' + expectedDuration + 's). Purge et régénération.');
-            isTruncatedPlaylist = true;
+            console.warn('[Xtream HLS] Playlist partielle pour ' + sessionKey + ' (' + dur.toFixed(0) + 's / attendu: ' + expectedDuration + 's). Poursuite de la conversion sans purge.');
+            // Conserver les segments déjà téléchargés sur disque, retirer ENDLIST pour permettre à FFmpeg de reprendre
             try {
-              if (fs.existsSync(hlsDir)) {
-                fs.rmSync(hlsDir, { recursive: true, force: true });
-              }
+              const cleanedContent = existingContent.replace(/#EXT-X-ENDLIST\r?\n?/g, '');
+              fs.writeFileSync(playlistPath, cleanedContent, 'utf8');
             } catch(e) {}
-            xtreamHlsSessions.delete(sessionKey);
-            session = null;
           }
         }
       } catch (e) {}
@@ -8847,23 +8850,29 @@ const EC3_AUDIO_CHANNELS = new Set([
     }
 
     function spawnHlsProc(streamSourceUrl) {
+      const existingSame = xtreamHlsSessions.get(sessionKey);
+      if (existingSame && existingSame.proc) {
+        try { existingSame.proc.kill('SIGTERM'); } catch (e) {}
+        existingSame.proc = null;
+      }
+
       if (!fs.existsSync(hlsDir)) fs.mkdirSync(hlsDir, { recursive: true });
 
       const isLocalFile = streamSourceUrl.startsWith('/') || streamSourceUrl.startsWith('file://');
       const ffmpegArgs = ['-v', 'warning'];
       if (!isLocalFile) {
         ffmpegArgs.push(
-          '-probesize', '350000',
-          '-analyzeduration', '500000',
+          '-probesize', '1000000',
+          '-analyzeduration', '1000000',
           '-fpsprobesize', '0',
           '-fflags', '+nobuffer+discardcorrupt',
           '-reconnect', '1',
           '-reconnect_streamed', '1',
           '-reconnect_at_eof', '1',
           '-rw_timeout', '15000000',
-          '-reconnect_delay_max', '2',
+          '-reconnect_delay_max', '3',
           '-reconnect_on_network_error', '1',
-          '-reconnect_on_http_error', '4xx,5xx',
+          '-reconnect_on_http_error', '5xx',
           '-user_agent', 'VLC/3.0.18 LibVLC/3.0.18'
         );
       }
@@ -8967,7 +8976,7 @@ const EC3_AUDIO_CHANNELS = new Set([
 
       if (session.isDone && (session.isFullComplete || isFullCompletePlaylist || isSufficientDuration || session.exitCode === 0)) {
         isFullCompletePlaylist = true;
-      } else if (session.isDone && !isFullCompletePlaylist && !isSufficientDuration && (session.recoveryAttempts || 0) < 2) {
+      } else if (session.isDone && !isFullCompletePlaylist && !isSufficientDuration && (session.recoveryAttempts || 0) < 6) {
         session.recoveryAttempts = (session.recoveryAttempts || 0) + 1;
         console.log(`[Xtream HLS Recovery #${session.recoveryAttempts}] Reconnexion FFmpeg pour ${sessionKey} (généré: ${existingPlaylistDuration.toFixed(0)}s / attendu: ${expectedDuration}s)`);
         const internalStreamUrl = isMovieHls
@@ -9724,9 +9733,9 @@ if (!isValidToken) {
         return;
       }
 
-      const isFoxBleu = isFoxBleuHost(targetUrl);
-      const client = (isFoxBleu && USE_SOCKS_PROXY && xtreamSocksAgent) ? http : (parsed.protocol === 'https:' ? https : http);
-      const agent = (isFoxBleu && USE_SOCKS_PROXY && xtreamSocksAgent) ? getXtreamAgent(targetUrl, true, true) : (parsed.protocol === 'https:' ? xtreamSeriesHttpsAgent : xtreamSeriesHttpAgent);
+      const isFoxBleu = true;
+      const client = (USE_SOCKS_PROXY && xtreamSocksAgent) ? http : (parsed.protocol === 'https:' ? https : http);
+      const agent = (USE_SOCKS_PROXY && xtreamSocksAgent) ? getXtreamAgent(targetUrl, true, true) : (parsed.protocol === 'https:' ? xtreamSeriesHttpsAgent : xtreamSeriesHttpAgent);
       const headersToForward = {
         'User-Agent': 'IPTVSmartersPro/1.0',
         'Accept': '*/*'
@@ -9765,8 +9774,10 @@ if (!isValidToken) {
           cleanupListeners();
           if (isMovie) xtreamMovieEdgeCache.delete(cacheKey);
           else xtreamSeriesEdgeCache.delete(cacheKey);
-          console.log(`[Xtream ${isMovie ? "Movie" : "Series"} Edge Fallback] Edge CDN a renvoyé HTTP ${upstreamRes.statusCode}. Récupération immédiate d'un nouveau jeton depuis foxbleu.org...`);
-          return pipeSeriesStream(originUrl, 0, false, 0);
+          if (retry < 2) {
+            console.log(`[Xtream ${isMovie ? "Movie" : "Series"} Edge Fallback] Edge CDN a renvoyé HTTP ${upstreamRes.statusCode}. Récupération immédiate d'un nouveau jeton depuis foxbleu.org...`);
+            return setTimeout(() => pipeSeriesStream(originUrl, hops + 1, false, retry + 1), 350);
+          }
         }
 
         // Si le serveur amont renvoie une erreur 502/503/504 temporaire : auto-retry avec backoff

@@ -1,0 +1,27 @@
+# Configuration Cloudflare Worker - ZIFLIX Streaming Proxy
+name = "ziflix-proxy"
+main = "src/index.js"
+compatibility_date = "2024-09-01"
+compatibility_flags = ["nodejs_compat"]
+
+[vars]
+ENVIRONMENT = "production"
+ALLOWED_ORIGIN = "https://ziablo.xyz"
+LOG_LEVEL = "info"
+
+# Secrets requis (injectés de manière sécurisée via wrangler secret put) :
+# - XTREAM_HOST (ex: foxbleu.org)
+# - XTREAM_PORT (ex: 80)
+# - XTREAM_USER (ex: josealbino)
+# - XTREAM_PASS (ex: 21321)
+# - ADMIN_TOKEN (ex: jeton cryptographique aléatoire)
+
+[[kv_namespaces]]
+binding = "CATALOG_KV"
+id = "ziflix_catalog_kv"
+preview_id = "ziflix_catalog_kv_preview"
+
+[[kv_namespaces]]
+binding = "SERIES_CACHE"
+id = "ziflix_series_cache"
+preview_id = "ziflix_series_cache_preview"
