@@ -5,25 +5,25 @@
       "episode_num": 1,
       "title": "La Villa des cœurs brisés (2015) - S11E01 - Episode 1",
       "published_at": "2026-09-12T17:12:06.848Z",
-      "telegram_msg_id": 21,
+      "telegram_msg_id": 24,
       "hd_published": true,
-      "telegram_msg_id_hd": 21,
-      "published_at_hd": "2026-09-28T20:53:33.144Z",
+      "telegram_msg_id_hd": 24,
+      "published_at_hd": "2026-09-28T22:00:34.873Z",
       "file_ref_hd": {
         "id": "5897759725482680761",
         "access_hash": "-314090044666593030",
-        "file_reference": "BgAAAAEIDwTcAAAAFWq608yWHxEiNUVNqgyJxjW2sukR",
+        "file_reference": "BgAAAAEIDwTcAAAAGGq644LGOSpce3UDodwKjWoKYO1G",
         "mime_type": "video/mp4",
         "size": 1082851531,
         "dc_id": 4
       },
       "sd_published": true,
-      "telegram_msg_id_sd": 22,
-      "published_at_sd": "2026-09-28T21:14:43.702Z",
+      "telegram_msg_id_sd": 25,
+      "published_at_sd": "2026-09-28T22:00:35.029Z",
       "file_ref_sd": {
         "id": "5897759725482680773",
         "access_hash": "226578953659155105",
-        "file_reference": "BgAAAAEIDwTcAAAAFmq62MMls3DhA0Gseb3PQI6Mb4vw",
+        "file_reference": "BgAAAAEIDwTcAAAAGWq644Ixur9ON5UkYq5F1vQJKFWQ",
         "mime_type": "video/mp4",
         "size": 406273964,
         "dc_id": 4
@@ -34,14 +34,14 @@
       "episode_num": 2,
       "title": "La Villa des cœurs brisés (2015) - S11E02 - Episode 2",
       "published_at": "2026-09-12T17:12:06.848Z",
-      "telegram_msg_id": 23,
+      "telegram_msg_id": 26,
       "hd_published": true,
-      "telegram_msg_id_hd": 23,
-      "published_at_hd": "2026-09-28T21:24:46.461Z",
+      "telegram_msg_id_hd": 26,
+      "published_at_hd": "2026-09-28T22:00:37.318Z",
       "file_ref_hd": {
         "id": "5897705089203709385",
         "access_hash": "-2901053069868696926",
-        "file_reference": "BgAAAAEIDwTcAAAAF2q62x6Uk5mKN1VO8/vm91n3c8kW",
+        "file_reference": "BgAAAAEIDwTcAAAAGmq644Uxy4g1yi1ei6ANMHltZzDS",
         "mime_type": "video/mp4",
         "size": 1871510368,
         "dc_id": 4
@@ -52,14 +52,36 @@
       "episode_num": 3,
       "title": "La Villa des cœurs brisés (2015) - S11E03 - Episode 3",
       "published_at": "2026-09-12T17:12:06.848Z",
-      "telegram_msg_id": "pre-existing"
+      "telegram_msg_id": 27,
+      "hd_published": true,
+      "telegram_msg_id_hd": 27,
+      "published_at_hd": "2026-09-28T22:05:59.637Z",
+      "file_ref_hd": {
+        "id": "5897705089203709397",
+        "access_hash": "323352527463982908",
+        "file_reference": "BgAAAAEIDwTcAAAAG2q65MdxuP4bxTYIQFz8FheAlbNz",
+        "mime_type": "video/mp4",
+        "size": 645219071,
+        "dc_id": 4
+      }
     },
     {
       "id": "480426",
       "episode_num": 4,
       "title": "La Villa des cœurs brisés (2015) - S11E04 - Episode 4",
       "published_at": "2026-09-12T17:12:06.848Z",
-      "telegram_msg_id": "pre-existing"
+      "telegram_msg_id": 28,
+      "hd_published": true,
+      "telegram_msg_id_hd": 28,
+      "published_at_hd": "2026-09-28T22:11:53.969Z",
+      "file_ref_hd": {
+        "id": "5897705089203709400",
+        "access_hash": "8768260446525511128",
+        "file_reference": "BgAAAAEIDwTcAAAAHGq65ikUlEEWEUi95qunMc9dQtuf",
+        "mime_type": "video/mp4",
+        "size": 719091024,
+        "dc_id": 4
+      }
     },
     {
       "id": "480497",

@@ -9600,5 +9600,21 @@
     "role": "user",
     "avatar": "assets/avatars/avatar-4.svg",
     "expires_at": 1793224446048
+  },
+  {
+    "token": "38e65696c44ebc68e3b9182bc6bad8a9863c3526e3986124bf77cf383c455dd1",
+    "user_id": "u_1790633591591_ffa03ea0",
+    "username": "Nix",
+    "role": "user",
+    "avatar": "assets/avatars/avatar-5.svg",
+    "expires_at": 1793225591681
+  },
+  {
+    "token": "5ceed3b26ebbda16bfa2930aaf5de27db25fa98a9fd887e987432e52e6559a8b",
+    "user_id": "u_1790633591591_ffa03ea0",
+    "username": "Nix",
+    "role": "user",
+    "avatar": "assets/avatars/avatar-5.svg",
+    "expires_at": 1793225705925
   }
 ]
