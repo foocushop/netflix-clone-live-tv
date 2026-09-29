@@ -1203,9 +1203,9 @@
     "role": "user",
     "banned": false,
     "created_at": "2026-09-13T12:07:28.952Z",
-    "last_login": "2026-09-15T19:44:31.255Z",
+    "last_login": "2026-09-29T11:42:02.268Z",
     "ip": "2001:42d8:4464:4100:649d:181:84e6:4677",
-    "last_ip": "2001:42d8:4464:4100:649d:181:84e6:4677"
+    "last_ip": "2001:42d8:4464:4100:ed1c:d7ec:64ad:181f"
   },
   {
     "id": "u_1789304223758_1bd0456f",
@@ -7613,9 +7613,9 @@
     "role": "user",
     "banned": false,
     "ip": "2a02:8440:9500:1b98:dc77:a78e:4b6f:11d4",
-    "last_ip": "2a02:8440:9508:828d:8c0:cbfd:47e3:8761",
+    "last_ip": "2a02:8434:da13:1c01:dcb8:48e2:342c:86de",
     "created_at": "2026-09-22T00:11:23.510Z",
-    "last_login": "2026-09-29T11:09:31.032Z"
+    "last_login": "2026-09-29T11:35:52.150Z"
   },
   {
     "id": "u_1790045119155_de4526d3",
@@ -21825,6 +21825,51 @@
     "last_ip": "2a01:cb08:82c8:1900:dc3d:f37:101c:956f",
     "created_at": "2026-09-29T10:55:45.723Z",
     "last_login": "2026-09-29T10:55:45.723Z",
+    "watch_credit_seconds": 1200,
+    "welcome_seen": false
+  },
+  {
+    "id": "u_1790681275183_6f1b4540",
+    "username": "Fatou99",
+    "password_hash": "ce7b493ed1e2e7a337cfa1cf0203c0c58cb7689fdffc9d38c1eeebf2e5082e2a90e068b7fac3b391af39e34d19c83a937bcccd3ad186f0f8dc6ceca9e40ab4db",
+    "salt": "48d1c077b19b3fae0a9f41392ca0439f",
+    "avatar": "assets/avatars/avatar-1.svg",
+    "role": "user",
+    "banned": false,
+    "ip": "41.83.153.144",
+    "last_ip": "41.83.153.144",
+    "created_at": "2026-09-29T11:27:55.183Z",
+    "last_login": "2026-09-29T11:27:55.183Z",
+    "watch_credit_seconds": 1200,
+    "welcome_seen": false
+  },
+  {
+    "id": "u_1790681811548_fa22457b",
+    "username": "nueve9",
+    "password_hash": "d7ee9057452b0c97384a6961d827809a2cd4c2f21eee84dcdc9c1dba522ad1f470d79bcfd0fe94730751abf0f29b31fdd399061a0ca72fef3fa133ef2d1127e5",
+    "salt": "943950cb5cf34fd00ea9b1f9ce788fde",
+    "avatar": "assets/avatars/avatar-1.svg",
+    "role": "user",
+    "banned": false,
+    "ip": "2a02:8434:da13:1c01:dcb8:48e2:342c:86de",
+    "last_ip": "2a02:8434:da13:1c01:dcb8:48e2:342c:86de",
+    "created_at": "2026-09-29T11:36:51.548Z",
+    "last_login": "2026-09-29T11:36:51.548Z",
+    "watch_credit_seconds": 1200,
+    "welcome_seen": false
+  },
+  {
+    "id": "u_1790683906156_6dafae22",
+    "username": "francois35160",
+    "password_hash": "b319cd4f694dbf86e9b650d1a5d4ffebd34516d6659ecc918b99eb65bcb1fdc096d2d8b7c3bb2e3867360a242dc5d9837b5c302e7f31e797c876e89064316e63",
+    "salt": "3f70d08d7be204884677f54eb55f5921",
+    "avatar": "assets/avatars/avatar-1.svg",
+    "role": "user",
+    "banned": false,
+    "ip": "2a01:cb08:82c8:1900:dc3d:f37:101c:956f",
+    "last_ip": "2a01:cb08:82c8:1900:dc3d:f37:101c:956f",
+    "created_at": "2026-09-29T12:11:46.157Z",
+    "last_login": "2026-09-29T12:11:46.157Z",
     "watch_credit_seconds": 1200,
     "welcome_seen": false
   }
