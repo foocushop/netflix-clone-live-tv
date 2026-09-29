@@ -8341,9 +8341,9 @@
     "role": "user",
     "banned": false,
     "ip": "2a01:e0a:1152:bcb0:c426:8a45:6d79:fcf6",
-    "last_ip": "2a01:e0a:1152:bcb0:c426:8a45:6d79:fcf6",
+    "last_ip": "2a04:cec0:11ec:cc95:a4ac:883d:4213:9caf",
     "created_at": "2026-09-24T18:25:50.119Z",
-    "last_login": "2026-09-24T18:25:50.119Z"
+    "last_login": "2026-09-29T13:56:37.462Z"
   },
   {
     "id": "u_1790274375025_4880d81c",
@@ -21885,6 +21885,21 @@
     "last_ip": "2001:4278:26:c831:b5a3:ddb4:e21f:78d1",
     "created_at": "2026-09-29T12:24:35.266Z",
     "last_login": "2026-09-29T12:24:35.266Z",
+    "watch_credit_seconds": 1200,
+    "welcome_seen": false
+  },
+  {
+    "id": "u_1790691549562_d53297ab",
+    "username": "jhbb",
+    "password_hash": "0abb4b6c99a1a5ed351bc06f5f1ca2c5fd6a3d68488d206c2a84e220c46d071f043c17ad5ef07e9f7ffe864fc1dbb51361f670ad3cde41606c25457f1241db68",
+    "salt": "1eadda377865daf0c0321de6774ae7df",
+    "avatar": "assets/avatars/avatar-3.svg",
+    "role": "user",
+    "banned": false,
+    "ip": "71.162.175.250",
+    "last_ip": "71.162.175.250",
+    "created_at": "2026-09-29T14:19:09.562Z",
+    "last_login": "2026-09-29T14:19:09.563Z",
     "watch_credit_seconds": 1200,
     "welcome_seen": false
   }
