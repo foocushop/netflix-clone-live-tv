@@ -537,6 +537,27 @@
       "published_at_hd": "2026-09-29T00:32:05.782Z",
       "telegram_msg_id": 69,
       "published_at_sd": "2026-09-29T00:32:05.943Z"
+    },
+    {
+      "id": "manual_series_6715_s11_E28",
+      "episode_num": 28,
+      "title": "La Villa des cœurs brisés - S11E28 - Episode 28",
+      "published_at": "2026-09-29T01:21:12.756Z",
+      "hd_published": true,
+      "sd_published": false,
+      "telegram_msg_id_hd": 72,
+      "telegram_msg_id_sd": null,
+      "file_ref_hd": {
+        "id": "5897705089203709417",
+        "access_hash": "8277522190015917932",
+        "file_reference": "BgAAAAEIDwTcAAAASGq7EogtplyR9qmuHGExAedxADbT",
+        "mime_type": "video/mp4",
+        "size": 485678069,
+        "dc_id": 4
+      },
+      "file_ref_sd": null,
+      "published_at_hd": "2026-09-29T01:21:12.756Z",
+      "telegram_msg_id": 72
     }
   ],
   "series_9066_s9": [
