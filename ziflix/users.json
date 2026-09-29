@@ -8,9 +8,9 @@
     "role": "admin",
     "banned": false,
     "created_at": "2026-09-12T00:18:32.081Z",
-    "last_login": "2026-09-27T01:27:28.258Z",
+    "last_login": "2026-09-29T11:08:35.733Z",
     "is_premium": true,
-    "last_ip": "41.208.137.219",
+    "last_ip": "2001:4278:26:c831:419e:856:faeb:89c4",
     "ip": "2001:4278:19:1293:c4e1:d8d8:aa15:a9fc"
   },
   {
@@ -1339,11 +1339,11 @@
     "role": "premium",
     "banned": false,
     "created_at": "2026-09-13T14:57:52.050Z",
-    "last_login": "2026-09-17T01:47:42.374Z",
+    "last_login": "2026-09-29T10:36:10.665Z",
     "premium_until": 1791903488754,
     "premium_plan": "monthly",
     "ip": "2001:4278:19:f867:fc32:e12d:4a86:f49d",
-    "last_ip": "2001:4278:19:f867:fc32:e12d:4a86:f49d"
+    "last_ip": "2001:4278:26:c831:419e:856:faeb:89c4"
   },
   {
     "id": "u_1789311549836_20fcd33e",
@@ -7613,9 +7613,9 @@
     "role": "user",
     "banned": false,
     "ip": "2a02:8440:9500:1b98:dc77:a78e:4b6f:11d4",
-    "last_ip": "2a02:8440:9505:38c3:cd86:b57b:a317:3953",
+    "last_ip": "2a02:8440:9508:828d:8c0:cbfd:47e3:8761",
     "created_at": "2026-09-22T00:11:23.510Z",
-    "last_login": "2026-09-25T23:25:54.722Z"
+    "last_login": "2026-09-29T11:09:31.032Z"
   },
   {
     "id": "u_1790045119155_de4526d3",
@@ -21812,5 +21812,20 @@
     "last_login": "2026-09-29T10:15:59.110Z",
     "ip": "154.0.186.179",
     "last_ip": "154.0.186.179"
+  },
+  {
+    "id": "u_1790679345723_037bfebe",
+    "username": "franche35160",
+    "password_hash": "e76a3f02ab415d73b1e336ca30bd0221361491d6a766ae73c7b00138057ebc12b60f7b3d9a861adfc18454ede7d6fcd3d567853cd751a7024b476a8c1b8d7619",
+    "salt": "fc80f2040f5c02c677bb861991047f5e",
+    "avatar": "assets/avatars/avatar-1.svg",
+    "role": "user",
+    "banned": false,
+    "ip": "2a01:cb08:82c8:1900:dc3d:f37:101c:956f",
+    "last_ip": "2a01:cb08:82c8:1900:dc3d:f37:101c:956f",
+    "created_at": "2026-09-29T10:55:45.723Z",
+    "last_login": "2026-09-29T10:55:45.723Z",
+    "watch_credit_seconds": 1200,
+    "welcome_seen": false
   }
 ]
