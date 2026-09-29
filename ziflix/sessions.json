@@ -9712,5 +9712,13 @@
     "role": "user",
     "avatar": "assets/avatars/avatar-9.svg",
     "expires_at": 1793248921619
+  },
+  {
+    "token": "ac77d062ce35e0566b7612cb52321858436355a886e2ffd48058d0110695f6aa",
+    "user_id": "u_1790665616840_adf4c395",
+    "username": "hdc",
+    "role": "user",
+    "avatar": "assets/avatars/avatar-1.svg",
+    "expires_at": 1793257616854
   }
 ]

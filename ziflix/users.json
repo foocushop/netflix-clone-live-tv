@@ -20733,5 +20733,20 @@
     "last_login": "2026-09-29T02:47:11.138Z",
     "watch_credit_seconds": 1200,
     "welcome_seen": false
+  },
+  {
+    "id": "u_1790665616840_adf4c395",
+    "username": "hdc",
+    "password_hash": "c9c104a5d43d4f4f1dce0054dccce2505bb7e7008d12984c6e72228cafb2cb5d02fc255415a866313ae4305f1b2b9a39405cba5f70134424a5f406ad148a215d",
+    "salt": "9e8a1eb72b8cbb675a0f8764e1555966",
+    "avatar": "assets/avatars/avatar-1.svg",
+    "role": "user",
+    "banned": false,
+    "ip": "154.72.163.217",
+    "last_ip": "154.72.163.217",
+    "created_at": "2026-09-29T07:06:56.840Z",
+    "last_login": "2026-09-29T07:06:56.840Z",
+    "watch_credit_seconds": 1200,
+    "welcome_seen": false
   }
 ]
