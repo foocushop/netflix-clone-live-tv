@@ -3665,9 +3665,9 @@
     "role": "user",
     "banned": false,
     "created_at": "2026-09-15T07:54:29.824Z",
-    "last_login": "2026-09-26T19:56:28.744Z",
+    "last_login": "2026-09-29T20:16:08.588Z",
     "ip": "2a01:e0a:1076:8bb0:49a6:6112:899c:8145",
-    "last_ip": "2a0d:e487:131f:4810:29b4:d9ec:e5e6:6d9d"
+    "last_ip": "2a01:e0a:1076:8bb0:a401:4f67:e004:91fd"
   },
   {
     "id": "u_1789458871928_f79a6798",
@@ -7613,9 +7613,9 @@
     "role": "user",
     "banned": false,
     "ip": "2a02:8440:9500:1b98:dc77:a78e:4b6f:11d4",
-    "last_ip": "2a02:8440:9505:38c3:cd86:b57b:a317:3953",
+    "last_ip": "2a02:8440:9502:2691:448e:215d:9ece:13a6",
     "created_at": "2026-09-22T00:11:23.510Z",
-    "last_login": "2026-09-25T23:25:54.722Z"
+    "last_login": "2026-09-29T20:23:53.223Z"
   },
   {
     "id": "u_1790045119155_de4526d3",
@@ -7730,9 +7730,9 @@
     "role": "user",
     "banned": false,
     "ip": "197.215.193.185",
-    "last_ip": "197.215.193.185",
+    "last_ip": "41.74.210.41",
     "created_at": "2026-09-22T19:05:04.176Z",
-    "last_login": "2026-09-22T19:05:04.176Z"
+    "last_login": "2026-09-29T20:07:10.343Z"
   },
   {
     "id": "u_1790104193158_22b4145b",
@@ -22917,6 +22917,51 @@
     "last_ip": "85.90.17.189",
     "created_at": "2026-09-29T19:32:18.523Z",
     "last_login": "2026-09-29T19:32:18.523Z",
+    "watch_credit_seconds": 1200,
+    "welcome_seen": false
+  },
+  {
+    "id": "u_1790714098049_25d5c9a2",
+    "username": "Cecgack80",
+    "password_hash": "4f8f713509b3776a509b9d6ac4b117c93b4dcff676d7f3e8f36616cae0d93db577b022df054c7562a6d6276f2cb59d5aff1c9b8e4862f2a9c1e8a47b31b8b7d8",
+    "salt": "1a66c1b039abbe602d6f76ec7017c885",
+    "avatar": "assets/avatars/avatar-1.svg",
+    "role": "user",
+    "banned": false,
+    "ip": "38.91.100.251",
+    "last_ip": "38.91.100.251",
+    "created_at": "2026-09-29T20:34:58.049Z",
+    "last_login": "2026-09-29T20:34:58.049Z",
+    "watch_credit_seconds": 1200,
+    "welcome_seen": false
+  },
+  {
+    "id": "u_1790714477508_f2426a37",
+    "username": "sgu83",
+    "password_hash": "23a7b7e9c1e1719ca57b530a4aa1340e3636249df03c22fa97aa0e32f8892336ffe616cd7efdc9a1b1b0ee0f603dca5c6264520905ef02dd02805555c8cf9f60",
+    "salt": "1e0e51ea531124336aef167407c47787",
+    "avatar": "assets/avatars/avatar-1.svg",
+    "role": "user",
+    "banned": false,
+    "ip": "178.197.194.166",
+    "last_ip": "178.197.194.166",
+    "created_at": "2026-09-29T20:41:17.508Z",
+    "last_login": "2026-09-29T20:41:17.508Z",
+    "watch_credit_seconds": 1200,
+    "welcome_seen": false
+  },
+  {
+    "id": "u_1790714761636_698c95f4",
+    "username": "lucaslechat25",
+    "password_hash": "5f5ecac790a381d469f225dd97bf1c3dc57e345a5616438b10b5ab37add9fe53cac5c0c977adc6606fae3380031aeae807c06110b8a2b540a8695c76d9feac95",
+    "salt": "f0f7182fe61b457a77f50a67cf25f7ff",
+    "avatar": "assets/avatars/avatar-3.svg",
+    "role": "user",
+    "banned": false,
+    "ip": "2a01:cb18:a4:5b00:dc9e:c1f4:bf14:1b08",
+    "last_ip": "2a01:cb18:a4:5b00:dc9e:c1f4:bf14:1b08",
+    "created_at": "2026-09-29T20:46:01.636Z",
+    "last_login": "2026-09-29T20:46:01.636Z",
     "watch_credit_seconds": 1200,
     "welcome_seen": false
   }

@@ -250,35 +250,68 @@
       "episode_num": 14,
       "title": "La Villa des cœurs brisés (2015) - S11E14 - Episode 14",
       "published_at": "2026-09-12T17:12:06.849Z",
-      "telegram_msg_id": "pre-existing"
+      "telegram_msg_id": 89,
+      "hd_published": true,
+      "telegram_msg_id_hd": 89,
+      "published_at_hd": "2026-09-29T19:56:31.299Z",
+      "file_ref_hd": {
+        "id": "5899956889017393140",
+        "access_hash": "-1279416926584068483",
+        "file_reference": "BgAAAAEIDwTcAAAAWWq8F+/KCVQOEZ8d+YkxnP9QxsRd",
+        "mime_type": "video/x-matroska",
+        "size": 1579155456,
+        "dc_id": 4
+      }
     },
     {
       "id": "482513",
       "episode_num": 15,
       "title": "La Villa des cœurs brisés (2015) - S11E15 - Episode 15",
       "published_at": "2026-09-12T17:12:06.849Z",
-      "telegram_msg_id": "pre-existing"
+      "telegram_msg_id": 90,
+      "hd_published": true,
+      "telegram_msg_id_hd": 90,
+      "published_at_hd": "2026-09-29T20:08:49.122Z",
+      "file_ref_hd": {
+        "id": "5899956889017393145",
+        "access_hash": "-398634706698207108",
+        "file_reference": "BgAAAAEIDwTcAAAAWmq8GtBbe6T2iIbDVL+j1MRe6tr5",
+        "mime_type": "video/x-matroska",
+        "size": 1464860672,
+        "dc_id": 4
+      }
     },
     {
       "id": "482593",
       "episode_num": 16,
       "title": "La Villa des cœurs brisés (2015) - S11E16 - Episode 16",
       "published_at": "2026-09-12T17:12:06.849Z",
-      "telegram_msg_id": "pre-existing"
+      "telegram_msg_id": 91,
+      "hd_published": true,
+      "telegram_msg_id_hd": 91,
+      "published_at_hd": "2026-09-29T20:16:56.242Z",
+      "file_ref_hd": {
+        "id": "5899956889017393149",
+        "access_hash": "-678320073790020799",
+        "file_reference": "BgAAAAEIDwTcAAAAW2q8HLd93SPmMJqLULQcT/drEuas",
+        "mime_type": "video/mp4",
+        "size": 735582466,
+        "dc_id": 4
+      }
     },
     {
       "id": "483096",
       "episode_num": 17,
       "title": "La Villa des cœurs brisés (2015) - S11E17 - Episode 17",
       "published_at": "2026-09-12T17:16:12.004Z",
-      "telegram_msg_id": 55,
+      "telegram_msg_id": 92,
       "hd_published": true,
-      "telegram_msg_id_hd": 55,
-      "published_at_hd": "2026-09-29T00:27:12.485Z",
+      "telegram_msg_id_hd": 92,
+      "published_at_hd": "2026-09-29T20:17:00.754Z",
       "file_ref_hd": {
         "id": "5897705089203709413",
         "access_hash": "-6231473957396109913",
-        "file_reference": "BgAAAAEIDwTcAAAAN2q7BeBGk72NPgCevwXOFz96xDjv",
+        "file_reference": "BgAAAAEIDwTcAAAAXGq8HLye10Ce5Fho9/k4woiN/G+X",
         "mime_type": "video/x-matroska",
         "size": 1226145792,
         "dc_id": 4
@@ -296,28 +329,50 @@
       "episode_num": 18,
       "title": "La Villa des cœurs brisés (2015) - S11E18 - Episode 18",
       "published_at": "2026-09-14T21:16:32.564Z",
-      "telegram_msg_id": 181
+      "telegram_msg_id": 93,
+      "hd_published": true,
+      "telegram_msg_id_hd": 93,
+      "published_at_hd": "2026-09-29T20:28:43.005Z",
+      "file_ref_hd": {
+        "id": "5899956889017393157",
+        "access_hash": "4537800823814997470",
+        "file_reference": "BgAAAAEIDwTcAAAAXWq8H3oILba9zBpGC3CIUFBhp3DT",
+        "mime_type": "video/x-matroska",
+        "size": 1643118592,
+        "dc_id": 4
+      }
     },
     {
       "id": "483409",
       "episode_num": 19,
       "title": "La Villa des cœurs brisés (2015) - S11E19 - Episode 19",
       "published_at": "2026-09-15T20:29:57.293Z",
-      "telegram_msg_id": 186
+      "telegram_msg_id": 94,
+      "hd_published": true,
+      "telegram_msg_id_hd": 94,
+      "published_at_hd": "2026-09-29T20:34:27.115Z",
+      "file_ref_hd": {
+        "id": "5899956889017393160",
+        "access_hash": "8113332782391210554",
+        "file_reference": "BgAAAAEIDwTcAAAAXmq8INJHZJR4XAym1IW1oCkR4mRc",
+        "mime_type": "video/mp4",
+        "size": 735228185,
+        "dc_id": 4
+      }
     },
     {
       "id": "483564",
       "episode_num": 20,
       "title": "La Villa des cœurs brisés (2015) - S11E20 - Episode 20",
       "published_at": "2026-09-16T19:21:36.315Z",
-      "telegram_msg_id": 56,
+      "telegram_msg_id": 95,
       "hd_published": true,
-      "telegram_msg_id_hd": 56,
-      "published_at_hd": "2026-09-29T00:31:43.805Z",
+      "telegram_msg_id_hd": 95,
+      "published_at_hd": "2026-09-29T20:34:31.552Z",
       "file_ref_hd": {
         "id": "5897705089203709414",
         "access_hash": "-3086957143904098412",
-        "file_reference": "BgAAAAEIDwTcAAAAOGq7Bu8hQFx/4oPnncATvstKEkcT",
+        "file_reference": "BgAAAAEIDwTcAAAAX2q8INc1ENNJ1HSlQp3xwUO98z7z",
         "mime_type": "video/x-matroska",
         "size": 898695168,
         "dc_id": 4
@@ -330,26 +385,26 @@
       "published_at": "2026-09-18T15:06:09.765Z",
       "hd_published": true,
       "sd_published": true,
-      "telegram_msg_id": 57,
-      "telegram_msg_id_hd": 57,
-      "telegram_msg_id_sd": 58,
+      "telegram_msg_id": 96,
+      "telegram_msg_id_hd": 96,
+      "telegram_msg_id_sd": 97,
       "telegram_msg_id_tf1": 197,
       "tf1_announced": true,
       "tf1_announced_at": "2026-09-18T15:06:09.765Z",
-      "published_at_hd": "2026-09-29T00:31:48.189Z",
+      "published_at_hd": "2026-09-29T20:34:33.899Z",
       "file_ref_hd": {
         "id": "5866128751636520689",
         "access_hash": "316124054047324951",
-        "file_reference": "BgAAAAEIDwTcAAAAOWq7BvSZ6f0ZzZejmQ7fR4j24TiM",
+        "file_reference": "BgAAAAEIDwTcAAAAYGq8INn6/7P9YHlxo7aTYm57rPyz",
         "mime_type": "video/mp4",
         "size": 1008018798,
         "dc_id": 4
       },
-      "published_at_sd": "2026-09-29T00:31:48.344Z",
+      "published_at_sd": "2026-09-29T20:34:34.094Z",
       "file_ref_sd": {
         "id": "5866128751636520702",
         "access_hash": "2641298966731572330",
-        "file_reference": "BgAAAAEIDwTcAAAAOmq7BvSnGTJv7vvOa6LY4LfyOoLt",
+        "file_reference": "BgAAAAEIDwTcAAAAYWq8INm7yL789BKluBfs/OiE7XaZ",
         "mime_type": "video/mp4",
         "size": 421087615,
         "dc_id": 4
@@ -362,26 +417,26 @@
       "published_at": "2026-09-18T15:06:05.457Z",
       "hd_published": true,
       "sd_published": true,
-      "telegram_msg_id": 59,
-      "telegram_msg_id_hd": 59,
-      "telegram_msg_id_sd": 60,
+      "telegram_msg_id": 98,
+      "telegram_msg_id_hd": 98,
+      "telegram_msg_id_sd": 99,
       "telegram_msg_id_tf1": 196,
       "tf1_announced": true,
       "tf1_announced_at": "2026-09-18T15:06:05.457Z",
-      "published_at_hd": "2026-09-29T00:31:50.720Z",
+      "published_at_hd": "2026-09-29T20:34:36.466Z",
       "file_ref_hd": {
         "id": "5868380551450206200",
         "access_hash": "6768417924711210142",
-        "file_reference": "BgAAAAEIDwTcAAAAO2q7BvapY8gRWfnXzg8oyyXJMpE6",
+        "file_reference": "BgAAAAEIDwTcAAAAYmq8INwE5MSSqnmetAfjb/HFye5t",
         "mime_type": "video/mp4",
         "size": 1031529002,
         "dc_id": 4
       },
-      "published_at_sd": "2026-09-29T00:31:50.864Z",
+      "published_at_sd": "2026-09-29T20:34:36.610Z",
       "file_ref_sd": {
         "id": "5868380551450206202",
         "access_hash": "-677957960613145384",
-        "file_reference": "BgAAAAEIDwTcAAAAPGq7Bva4dgZtcLK1dmwC9cEZFHgi",
+        "file_reference": "BgAAAAEIDwTcAAAAY2q8INxmwqNpzKlF3as5XZgggeLr",
         "mime_type": "video/mp4",
         "size": 437121401,
         "dc_id": 4
@@ -394,26 +449,26 @@
       "published_at": "2026-09-18T15:06:00.782Z",
       "hd_published": true,
       "sd_published": true,
-      "telegram_msg_id": 61,
-      "telegram_msg_id_hd": 61,
-      "telegram_msg_id_sd": 62,
+      "telegram_msg_id": 100,
+      "telegram_msg_id_hd": 100,
+      "telegram_msg_id_sd": 101,
       "telegram_msg_id_tf1": 195,
       "tf1_announced": true,
       "tf1_announced_at": "2026-09-18T15:06:00.782Z",
-      "published_at_hd": "2026-09-29T00:31:53.108Z",
+      "published_at_hd": "2026-09-29T20:34:38.932Z",
       "file_ref_hd": {
         "id": "5881935395221937686",
         "access_hash": "5439453632672980582",
-        "file_reference": "BgAAAAEIDwTcAAAAPWq7BvnmYjAbsYVZOyoBNxTYCqpZ",
+        "file_reference": "BgAAAAEIDwTcAAAAZGq8IN77jH5EfL5CdlScHPDhW2WS",
         "mime_type": "video/mp4",
         "size": 1098465995,
         "dc_id": 4
       },
-      "published_at_sd": "2026-09-29T00:31:53.240Z",
+      "published_at_sd": "2026-09-29T20:34:39.124Z",
       "file_ref_sd": {
         "id": "5881935395221937691",
         "access_hash": "-7469858747580246231",
-        "file_reference": "BgAAAAEIDwTcAAAAPmq7BvmCYSrtqkoXi/qMwEoBpFCF",
+        "file_reference": "BgAAAAEIDwTcAAAAZWq8IN8qBrEfsjqZYfyY2l2bW9p3",
         "mime_type": "video/mp4",
         "size": 457628042,
         "dc_id": 4
@@ -426,26 +481,26 @@
       "published_at": "2026-09-18T15:05:56.178Z",
       "hd_published": true,
       "sd_published": true,
-      "telegram_msg_id": 63,
-      "telegram_msg_id_hd": 63,
-      "telegram_msg_id_sd": 64,
+      "telegram_msg_id": 102,
+      "telegram_msg_id_hd": 102,
+      "telegram_msg_id_sd": 103,
       "telegram_msg_id_tf1": 194,
       "tf1_announced": true,
       "tf1_announced_at": "2026-09-18T15:05:56.178Z",
-      "published_at_hd": "2026-09-29T00:31:55.503Z",
+      "published_at_hd": "2026-09-29T20:34:41.516Z",
       "file_ref_hd": {
         "id": "5881935395221937614",
         "access_hash": "-1224312868186466792",
-        "file_reference": "BgAAAAEIDwTcAAAAP2q7Bvssvhddie/LiI5ny6QrtaFz",
+        "file_reference": "BgAAAAEIDwTcAAAAZmq8IOH9jys4v8Kus1wH8iTo4KNq",
         "mime_type": "video/mp4",
         "size": 982238632,
         "dc_id": 4
       },
-      "published_at_sd": "2026-09-29T00:31:58.730Z",
+      "published_at_sd": "2026-09-29T20:34:41.757Z",
       "file_ref_sd": {
         "id": "5881935395221937627",
         "access_hash": "6355316571315602678",
-        "file_reference": "BgAAAAEIDwTcAAAAQGq7Bv7DNoip87z8EaWySE8GLXcZ",
+        "file_reference": "BgAAAAEIDwTcAAAAZ2q8IOEdj19C7pnH2EZt3JMUuGpu",
         "mime_type": "video/mp4",
         "size": 403925589,
         "dc_id": 4
@@ -458,12 +513,12 @@
       "published_at": "2026-09-24T11:28:12.349Z",
       "hd_published": true,
       "sd_published": true,
-      "telegram_msg_id_hd": 65,
-      "telegram_msg_id_sd": 66,
+      "telegram_msg_id_hd": 104,
+      "telegram_msg_id_sd": 105,
       "file_ref_hd": {
         "id": "5884136205183885997",
         "access_hash": "8819798341847512347",
-        "file_reference": "BgAAAAEIDwTcAAAAQWq7BwB4Mh1qL2/jKmF1V2MDzLJw",
+        "file_reference": "BgAAAAEIDwTcAAAAaGq8IOSpRj7DAvKrr02XmeYODXxE",
         "mime_type": "video/mp4",
         "size": 1719887175,
         "dc_id": 4
@@ -471,14 +526,14 @@
       "file_ref_sd": {
         "id": "5884136205183886008",
         "access_hash": "4577093780493213752",
-        "file_reference": "BgAAAAEIDwTcAAAAQmq7BwEglxPSb7lnutFn/zWqAtw1",
+        "file_reference": "BgAAAAEIDwTcAAAAaWq8IOSUaklMMh64f47dzkv07fPV",
         "mime_type": "video/mp4",
         "size": 488110801,
         "dc_id": 4
       },
-      "published_at_hd": "2026-09-29T00:32:00.985Z",
-      "telegram_msg_id": 65,
-      "published_at_sd": "2026-09-29T00:32:01.119Z"
+      "published_at_hd": "2026-09-29T20:34:44.161Z",
+      "telegram_msg_id": 104,
+      "published_at_sd": "2026-09-29T20:34:44.332Z"
     },
     {
       "id": "485070",
@@ -487,12 +542,12 @@
       "published_at": "2026-09-24T21:13:22.728Z",
       "hd_published": true,
       "sd_published": true,
-      "telegram_msg_id_hd": 67,
-      "telegram_msg_id_sd": 68,
+      "telegram_msg_id_hd": 106,
+      "telegram_msg_id_sd": 107,
       "file_ref_hd": {
         "id": "5884136205183886230",
         "access_hash": "1210384271997029894",
-        "file_reference": "BgAAAAEIDwTcAAAAQ2q7BwP2aFkqmRhie1mEmKuEL7Gt",
+        "file_reference": "BgAAAAEIDwTcAAAAamq8IOYzk0NRHJgT8NsdHKUl3PjT",
         "mime_type": "video/mp4",
         "size": 1082829149,
         "dc_id": 4
@@ -500,14 +555,14 @@
       "file_ref_sd": {
         "id": "5884136205183886237",
         "access_hash": "-5281826788384136692",
-        "file_reference": "BgAAAAEIDwTcAAAARGq7BwNJAXuUC32rftRjTMeBzdC2",
+        "file_reference": "BgAAAAEIDwTcAAAAa2q8IOZzx8ESYlrWFt5r5kmzJHFl",
         "mime_type": "video/mp4",
         "size": 476344844,
         "dc_id": 4
       },
-      "published_at_hd": "2026-09-29T00:32:03.376Z",
-      "telegram_msg_id": 67,
-      "published_at_sd": "2026-09-29T00:32:03.513Z"
+      "published_at_hd": "2026-09-29T20:34:46.694Z",
+      "telegram_msg_id": 106,
+      "published_at_sd": "2026-09-29T20:34:46.918Z"
     },
     {
       "id": "485470",
@@ -516,12 +571,12 @@
       "published_at": "2026-09-25T23:38:21.453Z",
       "hd_published": true,
       "sd_published": true,
-      "telegram_msg_id_hd": 69,
-      "telegram_msg_id_sd": 70,
+      "telegram_msg_id_hd": 108,
+      "telegram_msg_id_sd": 109,
       "file_ref_hd": {
         "id": "5888974649051587971",
         "access_hash": "-5203068145332515593",
-        "file_reference": "BgAAAAEIDwTcAAAARWq7BwUbvcz/nnUuCbdHwK/fcgxO",
+        "file_reference": "BgAAAAEIDwTcAAAAbGq8IOmAG9mO6MdkJuV1Goe1cfnv",
         "mime_type": "video/x-matroska",
         "size": 1060202934,
         "dc_id": 4
@@ -529,14 +584,56 @@
       "file_ref_sd": {
         "id": "5888974649051587973",
         "access_hash": "8039689811155065953",
-        "file_reference": "BgAAAAEIDwTcAAAARmq7BwUcRxSNPJBQgoC+/HaM/Cda",
+        "file_reference": "BgAAAAEIDwTcAAAAbWq8IOm3EXuogd2vQJIlaOMAUF/4",
         "mime_type": "video/mp4",
         "size": 426575908,
         "dc_id": 4
       },
-      "published_at_hd": "2026-09-29T00:32:05.782Z",
-      "telegram_msg_id": 69,
-      "published_at_sd": "2026-09-29T00:32:05.943Z"
+      "published_at_hd": "2026-09-29T20:34:49.378Z",
+      "telegram_msg_id": 108,
+      "published_at_sd": "2026-09-29T20:34:49.691Z"
+    },
+    {
+      "id": "486009",
+      "episode_num": 28,
+      "title": "La Villa des Cœurs Brisés (2015) - S11E28 - Episode 28",
+      "published_at": "2026-09-29T20:38:41.270Z",
+      "hd_published": true,
+      "sd_published": false,
+      "telegram_msg_id_hd": 110,
+      "telegram_msg_id_sd": null,
+      "file_ref_hd": {
+        "id": "5899956889017393161",
+        "access_hash": "-1474410887340021690",
+        "file_reference": "BgAAAAEIDwTcAAAAbmq8IdHo/Vix6MXr180IIkeVjsFS",
+        "mime_type": "video/x-matroska",
+        "size": 751587328,
+        "dc_id": 4
+      },
+      "file_ref_sd": null,
+      "published_at_hd": "2026-09-29T20:38:41.270Z",
+      "telegram_msg_id": 110
+    },
+    {
+      "id": "487199",
+      "episode_num": 29,
+      "title": "La Villa des Cœurs Brisés (2015) - S11E29 - Episode 29",
+      "published_at": "2026-09-29T20:43:05.451Z",
+      "hd_published": true,
+      "sd_published": false,
+      "telegram_msg_id_hd": 111,
+      "telegram_msg_id_sd": null,
+      "file_ref_hd": {
+        "id": "5899956889017393162",
+        "access_hash": "5089433542693112859",
+        "file_reference": "BgAAAAEIDwTcAAAAb2q8ItlU9H/bSwJhVCmTXtm4Cila",
+        "mime_type": "video/x-matroska",
+        "size": 849771876,
+        "dc_id": 4
+      },
+      "file_ref_sd": null,
+      "published_at_hd": "2026-09-29T20:43:05.451Z",
+      "telegram_msg_id": 111
     }
   ],
   "series_9066_s9": [
