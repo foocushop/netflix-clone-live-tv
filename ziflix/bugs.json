@@ -1,5 +1,23 @@
 [
   {
+    "id": "bug_1790708599374_2a6ead",
+    "user_id": "admin",
+    "username": "admin",
+    "category": "playback",
+    "title": "Signalement : Les Apprentis Aventuriers S9E18",
+    "description": "",
+    "media_id": "xtream_series_9066",
+    "media_title": "Les Apprentis Aventuriers",
+    "season": 9,
+    "episode": 18,
+    "episode_id": null,
+    "device_info": "Android • Chrome",
+    "user_agent": "Mozilla/5.0 (Linux; Android 13; K) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.7922.199 Mobile Safari/537.36 Telegram-Android/12.10.1 (Samsung SM-A032F; Android 13; SDK 33; LOW)",
+    "url": "https://app.ziablo.xyz/#tgWebAppData=user%3D%257B%2522id%2522%253A8163359600%252C%2522first_name%2522%253A%2522Jessica%2522%252C%2522last_name%2522%253A%2522Diallo%25F0%259F%25A5%25B0%25F0%259F%2592%2",
+    "status": "open",
+    "created_at": "2026-09-29T19:03:19.374Z"
+  },
+  {
     "id": "bug_1790707788560_e91b65",
     "user_id": "u_1790706340478_29ff0adc",
     "username": "Sadia prefrere",
@@ -36,6 +54,24 @@
     "url": "https://ziablo.xyz/series",
     "status": "open",
     "created_at": "2026-09-29T18:34:22.204Z"
+  },
+  {
+    "id": "bug_1790706676928_686ecd",
+    "user_id": "admin",
+    "username": "admin",
+    "category": "playback",
+    "title": "Signalement : La Villa des Cœurs Brisés S11E27",
+    "description": "",
+    "media_id": "xtream_series_6715",
+    "media_title": "La Villa des Cœurs Brisés",
+    "season": 11,
+    "episode": 27,
+    "episode_id": null,
+    "device_info": "Mac (macOS)",
+    "user_agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko)",
+    "url": "https://app.ziablo.xyz/#tgWebAppData=user%3D%257B%2522id%2522%253A7206867056%252C%2522first_name%2522%253A%2522Stella%2522%252C%2522last_name%2522%253A%2522%2522%252C%2522language_code%2522%253A%2522e",
+    "status": "open",
+    "created_at": "2026-09-29T18:31:16.928Z"
   },
   {
     "id": "bug_1790705191837_89cf77",
