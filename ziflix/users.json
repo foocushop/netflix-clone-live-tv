@@ -23508,5 +23508,20 @@
     "last_login": "2026-09-30T15:55:39.138Z",
     "watch_credit_seconds": 1200,
     "welcome_seen": false
+  },
+  {
+    "id": "u_1790788551468_964952b1",
+    "username": "fbjjkit",
+    "password_hash": "a879f5172944a5a07dde0dfc1499ccb5475d20a5ddb99a567a9562d49f9350f9c92a960a2bdb969437c7e3a4fc171916ee578a72521706b395fa5b29898d0948",
+    "salt": "a77bbcc8c4658e87f27a97b43fa0b7ab",
+    "avatar": "assets/avatars/avatar-1.svg",
+    "role": "user",
+    "banned": false,
+    "ip": "2a01:cb08:82c8:1900:dc3d:f37:101c:956f",
+    "last_ip": "2a01:cb08:82c8:1900:dc3d:f37:101c:956f",
+    "created_at": "2026-09-30T17:15:51.468Z",
+    "last_login": "2026-09-30T17:15:51.468Z",
+    "watch_credit_seconds": 1200,
+    "welcome_seen": false
   }
 ]

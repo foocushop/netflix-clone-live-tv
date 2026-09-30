@@ -20,7 +20,7 @@
     "name": "Les Apprentis Aventuriers",
     "emoji": "👹",
     "template": "<b>{titre}</b> {emoji} Saison {saison}\n\nÉpisode {episode}",
-    "channel_id": "-1003839408616",
+    "channel_id": "-1004430169308",
     "enabled": true,
     "source_priority": "foxbleu",
     "delayed_release": true
