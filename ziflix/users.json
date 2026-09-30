@@ -23463,5 +23463,35 @@
     "last_login": "2026-09-30T13:50:42.265Z",
     "watch_credit_seconds": 1200,
     "welcome_seen": false
+  },
+  {
+    "id": "u_1790779254194_01fea6e7",
+    "username": "mimicat",
+    "password_hash": "3267051a5e011459dee4cb103f94a2c0a65bd50906b965a9a19fd6d0da2c506c06d15a2f7b244cd252156a914038b6f8829b9aea85f403c7486109ee424ec027",
+    "salt": "0bab8865c65bd97e994cb0561ecd5f2d",
+    "avatar": "assets/avatars/avatar-9.svg",
+    "role": "user",
+    "banned": false,
+    "ip": "2001:4278:17:2cb6:cd72:4072:2ddf:f755",
+    "last_ip": "2001:4278:17:2cb6:cd72:4072:2ddf:f755",
+    "created_at": "2026-09-30T14:40:54.194Z",
+    "last_login": "2026-09-30T14:40:54.194Z",
+    "watch_credit_seconds": 1200,
+    "welcome_seen": false
+  },
+  {
+    "id": "u_1790779348491_75c0a3ce",
+    "username": "Aude27",
+    "password_hash": "21f51d7b71a728858a7785921f528924ac7296a7b11f536d8dd94588aca9d0b1d2035ec024a03520bb5679eb29bef23bee23c7731aef21daf0bf656ddd15de3b",
+    "salt": "a055875350f4791e8068db42893cbbd9",
+    "avatar": "assets/avatars/avatar-1.svg",
+    "role": "user",
+    "banned": false,
+    "ip": "2001:42d8:4638:6e00:48aa:f902:b4f1:f4d0",
+    "last_ip": "2001:42d8:4638:6e00:48aa:f902:b4f1:f4d0",
+    "created_at": "2026-09-30T14:42:28.491Z",
+    "last_login": "2026-09-30T14:42:28.491Z",
+    "watch_credit_seconds": 1200,
+    "welcome_seen": false
   }
 ]
