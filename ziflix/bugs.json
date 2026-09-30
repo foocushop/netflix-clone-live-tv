@@ -1,5 +1,24 @@
 [
   {
+    "id": "bug_1790766956241_80588e",
+    "user_id": "u_1789557995611_a97b519a",
+    "username": "christi",
+    "avatar": "assets/avatars/avatar-9.svg",
+    "category": "playback",
+    "title": "Signalement : Les Apprentis Aventuriers S9E19",
+    "description": "",
+    "media_id": "xtream_series_9066",
+    "media_title": "Les Apprentis Aventuriers",
+    "season": 9,
+    "episode": 19,
+    "episode_id": null,
+    "device_info": "PC Windows • Chrome",
+    "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/154.0.0.0 Safari/537.36",
+    "url": "https://ziablo.xyz/",
+    "status": "open",
+    "created_at": "2026-09-30T11:15:56.241Z"
+  },
+  {
     "id": "bug_1790755030729_31179c",
     "user_id": "u_1789506261091_a58195d6",
     "username": "leaticiangello83@gmail.com",
