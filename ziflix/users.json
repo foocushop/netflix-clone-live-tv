@@ -23473,9 +23473,9 @@
     "role": "user",
     "banned": false,
     "ip": "2001:4278:17:2cb6:cd72:4072:2ddf:f755",
-    "last_ip": "2001:4278:17:2cb6:cd72:4072:2ddf:f755",
+    "last_ip": "2001:4278:17:2cb6:d492:a90b:3dc5:717b",
     "created_at": "2026-09-30T14:40:54.194Z",
-    "last_login": "2026-09-30T14:40:54.194Z",
+    "last_login": "2026-09-30T16:11:50.048Z",
     "watch_credit_seconds": 1200,
     "welcome_seen": false
   },
@@ -23491,6 +23491,21 @@
     "last_ip": "2001:42d8:4638:6e00:48aa:f902:b4f1:f4d0",
     "created_at": "2026-09-30T14:42:28.491Z",
     "last_login": "2026-09-30T14:42:28.491Z",
+    "watch_credit_seconds": 1200,
+    "welcome_seen": false
+  },
+  {
+    "id": "u_1790783739138_ebcce58d",
+    "username": "Qep",
+    "password_hash": "1488bce42b2d63c5c5d4af6acdda7756b2582938e8a6e735378d18cb7faf9c75459ee9302d886bb534d6fa59df4740365e557a68eee3147c0abc792676490f2f",
+    "salt": "2de023f9b2f428145c9e481225f83074",
+    "avatar": "assets/avatars/avatar-1.svg",
+    "role": "user",
+    "banned": false,
+    "ip": "154.66.162.115",
+    "last_ip": "154.66.162.115",
+    "created_at": "2026-09-30T15:55:39.138Z",
+    "last_login": "2026-09-30T15:55:39.138Z",
     "watch_credit_seconds": 1200,
     "welcome_seen": false
   }
