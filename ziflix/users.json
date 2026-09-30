@@ -4536,9 +4536,9 @@
     "role": "user",
     "banned": false,
     "created_at": "2026-09-15T17:49:52.362Z",
-    "last_login": "2026-09-19T12:41:34.359Z",
+    "last_login": "2026-09-30T13:45:23.655Z",
     "ip": "41.214.39.223",
-    "last_ip": "41.82.12.195"
+    "last_ip": "41.83.180.170"
   },
   {
     "id": "u_1789495159097_d69bfb28",
@@ -23416,6 +23416,51 @@
     "last_ip": "41.83.180.170",
     "created_at": "2026-09-30T07:47:36.606Z",
     "last_login": "2026-09-30T07:47:36.606Z",
+    "watch_credit_seconds": 1200,
+    "welcome_seen": false
+  },
+  {
+    "id": "u_1790773237782_176e761e",
+    "username": "nathou",
+    "password_hash": "debfc0ff20f853d481e541621c828bc0a070d4e165499ca80b04c466e638788bd87c50ff094cccd2ab496f2af4cf61e7a31fb2cb86beff2a7880216405e1a8c3",
+    "salt": "2855532eb52672045436918ee90d8e10",
+    "avatar": "assets/avatars/avatar-1.svg",
+    "role": "user",
+    "banned": false,
+    "ip": "2c0f:f038:65f:9900:a82e:7d83:d903:5f19",
+    "last_ip": "2c0f:f038:65f:9900:a82e:7d83:d903:5f19",
+    "created_at": "2026-09-30T13:00:37.782Z",
+    "last_login": "2026-09-30T13:00:37.782Z",
+    "watch_credit_seconds": 1200,
+    "welcome_seen": false
+  },
+  {
+    "id": "u_1790776224203_469d5908",
+    "username": "FOZD9A",
+    "password_hash": "f41d7d89a69f803aacde6ac941b11a71c23b3a58fae43b150cde23ac0fec40ce4e2e23304b27d310c0bf44a9e441445e0e7a996427e285899a6c525fcc6f258c",
+    "salt": "51f270dd3b065b5682e561a95b7d3df4",
+    "avatar": "assets/avatars/avatar-3.svg",
+    "role": "user",
+    "banned": false,
+    "ip": "187.13.199.246",
+    "last_ip": "187.13.199.246",
+    "created_at": "2026-09-30T13:50:24.203Z",
+    "last_login": "2026-09-30T13:50:24.203Z",
+    "watch_credit_seconds": 1200,
+    "welcome_seen": false
+  },
+  {
+    "id": "u_1790776242265_1cb65354",
+    "username": "abir02",
+    "password_hash": "d8ae908cdbc6a61d122e59db09fa805d8cc3ec6ca3835a386ae7a3a4c191ecef00ab7f2997f49c2ec6fd8f9ec8ce7c12a2347af1d623efa254c364e1600ad0c5",
+    "salt": "cd5ed0fcacfd3d3ce087a2afaddac9b8",
+    "avatar": "assets/avatars/avatar-8.svg",
+    "role": "user",
+    "banned": false,
+    "ip": "41.231.61.130",
+    "last_ip": "41.231.61.130",
+    "created_at": "2026-09-30T13:50:42.265Z",
+    "last_login": "2026-09-30T13:50:42.265Z",
     "watch_credit_seconds": 1200,
     "welcome_seen": false
   }
