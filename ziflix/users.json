@@ -3795,9 +3795,9 @@
     "role": "user",
     "banned": false,
     "created_at": "2026-09-15T11:49:46.099Z",
-    "last_login": "2026-09-20T23:59:50.227Z",
+    "last_login": "2026-09-30T00:14:26.439Z",
     "ip": "167.17.64.193",
-    "last_ip": "2001:4278:23:5ad9:980e:d489:2d6e:b226"
+    "last_ip": "2001:4278:20:d70b:e56c:94d8:164d:80a7"
   },
   {
     "id": "u_1789473983090_1572b072",
@@ -9198,9 +9198,9 @@
     "role": "user",
     "banned": false,
     "ip": "200.113.238.155",
-    "last_ip": "200.113.238.155",
+    "last_ip": "200.113.238.83",
     "created_at": "2026-09-24T20:48:07.158Z",
-    "last_login": "2026-09-24T20:48:07.158Z",
+    "last_login": "2026-09-30T00:19:14.382Z",
     "watch_credit_seconds": 1200,
     "welcome_seen": false
   },
@@ -23358,5 +23358,20 @@
     "last_login": "2026-09-29T22:01:45.577Z",
     "ip": "2001:4958:3dba:6e01:842b:f8c6:54fd:4786",
     "last_ip": "2001:4958:3dba:6e01:842b:f8c6:54fd:4786"
+  },
+  {
+    "id": "u_1790727331215_54034cbb",
+    "username": "Aleca",
+    "password_hash": "92e38505c7badd7258a6b4d61d7939a322549c86d17116ad18938a891df72359d242c1ccaeef64a4d6c5f65121594c24d58781007c2973ed5d7f81f5c1dac574",
+    "salt": "6e2431557f90c86b859cb00cf1950858",
+    "avatar": "assets/avatars/avatar-3.svg",
+    "role": "user",
+    "banned": false,
+    "ip": "41.83.180.170",
+    "last_ip": "41.83.180.170",
+    "created_at": "2026-09-30T00:15:31.215Z",
+    "last_login": "2026-09-30T00:15:31.215Z",
+    "watch_credit_seconds": 1200,
+    "welcome_seen": false
   }
 ]
