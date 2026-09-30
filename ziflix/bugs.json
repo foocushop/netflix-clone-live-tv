@@ -1,5 +1,24 @@
 [
   {
+    "id": "bug_1790771753583_ee53c1",
+    "user_id": "u_1789345855398_6fa84fbe",
+    "username": "Aby",
+    "avatar": "assets/avatars/avatar-7.svg",
+    "category": "playback",
+    "title": "Signalement : La Villa des Cœurs Brisés S11E28",
+    "description": "",
+    "media_id": "xtream_series_6715",
+    "media_title": "La Villa des Cœurs Brisés",
+    "season": 11,
+    "episode": 28,
+    "episode_id": null,
+    "device_info": "iPhone (iOS) • Safari",
+    "user_agent": "Mozilla/5.0 (iPhone; CPU iPhone OS 26_3_1 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) CriOS/154.0.8037.55 Mobile/15E148 Safari/604.1",
+    "url": "https://ziablo.xyz/",
+    "status": "open",
+    "created_at": "2026-09-30T12:35:53.584Z"
+  },
+  {
     "id": "bug_1790766956241_80588e",
     "user_id": "u_1789557995611_a97b519a",
     "username": "christi",
