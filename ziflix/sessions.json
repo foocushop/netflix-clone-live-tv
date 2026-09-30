@@ -10096,5 +10096,13 @@
     "role": "user",
     "avatar": "assets/avatars/avatar-6.svg",
     "expires_at": 1793338123047
+  },
+  {
+    "token": "cca7f47a9b30173331b12faa80f1ba01479de7dc65a8c728386f9a335ae00d32",
+    "user_id": "u_1790751048775_99b6bfd0",
+    "username": "Rakelia",
+    "role": "user",
+    "avatar": "assets/avatars/avatar-1.svg",
+    "expires_at": 1793343048789
   }
 ]

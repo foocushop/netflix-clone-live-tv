@@ -23388,5 +23388,20 @@
     "last_login": "2026-09-30T05:28:43.020Z",
     "watch_credit_seconds": 1200,
     "welcome_seen": false
+  },
+  {
+    "id": "u_1790751048775_99b6bfd0",
+    "username": "Rakelia",
+    "password_hash": "2b5e898c5bf66608015a9ab5e1172e882da3db82099965346568220093fec92b61c1ab54172f2849ca7f927e3d992a65dc3f6666de9faedfb80dc3b3d6895581",
+    "salt": "ce417fd00d0cc0121215900164a89b89",
+    "avatar": "assets/avatars/avatar-1.svg",
+    "role": "user",
+    "banned": false,
+    "ip": "41.216.87.43",
+    "last_ip": "41.216.87.43",
+    "created_at": "2026-09-30T06:50:48.775Z",
+    "last_login": "2026-09-30T06:50:48.775Z",
+    "watch_credit_seconds": 1200,
+    "welcome_seen": false
   }
 ]
