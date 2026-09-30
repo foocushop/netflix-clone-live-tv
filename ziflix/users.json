@@ -2469,9 +2469,9 @@
     "role": "user",
     "banned": false,
     "created_at": "2026-09-14T09:34:08.058Z",
-    "last_login": "2026-09-14T22:11:57.172Z",
+    "last_login": "2026-09-30T20:45:18.076Z",
     "ip": "2a01:e0a:a8f:b130:4f20:f6ce:77c1:4ea9",
-    "last_ip": "2a01:e0a:a8f:b130:4f20:f6ce:77c1:4ea9"
+    "last_ip": "2a01:e0a:a8f:b130:92f0:d39f:2c7e:fcf1"
   },
   {
     "id": "u_1789378578660_1dbec1b4",
@@ -3951,9 +3951,9 @@
     "role": "user",
     "banned": false,
     "created_at": "2026-09-15T15:15:47.669Z",
-    "last_login": "2026-09-29T22:44:54.937Z",
+    "last_login": "2026-09-30T20:38:50.024Z",
     "ip": "196.168.116.116",
-    "last_ip": "196.168.206.69"
+    "last_ip": "196.168.192.87"
   },
   {
     "id": "u_1789485497175_51adfaa6",
@@ -8042,7 +8042,7 @@
     "role": "user",
     "banned": false,
     "ip": "2a02:1811:341d:3400:e0f8:2516:bb8:158a",
-    "last_ip": "2a02:1811:341d:3400:e0f8:2516:bb8:158a",
+    "last_ip": "2a02:1811:341d:3400:9bb:76fe:11d6:37b4",
     "created_at": "2026-09-23T23:43:31.505Z",
     "last_login": "2026-09-23T23:43:31.505Z"
   },
@@ -23521,6 +23521,36 @@
     "last_ip": "2a01:cb08:82c8:1900:dc3d:f37:101c:956f",
     "created_at": "2026-09-30T17:15:51.468Z",
     "last_login": "2026-09-30T17:15:51.468Z",
+    "watch_credit_seconds": 1200,
+    "welcome_seen": false
+  },
+  {
+    "id": "u_1790799760714_7e6efdf4",
+    "username": "Rakelia08",
+    "password_hash": "f65fe19a6b09ecbb275435105b550c89394ff3287869cabd914d475fc9c4e2454fa65881b2caaa6db3dad37c8a04824a2598f43e07de47ed6ba06e84dde5623d",
+    "salt": "eff8dfb1ce721a58c53bfda3f0890ec8",
+    "avatar": "assets/avatars/avatar-1.svg",
+    "role": "user",
+    "banned": false,
+    "ip": "41.216.87.43",
+    "last_ip": "41.216.87.43",
+    "created_at": "2026-09-30T20:22:40.715Z",
+    "last_login": "2026-09-30T20:22:40.715Z",
+    "watch_credit_seconds": 1200,
+    "welcome_seen": false
+  },
+  {
+    "id": "u_1790800636504_cc238e1e",
+    "username": "spydi",
+    "password_hash": "bc3d0bf9e62dbb8028c768065307c0c497c960889b5f3cc5a6751e29ba068ba6b026d7df62f589ce4ea95ecf6be62e3cfba5ab88e2b20dbab771b4f8ee89c606",
+    "salt": "c7b2f66693e80f7dbd8b25a73b42dec7",
+    "avatar": "assets/avatars/avatar-1.svg",
+    "role": "user",
+    "banned": false,
+    "ip": "104.205.109.104",
+    "last_ip": "104.205.109.104",
+    "created_at": "2026-09-30T20:37:16.504Z",
+    "last_login": "2026-09-30T20:37:16.504Z",
     "watch_credit_seconds": 1200,
     "welcome_seen": false
   }
