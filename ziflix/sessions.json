@@ -10192,5 +10192,13 @@
     "role": "user",
     "avatar": "assets/avatars/avatar-1.svg",
     "expires_at": 1793380551484
+  },
+  {
+    "token": "39728d83cd165565e673e92f3662116ca0fe72c89e9329b6d677a9f0d344904f",
+    "user_id": "u_1790447911928_f20fc323",
+    "username": "Sam28",
+    "role": "user",
+    "avatar": "assets/avatars/avatar-3.svg",
+    "expires_at": 1793385699710
   }
 ]
