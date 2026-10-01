@@ -25168,5 +25168,35 @@
     "last_login": "2026-10-01T20:24:33.005Z",
     "watch_credit_seconds": 1200,
     "welcome_seen": false
+  },
+  {
+    "id": "u_1790889938638_806ab141",
+    "username": "madre",
+    "password_hash": "a1d946635258e45f60bd1eae260d1c07c261e08cd2ae01dae79485d036ddfb3a1d1ed4480d00e7043f45c31134fd434f21511826726d7df39b4ce0f6c558936e",
+    "salt": "ce26b2c4a2e8ca3059accbd9aced48b4",
+    "avatar": "assets/avatars/avatar-1.svg",
+    "role": "user",
+    "banned": false,
+    "ip": "41.92.43.252",
+    "last_ip": "41.92.43.252",
+    "created_at": "2026-10-01T21:25:38.638Z",
+    "last_login": "2026-10-01T21:25:38.638Z",
+    "watch_credit_seconds": 1200,
+    "welcome_seen": false
+  },
+  {
+    "id": "u_1790890806730_b19efd49",
+    "username": "ferielaffiane07@gmail.com",
+    "password_hash": "808d2b0a3ccdb1ac4c3116a4587cf131d7d381210f4fb562d0d3951a2cb8d075715420245d0de44919740a111f36d8e626200358c7b1a5605dee4d9ae13bb6d8",
+    "salt": "4d3fd8ce53675927c7475b60b041c5d0",
+    "avatar": "assets/avatars/avatar-1.svg",
+    "role": "user",
+    "banned": false,
+    "ip": "105.100.173.160",
+    "last_ip": "105.100.173.160",
+    "created_at": "2026-10-01T21:40:06.730Z",
+    "last_login": "2026-10-01T21:40:06.730Z",
+    "watch_credit_seconds": 1200,
+    "welcome_seen": false
   }
 ]
