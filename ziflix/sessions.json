@@ -10352,5 +10352,13 @@
     "role": "user",
     "avatar": "assets/avatars/avatar-9.svg",
     "expires_at": 1793449769492
+  },
+  {
+    "token": "9f3aef5eec1949484f63b7b6e4829c0f46c9d088c43ff53759cc658c40c93f4d",
+    "user_id": "u_1789485155582_67f068ba",
+    "username": "oli",
+    "role": "user",
+    "avatar": "assets/avatars/avatar-1.svg",
+    "expires_at": 1793461510308
   }
 ]
