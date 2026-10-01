@@ -1131,46 +1131,46 @@
       "published_at_sd": "2026-09-30T17:53:35.431Z"
     },
     {
-      "id": "486010",
-      "episode_num": 18,
-      "title": "Les Apprentis Aventuriers (2016) - S09E18 - Épisode 18",
-      "published_at": "2026-09-30T17:55:27.149Z",
+      "id": "manual_series_9066_s9_E19",
+      "episode_num": 19,
+      "title": "Les Apprentis Aventuriers - S09E19 - Episode 19",
+      "published_at": "2026-10-01T18:50:45.157Z",
       "hd_published": true,
       "sd_published": false,
-      "telegram_msg_id_hd": 147,
+      "telegram_msg_id_hd": 149,
       "telegram_msg_id_sd": null,
       "file_ref_hd": {
-        "id": "5904426953540115622",
-        "access_hash": "3936504070917457611",
-        "file_reference": "BgAAAAEIDwTcAAAAk2q9TQ6p9K6MG+oijgF2sv4uqN/0",
+        "id": "5906678753353802332",
+        "access_hash": "-856341914969704582",
+        "file_reference": "BgAAAAEIDwTcAAAAlWq+q4SMN089QXjho6KPrDavUEEg",
         "mime_type": "video/mp4",
-        "size": 296510734,
+        "size": 1237366787,
         "dc_id": 4
       },
       "file_ref_sd": null,
-      "published_at_hd": "2026-09-30T17:55:27.149Z",
-      "telegram_msg_id": 147
+      "published_at_hd": "2026-10-01T18:50:45.157Z",
+      "telegram_msg_id": 149
     },
     {
-      "id": "487198",
-      "episode_num": 19,
-      "title": "Les Apprentis Aventuriers (2016) - S09E19 - Épisode 19",
-      "published_at": "2026-09-30T17:57:11.683Z",
+      "id": "manual_series_9066_s9_E18",
+      "episode_num": 18,
+      "title": "Les Apprentis Aventuriers - S09E18 - Episode 18",
+      "published_at": "2026-10-01T19:11:35.521Z",
       "hd_published": true,
       "sd_published": false,
-      "telegram_msg_id_hd": 148,
+      "telegram_msg_id_hd": 150,
       "telegram_msg_id_sd": null,
       "file_ref_hd": {
-        "id": "5904426953540115623",
-        "access_hash": "-4879895899461755524",
-        "file_reference": "BgAAAAEIDwTcAAAAlGq9TXdjTrxo6gzDM/BjUrkbN5sS",
+        "id": "5906678753353802345",
+        "access_hash": "4740822267914174163",
+        "file_reference": "BgAAAAEIDwTcAAAAlmq+sGd5ENZRex6je+rb/2slOwDQ",
         "mime_type": "video/mp4",
-        "size": 272869470,
+        "size": 1271956414,
         "dc_id": 4
       },
       "file_ref_sd": null,
-      "published_at_hd": "2026-09-30T17:57:11.683Z",
-      "telegram_msg_id": 148
+      "published_at_hd": "2026-10-01T19:11:35.521Z",
+      "telegram_msg_id": 150
     }
   ],
   "series_test_s1": [
