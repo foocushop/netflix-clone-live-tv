@@ -10336,5 +10336,13 @@
     "role": "user",
     "avatar": "assets/avatars/avatar-9.svg",
     "expires_at": 1793418386712
+  },
+  {
+    "token": "ef4c7b43c472c48a3bbb6faf9c824ab00151672ca76d2eacd0e464ede60929f5",
+    "user_id": "u_1790274350119_74c4edf1",
+    "username": "Nena",
+    "role": "user",
+    "avatar": "assets/avatars/avatar-1.svg",
+    "expires_at": 1793448717546
   }
 ]
