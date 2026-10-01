@@ -3665,9 +3665,9 @@
     "role": "user",
     "banned": false,
     "created_at": "2026-09-15T07:54:29.824Z",
-    "last_login": "2026-09-26T19:56:28.744Z",
+    "last_login": "2026-10-01T12:29:29.477Z",
     "ip": "2a01:e0a:1076:8bb0:49a6:6112:899c:8145",
-    "last_ip": "2a0d:e487:131f:4810:29b4:d9ec:e5e6:6d9d"
+    "last_ip": "2a01:e0a:1076:8bb0:44a5:94eb:e6bd:5c47"
   },
   {
     "id": "u_1789458871928_f79a6798",
@@ -25108,5 +25108,20 @@
     "last_login": "2026-10-01T06:14:38.733Z",
     "ip": "81.250.128.158",
     "last_ip": "81.250.128.158"
+  },
+  {
+    "id": "u_1790859380838_9d9f86dd",
+    "username": "arzi",
+    "password_hash": "6cb5de53fc0bd9928c3e967d44fe791de2c13dea4ebf89537fe977173c89309dd1294a1d529058b869ab4568bec8e54053f07abf33f1a0e69b59d8d717357c18",
+    "salt": "4abaeb07b47e5f1d059a4f25982f2b60",
+    "avatar": "assets/avatars/avatar-1.svg",
+    "role": "user",
+    "banned": false,
+    "ip": "196.20.216.137",
+    "last_ip": "196.20.216.137",
+    "created_at": "2026-10-01T12:56:20.839Z",
+    "last_login": "2026-10-01T12:56:20.839Z",
+    "watch_credit_seconds": 1200,
+    "welcome_seen": false
   }
 ]
