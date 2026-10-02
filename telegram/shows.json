@@ -11,7 +11,8 @@
     "source_priority": "foxbleu",
     "tf1_program_slug": "la-villa-des-coeurs-brises",
     "tf1_channel_slug": "tfx",
-    "delayed_release": false
+    "delayed_release": false,
+    "photo": "/var/www/telegram-reality-publisher/assets/shows/series_6715_s11.jpg"
   },
   {
     "id": "series_9066_s9",
@@ -23,6 +24,7 @@
     "channel_id": "-1004430169308",
     "enabled": true,
     "source_priority": "foxbleu",
-    "delayed_release": false
+    "delayed_release": false,
+    "photo": "/var/www/telegram-reality-publisher/assets/shows/series_9066_s9.jpg"
   }
 ]
