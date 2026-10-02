@@ -676,6 +676,27 @@
       "file_ref_sd": null,
       "published_at_hd": "2026-10-02T11:44:06.922Z",
       "telegram_msg_id": 152
+    },
+    {
+      "id": "487567",
+      "episode_num": 32,
+      "title": "La Villa des Cœurs Brisés (2015) - S11E32 - Episode 32",
+      "published_at": "2026-10-02T19:46:28.928Z",
+      "hd_published": true,
+      "sd_published": false,
+      "telegram_msg_id_hd": 156,
+      "telegram_msg_id_sd": null,
+      "file_ref_hd": {
+        "id": "5911239231233072780",
+        "access_hash": "-4062429479510372754",
+        "file_reference": "BgAAAAEIDwTcAAAAnGrAChQ92RirFeWqi5bsfc0GnGrF",
+        "mime_type": "video/mp4",
+        "size": 1374629202,
+        "dc_id": 4
+      },
+      "file_ref_sd": null,
+      "published_at_hd": "2026-10-02T19:46:28.928Z",
+      "telegram_msg_id": 156
     }
   ],
   "series_9066_s9": [
