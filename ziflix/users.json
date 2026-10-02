@@ -7613,9 +7613,9 @@
     "role": "user",
     "banned": false,
     "ip": "2a02:8440:9500:1b98:dc77:a78e:4b6f:11d4",
-    "last_ip": "2a02:8440:9505:38c3:cd86:b57b:a317:3953",
+    "last_ip": "2a02:8440:9507:1878:71fb:517b:ce9d:905b",
     "created_at": "2026-09-22T00:11:23.510Z",
-    "last_login": "2026-09-25T23:25:54.722Z"
+    "last_login": "2026-10-02T11:04:31.378Z"
   },
   {
     "id": "u_1790045119155_de4526d3",
@@ -25241,6 +25241,36 @@
     "last_ip": "102.129.75.235",
     "created_at": "2026-10-01T22:59:06.215Z",
     "last_login": "2026-10-01T23:53:25.827Z",
+    "watch_credit_seconds": 1200,
+    "welcome_seen": false
+  },
+  {
+    "id": "u_1790938756860_1f1c1f46",
+    "username": "Rakeliaa",
+    "password_hash": "0bf6c115f909272211273da79f96869b370a5a3b0e6a10345da8bbbf6a06a77aa595a153d934ff556e4c70c98a82532f41b2df5552e0f6a8b218e669670d782e",
+    "salt": "eba128e1f27e983b84bed8fd26c4c4f0",
+    "avatar": "assets/avatars/avatar-1.svg",
+    "role": "user",
+    "banned": false,
+    "ip": "102.212.183.10",
+    "last_ip": "102.212.183.10",
+    "created_at": "2026-10-02T10:59:16.860Z",
+    "last_login": "2026-10-02T10:59:16.860Z",
+    "watch_credit_seconds": 1200,
+    "welcome_seen": false
+  },
+  {
+    "id": "u_1790939608264_2027a6bb",
+    "username": "Rakeliaaa",
+    "password_hash": "d939a8362bd71864e286773369397b6ec68ff6e07aa5bc52aa4de1c7f11f355d41dd3c76be7353a71ec77b76ce9510ea539f3c7921d4fd2ceb2f8f40d9bb0d73",
+    "salt": "888c47577a43af10ace2dc43aa356172",
+    "avatar": "assets/avatars/avatar-1.svg",
+    "role": "user",
+    "banned": false,
+    "ip": "102.212.183.10",
+    "last_ip": "102.212.183.10",
+    "created_at": "2026-10-02T11:13:28.264Z",
+    "last_login": "2026-10-02T11:13:28.264Z",
     "watch_credit_seconds": 1200,
     "welcome_seen": false
   }
