@@ -634,6 +634,48 @@
       "file_ref_sd": null,
       "published_at_hd": "2026-09-29T20:43:05.451Z",
       "telegram_msg_id": 111
+    },
+    {
+      "id": "487328",
+      "episode_num": 30,
+      "title": "La Villa des Cœurs Brisés (2015) - S11E30 - Episode 30",
+      "published_at": "2026-10-02T11:39:18.132Z",
+      "hd_published": true,
+      "sd_published": false,
+      "telegram_msg_id_hd": 151,
+      "telegram_msg_id_sd": null,
+      "file_ref_hd": {
+        "id": "5908987431419388035",
+        "access_hash": "-4200795433849773680",
+        "file_reference": "BgAAAAEIDwTcAAAAl2q/l+XDB3rkq93I8t97dxyUz9N8",
+        "mime_type": "video/x-matroska",
+        "size": 727314370,
+        "dc_id": 4
+      },
+      "file_ref_sd": null,
+      "published_at_hd": "2026-10-02T11:39:18.132Z",
+      "telegram_msg_id": 151
+    },
+    {
+      "id": "487329",
+      "episode_num": 31,
+      "title": "La Villa des Cœurs Brisés (2015) - S11E31",
+      "published_at": "2026-10-02T11:44:06.922Z",
+      "hd_published": true,
+      "sd_published": false,
+      "telegram_msg_id_hd": 152,
+      "telegram_msg_id_sd": null,
+      "file_ref_hd": {
+        "id": "5908987431419388037",
+        "access_hash": "-7412054531861771379",
+        "file_reference": "BgAAAAEIDwTcAAAAmGq/mQbo4+PqK6wl4u4lwlhXSict",
+        "mime_type": "video/x-matroska",
+        "size": 1266611305,
+        "dc_id": 4
+      },
+      "file_ref_sd": null,
+      "published_at_hd": "2026-10-02T11:44:06.922Z",
+      "telegram_msg_id": 152
     }
   ],
   "series_9066_s9": [
