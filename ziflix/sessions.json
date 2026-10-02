@@ -10608,5 +10608,13 @@
     "role": "user",
     "avatar": "assets/avatars/avatar-8.svg",
     "expires_at": 1793534941749
+  },
+  {
+    "token": "9e79337ddbbf16858f7d26d0f14f37bd7ee63faaf269fa54dc94218eee1a0d50",
+    "user_id": "u_1789383494548_4b9461f3",
+    "username": "Aude marion24",
+    "role": "user",
+    "avatar": "assets/avatars/avatar-1.svg",
+    "expires_at": 1793539596405
   }
 ]
