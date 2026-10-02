@@ -639,22 +639,22 @@
       "id": "487328",
       "episode_num": 30,
       "title": "La Villa des Cœurs Brisés (2015) - S11E30 - Episode 30",
-      "published_at": "2026-10-02T12:45:40.438Z",
+      "published_at": "2026-10-02T12:47:14.106Z",
       "hd_published": true,
       "sd_published": false,
-      "telegram_msg_id_hd": 153,
+      "telegram_msg_id_hd": 155,
       "telegram_msg_id_sd": null,
       "file_ref_hd": {
-        "id": "5908987431419388080",
-        "access_hash": "2228513225875581986",
-        "file_reference": "BgAAAAEIDwTcAAAAmWq/p3R13aHDJjj2Esh8Crmih4aI",
+        "id": "5908987431419388082",
+        "access_hash": "-4091700977895238434",
+        "file_reference": "BgAAAAEIDwTcAAAAm2q/p9EPaLYVc25biSU/5ChNnPsQ",
         "mime_type": "video/mp4",
         "size": 806245266,
         "dc_id": 4
       },
       "file_ref_sd": null,
-      "published_at_hd": "2026-10-02T12:45:40.438Z",
-      "telegram_msg_id": 153
+      "published_at_hd": "2026-10-02T12:47:14.106Z",
+      "telegram_msg_id": 155
     },
     {
       "id": "487329",
