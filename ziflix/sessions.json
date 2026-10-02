@@ -10552,5 +10552,13 @@
     "role": "user",
     "avatar": "assets/avatars/avatar-9.svg",
     "expires_at": 1793491815132
+  },
+  {
+    "token": "c0c3489f2a6f8c209448a027c77d6fdacb78b647a4ed855958f7b7b473e80758",
+    "user_id": "u_1789458869824_e5248185",
+    "username": "Lilith",
+    "role": "user",
+    "avatar": "assets/avatars/avatar-9.svg",
+    "expires_at": 1793507575049
   }
 ]
