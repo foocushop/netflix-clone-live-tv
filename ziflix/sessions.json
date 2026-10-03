@@ -6778,14 +6778,6 @@
     "expires_at": 1792867124931
   },
   {
-    "token": "4e85de490c526807bba3ecbd0db53056b13037fd00a41add8fa716edc0d390a3",
-    "user_id": "u_1790275132735_801e1dda",
-    "username": "eelenajr@gmail.com",
-    "role": "user",
-    "avatar": "assets/avatars/avatar-1.svg",
-    "expires_at": 1792867132739
-  },
-  {
     "token": "a7ce9a3f5352ad2dfd0be65bc01f7ff15113d1c7bd6a4b84519dca031269cba8",
     "user_id": "u_1790275151739_d1c4aa1b",
     "username": "melaniendione29@gmail.com",
@@ -10841,5 +10833,13 @@
     "role": "user",
     "avatar": "assets/avatars/avatar-1.svg",
     "expires_at": 1793642250667
+  },
+  {
+    "token": "65b562ff36154a37dbc26caa0f9e4c417d1b6bc08e819249fabef87f0c5276c5",
+    "user_id": "u_1789458869824_e5248185",
+    "username": "Lilith",
+    "role": "user",
+    "avatar": "assets/avatars/avatar-9.svg",
+    "expires_at": 1793648483857
   }
 ]
