@@ -10745,5 +10745,13 @@
     "role": "user",
     "avatar": "assets/avatars/avatar-1.svg",
     "expires_at": 1793600787293
+  },
+  {
+    "token": "a1521b2070e1b835f2469ce7ce858f07835cd7a66a99109ac4d0d8bb0f4bce8e",
+    "user_id": "u_1790895546215_dc20f137",
+    "username": "Keth03",
+    "role": "user",
+    "avatar": "assets/avatars/avatar-1.svg",
+    "expires_at": 1793618169262
   }
 ]
