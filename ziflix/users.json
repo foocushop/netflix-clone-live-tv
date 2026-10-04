@@ -26719,5 +26719,20 @@
     "last_login": "2026-10-04T10:27:06.209Z",
     "watch_credit_seconds": 1200,
     "welcome_seen": false
+  },
+  {
+    "id": "u_1791112993106_e75e3b34",
+    "username": "NaelZpae",
+    "password_hash": "28aa42b1d88dc56ad6cc4bab72476bcfc8e53ee194376a78f8eb87e5f656ff9fcc09df42e360d2ca050b5e8f938168ed30a311772c12a29b5b2665eb91578333",
+    "salt": "3e2782b47103017c49081c6a5ebc949c",
+    "avatar": "assets/avatars/avatar-1.svg",
+    "role": "user",
+    "banned": false,
+    "ip": "88.166.8.110",
+    "last_ip": "88.166.8.110",
+    "created_at": "2026-10-04T11:23:13.106Z",
+    "last_login": "2026-10-04T11:23:13.106Z",
+    "watch_credit_seconds": 1200,
+    "welcome_seen": false
   }
 ]

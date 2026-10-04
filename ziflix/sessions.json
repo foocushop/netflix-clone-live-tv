@@ -10881,5 +10881,13 @@
     "role": "user",
     "avatar": "assets/avatars/avatar-1.svg",
     "expires_at": 1793701626263
+  },
+  {
+    "token": "2dde9bfa2dfdbadf019420713ed5645a961506a1244885b7f76018eb323c0f32",
+    "user_id": "u_1791112993106_e75e3b34",
+    "username": "NaelZpae",
+    "role": "user",
+    "avatar": "assets/avatars/avatar-1.svg",
+    "expires_at": 1793704993145
   }
 ]
