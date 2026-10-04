@@ -1,5 +1,24 @@
 [
   {
+    "id": "bug_1791150825431_51adbb",
+    "user_id": "u_1789380774102_bb9a8099",
+    "username": "Marina",
+    "avatar": "assets/avatars/avatar-1.svg",
+    "category": "playback",
+    "title": "Signalement problème",
+    "description": "",
+    "media_id": "",
+    "media_title": "",
+    "season": null,
+    "episode": null,
+    "episode_id": null,
+    "device_info": "iPhone (iOS) • Safari",
+    "user_agent": "Mozilla/5.0 (iPhone; CPU iPhone OS 18_7 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/26.5.2 Mobile/15E148 Safari/604.1",
+    "url": "https://ziablo.xyz/",
+    "status": "open",
+    "created_at": "2026-10-04T21:53:45.433Z"
+  },
+  {
     "id": "bug_1791109833027_7b0edb",
     "user_id": "u_1791109626208_803ad983",
     "username": "Titif",
