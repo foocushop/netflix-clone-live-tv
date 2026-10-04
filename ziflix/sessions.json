@@ -10873,5 +10873,13 @@
     "role": "user",
     "avatar": "assets/avatars/avatar-4.svg",
     "expires_at": 1793665215829
+  },
+  {
+    "token": "40052bf919782c43ae48d524a80cb147001d09b440780ca0009005bbf3e6dfb0",
+    "user_id": "u_1791109626208_803ad983",
+    "username": "Titif",
+    "role": "user",
+    "avatar": "assets/avatars/avatar-1.svg",
+    "expires_at": 1793701626263
   }
 ]
