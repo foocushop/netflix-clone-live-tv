@@ -2573,9 +2573,9 @@
     "role": "user",
     "banned": false,
     "created_at": "2026-09-14T10:12:54.102Z",
-    "last_login": "2026-09-14T10:14:03.341Z",
+    "last_login": "2026-10-04T20:06:37.283Z",
     "ip": "2a01:e0a:863:3ce0:6454:5ea3:56fc:4f26",
-    "last_ip": "2a01:e0a:863:3ce0:6454:5ea3:56fc:4f26"
+    "last_ip": "2a01:e0a:863:3ce0:b532:ac40:2a1c:5c8f"
   },
   {
     "id": "u_1789381726100_14a67e02",
@@ -25238,9 +25238,9 @@
     "role": "user",
     "banned": false,
     "ip": "102.129.75.235",
-    "last_ip": "160.113.0.106",
+    "last_ip": "160.113.0.118",
     "created_at": "2026-10-01T22:59:06.215Z",
-    "last_login": "2026-10-03T11:16:09.242Z",
+    "last_login": "2026-10-04T20:22:28.688Z",
     "watch_credit_seconds": 1200,
     "welcome_seen": false
   },
@@ -26762,6 +26762,21 @@
     "last_ip": "2a01:cb08:82c8:1900:dc3d:f37:101c:956f",
     "created_at": "2026-10-04T16:04:14.592Z",
     "last_login": "2026-10-04T16:04:14.592Z",
+    "watch_credit_seconds": 1200,
+    "welcome_seen": false
+  },
+  {
+    "id": "u_1791144452646_b4c27dcf",
+    "username": "Jagde34",
+    "password_hash": "ccd6b405818d7fcc1b5a27c24daf99f56c0c2e8e93e1d7bf57992435000a7f34dcd85cec14518082bd0964f53abf9053e6ca3dd9e3ae2652666069a39e463176",
+    "salt": "9afc19cb40c8a41198be1286f8b3f134",
+    "avatar": "assets/avatars/avatar-1.svg",
+    "role": "user",
+    "banned": false,
+    "ip": "2a0d:e487:414e:1ffd:1a9:bd52:ba49:31d3",
+    "last_ip": "82.216.149.138",
+    "created_at": "2026-10-04T20:07:32.646Z",
+    "last_login": "2026-10-04T20:11:54.651Z",
     "watch_credit_seconds": 1200,
     "welcome_seen": false
   }
