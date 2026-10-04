@@ -1234,6 +1234,27 @@
       "file_ref_sd": null,
       "published_at_hd": "2026-10-01T19:11:35.521Z",
       "telegram_msg_id": 150
+    },
+    {
+      "id": "488195",
+      "episode_num": 20,
+      "title": "Les Apprentis Aventuriers (2016) - S09E20 - Épisode 20",
+      "published_at": "2026-10-04T16:13:21.275Z",
+      "hd_published": true,
+      "sd_published": false,
+      "telegram_msg_id_hd": 157,
+      "telegram_msg_id_sd": null,
+      "file_ref_hd": {
+        "id": "5913244474154164804",
+        "access_hash": "1312469336003274700",
+        "file_reference": "BgAAAAEIDwTcAAAAnWrCeyH1EWoAc6Aw2wfjH9u9TW8/",
+        "mime_type": "video/mp4",
+        "size": 1244937376,
+        "dc_id": 4
+      },
+      "file_ref_sd": null,
+      "published_at_hd": "2026-10-04T16:13:21.275Z",
+      "telegram_msg_id": 157
     }
   ],
   "series_test_s1": [
