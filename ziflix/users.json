@@ -8096,7 +8096,7 @@
     "ip": "41.231.61.130",
     "last_ip": "41.231.61.130",
     "created_at": "2026-09-24T13:07:42.299Z",
-    "last_login": "2026-09-24T13:07:42.299Z"
+    "last_login": "2026-10-05T13:34:46.940Z"
   },
   {
     "id": "u_1790263829495_4eb6a9ad",
@@ -26792,6 +26792,21 @@
     "last_ip": "2001:861:20c3:3a50:2545:3a5d:15f7:746c",
     "created_at": "2026-10-05T08:54:02.742Z",
     "last_login": "2026-10-05T08:54:02.742Z",
+    "watch_credit_seconds": 1200,
+    "welcome_seen": false
+  },
+  {
+    "id": "u_1791205849352_f824cbd7",
+    "username": "Toulaye-23",
+    "password_hash": "bd588aa0c2c2a3d192be3bc2e166956bebd65b8714937e69274fb479c53a267c1a28aca86f2bb5818bd55f92125b2538f5bd1ca866d06b12ac518138423bdb3a",
+    "salt": "6535d273a204470235138fa99c76c2d7",
+    "avatar": "assets/avatars/avatar-1.svg",
+    "role": "user",
+    "banned": false,
+    "ip": "41.82.68.181",
+    "last_ip": "41.82.68.181",
+    "created_at": "2026-10-05T13:10:49.352Z",
+    "last_login": "2026-10-05T13:10:49.352Z",
     "watch_credit_seconds": 1200,
     "welcome_seen": false
   }
