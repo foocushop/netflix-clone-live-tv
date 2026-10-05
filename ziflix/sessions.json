@@ -11033,5 +11033,13 @@
     "role": "user",
     "avatar": "assets/avatars/avatar-1.svg",
     "expires_at": 1793799286965
+  },
+  {
+    "token": "ff80903d2b855eae1508459bdc93bd47b112870f7ca492301ae867bf784eb793",
+    "user_id": "u_1791211610329_3a556044",
+    "username": "sarahagst",
+    "role": "user",
+    "avatar": "assets/avatars/avatar-1.svg",
+    "expires_at": 1793803610352
   }
 ]

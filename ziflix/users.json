@@ -26809,5 +26809,20 @@
     "last_login": "2026-10-05T13:10:49.352Z",
     "watch_credit_seconds": 1200,
     "welcome_seen": false
+  },
+  {
+    "id": "u_1791211610329_3a556044",
+    "username": "sarahagst",
+    "password_hash": "518bf5d94e471a0af2a5b943ad8f539782dc628e9f72becafe9b91de5d57aafe9eef582759982e711c00e67af22364371b222b1f961bf4cf6cf1caa4032b7bca",
+    "salt": "03c31e6748eb7f311c994c531ba5af34",
+    "avatar": "assets/avatars/avatar-1.svg",
+    "role": "user",
+    "banned": false,
+    "ip": "2a02:842a:1245:8e01:f82f:5626:d490:95e1",
+    "last_ip": "2a02:842a:1245:8e01:f82f:5626:d490:95e1",
+    "created_at": "2026-10-05T14:46:50.329Z",
+    "last_login": "2026-10-05T14:46:50.329Z",
+    "watch_credit_seconds": 1200,
+    "welcome_seen": false
   }
 ]
