@@ -697,6 +697,27 @@
       "file_ref_sd": null,
       "published_at_hd": "2026-10-02T19:46:28.928Z",
       "telegram_msg_id": 156
+    },
+    {
+      "id": "488444",
+      "episode_num": 33,
+      "title": "La Villa des Cœurs Brisés (2015) - S11E33 - Episode 33",
+      "published_at": "2026-10-05T20:25:58.570Z",
+      "hd_published": true,
+      "sd_published": false,
+      "telegram_msg_id_hd": 158,
+      "telegram_msg_id_sd": null,
+      "file_ref_hd": {
+        "id": "5917980186699120019",
+        "access_hash": "-7932352971100478335",
+        "file_reference": "BgAAAAEIDwTcAAAAnmrEB9a97KHUoCLwmCTILFnWMVgr",
+        "mime_type": "video/mp4",
+        "size": 788705590,
+        "dc_id": 4
+      },
+      "file_ref_sd": null,
+      "published_at_hd": "2026-10-05T20:25:58.570Z",
+      "telegram_msg_id": 158
     }
   ],
   "series_9066_s9": [
@@ -1255,6 +1276,27 @@
       "file_ref_sd": null,
       "published_at_hd": "2026-10-04T16:13:21.275Z",
       "telegram_msg_id": 157
+    },
+    {
+      "id": "488445",
+      "episode_num": 21,
+      "title": "Les Apprentis Aventuriers (2016) - S09E21 - Épisode 21",
+      "published_at": "2026-10-05T20:32:29.374Z",
+      "hd_published": true,
+      "sd_published": false,
+      "telegram_msg_id_hd": 159,
+      "telegram_msg_id_sd": null,
+      "file_ref_hd": {
+        "id": "5917980186699120026",
+        "access_hash": "8189057811828686580",
+        "file_reference": "BgAAAAEIDwTcAAAAn2rECV0ZbvU52mKrm4ZLnxFMsgP1",
+        "mime_type": "video/mp4",
+        "size": 1158935820,
+        "dc_id": 4
+      },
+      "file_ref_sd": null,
+      "published_at_hd": "2026-10-05T20:32:29.374Z",
+      "telegram_msg_id": 159
     }
   ],
   "series_test_s1": [
