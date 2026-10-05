@@ -26824,5 +26824,35 @@
     "last_login": "2026-10-05T14:46:50.329Z",
     "watch_credit_seconds": 1200,
     "welcome_seen": false
+  },
+  {
+    "id": "u_1791217876218_0aae5632",
+    "username": "Rachel00",
+    "password_hash": "5149a0ee5e785d1ede73030616491b481eafa115a1c82da1328b7793a005d296bf9ac8c812eed1c38eb4eb89bec77bd2c9ba9d69c4a3cc763ef8f9ad0dce31db",
+    "salt": "1401a0d2422e7cfacefb3d49c2f876f0",
+    "avatar": "assets/avatars/avatar-1.svg",
+    "role": "user",
+    "banned": false,
+    "ip": "102.212.181.56",
+    "last_ip": "102.212.181.56",
+    "created_at": "2026-10-05T16:31:16.218Z",
+    "last_login": "2026-10-05T16:31:16.218Z",
+    "watch_credit_seconds": 1200,
+    "welcome_seen": false
+  },
+  {
+    "id": "u_1791218074398_88dd74ab",
+    "username": "Kriswell",
+    "password_hash": "de25a47d20463016bacc35a331e9f5326b152c32a6c172d518bdd401decb525eb06466b464cf4fe28499ca0a7ca9b2d261eca32e874023bf6f880ec4ac5d96c0",
+    "salt": "9a9c10ebb122d6511d9a3a8bf5b41da5",
+    "avatar": "assets/avatars/avatar-7.svg",
+    "role": "user",
+    "banned": false,
+    "ip": "82.28.112.167",
+    "last_ip": "82.28.112.167",
+    "created_at": "2026-10-05T16:34:34.398Z",
+    "last_login": "2026-10-05T16:34:34.398Z",
+    "watch_credit_seconds": 1200,
+    "welcome_seen": false
   }
 ]
