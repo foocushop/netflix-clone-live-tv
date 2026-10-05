@@ -25238,9 +25238,9 @@
     "role": "user",
     "banned": false,
     "ip": "102.129.75.235",
-    "last_ip": "160.113.0.118",
+    "last_ip": "102.129.81.243",
     "created_at": "2026-10-01T22:59:06.215Z",
-    "last_login": "2026-10-04T20:22:28.688Z",
+    "last_login": "2026-10-05T21:20:04.380Z",
     "watch_credit_seconds": 1200,
     "welcome_seen": false
   },
@@ -27806,6 +27806,21 @@
     "last_ip": "2a01:cb08:82df:8600:297e:f6be:559c:20d6",
     "created_at": "2026-10-05T20:04:44.826Z",
     "last_login": "2026-10-05T20:04:44.826Z",
+    "watch_credit_seconds": 1200,
+    "welcome_seen": false
+  },
+  {
+    "id": "u_1791234998550_f2cf5978",
+    "username": "alexhiba",
+    "password_hash": "f653ea4b85ce79640bc8d700b79b4dca377f2d0dda4274eba082aaa0367cc0fd9f51f3ab69fb47a31d19b7349c7b903ef6c6d5800bc0518a633c705c4b3e345b",
+    "salt": "08d15b70a6dc983f877ccd526c0365a1",
+    "avatar": "assets/avatars/avatar-10.svg",
+    "role": "user",
+    "banned": false,
+    "ip": "105.66.134.245",
+    "last_ip": "105.66.134.245",
+    "created_at": "2026-10-05T21:16:38.550Z",
+    "last_login": "2026-10-05T21:16:38.550Z",
     "watch_credit_seconds": 1200,
     "welcome_seen": false
   }

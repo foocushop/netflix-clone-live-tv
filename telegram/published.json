@@ -1297,6 +1297,27 @@
       "file_ref_sd": null,
       "published_at_hd": "2026-10-05T20:32:29.374Z",
       "telegram_msg_id": 159
+    },
+    {
+      "id": "488443",
+      "episode_num": 22,
+      "title": "Les Apprentis Aventuriers (2016) - S09E22 - Épisode 22",
+      "published_at": "2026-10-05T20:38:48.954Z",
+      "hd_published": true,
+      "sd_published": false,
+      "telegram_msg_id_hd": 160,
+      "telegram_msg_id_sd": null,
+      "file_ref_hd": {
+        "id": "5917980186699120033",
+        "access_hash": "7828756424055942443",
+        "file_reference": "BgAAAAEIDwTcAAAAoGrECthBx5aK+d8EAMB3+kG/qkvj",
+        "mime_type": "video/mp4",
+        "size": 1336959905,
+        "dc_id": 4
+      },
+      "file_ref_sd": null,
+      "published_at_hd": "2026-10-05T20:38:48.954Z",
+      "telegram_msg_id": 160
     }
   ],
   "series_test_s1": [
