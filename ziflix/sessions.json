@@ -10993,5 +10993,13 @@
     "role": "user",
     "avatar": "assets/avatars/avatar-1.svg",
     "expires_at": 1793737348706
+  },
+  {
+    "token": "35c713020e3eb13fb4d55f7c218e17636c761b99b83d70b7b6bc786e15a17552",
+    "user_id": "u_1789808759273_1549d8d4",
+    "username": "Sirantousylla",
+    "role": "user",
+    "avatar": "assets/avatars/avatar-1.svg",
+    "expires_at": 1793775988871
   }
 ]
