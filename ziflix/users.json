@@ -21940,9 +21940,9 @@
     "role": "user",
     "banned": false,
     "ip": "2001:42d8:4638:6e00:284f:d5bd:f6ee:b7bc",
-    "last_ip": "2001:42d8:4638:6e00:284f:d5bd:f6ee:b7bc",
+    "last_ip": "2001:42d8:4638:6e00:99b9:acae:69cf:5f4a",
     "created_at": "2026-09-29T17:28:37.384Z",
-    "last_login": "2026-09-29T17:28:37.384Z",
+    "last_login": "2026-10-05T08:54:30.646Z",
     "watch_credit_seconds": 1200,
     "welcome_seen": false
   },
@@ -26777,6 +26777,21 @@
     "last_ip": "82.216.149.138",
     "created_at": "2026-10-04T20:07:32.646Z",
     "last_login": "2026-10-04T20:11:54.651Z",
+    "watch_credit_seconds": 1200,
+    "welcome_seen": false
+  },
+  {
+    "id": "u_1791190442742_cd99a399",
+    "username": "Beverly720",
+    "password_hash": "8b06a0741b1f2000315b762fdef106c1f929c510a117dd5ed5d10baef015fb4cb2ff52f486c4742ebc599740d9922dac7ecfd34c1c4c0e8f7d5ac5a08471a025",
+    "salt": "9a5f0e699a5e9b8c9aee1ac3a76deff8",
+    "avatar": "assets/avatars/avatar-9.svg",
+    "role": "user",
+    "banned": false,
+    "ip": "2001:861:20c3:3a50:2545:3a5d:15f7:746c",
+    "last_ip": "2001:861:20c3:3a50:2545:3a5d:15f7:746c",
+    "created_at": "2026-10-05T08:54:02.742Z",
+    "last_login": "2026-10-05T08:54:02.742Z",
     "watch_credit_seconds": 1200,
     "welcome_seen": false
   }
