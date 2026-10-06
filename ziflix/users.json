@@ -7977,9 +7977,9 @@
     "role": "user",
     "banned": false,
     "ip": "2a0d:e487:69f:e83:3090:cc10:3e9:6d94",
-    "last_ip": "2a0d:e487:15df:6389:95dd:8eb5:f0b0:ce9d",
+    "last_ip": "2a0d:e487:156f:2219:d48d:4521:ed9e:7428",
     "created_at": "2026-09-23T17:56:55.844Z",
-    "last_login": "2026-09-25T20:47:22.381Z"
+    "last_login": "2026-10-06T16:24:38.149Z"
   },
   {
     "id": "u_1790187834994_8ed99933",
@@ -27866,6 +27866,21 @@
     "last_ip": "71.162.175.250",
     "created_at": "2026-10-06T14:52:21.456Z",
     "last_login": "2026-10-06T14:52:21.456Z",
+    "watch_credit_seconds": 1200,
+    "welcome_seen": false
+  },
+  {
+    "id": "u_1791301669628_ce290c0a",
+    "username": "gjgcjk",
+    "password_hash": "9264511570c6cf7a789db2efefa61b6f0901015fa2682e004745bf96c52f7e7f60757fde232dbb25c35f52f85c515f69f3835cf950606499d962c0f170b5289c",
+    "salt": "2144064ff9652aab5256086917a287fe",
+    "avatar": "assets/avatars/avatar-1.svg",
+    "role": "user",
+    "banned": false,
+    "ip": "2a01:cb08:82c8:1900:297e:f6be:559c:20d6",
+    "last_ip": "2a01:cb08:82c8:1900:297e:f6be:559c:20d6",
+    "created_at": "2026-10-06T15:47:49.628Z",
+    "last_login": "2026-10-06T15:47:49.628Z",
     "watch_credit_seconds": 1200,
     "welcome_seen": false
   }
