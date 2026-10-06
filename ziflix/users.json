@@ -3951,7 +3951,7 @@
     "role": "user",
     "banned": false,
     "created_at": "2026-09-15T15:15:47.669Z",
-    "last_login": "2026-10-06T19:11:55.330Z",
+    "last_login": "2026-10-06T22:38:21.827Z",
     "ip": "196.168.116.116",
     "last_ip": "196.169.10.129"
   },
@@ -7613,9 +7613,9 @@
     "role": "user",
     "banned": false,
     "ip": "2a02:8440:9500:1b98:dc77:a78e:4b6f:11d4",
-    "last_ip": "2a02:8440:9505:38c3:cd86:b57b:a317:3953",
+    "last_ip": "2a02:8440:950d:28c5:aca7:3c1f:b0a6:2933",
     "created_at": "2026-09-22T00:11:23.510Z",
-    "last_login": "2026-09-25T23:25:54.722Z"
+    "last_login": "2026-10-06T23:01:34.212Z"
   },
   {
     "id": "u_1790045119155_de4526d3",
@@ -27881,6 +27881,21 @@
     "last_ip": "2a01:cb08:82c8:1900:297e:f6be:559c:20d6",
     "created_at": "2026-10-06T15:47:49.628Z",
     "last_login": "2026-10-06T15:47:49.628Z",
+    "watch_credit_seconds": 1200,
+    "welcome_seen": false
+  },
+  {
+    "id": "u_1791326584883_db02fc94",
+    "username": "Jimmy20richard",
+    "password_hash": "dea24797a0e2f309269d786d05c0a2c9cd6e1d05922f865d3271687462c60093f84d0f6e700a760341a22dfb845e066be893a2e5f0e3cd4abbd50d3f4e95efdd",
+    "salt": "1c8632161c6263e3175184208207b43b",
+    "avatar": "assets/avatars/avatar-9.svg",
+    "role": "user",
+    "banned": false,
+    "ip": "41.78.139.46",
+    "last_ip": "41.78.139.46",
+    "created_at": "2026-10-06T22:43:04.884Z",
+    "last_login": "2026-10-06T22:43:04.884Z",
     "watch_credit_seconds": 1200,
     "welcome_seen": false
   }
