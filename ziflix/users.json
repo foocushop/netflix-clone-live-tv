@@ -27838,5 +27838,20 @@
     "last_login": "2026-10-05T21:58:20.024Z",
     "watch_credit_seconds": 1200,
     "welcome_seen": false
+  },
+  {
+    "id": "u_1791285411859_7021e59f",
+    "username": "Ruthdivine",
+    "password_hash": "6bab85ef22d0cbbad71767c36ec1861c0aa32850b88ab08312219070bdb0f3a27a273c20bb6aeec57c11de2e16e6c0157741e70527c2b9a242aa906aa8d71f56",
+    "salt": "705a1b7e5ebc75c298d9cfdfd3573772",
+    "avatar": "assets/avatars/avatar-1.svg",
+    "role": "user",
+    "banned": false,
+    "ip": "2c0f:e00:606:500:2438:75b9:bb7e:3b94",
+    "last_ip": "2c0f:e00:606:500:2438:75b9:bb7e:3b94",
+    "created_at": "2026-10-06T11:16:51.859Z",
+    "last_login": "2026-10-06T11:16:51.859Z",
+    "watch_credit_seconds": 1200,
+    "welcome_seen": false
   }
 ]
