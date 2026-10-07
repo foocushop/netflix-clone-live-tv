@@ -8042,7 +8042,7 @@
     "role": "user",
     "banned": false,
     "ip": "2a02:1811:341d:3400:e0f8:2516:bb8:158a",
-    "last_ip": "2a02:1811:341d:3400:e0f8:2516:bb8:158a",
+    "last_ip": "2a02:1811:341d:3400:8cb:620c:d724:8899",
     "created_at": "2026-09-23T23:43:31.505Z",
     "last_login": "2026-09-23T23:43:31.505Z"
   },
@@ -28430,5 +28430,20 @@
     "last_login": "2026-10-07T00:14:41.246Z",
     "ip": "2c0f:ef58:6c7:c000:a1b5:375e:9de8:f996",
     "last_ip": "2c0f:ef58:6c7:c000:a1b5:375e:9de8:f996"
+  },
+  {
+    "id": "u_1791372628625_1a18d368",
+    "username": "fvbhklk",
+    "password_hash": "d143c3b4a5e16735954188dfac80f3032f531e3d764041d0c89338c739671adc65c8fbcadcceb03e8a3948727744b8bfda5ff550b210eef3f65c8773a45ad0b3",
+    "salt": "b573445c60cfa13b580d51794f14bdbf",
+    "avatar": "assets/avatars/avatar-1.svg",
+    "role": "user",
+    "banned": false,
+    "ip": "2a01:cb08:82c8:1900:297e:f6be:559c:20d6",
+    "last_ip": "2a01:cb08:82c8:1900:297e:f6be:559c:20d6",
+    "created_at": "2026-10-07T11:30:28.625Z",
+    "last_login": "2026-10-07T11:30:28.625Z",
+    "watch_credit_seconds": 1200,
+    "welcome_seen": false
   }
 ]
