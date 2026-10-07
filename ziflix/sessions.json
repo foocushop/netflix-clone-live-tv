@@ -11313,5 +11313,13 @@
     "role": "user",
     "avatar": "assets/avatars/avatar-6.svg",
     "expires_at": 1793969422296
+  },
+  {
+    "token": "9fe8f95b13d815d53e20274e3155abb6b5469df61378ba4296af2ea18a214735",
+    "user_id": "u_1791383315174_70431e03",
+    "username": "Ruth Divine",
+    "role": "user",
+    "avatar": "assets/avatars/avatar-1.svg",
+    "expires_at": 1793975315196
   }
 ]

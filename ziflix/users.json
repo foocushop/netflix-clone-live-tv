@@ -28445,5 +28445,20 @@
     "last_login": "2026-10-07T11:30:28.625Z",
     "watch_credit_seconds": 1200,
     "welcome_seen": false
+  },
+  {
+    "id": "u_1791383315174_70431e03",
+    "username": "Ruth Divine",
+    "password_hash": "a69fb57fc74ca2a1634d3aea0593eae03cc17fd56c090d45cfb3dc24825e9d7a1c9adac4f1939ad266c970c4c6260f3058cec9945a72b6567b55a8d33e784ee3",
+    "salt": "bfef926cf7832600623bdd1cb8e4b102",
+    "avatar": "assets/avatars/avatar-1.svg",
+    "role": "user",
+    "banned": false,
+    "ip": "169.159.220.96",
+    "last_ip": "169.159.220.96",
+    "created_at": "2026-10-07T14:28:35.174Z",
+    "last_login": "2026-10-07T14:28:35.174Z",
+    "watch_credit_seconds": 1200,
+    "welcome_seen": false
   }
 ]
