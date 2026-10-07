@@ -718,6 +718,27 @@
       "file_ref_sd": null,
       "published_at_hd": "2026-10-05T20:25:58.570Z",
       "telegram_msg_id": 158
+    },
+    {
+      "id": "488590",
+      "episode_num": 34,
+      "title": "La Villa des Cœurs Brisés (2015) - S11E34 - Episode 34",
+      "published_at": "2026-10-07T00:33:21.218Z",
+      "hd_published": true,
+      "sd_published": false,
+      "telegram_msg_id_hd": 161,
+      "telegram_msg_id_sd": null,
+      "file_ref_hd": {
+        "id": "5922357638842031869",
+        "access_hash": "-6100288190709215555",
+        "file_reference": "BgAAAAEIDwTcAAAAoWrFk1Et+yLquGbFw4J84xbFqA7y",
+        "mime_type": "video/mp4",
+        "size": 1270397657,
+        "dc_id": 4
+      },
+      "file_ref_sd": null,
+      "published_at_hd": "2026-10-07T00:33:21.218Z",
+      "telegram_msg_id": 161
     }
   ],
   "series_9066_s9": [
