@@ -28460,5 +28460,20 @@
     "last_login": "2026-10-07T14:28:35.174Z",
     "watch_credit_seconds": 1200,
     "welcome_seen": false
+  },
+  {
+    "id": "u_1791397483066_3c5047db",
+    "username": "Mane",
+    "password_hash": "f55493c50cb5469ecea14182494e033f80891585ddceb3abc2af8bc8e6b06f67963d160b7bce26af2d31831262ad7af61dd04f248275607a7ce28ca3ef27525f",
+    "salt": "4f7c4fe03710adad8ece4c2edb0ecdbf",
+    "avatar": "assets/avatars/avatar-1.svg",
+    "role": "user",
+    "banned": false,
+    "ip": "154.124.71.152",
+    "last_ip": "154.124.71.152",
+    "created_at": "2026-10-07T18:24:43.066Z",
+    "last_login": "2026-10-07T18:24:43.066Z",
+    "watch_credit_seconds": 1200,
+    "welcome_seen": false
   }
 ]
