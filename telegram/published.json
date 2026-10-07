@@ -1381,6 +1381,27 @@
       "file_ref_sd": null,
       "published_at_hd": "2026-10-07T21:52:53.291Z",
       "telegram_msg_id": 164
+    },
+    {
+      "id": "488674",
+      "episode_num": 24,
+      "title": "Les Apprentis Aventuriers (2016) - S09E24 - Épisode 24",
+      "published_at": "2026-10-07T21:59:07.508Z",
+      "hd_published": true,
+      "sd_published": false,
+      "telegram_msg_id_hd": 165,
+      "telegram_msg_id_sd": null,
+      "file_ref_hd": {
+        "id": "5924609438655717993",
+        "access_hash": "4822478747690139965",
+        "file_reference": "BgAAAAEIDwTcAAAApWrGwKtQHLWF32YcQk1ylSPOaPYx",
+        "mime_type": "video/mp4",
+        "size": 575171049,
+        "dc_id": 4
+      },
+      "file_ref_sd": null,
+      "published_at_hd": "2026-10-07T21:59:07.508Z",
+      "telegram_msg_id": 165
     }
   ],
   "series_test_s1": [
