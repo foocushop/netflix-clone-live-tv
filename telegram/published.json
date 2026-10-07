@@ -739,6 +739,27 @@
       "file_ref_sd": null,
       "published_at_hd": "2026-10-07T00:33:21.218Z",
       "telegram_msg_id": 161
+    },
+    {
+      "id": "488671",
+      "episode_num": 35,
+      "title": "La Villa des Cœurs Brisés (2015) - S11E35 - Episode 35",
+      "published_at": "2026-10-07T21:46:18.977Z",
+      "hd_published": true,
+      "sd_published": false,
+      "telegram_msg_id_hd": 163,
+      "telegram_msg_id_sd": null,
+      "file_ref_hd": {
+        "id": "5924609438655717987",
+        "access_hash": "2581458477938946237",
+        "file_reference": "BgAAAAEIDwTcAAAAo2rGvaoPDXNwYPBIhxYRXebpFtyl",
+        "mime_type": "video/mp4",
+        "size": 576013938,
+        "dc_id": 4
+      },
+      "file_ref_sd": null,
+      "published_at_hd": "2026-10-07T21:46:18.977Z",
+      "telegram_msg_id": 163
     }
   ],
   "series_9066_s9": [
@@ -1339,6 +1360,27 @@
       "file_ref_sd": null,
       "published_at_hd": "2026-10-05T20:38:48.954Z",
       "telegram_msg_id": 160
+    },
+    {
+      "id": "488686",
+      "episode_num": 23,
+      "title": "Les Apprentis Aventuriers (2016) - S09E23 - Sacrifice",
+      "published_at": "2026-10-07T21:52:53.291Z",
+      "hd_published": true,
+      "sd_published": false,
+      "telegram_msg_id_hd": 164,
+      "telegram_msg_id_sd": null,
+      "file_ref_hd": {
+        "id": "5924609438655717989",
+        "access_hash": "-8230328726014196566",
+        "file_reference": "BgAAAAEIDwTcAAAApGrGvzWwBmUXfSDgg7Xlk2FbtLj3",
+        "mime_type": "video/mp4",
+        "size": 481414536,
+        "dc_id": 4
+      },
+      "file_ref_sd": null,
+      "published_at_hd": "2026-10-07T21:52:53.291Z",
+      "telegram_msg_id": 164
     }
   ],
   "series_test_s1": [

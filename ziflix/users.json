@@ -28475,5 +28475,35 @@
     "last_login": "2026-10-07T18:24:43.066Z",
     "watch_credit_seconds": 1200,
     "welcome_seen": false
+  },
+  {
+    "id": "u_1791408423151_a96c0aeb",
+    "username": "fjhggji",
+    "password_hash": "e3f72b8903a4caa88b7ece237a4680ccfe30a4b9376c8944341c6473f001c454853fc476a7760074346922d0907e25edf724c91407175ba28bd8192b87da8605",
+    "salt": "c84dfe3ce4c8bb9540a66148e186732c",
+    "avatar": "assets/avatars/avatar-1.svg",
+    "role": "user",
+    "banned": false,
+    "ip": "2a01:cb08:82df:8600:89de:f4d0:71c8:3c74",
+    "last_ip": "2a01:cb08:82df:8600:89de:f4d0:71c8:3c74",
+    "created_at": "2026-10-07T21:27:03.152Z",
+    "last_login": "2026-10-07T21:27:03.152Z",
+    "watch_credit_seconds": 1200,
+    "welcome_seen": false
+  },
+  {
+    "id": "u_1791409773947_c332fe80",
+    "username": "sarasangare2004@gmail.com",
+    "password_hash": "a65b4cd7652198389b8b84884e78d35f3c5b7768683b89efcb05db019439f1b828e7bad8ae1c14e930b3dff77c01e1a4a4c81d652561fd8f65a5c2b1d403cf54",
+    "salt": "3abf828b282f9efac22a0b8b4b6d588d",
+    "avatar": "assets/avatars/avatar-1.svg",
+    "role": "user",
+    "banned": false,
+    "ip": "2001:861:38c4:d000:4496:e31f:a197:ffbd",
+    "last_ip": "2001:861:38c4:d000:4496:e31f:a197:ffbd",
+    "created_at": "2026-10-07T21:49:33.947Z",
+    "last_login": "2026-10-07T21:49:33.947Z",
+    "watch_credit_seconds": 1200,
+    "welcome_seen": false
   }
 ]
