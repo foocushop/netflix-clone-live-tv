@@ -11289,5 +11289,13 @@
     "role": "user",
     "avatar": "assets/avatars/avatar-1.svg",
     "expires_at": 1793919694317
+  },
+  {
+    "token": "a7a739bd8f40c27464de95030b0a169ad105b4815d82a6000ccad633d3507ac6",
+    "user_id": "u_1790104193158_22b4145b",
+    "username": "Dauphin",
+    "role": "user",
+    "avatar": "assets/avatars/avatar-6.svg",
+    "expires_at": 1793946871308
   }
 ]
