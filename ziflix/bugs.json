@@ -1,5 +1,24 @@
 [
   {
+    "id": "bug_1791420407524_5adef9",
+    "user_id": "u_1789775328783_890cc161",
+    "username": "cb06",
+    "avatar": "assets/avatars/avatar-3.svg",
+    "category": "playback",
+    "title": "Signalement : La Villa des Cœurs Brisés S11E35",
+    "description": "",
+    "media_id": "xtream_series_6715",
+    "media_title": "La Villa des Cœurs Brisés",
+    "season": 11,
+    "episode": 35,
+    "episode_id": null,
+    "device_info": "PC Windows • Chrome",
+    "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/154.0.0.0 Safari/537.36",
+    "url": "https://ziablo.xyz/",
+    "status": "open",
+    "created_at": "2026-10-08T00:46:47.525Z"
+  },
+  {
     "id": "bug_1791409718206_d76416",
     "user_id": "u_1789498731772_0390241b",
     "username": "Luciee.m",
