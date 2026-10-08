@@ -11417,5 +11417,13 @@
     "role": "user",
     "avatar": "assets/avatars/avatar-1.svg",
     "expires_at": 1794013374525
+  },
+  {
+    "token": "d5eb3a1834bb8b8b809f07a8aeffc5b2e63a56028cb0d49913f626874074c426",
+    "user_id": "u_1791428471843_51bd07fe",
+    "username": "ngfxnf",
+    "role": "user",
+    "avatar": "assets/avatars/avatar-1.svg",
+    "expires_at": 1794020471867
   }
 ]
