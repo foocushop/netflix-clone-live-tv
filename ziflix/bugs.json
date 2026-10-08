@@ -1,5 +1,24 @@
 [
   {
+    "id": "bug_1791480977776_4d86e9",
+    "user_id": "u_1789339188575_50d8ccad",
+    "username": "Louise03",
+    "avatar": "assets/avatars/avatar-1.svg",
+    "category": "playback",
+    "title": "Signalement : La Villa des Cœurs Brisés S11E35",
+    "description": "L'épisode 35 saison 11 de la villa des coeurs brisés, n'a plus de son ni d'image à partir de 25 min",
+    "media_id": "68628",
+    "media_title": "La Villa des Cœurs Brisés",
+    "season": 11,
+    "episode": 35,
+    "episode_id": null,
+    "device_info": "PC Windows • Chrome",
+    "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/154.0.0.0 Safari/537.36",
+    "url": "https://ziablo.xyz/",
+    "status": "open",
+    "created_at": "2026-10-08T17:36:17.776Z"
+  },
+  {
     "id": "bug_1791473181276_6e234b",
     "user_id": "u_1790045704690_b5518338",
     "username": "Nanafi",
