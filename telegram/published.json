@@ -744,22 +744,22 @@
       "id": "488671",
       "episode_num": 35,
       "title": "La Villa des Cœurs Brisés (2015) - S11E35 - Episode 35",
-      "published_at": "2026-10-07T21:46:18.977Z",
+      "published_at": "2026-10-08T15:12:36.005Z",
       "hd_published": true,
       "sd_published": false,
-      "telegram_msg_id_hd": 163,
+      "telegram_msg_id_hd": 167,
       "telegram_msg_id_sd": null,
       "file_ref_hd": {
-        "id": "5924609438655717987",
-        "access_hash": "2581458477938946237",
-        "file_reference": "BgAAAAEIDwTcAAAAo2rGvaoPDXNwYPBIhxYRXebpFtyl",
+        "id": "5927069385469468788",
+        "access_hash": "-6461720504499513299",
+        "file_reference": "BgAAAAEIDwTcAAAAp2rHszwhFwLYAXixu2/h6jKT0+c2",
         "mime_type": "video/mp4",
-        "size": 576013938,
+        "size": 1063946532,
         "dc_id": 4
       },
       "file_ref_sd": null,
-      "published_at_hd": "2026-10-07T21:46:18.977Z",
-      "telegram_msg_id": 163
+      "published_at_hd": "2026-10-08T15:14:04.235Z",
+      "telegram_msg_id": 167
     }
   ],
   "series_9066_s9": [
