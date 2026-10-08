@@ -1423,6 +1423,27 @@
       "file_ref_sd": null,
       "published_at_hd": "2026-10-08T15:51:08.829Z",
       "telegram_msg_id": 171
+    },
+    {
+      "id": "488965",
+      "episode_num": 25,
+      "title": "Les Apprentis Aventuriers (2016) - S09E25 - Le zoo",
+      "published_at": "2026-10-08T21:31:38.574Z",
+      "hd_published": true,
+      "sd_published": false,
+      "telegram_msg_id_hd": 173,
+      "telegram_msg_id_sd": null,
+      "file_ref_hd": {
+        "id": "5929321185283153970",
+        "access_hash": "-5408264645448462250",
+        "file_reference": "BgAAAAEIDwTcAAAArWrIC7pcIf25LXJeYZfyjBfm1SSL",
+        "mime_type": "video/mp4",
+        "size": 1627997571,
+        "dc_id": 4
+      },
+      "file_ref_sd": null,
+      "published_at_hd": "2026-10-08T21:31:38.574Z",
+      "telegram_msg_id": 173
     }
   ],
   "series_test_s1": [
