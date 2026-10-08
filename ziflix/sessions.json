@@ -11409,5 +11409,13 @@
     "role": "user",
     "avatar": "assets/avatars/avatar-1.svg",
     "expires_at": 1794009407357
+  },
+  {
+    "token": "8c159dbb8f041dbf64999f4d646ae4ddcb7f5a949832e713131b991c83291ff7",
+    "user_id": "u_1789298901513_4ce33221",
+    "username": "Leooooox",
+    "role": "user",
+    "avatar": "assets/avatars/avatar-1.svg",
+    "expires_at": 1794013374525
   }
 ]
