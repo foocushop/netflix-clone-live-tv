@@ -1365,43 +1365,43 @@
       "id": "488686",
       "episode_num": 23,
       "title": "Les Apprentis Aventuriers (2016) - S09E23 - Sacrifice",
-      "published_at": "2026-10-07T21:52:53.291Z",
+      "published_at": "2026-10-08T15:36:27.360Z",
       "hd_published": true,
       "sd_published": false,
-      "telegram_msg_id_hd": 164,
+      "telegram_msg_id_hd": 169,
       "telegram_msg_id_sd": null,
       "file_ref_hd": {
-        "id": "5924609438655717989",
-        "access_hash": "-8230328726014196566",
-        "file_reference": "BgAAAAEIDwTcAAAApGrGvzWwBmUXfSDgg7Xlk2FbtLj3",
+        "id": "5927069385469468802",
+        "access_hash": "-5875944182365091961",
+        "file_reference": "BgAAAAEIDwTcAAAAqWrHuLWmH11nn1OlbjRRnwK2n6YV",
         "mime_type": "video/mp4",
-        "size": 481414536,
+        "size": 1542566406,
         "dc_id": 4
       },
       "file_ref_sd": null,
-      "published_at_hd": "2026-10-07T21:52:53.291Z",
-      "telegram_msg_id": 164
+      "published_at_hd": "2026-10-08T15:37:25.342Z",
+      "telegram_msg_id": 169
     },
     {
       "id": "488674",
       "episode_num": 24,
       "title": "Les Apprentis Aventuriers (2016) - S09E24 - Épisode 24",
-      "published_at": "2026-10-07T21:59:07.508Z",
+      "published_at": "2026-10-08T15:51:04.516Z",
       "hd_published": true,
       "sd_published": false,
-      "telegram_msg_id_hd": 165,
+      "telegram_msg_id_hd": 171,
       "telegram_msg_id_sd": null,
       "file_ref_hd": {
-        "id": "5924609438655717993",
-        "access_hash": "4822478747690139965",
-        "file_reference": "BgAAAAEIDwTcAAAApWrGwKtQHLWF32YcQk1ylSPOaPYx",
+        "id": "5927069385469468818",
+        "access_hash": "-7782352921588068823",
+        "file_reference": "BgAAAAEIDwTcAAAAq2rHu+wB+SChrqQyEspJyOyah+yw",
         "mime_type": "video/mp4",
-        "size": 575171049,
+        "size": 1508236747,
         "dc_id": 4
       },
       "file_ref_sd": null,
-      "published_at_hd": "2026-10-07T21:59:07.508Z",
-      "telegram_msg_id": 165
+      "published_at_hd": "2026-10-08T15:51:08.829Z",
+      "telegram_msg_id": 171
     }
   ],
   "series_test_s1": [
