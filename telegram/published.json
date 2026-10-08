@@ -760,6 +760,27 @@
       "file_ref_sd": null,
       "published_at_hd": "2026-10-08T15:14:04.235Z",
       "telegram_msg_id": 167
+    },
+    {
+      "id": "488964",
+      "episode_num": 36,
+      "title": "La Villa des Cœurs Brisés (2015) - S11E36 - Episode 36",
+      "published_at": "2026-10-08T21:09:31.767Z",
+      "hd_published": true,
+      "sd_published": false,
+      "telegram_msg_id_hd": 172,
+      "telegram_msg_id_sd": null,
+      "file_ref_hd": {
+        "id": "5927069385469468953",
+        "access_hash": "5444940718218990059",
+        "file_reference": "BgAAAAEIDwTcAAAArGrIBosAz+/7Kb+LXvpgAqi89ww5",
+        "mime_type": "video/mp4",
+        "size": 1038761049,
+        "dc_id": 4
+      },
+      "file_ref_sd": null,
+      "published_at_hd": "2026-10-08T21:09:31.767Z",
+      "telegram_msg_id": 172
     }
   ],
   "series_9066_s9": [
