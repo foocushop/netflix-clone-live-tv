@@ -5642,9 +5642,9 @@
     "role": "user",
     "banned": false,
     "created_at": "2026-09-16T11:26:35.612Z",
-    "last_login": "2026-09-26T10:03:10.417Z",
+    "last_login": "2026-10-08T20:10:27.165Z",
     "ip": "137.255.27.196",
-    "last_ip": "2c0f:53c0:649:e500:1d0b:dbb:23b0:207b"
+    "last_ip": "2c0f:53c0:649:e500:1d00:ba30:ba4d:8e04"
   },
   {
     "id": "u_1789560330912_2639a675",
@@ -29127,6 +29127,21 @@
     "last_ip": "102.18.62.186",
     "created_at": "2026-10-08T19:18:18.525Z",
     "last_login": "2026-10-08T19:18:18.525Z",
+    "watch_credit_seconds": 1200,
+    "welcome_seen": false
+  },
+  {
+    "id": "u_1791488783430_9e56b568",
+    "username": "Tchoubiloubilou35",
+    "password_hash": "cd91b8da8ea379a95dd61e969aef0ae184b3b69ccc2853a29c37f17c7674d22f6d5edcc0a71ab3f042f225f31c531c795509330a528920cb57cbdfd94d1765f6",
+    "salt": "4696ad83137455f256d1ba3a0dc6ecba",
+    "avatar": "assets/avatars/avatar-6.svg",
+    "role": "user",
+    "banned": false,
+    "ip": "2a01:cb08:82df:9500:bcbc:ea4d:ab13:f9f2",
+    "last_ip": "2a01:cb08:82df:9500:bcbc:ea4d:ab13:f9f2",
+    "created_at": "2026-10-08T19:46:23.430Z",
+    "last_login": "2026-10-08T19:46:23.430Z",
     "watch_credit_seconds": 1200,
     "welcome_seen": false
   }
