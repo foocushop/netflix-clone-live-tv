@@ -781,6 +781,27 @@
       "file_ref_sd": null,
       "published_at_hd": "2026-10-08T21:09:31.767Z",
       "telegram_msg_id": 172
+    },
+    {
+      "id": "489346",
+      "episode_num": 37,
+      "title": "La Villa des Cœurs Brisés (2015) - S11E37 - Episode 37",
+      "published_at": "2026-10-09T19:40:38.959Z",
+      "hd_published": true,
+      "sd_published": false,
+      "telegram_msg_id_hd": 174,
+      "telegram_msg_id_sd": null,
+      "file_ref_hd": {
+        "id": "5929094359470316822",
+        "access_hash": "-3655969058074434603",
+        "file_reference": "BgAAAAEIDwTcAAAArmrJQzavXkmMGGpoa3Pa50Bcsfm4",
+        "mime_type": "video/mp4",
+        "size": 1051052862,
+        "dc_id": 4
+      },
+      "file_ref_sd": null,
+      "published_at_hd": "2026-10-09T19:40:38.959Z",
+      "telegram_msg_id": 174
     }
   ],
   "series_9066_s9": [
