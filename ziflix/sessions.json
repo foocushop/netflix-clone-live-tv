@@ -11617,5 +11617,13 @@
     "role": "admin",
     "avatar": "assets/avatars/avatar-1.svg",
     "expires_at": 1794239498171
+  },
+  {
+    "token": "f4b6c52ea12022199cb50e3309898a790f48c81767a35a757dfb79fa3abfd7a6",
+    "user_id": "u_1790077026904_732cd590",
+    "username": "Leslie",
+    "role": "user",
+    "avatar": "assets/avatars/avatar-1.svg",
+    "expires_at": 1794248294413
   }
 ]
