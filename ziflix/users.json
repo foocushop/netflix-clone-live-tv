@@ -29230,5 +29230,35 @@
     "last_login": "2026-10-10T00:12:43.342Z",
     "watch_credit_seconds": 1200,
     "welcome_seen": false
+  },
+  {
+    "id": "u_1791619758152_dcd4115e",
+    "username": "laura.30",
+    "password_hash": "b7e4ea9e6d825eb63f61817985cd4008094b8119a062caa6770090946e7ec0a4488a4fbbd9fb4f741d596ba9779df21e3dfcf43191f01810db921a270d76a1c7",
+    "salt": "d07933da58fdc9b921486fa3629270e5",
+    "avatar": "assets/avatars/avatar-7.svg",
+    "role": "user",
+    "banned": false,
+    "ip": "2a01:cb14:1328:3400:cf4d:4c4c:ff26:e259",
+    "last_ip": "2a01:cb14:1328:3400:cf4d:4c4c:ff26:e259",
+    "created_at": "2026-10-10T08:09:18.152Z",
+    "last_login": "2026-10-10T08:09:18.152Z",
+    "watch_credit_seconds": 1200,
+    "welcome_seen": false
+  },
+  {
+    "id": "u_1791620542550_87cd0c6c",
+    "username": "Liliane",
+    "password_hash": "5639c034c49e48503c0263f2da9274e901ef17203263621ff0467969a38b17e6b2ff14f0d8ba49c1ddc199e7b5aa54647f0c266df72367897375fabcbdb3bd65",
+    "salt": "86cfd4d888dbb8ead1993dd4bb24421b",
+    "avatar": "assets/avatars/avatar-1.svg",
+    "role": "user",
+    "banned": false,
+    "ip": "2001:4278:1b:52fc:96a:eb66:1cf:27cb",
+    "last_ip": "2001:4278:1b:52fc:96a:eb66:1cf:27cb",
+    "created_at": "2026-10-10T08:22:22.550Z",
+    "last_login": "2026-10-10T08:22:22.550Z",
+    "watch_credit_seconds": 1200,
+    "welcome_seen": false
   }
 ]
