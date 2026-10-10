@@ -5970,14 +5970,6 @@
     "expires_at": 1792665324089
   },
   {
-    "token": "24fb0a1d684b688c5018aed10b4daa35c587153d83e1412c09559c79e9533f85",
-    "user_id": "u_1790077026904_732cd590",
-    "username": "Leslie",
-    "role": "user",
-    "avatar": "assets/avatars/avatar-1.svg",
-    "expires_at": 1792669026918
-  },
-  {
     "token": "0c3531e998ed75e99f8412e5115f1e18a6af172f77f4458075cf5189b0a99f3d",
     "user_id": "u_1789674389938_6e62202c",
     "username": "Maronne",
@@ -11593,5 +11585,13 @@
     "role": "user",
     "avatar": "assets/avatars/avatar-1.svg",
     "expires_at": 1794212542580
+  },
+  {
+    "token": "45e9dc61aa2f322993fcf3c6077362d6cebf6b66d55f19fda029af77f39ebbff",
+    "user_id": "u_1790077026904_732cd590",
+    "username": "Leslie",
+    "role": "user",
+    "avatar": "assets/avatars/avatar-1.svg",
+    "expires_at": 1794229604472
   }
 ]
