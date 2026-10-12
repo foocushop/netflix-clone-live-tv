@@ -11793,5 +11793,13 @@
     "role": "user",
     "avatar": "assets/avatars/avatar-1.svg",
     "expires_at": 1794423797430
+  },
+  {
+    "token": "391c06668243d70b60e1bdf97663ca59a006e6da11cd8ac501235c0afbe8952d",
+    "user_id": "u_1789485347669_b4aaedab",
+    "username": "Lauryyy82miss",
+    "role": "user",
+    "avatar": "assets/avatars/avatar-9.svg",
+    "expires_at": 1794426910374
   }
 ]
