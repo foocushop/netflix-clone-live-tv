@@ -29894,5 +29894,20 @@
     "last_login": "2026-10-11T20:58:06.052Z",
     "ip": "105.102.162.135",
     "last_ip": "105.102.162.135"
+  },
+  {
+    "id": "u_1791813152137_c3727cdb",
+    "username": "Laurine",
+    "password_hash": "34742d4305cbb14a1460fd5832851f976b0d8f26307676af6eed3ca98f6e65711c6920370bdb1f0e51e3fb6b43b292e223c1bc39379d861095819120808b49b4",
+    "salt": "e01624cd4f508e24d63ae290c6074558",
+    "avatar": "assets/avatars/avatar-10.svg",
+    "role": "user",
+    "banned": false,
+    "ip": "190.115.176.116",
+    "last_ip": "190.115.176.116",
+    "created_at": "2026-10-12T13:52:32.137Z",
+    "last_login": "2026-10-12T13:52:32.137Z",
+    "watch_credit_seconds": 1200,
+    "welcome_seen": false
   }
 ]
