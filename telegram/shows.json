@@ -26,5 +26,15 @@
     "source_priority": "foxbleu",
     "delayed_release": false,
     "photo": "/var/www/telegram-reality-publisher/assets/shows/series_9066_s9.jpg"
+  },
+  {
+    "id": "series_9193_s1",
+    "series_id": 9193,
+    "season": 1,
+    "name": "Minerva Academy",
+    "emoji": "🔥",
+    "template": "<b>{titre}</b> {emoji} Saison {saison}\n\nÉpisode {episode}",
+    "channel_id": "-1004430169308",
+    "enabled": true
   }
 ]

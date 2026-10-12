@@ -1481,5 +1481,175 @@
       "telegram_msg_id": 1001,
       "published_at_sd": "2026-09-17T21:32:01.540Z"
     }
+  ],
+  "series_9193_s1": [
+    {
+      "id": "484649",
+      "episode_num": 1,
+      "title": "Minerva Academy (2026) - S01E01 - Épisode 1",
+      "published_at": "2026-10-11T23:43:16.518Z",
+      "hd_published": true,
+      "sd_published": false,
+      "telegram_msg_id_hd": 175,
+      "telegram_msg_id_sd": null,
+      "file_ref_hd": {
+        "id": "5936172465574125185",
+        "access_hash": "-6653794380352811716",
+        "file_reference": "BgAAAAEIDwTcAAAAr2rMHxS5ZIkGhR9IIBqg1HI7DKou",
+        "mime_type": "video/mp4",
+        "size": 1404713246,
+        "dc_id": 4
+      },
+      "file_ref_sd": null,
+      "published_at_hd": "2026-10-11T23:43:16.518Z",
+      "telegram_msg_id": 175
+    },
+    {
+      "id": "484650",
+      "episode_num": 2,
+      "title": "Minerva Academy (2026) - S01E02 - Épisode 2",
+      "published_at": "2026-10-11T23:47:22.197Z",
+      "hd_published": true,
+      "sd_published": false,
+      "telegram_msg_id_hd": 176,
+      "telegram_msg_id_sd": null,
+      "file_ref_hd": {
+        "id": "5936172465574125186",
+        "access_hash": "-2728052816735485767",
+        "file_reference": "BgAAAAEIDwTcAAAAsGrMIAoSyLwjLFtwaCAaNplL63/x",
+        "mime_type": "video/mp4",
+        "size": 1552779334,
+        "dc_id": 4
+      },
+      "file_ref_sd": null,
+      "published_at_hd": "2026-10-11T23:47:22.197Z",
+      "telegram_msg_id": 176
+    },
+    {
+      "id": "484651",
+      "episode_num": 3,
+      "title": "Minerva Academy (2026) - S01E03 - Épisode 3",
+      "published_at": "2026-10-11T23:49:08.707Z",
+      "hd_published": true,
+      "sd_published": false,
+      "telegram_msg_id_hd": 177,
+      "telegram_msg_id_sd": null,
+      "file_ref_hd": {
+        "id": "5936172465574125188",
+        "access_hash": "6771346363896401726",
+        "file_reference": "BgAAAAEIDwTcAAAAsWrMIHQsJd3T8TAY1nyDYPyZ5c5y",
+        "mime_type": "video/mp4",
+        "size": 689181622,
+        "dc_id": 4
+      },
+      "file_ref_sd": null,
+      "published_at_hd": "2026-10-11T23:49:08.707Z",
+      "telegram_msg_id": 177
+    },
+    {
+      "id": "484652",
+      "episode_num": 4,
+      "title": "Minerva Academy (2026) - S01E04 - Épisode 4",
+      "published_at": "2026-10-11T23:53:06.068Z",
+      "hd_published": true,
+      "sd_published": false,
+      "telegram_msg_id_hd": 178,
+      "telegram_msg_id_sd": null,
+      "file_ref_hd": {
+        "id": "5936172465574125189",
+        "access_hash": "5711340429187768424",
+        "file_reference": "BgAAAAEIDwTcAAAAsmrMIWGOjChM/NUdD7RyXiJR/wys",
+        "mime_type": "video/mp4",
+        "size": 1660558734,
+        "dc_id": 4
+      },
+      "file_ref_sd": null,
+      "published_at_hd": "2026-10-11T23:53:06.068Z",
+      "telegram_msg_id": 178
+    },
+    {
+      "id": "484653",
+      "episode_num": 5,
+      "title": "Minerva Academy (2026) - S01E05 - Épisode 5",
+      "published_at": "2026-10-11T23:56:56.218Z",
+      "hd_published": true,
+      "sd_published": false,
+      "telegram_msg_id_hd": 179,
+      "telegram_msg_id_sd": null,
+      "file_ref_hd": {
+        "id": "5936172465574125191",
+        "access_hash": "-7258867641588603664",
+        "file_reference": "BgAAAAEIDwTcAAAAs2rMIkgOMYpTYBLDD67bMSNoiWNw",
+        "mime_type": "video/mp4",
+        "size": 1822585014,
+        "dc_id": 4
+      },
+      "file_ref_sd": null,
+      "published_at_hd": "2026-10-11T23:56:56.218Z",
+      "telegram_msg_id": 179
+    },
+    {
+      "id": "484654",
+      "episode_num": 6,
+      "title": "Minerva Academy (2026) - S01E06 - Épisode 6",
+      "published_at": "2026-10-12T00:01:42.510Z",
+      "hd_published": true,
+      "sd_published": false,
+      "telegram_msg_id_hd": 180,
+      "telegram_msg_id_sd": null,
+      "file_ref_hd": {
+        "id": "5936172465574125192",
+        "access_hash": "8634354373212935000",
+        "file_reference": "BgAAAAEIDwTcAAAAtGrMI2bFZ4+A4Xk4t3pdrGChdFWh",
+        "mime_type": "video/mp4",
+        "size": 1497685165,
+        "dc_id": 4
+      },
+      "file_ref_sd": null,
+      "published_at_hd": "2026-10-12T00:01:42.510Z",
+      "telegram_msg_id": 180
+    },
+    {
+      "id": "484655",
+      "episode_num": 7,
+      "title": "Minerva Academy (2026) - S01E07 - Épisode 7",
+      "published_at": "2026-10-12T00:05:08.374Z",
+      "hd_published": true,
+      "sd_published": false,
+      "telegram_msg_id_hd": 181,
+      "telegram_msg_id_sd": null,
+      "file_ref_hd": {
+        "id": "5936172465574125193",
+        "access_hash": "4000586529285041329",
+        "file_reference": "BgAAAAEIDwTcAAAAtWrMJDQ3zCcRcenMkc2bQzIupwkz",
+        "mime_type": "video/mp4",
+        "size": 1093801948,
+        "dc_id": 4
+      },
+      "file_ref_sd": null,
+      "published_at_hd": "2026-10-12T00:05:08.374Z",
+      "telegram_msg_id": 181
+    },
+    {
+      "id": "484656",
+      "episode_num": 8,
+      "title": "Minerva Academy (2026) - S01E08 - Épisode 8",
+      "published_at": "2026-10-12T00:08:57.926Z",
+      "hd_published": true,
+      "sd_published": false,
+      "telegram_msg_id_hd": 182,
+      "telegram_msg_id_sd": null,
+      "file_ref_hd": {
+        "id": "5936172465574125194",
+        "access_hash": "2289490194103665020",
+        "file_reference": "BgAAAAEIDwTcAAAAtmrMJRnB5nFXXoSHGQqdZfoJZkL6",
+        "mime_type": "video/mp4",
+        "size": 1554462871,
+        "dc_id": 4
+      },
+      "file_ref_sd": null,
+      "published_at_hd": "2026-10-12T00:08:57.926Z",
+      "telegram_msg_id": 182
+    }
   ]
 }
