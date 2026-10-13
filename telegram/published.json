@@ -1507,6 +1507,27 @@
       "file_ref_sd": null,
       "published_at_hd": "2026-10-13T15:38:47.538Z",
       "telegram_msg_id": 184
+    },
+    {
+      "id": "490145",
+      "episode_num": 27,
+      "title": "Les Apprentis Aventuriers (2016) - S09E27 - Episode 27",
+      "published_at": "2026-10-13T18:32:55.594Z",
+      "hd_published": true,
+      "sd_published": false,
+      "telegram_msg_id_hd": 185,
+      "telegram_msg_id_sd": null,
+      "file_ref_hd": {
+        "id": "5942977742470392342",
+        "access_hash": "2071112853618984810",
+        "file_reference": "BgAAAAEIDwTcAAAAuWrOeVd/4yl7IhiIdqJQFRwAyJFk",
+        "mime_type": "video/mp4",
+        "size": 1572511850,
+        "dc_id": 4
+      },
+      "file_ref_sd": null,
+      "published_at_hd": "2026-10-13T18:32:55.594Z",
+      "telegram_msg_id": 185
     }
   ],
   "series_test_s1": [
