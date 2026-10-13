@@ -802,6 +802,27 @@
       "file_ref_sd": null,
       "published_at_hd": "2026-10-09T19:40:38.959Z",
       "telegram_msg_id": 174
+    },
+    {
+      "id": "490104",
+      "episode_num": 38,
+      "title": "La Villa des Cœurs Brisés (2015) - S11E38 - Episode 38",
+      "published_at": "2026-10-13T15:31:43.643Z",
+      "hd_published": true,
+      "sd_published": false,
+      "telegram_msg_id_hd": 183,
+      "telegram_msg_id_sd": null,
+      "file_ref_hd": {
+        "id": "5942977742470392200",
+        "access_hash": "1911501457478614561",
+        "file_reference": "BgAAAAEIDwTcAAAAt2rOTt89vBAtELJiknATP9KgT6VU",
+        "mime_type": "video/mp4",
+        "size": 984660744,
+        "dc_id": 4
+      },
+      "file_ref_sd": null,
+      "published_at_hd": "2026-10-13T15:31:43.643Z",
+      "telegram_msg_id": 183
     }
   ],
   "series_9066_s9": [
@@ -1465,6 +1486,27 @@
       "file_ref_sd": null,
       "published_at_hd": "2026-10-08T21:31:38.574Z",
       "telegram_msg_id": 173
+    },
+    {
+      "id": "490102",
+      "episode_num": 26,
+      "title": "Les Apprentis Aventuriers (2016) - S09E26 - Bizarre bizarre...",
+      "published_at": "2026-10-13T15:38:47.538Z",
+      "hd_published": true,
+      "sd_published": false,
+      "telegram_msg_id_hd": 184,
+      "telegram_msg_id_sd": null,
+      "file_ref_hd": {
+        "id": "5942977742470392204",
+        "access_hash": "-9023363232030547453",
+        "file_reference": "BgAAAAEIDwTcAAAAuGrOUIeMaPQr1B72NVOsM92wcP2u",
+        "mime_type": "video/mp4",
+        "size": 1689790027,
+        "dc_id": 4
+      },
+      "file_ref_sd": null,
+      "published_at_hd": "2026-10-13T15:38:47.538Z",
+      "telegram_msg_id": 184
     }
   ],
   "series_test_s1": [
