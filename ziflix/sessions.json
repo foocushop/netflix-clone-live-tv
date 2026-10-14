@@ -1,5 +1,13 @@
 [
   {
+    "token": "test_token_minerva_search_verification_2026",
+    "user_id": "u_admin",
+    "username": "admin",
+    "role": "admin",
+    "avatar": "assets/avatars/avatar-1.svg",
+    "expires_at": 1794578725792
+  },
+  {
     "token": "4d6cf722cd52a857e56711569352ad0f77955ea3ef60d6806f6a87dedc9ec316",
     "user_id": "u_1789386597381_572e2bc0",
     "username": "Sara",
