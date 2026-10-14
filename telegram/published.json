@@ -823,6 +823,27 @@
       "file_ref_sd": null,
       "published_at_hd": "2026-10-13T15:31:43.643Z",
       "telegram_msg_id": 183
+    },
+    {
+      "id": "490189",
+      "episode_num": 39,
+      "title": "La Villa des Cœurs Brisés (2015) - S11E39 - Episode 39",
+      "published_at": "2026-10-14T21:22:27.754Z",
+      "hd_published": true,
+      "sd_published": false,
+      "telegram_msg_id_hd": 186,
+      "telegram_msg_id_sd": null,
+      "file_ref_hd": {
+        "id": "5945202252061875396",
+        "access_hash": "1747887347528238826",
+        "file_reference": "BgAAAAEIDwTcAAAAumrP8pNK6B0X8OUumkXPQzPLuflb",
+        "mime_type": "video/mp4",
+        "size": 920170628,
+        "dc_id": 4
+      },
+      "file_ref_sd": null,
+      "published_at_hd": "2026-10-14T21:22:27.754Z",
+      "telegram_msg_id": 186
     }
   ],
   "series_9066_s9": [

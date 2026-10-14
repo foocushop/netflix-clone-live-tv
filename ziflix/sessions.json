@@ -11008,5 +11008,13 @@
     "role": "user",
     "avatar": "assets/avatars/avatar-7.svg",
     "expires_at": 1794599498795
+  },
+  {
+    "token": "eebe8ed7a53c90bc8a767bbfaba031b237cc904351a04a9e3332ad692d234f8b",
+    "user_id": "u_1789458201541_f764c32b",
+    "username": "Gerbi",
+    "role": "user",
+    "avatar": "assets/avatars/avatar-1.svg",
+    "expires_at": 1794604032664
   }
 ]
