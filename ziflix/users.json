@@ -7249,9 +7249,9 @@
     "role": "user",
     "banned": false,
     "ip": "23.162.152.28",
-    "last_ip": "154.124.229.249",
+    "last_ip": "41.83.152.167",
     "created_at": "2026-09-19T10:33:29.759Z",
-    "last_login": "2026-09-19T19:14:01.420Z"
+    "last_login": "2026-10-14T13:09:33.364Z"
   },
   {
     "id": "u_1789814463308_6c06d9a3",
@@ -12210,9 +12210,9 @@
     "role": "user",
     "banned": false,
     "created_at": "2026-09-27T16:41:04.519Z",
-    "last_login": "2026-10-14T03:11:50.956Z",
+    "last_login": "2026-10-14T12:32:26.823Z",
     "ip": "2001:4278:22:4830:84ab:9bd1:c29c:f9ca",
-    "last_ip": "2001:4278:21:b13d:c81f:3224:15f0:11eb"
+    "last_ip": "2001:4278:21:b13d:800e:a6aa:6713:137c"
   },
   {
     "id": "tg_7648710105",
@@ -14073,9 +14073,9 @@
     "role": "user",
     "banned": false,
     "created_at": "2026-09-27T17:24:41.578Z",
-    "last_login": "2026-10-10T15:20:38.058Z",
+    "last_login": "2026-10-14T13:05:19.437Z",
     "ip": "2a01:cb0d:b068:cbe9:6519:f15b:b552:53a3",
-    "last_ip": "2a01:cb16:3063:ec5b:4dae:7455:7733:7c49"
+    "last_ip": "2a01:cb16:3030:e097:b8bf:8ded:3c97:b8d0"
   },
   {
     "id": "tg_8370187172",
@@ -14927,9 +14927,9 @@
     "role": "user",
     "banned": false,
     "created_at": "2026-09-27T18:24:23.369Z",
-    "last_login": "2026-10-12T19:19:02.098Z",
+    "last_login": "2026-10-14T12:55:17.718Z",
     "ip": "46.210.206.95",
-    "last_ip": "46.210.138.25"
+    "last_ip": "2a06:c701:434d:4a00:a239:3f72:7971:333"
   },
   {
     "id": "tg_6378585865",
@@ -16949,9 +16949,9 @@
     "role": "user",
     "banned": false,
     "created_at": "2026-09-27T22:24:21.913Z",
-    "last_login": "2026-10-13T22:30:17.838Z",
+    "last_login": "2026-10-14T12:37:09.695Z",
     "ip": "41.141.172.128",
-    "last_ip": "41.141.6.168"
+    "last_ip": "196.64.46.139"
   },
   {
     "id": "tg_5130164436",
@@ -17650,7 +17650,7 @@
     "role": "user",
     "banned": false,
     "created_at": "2026-09-28T03:18:10.220Z",
-    "last_login": "2026-10-12T16:21:00.390Z",
+    "last_login": "2026-10-14T12:36:37.502Z",
     "ip": "37.210.123.161",
     "last_ip": "37.210.123.161"
   },
@@ -18393,9 +18393,9 @@
     "role": "user",
     "banned": false,
     "created_at": "2026-09-28T09:23:43.405Z",
-    "last_login": "2026-10-14T06:55:12.198Z",
+    "last_login": "2026-10-14T12:58:54.716Z",
     "ip": "105.235.11.138",
-    "last_ip": "160.155.247.205"
+    "last_ip": "160.154.129.174"
   },
   {
     "id": "tg_7885796030",
@@ -18897,7 +18897,7 @@
     "role": "user",
     "banned": false,
     "created_at": "2026-09-28T13:59:34.761Z",
-    "last_login": "2026-10-14T01:52:08.672Z",
+    "last_login": "2026-10-14T12:51:54.001Z",
     "ip": "41.214.61.41",
     "last_ip": "41.83.119.186"
   },
@@ -19052,9 +19052,9 @@
     "role": "user",
     "banned": false,
     "created_at": "2026-09-28T14:42:41.532Z",
-    "last_login": "2026-10-14T07:52:53.726Z",
+    "last_login": "2026-10-14T12:47:02.669Z",
     "ip": "41.73.105.182",
-    "last_ip": "2001:42c0:8217:4900:f4e6:c863:86:7c39"
+    "last_ip": "2001:42c0:820d:8b00:548c:c7f6:dad2:c40b"
   },
   {
     "id": "tg_1434849430",
@@ -19952,7 +19952,7 @@
     "role": "user",
     "banned": false,
     "created_at": "2026-09-28T18:28:20.239Z",
-    "last_login": "2026-10-13T13:27:44.265Z",
+    "last_login": "2026-10-14T12:36:18.339Z",
     "ip": "129.143.100.173",
     "last_ip": "129.143.100.173"
   },
@@ -20953,7 +20953,7 @@
     "role": "user",
     "banned": false,
     "created_at": "2026-09-28T22:07:55.573Z",
-    "last_login": "2026-10-14T12:18:25.569Z",
+    "last_login": "2026-10-14T12:21:24.570Z",
     "ip": "154.243.159.147",
     "last_ip": "105.98.15.13"
   },
@@ -22605,7 +22605,7 @@
     "role": "user",
     "banned": false,
     "created_at": "2026-09-29T17:58:32.985Z",
-    "last_login": "2026-10-13T21:31:48.628Z",
+    "last_login": "2026-10-14T12:41:22.253Z",
     "ip": "2001:42d8:5115:6900:e895:5f8a:c01a:26f",
     "last_ip": "2001:42d8:5115:6900:a814:21ee:5510:332"
   },
@@ -23030,9 +23030,9 @@
     "role": "user",
     "banned": false,
     "created_at": "2026-09-29T19:51:55.514Z",
-    "last_login": "2026-10-12T19:14:59.272Z",
+    "last_login": "2026-10-14T12:33:28.790Z",
     "ip": "2a01:e0a:ab2:5430:789a:4765:7e57:6068",
-    "last_ip": "2a01:cb11:9052:fd5b:4823:6d0f:3114:7ed7"
+    "last_ip": "2a01:e0a:ab2:5430:5c10:3e73:8863:e5ac"
   },
   {
     "id": "tg_7555848014",
@@ -28928,9 +28928,9 @@
     "role": "user",
     "banned": false,
     "created_at": "2026-10-07T23:15:03.185Z",
-    "last_login": "2026-10-13T00:44:22.716Z",
+    "last_login": "2026-10-14T12:25:26.449Z",
     "ip": "41.219.27.146",
-    "last_ip": "162.19.104.42"
+    "last_ip": "41.219.27.122"
   },
   {
     "id": "tg_1500048789",
@@ -29609,9 +29609,9 @@
     "role": "user",
     "banned": false,
     "created_at": "2026-10-10T17:48:11.192Z",
-    "last_login": "2026-10-10T17:51:21.010Z",
+    "last_login": "2026-10-14T12:34:08.861Z",
     "ip": "102.117.124.14",
-    "last_ip": "102.117.124.14"
+    "last_ip": "102.117.119.183"
   },
   {
     "id": "tg_6901007005",
@@ -30289,5 +30289,33 @@
     "last_login": "2026-10-14T10:40:40.549Z",
     "watch_credit_seconds": 1200,
     "welcome_seen": false
+  },
+  {
+    "id": "tg_8159027916",
+    "telegram_id": "8159027916",
+    "username": "Canon_5D",
+    "first_name": "Canon 5D",
+    "last_name": "",
+    "avatar": "https://t.me/i/userpic/320/6HPQ6CI6Je93xiLQbekZPCz_YqHJZGFtwLDWkWlRyZRB2XzG97JKWQ5Qg7OZiF5Z.svg",
+    "role": "user",
+    "banned": false,
+    "created_at": "2026-10-14T12:21:49.099Z",
+    "last_login": "2026-10-14T12:21:49.099Z",
+    "ip": "41.83.119.186",
+    "last_ip": "41.83.119.186"
+  },
+  {
+    "id": "tg_8913234568",
+    "telegram_id": "8913234568",
+    "username": "Sherol",
+    "first_name": "Sherol",
+    "last_name": "ZOKOU",
+    "avatar": "https://t.me/i/userpic/320/qbbqZqCuwVotk4Ni1ts10gJl3czERoaQ0CL8ChZkYLg1hMrJdbAxvJVb_0SgWFu6.svg",
+    "role": "user",
+    "banned": false,
+    "created_at": "2026-10-14T13:03:03.337Z",
+    "last_login": "2026-10-14T13:06:03.003Z",
+    "ip": "2c0f:ecf0:5de:f100:ac3f:9e35:5de3:c7ae",
+    "last_ip": "2c0f:ecf0:5de:f100:ac3f:9e35:5de3:c7ae"
   }
 ]
