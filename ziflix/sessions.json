@@ -11080,5 +11080,13 @@
     "role": "admin",
     "avatar": "assets/avatars/avatar-1.svg",
     "expires_at": 1794618383357
+  },
+  {
+    "token": "1fdf183271187afbd402918f422de423b12f2655da1f9d0953fad98a1dcf4a07",
+    "user_id": "u_1792032988675_27c347bd",
+    "username": "Frffff",
+    "role": "user",
+    "avatar": "assets/avatars/avatar-1.svg",
+    "expires_at": 1794624988697
   }
 ]
