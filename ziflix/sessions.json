@@ -8,22 +8,6 @@
     "expires_at": 1794578725792
   },
   {
-    "token": "36eec52cbe1b17c7c421aa366a24052375bd7fd6b7251739e3c5a96aacb8ea02",
-    "user_id": "u_1789481296269_27746594",
-    "username": "Jeje",
-    "role": "user",
-    "avatar": "assets/avatars/avatar-1.svg",
-    "expires_at": 1792073296271
-  },
-  {
-    "token": "e1ae1009aae640731346275a47426f7f8d9bc420fd4856043fa7a0c71cce241a",
-    "user_id": "u_1789482566769_a630c39c",
-    "username": "sam",
-    "role": "user",
-    "avatar": "assets/avatars/avatar-9.svg",
-    "expires_at": 1792074566771
-  },
-  {
     "token": "4271319647023830c44cdc45d7c65aa7a7fd86ccf2fd09d1af7317e028b4d698",
     "user_id": "u_1789484608227_3caa82c4",
     "username": "Mina",
@@ -10512,5 +10496,13 @@
     "role": "user",
     "avatar": "assets/avatars/avatar-3.svg",
     "expires_at": 1794665539200
+  },
+  {
+    "token": "541336621cde569cab623a7023531ef53528efe50a8db4669b49628a45c90f72",
+    "user_id": "u_1790186215844_f87b8d03",
+    "username": "Dbdyaz",
+    "role": "user",
+    "avatar": "assets/avatars/avatar-3.svg",
+    "expires_at": 1794669244196
   }
 ]
