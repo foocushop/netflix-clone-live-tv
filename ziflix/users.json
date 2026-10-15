@@ -30461,5 +30461,20 @@
     "last_login": "2026-10-15T02:56:28.675Z",
     "watch_credit_seconds": 1200,
     "welcome_seen": false
+  },
+  {
+    "id": "u_1792059030487_6fdb73bd",
+    "username": "Dani 024",
+    "password_hash": "58ee3d001e33ff400f6bcd177c7386c7eeeac87dc6519cddd93eee538a71687794ee72567175ca2c2a46e375cfaff024c59fa397a2f947e75819889e4cc1a5c8",
+    "salt": "c82c82865f0d1a35f0fe2a7e87b9b331",
+    "avatar": "assets/avatars/avatar-2.svg",
+    "role": "user",
+    "banned": false,
+    "ip": "195.174.38.47",
+    "last_ip": "195.174.38.47",
+    "created_at": "2026-10-15T10:10:30.487Z",
+    "last_login": "2026-10-15T10:10:30.487Z",
+    "watch_credit_seconds": 1200,
+    "welcome_seen": false
   }
 ]

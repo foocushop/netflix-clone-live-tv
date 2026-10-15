@@ -11088,5 +11088,13 @@
     "role": "user",
     "avatar": "assets/avatars/avatar-1.svg",
     "expires_at": 1794624988697
+  },
+  {
+    "token": "068eb2e1c77ff401f629bd05d8c138f65373a1d8fcaee6f260f42d7083a78fb8",
+    "user_id": "u_1792059030487_6fdb73bd",
+    "username": "Dani 024",
+    "role": "user",
+    "avatar": "assets/avatars/avatar-2.svg",
+    "expires_at": 1794651030510
   }
 ]
