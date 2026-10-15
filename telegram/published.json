@@ -865,6 +865,27 @@
       "file_ref_sd": null,
       "published_at_hd": "2026-10-14T21:35:25.398Z",
       "telegram_msg_id": 187
+    },
+    {
+      "id": "490358",
+      "episode_num": 41,
+      "title": "La Villa des Cœurs Brisés (2015) - S11E41 - Episode 41",
+      "published_at": "2026-10-15T19:38:48.058Z",
+      "hd_published": true,
+      "sd_published": false,
+      "telegram_msg_id_hd": 189,
+      "telegram_msg_id_sd": null,
+      "file_ref_hd": {
+        "id": "5947554498275713126",
+        "access_hash": "8630835405769591996",
+        "file_reference": "BgAAAAEIDwTcAAAAvWrRK8dhHbAl3yb+TCCK2yLujqNb",
+        "mime_type": "video/mp4",
+        "size": 1056265697,
+        "dc_id": 4
+      },
+      "file_ref_sd": null,
+      "published_at_hd": "2026-10-15T19:38:48.058Z",
+      "telegram_msg_id": 189
     }
   ],
   "series_9066_s9": [
