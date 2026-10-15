@@ -8,14 +8,6 @@
     "expires_at": 1794578725792
   },
   {
-    "token": "95168a065ccb07e57d3fe5afe20b594c685df24afe87c2426900fc9059517f3c",
-    "user_id": "u_1789348400996_ba5f573b",
-    "username": "Khadija2",
-    "role": "user",
-    "avatar": "assets/avatars/avatar-1.svg",
-    "expires_at": 1792069336416
-  },
-  {
     "token": "36eec52cbe1b17c7c421aa366a24052375bd7fd6b7251739e3c5a96aacb8ea02",
     "user_id": "u_1789481296269_27746594",
     "username": "Jeje",
@@ -10472,5 +10464,53 @@
     "role": "admin",
     "avatar": "assets/avatars/avatar-1.svg",
     "expires_at": 1794662119955
+  },
+  {
+    "token": "0451ac9ed0b461137a09cc5845907cdf5ede46bea0989525f493474abef2f74e",
+    "user_id": "u_admin",
+    "username": "admin",
+    "role": "admin",
+    "avatar": "assets/avatars/avatar-1.svg",
+    "expires_at": 1794663604232
+  },
+  {
+    "token": "e31d67061b1251d4584a9196f32e1da8ad5ac9a6bcb57ff2a8cc03a5e7b8b991",
+    "user_id": "u_admin",
+    "username": "admin",
+    "role": "admin",
+    "avatar": "assets/avatars/avatar-1.svg",
+    "expires_at": 1794663800395
+  },
+  {
+    "token": "2974ffc18ac15c14f263e0e7b5e957c40d519fcc7c3bca80d6d9ad45a2b3cf31",
+    "user_id": "u_admin",
+    "username": "admin",
+    "role": "admin",
+    "avatar": "assets/avatars/avatar-1.svg",
+    "expires_at": 1794663901606
+  },
+  {
+    "token": "48a36dc28b3e06737cdc332873cc45d2d2d8dd14666ce9eba0ca18baa0fd5353",
+    "user_id": "u_admin",
+    "username": "admin",
+    "role": "admin",
+    "avatar": "assets/avatars/avatar-1.svg",
+    "expires_at": 1794664027114
+  },
+  {
+    "token": "173b5ed85d163ea188b31ac60b27d036463871a7df186febda37716f71bc579e",
+    "user_id": "u_admin",
+    "username": "admin",
+    "role": "admin",
+    "avatar": "assets/avatars/avatar-1.svg",
+    "expires_at": 1794664641104
+  },
+  {
+    "token": "f6ea00007fc6ed24aa21e3cfced271c3ac2f9e6c7736d5ecc77056a097a995c1",
+    "user_id": "u_1790186215844_f87b8d03",
+    "username": "Dbdyaz",
+    "role": "user",
+    "avatar": "assets/avatars/avatar-3.svg",
+    "expires_at": 1794665539200
   }
 ]
