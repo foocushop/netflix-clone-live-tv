@@ -886,6 +886,27 @@
       "file_ref_sd": null,
       "published_at_hd": "2026-10-15T19:38:48.058Z",
       "telegram_msg_id": 189
+    },
+    {
+      "id": "490447",
+      "episode_num": 42,
+      "title": "La Villa des Cœurs Brisés (2015) - S11E42 - Episode 42",
+      "published_at": "2026-10-16T21:07:04.608Z",
+      "hd_published": true,
+      "sd_published": false,
+      "telegram_msg_id_hd": 190,
+      "telegram_msg_id_sd": null,
+      "file_ref_hd": {
+        "id": "5949806298089397955",
+        "access_hash": "-53291150957271726",
+        "file_reference": "BgAAAAEIDwTcAAAAvmrSkfi+REhms6VaMvF8Q9C4op7D",
+        "mime_type": "video/mp4",
+        "size": 862016653,
+        "dc_id": 4
+      },
+      "file_ref_sd": null,
+      "published_at_hd": "2026-10-16T21:07:04.608Z",
+      "telegram_msg_id": 190
     }
   ],
   "series_9066_s9": [
@@ -1612,6 +1633,48 @@
       "file_ref_sd": null,
       "published_at_hd": "2026-10-14T21:50:21.908Z",
       "telegram_msg_id": 188
+    },
+    {
+      "id": "490448",
+      "episode_num": 29,
+      "title": "Les Apprentis Aventuriers (2016) - S09E29 - ep 29",
+      "published_at": "2026-10-16T21:13:19.786Z",
+      "hd_published": true,
+      "sd_published": false,
+      "telegram_msg_id_hd": 191,
+      "telegram_msg_id_sd": null,
+      "file_ref_hd": {
+        "id": "5952058097903084467",
+        "access_hash": "1345739850390985289",
+        "file_reference": "BgAAAAEIDwTcAAAAv2rSk28bBwVHavg5FjsbRw5lQ8gC",
+        "mime_type": "video/mp4",
+        "size": 1628529658,
+        "dc_id": 4
+      },
+      "file_ref_sd": null,
+      "published_at_hd": "2026-10-16T21:13:19.786Z",
+      "telegram_msg_id": 191
+    },
+    {
+      "id": "490449",
+      "episode_num": 30,
+      "title": "Les Apprentis Aventuriers (2016) - S09E30 - ep 30",
+      "published_at": "2026-10-16T21:22:21.303Z",
+      "hd_published": true,
+      "sd_published": false,
+      "telegram_msg_id_hd": 192,
+      "telegram_msg_id_sd": null,
+      "file_ref_hd": {
+        "id": "5952058097903084469",
+        "access_hash": "2035531949113688906",
+        "file_reference": "BgAAAAEIDwTcAAAAwGrSlY3WpNgL0PsgW2JvvWzFFLML",
+        "mime_type": "video/mp4",
+        "size": 1673749516,
+        "dc_id": 4
+      },
+      "file_ref_sd": null,
+      "published_at_hd": "2026-10-16T21:22:21.303Z",
+      "telegram_msg_id": 192
     }
   ],
   "series_test_s1": [
