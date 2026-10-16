@@ -30786,5 +30786,20 @@
     "last_login": "2026-10-15T23:26:32.014Z",
     "ip": "154.244.4.198",
     "last_ip": "154.244.4.198"
+  },
+  {
+    "id": "u_1792118844151_2bc5569e",
+    "username": "Amina skinny",
+    "password_hash": "9f2c4468b441fde917c01c25e5f844135875c102b58e9aa9c9dc0d1dc7a22f586545ea00501d52c7e4b44d8673d78fb0cd89300f9177063334190893a47bc53c",
+    "salt": "0f489832704f003660cdffd3f5dc7cea",
+    "avatar": "assets/avatars/avatar-9.svg",
+    "role": "user",
+    "banned": false,
+    "ip": "41.82.169.228",
+    "last_ip": "41.82.169.228",
+    "created_at": "2026-10-16T02:47:24.151Z",
+    "last_login": "2026-10-16T02:47:24.151Z",
+    "watch_credit_seconds": 1200,
+    "welcome_seen": false
   }
 ]
