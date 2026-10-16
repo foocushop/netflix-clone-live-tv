@@ -30801,5 +30801,20 @@
     "last_login": "2026-10-16T02:47:24.151Z",
     "watch_credit_seconds": 1200,
     "welcome_seen": false
+  },
+  {
+    "id": "u_1792144590086_61893254",
+    "username": "restream",
+    "password_hash": "acc0373c009c76ff7e9a6ce4df69a9752a8561f5dda263d8f234c6b6640bd7fd3a13762e73ea3881e084aed1d12176d9062b24088b964e4e95ad2b257d0c60b7",
+    "salt": "b9274dd5d20f57b96eb28b75cd2b97eb",
+    "avatar": "assets/avatars/avatar-3.svg",
+    "role": "user",
+    "banned": false,
+    "ip": "2a02:8440:950e:17cd:1d4:34fb:f93c:dbab",
+    "last_ip": "2a02:8440:950e:17cd:1d4:34fb:f93c:dbab",
+    "created_at": "2026-10-16T09:56:30.086Z",
+    "last_login": "2026-10-16T09:56:30.086Z",
+    "watch_credit_seconds": 1200,
+    "welcome_seen": false
   }
 ]
