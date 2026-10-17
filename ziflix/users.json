@@ -8,9 +8,9 @@
     "role": "admin",
     "banned": false,
     "created_at": "2026-09-12T00:18:32.081Z",
-    "last_login": "2026-09-27T01:27:28.258Z",
+    "last_login": "2026-10-17T18:04:18.924Z",
     "is_premium": true,
-    "last_ip": "41.208.137.219",
+    "last_ip": "2001:4278:26:9644:177:8822:d48a:b235",
     "ip": "2001:4278:19:1293:c4e1:d8d8:aa15:a9fc"
   },
   {
@@ -31131,6 +31131,21 @@
     "last_ip": "46.193.7.247",
     "created_at": "2026-10-17T17:20:43.490Z",
     "last_login": "2026-10-17T17:20:43.490Z",
+    "watch_credit_seconds": 1200,
+    "welcome_seen": false
+  },
+  {
+    "id": "u_1792259248651_a9687e9a",
+    "username": "wesly, foot",
+    "password_hash": "cad5fd35ff9bfe414ae6cf61a4de02ab96c400e7311bb81b8eb8d5ce20a1cc98e21b36cd1c6a16708cf13bfbb77508270513262fed60e983013b7c53fd4e4b26",
+    "salt": "46e8171b46fe3d5d0d6bf09bbc90db4e",
+    "avatar": "assets/avatars/avatar-1.svg",
+    "role": "user",
+    "banned": false,
+    "ip": "190.115.175.151",
+    "last_ip": "190.115.175.151",
+    "created_at": "2026-10-17T17:47:28.651Z",
+    "last_login": "2026-10-17T17:47:28.651Z",
     "watch_credit_seconds": 1200,
     "welcome_seen": false
   }
