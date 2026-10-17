@@ -7979,7 +7979,7 @@
     "ip": "2a0d:e487:69f:e83:3090:cc10:3e9:6d94",
     "last_ip": "2a0d:e487:146e:f9dc:c0be:a10e:b4ed:b0e3",
     "created_at": "2026-09-23T17:56:55.844Z",
-    "last_login": "2026-10-17T16:01:17.952Z"
+    "last_login": "2026-10-17T20:39:37.515Z"
   },
   {
     "id": "u_1790187834994_8ed99933",
@@ -31161,6 +31161,21 @@
     "last_ip": "105.67.1.33",
     "created_at": "2026-10-17T18:51:17.263Z",
     "last_login": "2026-10-17T18:51:17.263Z",
+    "watch_credit_seconds": 1200,
+    "welcome_seen": false
+  },
+  {
+    "id": "u_1792268913769_a5e8dc6d",
+    "username": "Fab",
+    "password_hash": "59c0b645b64166f390a38d6810569c7c88a466d2f374cc010e112b604f8e64be56e0415bbd4b274334eb858483cae70de413297d2d70943da0925eea5c7f6be3",
+    "salt": "2abcbb154b98e455f2101363d5c3952f",
+    "avatar": "assets/avatars/avatar-9.svg",
+    "role": "user",
+    "banned": false,
+    "ip": "154.72.162.249",
+    "last_ip": "154.72.162.249",
+    "created_at": "2026-10-17T20:28:33.769Z",
+    "last_login": "2026-10-17T20:28:33.769Z",
     "watch_credit_seconds": 1200,
     "welcome_seen": false
   }
