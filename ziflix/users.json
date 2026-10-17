@@ -138,9 +138,9 @@
     "role": "user",
     "banned": false,
     "created_at": "2026-09-12T17:17:29.884Z",
-    "last_login": "2026-09-15T19:58:31.255Z",
+    "last_login": "2026-10-17T19:26:58.141Z",
     "ip": "2001:861:2410:b100:88b4:f0cf:a85c:f947",
-    "last_ip": "2001:861:2410:b100:88b4:f0cf:a85c:f947"
+    "last_ip": "2001:861:2410:b100:3157:c292:9774:3b28"
   },
   {
     "id": "u_1789233483304_28a8ba54",
@@ -31146,6 +31146,21 @@
     "last_ip": "190.115.175.151",
     "created_at": "2026-10-17T17:47:28.651Z",
     "last_login": "2026-10-17T17:47:28.651Z",
+    "watch_credit_seconds": 1200,
+    "welcome_seen": false
+  },
+  {
+    "id": "u_1792263077262_74268302",
+    "username": "Lilaa",
+    "password_hash": "7f5a03cb8b1556d1d671fcbf6de3f69387ec0e91ee6e5d18ba0098cf0b01a56ad57cf7cc4097034908f75421017b07d08c0f84b26e0bd8fe278967ee5d4c4dff",
+    "salt": "cb9d6112b1331b628b6fca2f297240ff",
+    "avatar": "assets/avatars/avatar-9.svg",
+    "role": "user",
+    "banned": false,
+    "ip": "105.67.1.33",
+    "last_ip": "105.67.1.33",
+    "created_at": "2026-10-17T18:51:17.263Z",
+    "last_login": "2026-10-17T18:51:17.263Z",
     "watch_credit_seconds": 1200,
     "welcome_seen": false
   }
