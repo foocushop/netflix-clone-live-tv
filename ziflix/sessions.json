@@ -112,14 +112,6 @@
     "expires_at": 1792344862977
   },
   {
-    "token": "5e3aac06c65e245e54380a5a0fac11361766e5e8b49b558d42d0d3c67bb8a48e",
-    "user_id": "u_1789563160463_7b953cd3",
-    "username": "Biba",
-    "role": "user",
-    "avatar": "assets/avatars/avatar-1.svg",
-    "expires_at": 1792346171135
-  },
-  {
     "token": "f3ed8c8bd6c4db3feedc583af23e3754e97d7b3ab7a95fe095d129eeceabddeb",
     "user_id": "u_1789228863414_110003d7",
     "username": "Manon95",
@@ -182,14 +174,6 @@
     "role": "user",
     "avatar": "assets/avatars/avatar-1.svg",
     "expires_at": 1792352415841
-  },
-  {
-    "token": "89f6207d038152482a834c6052bb9b9e999922272b77a390d26c56d8e6c912bb",
-    "user_id": "u_1789743084672_3345b370",
-    "username": "Alexander",
-    "role": "user",
-    "avatar": "assets/avatars/avatar-9.svg",
-    "expires_at": 1792353210254
   },
   {
     "token": "83f598d3700aacede5dabb87d3345005bd714740b8c6818311e7d9710c112bd2",
@@ -8254,5 +8238,13 @@
     "role": "user",
     "avatar": "assets/avatars/avatar-9.svg",
     "expires_at": 1794947207427
+  },
+  {
+    "token": "71e63c1f3f64eaacc44fde59786e9298a7a1e118256b958d3b4d39d11d54ac17",
+    "user_id": "u_1792357522405_0b53af7d",
+    "username": "herwann",
+    "role": "user",
+    "avatar": "assets/avatars/avatar-1.svg",
+    "expires_at": 1794949522427
   }
 ]
