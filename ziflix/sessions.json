@@ -8030,5 +8030,13 @@
     "role": "user",
     "avatar": "assets/avatars/avatar-1.svg",
     "expires_at": 1794883927989
+  },
+  {
+    "token": "b42213164bda65fa3607471e10093ac10c4ecc69a2b3a027e15e420758f81b6c",
+    "user_id": "u_1792301834243_95026b58",
+    "username": "Sorelle",
+    "role": "user",
+    "avatar": "assets/avatars/avatar-1.svg",
+    "expires_at": 1794893834264
   }
 ]
