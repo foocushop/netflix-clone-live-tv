@@ -8062,5 +8062,13 @@
     "role": "user",
     "avatar": "assets/avatars/avatar-4.svg",
     "expires_at": 1794898106584
+  },
+  {
+    "token": "f902ffe55dd0cc38e7824d2a26dfd2a006895ac8ea4882a9cdc90d071afbd8af",
+    "user_id": "u_1792309872649_9ba556d5",
+    "username": "Lulu23300",
+    "role": "user",
+    "avatar": "assets/avatars/avatar-1.svg",
+    "expires_at": 1794901872673
   }
 ]

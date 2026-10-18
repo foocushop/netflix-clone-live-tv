@@ -31583,5 +31583,20 @@
     "last_login": "2026-10-18T06:36:18.977Z",
     "watch_credit_seconds": 1200,
     "welcome_seen": false
+  },
+  {
+    "id": "u_1792309872649_9ba556d5",
+    "username": "Lulu23300",
+    "password_hash": "48e3d0759f6fab6ba928d1dee9858f43570712117a39bc2c9d9a594863b8e734af065cc393c577247f0fe9abe6f75190b6a37f21574f6e1e37cd008296507c5d",
+    "salt": "e3f1e1f873caaa80420ec6a9424f7a04",
+    "avatar": "assets/avatars/avatar-1.svg",
+    "role": "user",
+    "banned": false,
+    "ip": "2a01:cb18:a4:5b00:b5ea:cffb:66ac:da8e",
+    "last_ip": "2a01:cb18:a4:5b00:b5ea:cffb:66ac:da8e",
+    "created_at": "2026-10-18T07:51:12.649Z",
+    "last_login": "2026-10-18T07:51:12.649Z",
+    "watch_credit_seconds": 1200,
+    "welcome_seen": false
   }
 ]
