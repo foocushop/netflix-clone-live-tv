@@ -2339,7 +2339,7 @@
     "role": "user",
     "banned": false,
     "created_at": "2026-09-14T01:13:20.996Z",
-    "last_login": "2026-10-17T23:27:49.929Z",
+    "last_login": "2026-10-18T00:35:12.310Z",
     "ip": "2001:4278:20:5bec:314b:56ca:e346:a374",
     "last_ip": "2001:4278:1f:e8f8:881b:c914:6490:5e48"
   },
@@ -31460,7 +31460,7 @@
     "ip": "41.143.226.250",
     "last_ip": "41.143.226.250",
     "created_at": "2026-10-17T23:47:05.960Z",
-    "last_login": "2026-10-17T23:47:05.960Z",
+    "last_login": "2026-10-18T00:30:51.768Z",
     "watch_credit_seconds": 1200,
     "welcome_seen": false
   },
@@ -31476,6 +31476,21 @@
     "last_ip": "167.17.64.239",
     "created_at": "2026-10-18T00:14:28.594Z",
     "last_login": "2026-10-18T00:14:28.594Z",
+    "watch_credit_seconds": 1200,
+    "welcome_seen": false
+  },
+  {
+    "id": "u_1792284606015_5d58f37f",
+    "username": "dija24",
+    "password_hash": "6ee8b0a9a9a5f0695ab84c988bbdeb8817a015a790cfbb060f283d5eccb8e2e145cddfa49d6a8ffeb5dd9c56224fc193240ecd14ad8bd24ccb89c55a95e5107b",
+    "salt": "bf45bc4eb181868d2f711bb57270f62d",
+    "avatar": "assets/avatars/avatar-1.svg",
+    "role": "user",
+    "banned": false,
+    "ip": "2001:4278:1f:e8f8:11e9:6a00:5279:e854",
+    "last_ip": "2001:4278:1f:e8f8:11e9:6a00:5279:e854",
+    "created_at": "2026-10-18T00:50:06.015Z",
+    "last_login": "2026-10-18T00:50:06.015Z",
     "watch_credit_seconds": 1200,
     "welcome_seen": false
   }
