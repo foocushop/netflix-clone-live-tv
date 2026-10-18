@@ -2339,7 +2339,7 @@
     "role": "user",
     "banned": false,
     "created_at": "2026-09-14T01:13:20.996Z",
-    "last_login": "2026-10-18T11:45:27.407Z",
+    "last_login": "2026-10-18T16:14:21.057Z",
     "ip": "2001:4278:20:5bec:314b:56ca:e346:a374",
     "last_ip": "2001:4278:20:f9a:6464:4ee9:8338:b469"
   },
@@ -31821,6 +31821,21 @@
     "last_ip": "2a01:cb08:82df:9500:57e:ed72:ea0a:916a",
     "created_at": "2026-10-18T15:20:13.024Z",
     "last_login": "2026-10-18T15:20:13.024Z",
+    "watch_credit_seconds": 1200,
+    "welcome_seen": false
+  },
+  {
+    "id": "u_1792338568875_77747d52",
+    "username": "LoloFaya94",
+    "password_hash": "699cce9636af4fe6da09ba3c5b3f76b798ce37a57c3a8e4597cd2e52040d832024d104708be3614825080fe3d92ad1d471aa7a0b78bb85b70d404ec13792e1be",
+    "salt": "2699698416a7934d2f56ce1537c488f3",
+    "avatar": "assets/avatars/avatar-1.svg",
+    "role": "user",
+    "banned": false,
+    "ip": "2001:861:388d:ea70:493b:4858:9981:5a47",
+    "last_ip": "2001:861:388d:ea70:493b:4858:9981:5a47",
+    "created_at": "2026-10-18T15:49:28.875Z",
+    "last_login": "2026-10-18T15:49:28.875Z",
     "watch_credit_seconds": 1200,
     "welcome_seen": false
   }
