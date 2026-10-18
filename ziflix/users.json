@@ -32018,5 +32018,35 @@
     "last_login": "2026-10-18T22:18:11.289Z",
     "watch_credit_seconds": 1200,
     "welcome_seen": false
+  },
+  {
+    "id": "u_1792362620002_aeb58731",
+    "username": "desiresall2003@iclaud.com",
+    "password_hash": "802bf5a9b7b447843d410b574566bd8f0f9a679df50e936e3fecd7955d34824c3c2f3910694f6aa5256d602d70a104cc9ded9fecf2842aa2312affe80d5b289b",
+    "salt": "f51ef51cc9fb2461507589e08933fa85",
+    "avatar": "assets/avatars/avatar-4.svg",
+    "role": "user",
+    "banned": false,
+    "ip": "2001:4278:23:f1d3:d982:73ba:588:7dff",
+    "last_ip": "2001:4278:20:9f39:50ab:ce43:2c32:6fe1",
+    "created_at": "2026-10-18T22:30:20.002Z",
+    "last_login": "2026-10-18T22:41:35.977Z",
+    "watch_credit_seconds": 1200,
+    "welcome_seen": false
+  },
+  {
+    "id": "u_1792365231407_29c8eb2d",
+    "username": "amilo765",
+    "password_hash": "3f4d25a6a13b18ab03950b39289b80e81e459ea1107d0c24879c665d32753abb35ff96d2a9e61c2a022d4d3770a3d87d4135cfa70609bc92177d57fbef596d49",
+    "salt": "5b6a31fe5572b822e3d72d5f995598a2",
+    "avatar": "assets/avatars/avatar-1.svg",
+    "role": "user",
+    "banned": false,
+    "ip": "2a01:cb22:8807:200:6168:823b:c896:f621",
+    "last_ip": "2a01:cb22:8807:200:6168:823b:c896:f621",
+    "created_at": "2026-10-18T23:13:51.408Z",
+    "last_login": "2026-10-18T23:13:51.408Z",
+    "watch_credit_seconds": 1200,
+    "welcome_seen": false
   }
 ]
