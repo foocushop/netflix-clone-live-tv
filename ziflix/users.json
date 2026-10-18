@@ -7977,9 +7977,9 @@
     "role": "user",
     "banned": false,
     "ip": "2a0d:e487:69f:e83:3090:cc10:3e9:6d94",
-    "last_ip": "2a0d:e487:221f:14fc:9595:efef:c119:7fad",
+    "last_ip": "2a0d:e487:222f:e9c0:adbc:5a59:d06c:7ea2",
     "created_at": "2026-09-23T17:56:55.844Z",
-    "last_login": "2026-10-18T08:47:27.454Z"
+    "last_login": "2026-10-18T12:56:00.402Z"
   },
   {
     "id": "u_1790187834994_8ed99933",
@@ -31716,6 +31716,36 @@
     "last_ip": "2a01:e0a:f06:fa50:cd07:30d8:5911:5a5",
     "created_at": "2026-10-18T12:12:50.161Z",
     "last_login": "2026-10-18T12:12:50.161Z",
+    "watch_credit_seconds": 1200,
+    "welcome_seen": false
+  },
+  {
+    "id": "u_1792328877882_6131b444",
+    "username": "hello99",
+    "password_hash": "b05cb1bd2fb64ed6825406b71c569cac6ebebe830f17f8cf7df34089cdc387e32706ee39027d0f7fad354a2a1d7eb97daa28a300bb8130373325e923588c0a3e",
+    "salt": "b45a32d3bb68785136e0a2fd5023cb98",
+    "avatar": "assets/avatars/avatar-1.svg",
+    "role": "user",
+    "banned": false,
+    "ip": "197.241.93.136",
+    "last_ip": "197.241.93.136",
+    "created_at": "2026-10-18T13:07:57.882Z",
+    "last_login": "2026-10-18T13:07:57.882Z",
+    "watch_credit_seconds": 1200,
+    "welcome_seen": false
+  },
+  {
+    "id": "u_1792329803707_468e64a6",
+    "username": "Laya",
+    "password_hash": "745adfe7258994ba6cc4efc0ef16f1848d823002dd6edf1cdce833a575a136d945e036cc1894ae0f3d45c85182bfc962f9aed199d5b10a5adb738bf88fcbc572",
+    "salt": "b32e448fa51fec2f92177602ac91b3ef",
+    "avatar": "assets/avatars/avatar-7.svg",
+    "role": "user",
+    "banned": false,
+    "ip": "2a01:e0a:1238:89d0:ec95:9ed3:d62b:658e",
+    "last_ip": "2a01:e0a:1238:89d0:ec95:9ed3:d62b:658e",
+    "created_at": "2026-10-18T13:23:23.707Z",
+    "last_login": "2026-10-18T13:25:42.980Z",
     "watch_credit_seconds": 1200,
     "welcome_seen": false
   }
