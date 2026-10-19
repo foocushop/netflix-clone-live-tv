@@ -1696,6 +1696,27 @@
       "file_ref_sd": null,
       "published_at_hd": "2026-10-16T21:22:21.303Z",
       "telegram_msg_id": 192
+    },
+    {
+      "id": "491088",
+      "episode_num": 31,
+      "title": "Les Apprentis Aventuriers (2016) - S09E31 - ep 31",
+      "published_at": "2026-10-19T19:46:50.532Z",
+      "hd_published": true,
+      "sd_published": false,
+      "telegram_msg_id_hd": 194,
+      "telegram_msg_id_sd": null,
+      "file_ref_hd": {
+        "id": "5958299617392075220",
+        "access_hash": "-142454199038520548",
+        "file_reference": "BgAAAAEIDwTcAAAAwmrWc6oHSTvHyh4fzDo0DATu6OvQ",
+        "mime_type": "video/mp4",
+        "size": 1708675310,
+        "dc_id": 4
+      },
+      "file_ref_sd": null,
+      "published_at_hd": "2026-10-19T19:46:50.532Z",
+      "telegram_msg_id": 194
     }
   ],
   "series_test_s1": [
