@@ -32447,5 +32447,20 @@
     "last_login": "2026-10-19T21:12:07.803Z",
     "watch_credit_seconds": 1200,
     "welcome_seen": false
+  },
+  {
+    "id": "u_1792449354926_6228cea9",
+    "username": "adou laurine",
+    "password_hash": "272e2208f6bcdaecf9603595b011d2972d2b7b69523c7d74a2390e5ee1238d194b452ab836d1a9f0cf7294ad579ce0a042ac01f1804be511a62f4e15d1c9f9b5",
+    "salt": "234788b155bf936f6e308608622ed10b",
+    "avatar": "assets/avatars/avatar-7.svg",
+    "role": "user",
+    "banned": false,
+    "ip": "41.66.53.37",
+    "last_ip": "41.66.53.37",
+    "created_at": "2026-10-19T22:35:54.926Z",
+    "last_login": "2026-10-19T22:35:54.926Z",
+    "watch_credit_seconds": 1200,
+    "welcome_seen": false
   }
 ]
