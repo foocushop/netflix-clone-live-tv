@@ -8326,5 +8326,13 @@
     "role": "user",
     "avatar": "assets/avatars/avatar-1.svg",
     "expires_at": 1794968468343
+  },
+  {
+    "token": "22e81c10e63041d83e462a908ef99fa457edc2a968f3b0d063486b46c84a29af",
+    "user_id": "u_1792381125403_5d8ad785",
+    "username": "Fasha",
+    "role": "user",
+    "avatar": "assets/avatars/avatar-1.svg",
+    "expires_at": 1794973125423
   }
 ]
