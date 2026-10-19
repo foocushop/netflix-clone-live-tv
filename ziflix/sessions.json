@@ -8422,5 +8422,13 @@
     "role": "user",
     "avatar": "assets/avatars/avatar-1.svg",
     "expires_at": 1795009557029
+  },
+  {
+    "token": "8beca6a85a9dd1a86ffb080cf526385d25e882d2162e022a469e03ee4302f763",
+    "user_id": "u_1792420894437_6366cf4f",
+    "username": "Fab22",
+    "role": "user",
+    "avatar": "assets/avatars/avatar-1.svg",
+    "expires_at": 1795012894478
   }
 ]
