@@ -8294,5 +8294,13 @@
     "role": "user",
     "avatar": "assets/avatars/avatar-1.svg",
     "expires_at": 1794957231479
+  },
+  {
+    "token": "9a9f6f4f4b5c3059c2eca4e3f5fc23c48201f935245a2e4144fd89d0a07baab9",
+    "user_id": "u_1792369248394_f1f745ee",
+    "username": "Nihell Mohammedi",
+    "role": "user",
+    "avatar": "assets/avatars/avatar-1.svg",
+    "expires_at": 1794961248415
   }
 ]

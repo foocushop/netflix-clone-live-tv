@@ -32048,5 +32048,20 @@
     "last_login": "2026-10-18T23:13:51.408Z",
     "watch_credit_seconds": 1200,
     "welcome_seen": false
+  },
+  {
+    "id": "u_1792369248394_f1f745ee",
+    "username": "Nihell Mohammedi",
+    "password_hash": "96a422445db73182690153e83b7ff985dad97df2bc14225c69d5134d9eb51e787a4d4cc9fdb491144ced08809208792e0ba50c56a8f318dc53b368c42b14def0",
+    "salt": "286a7dd053fcce5aca86eaf60b169d48",
+    "avatar": "assets/avatars/avatar-1.svg",
+    "role": "user",
+    "banned": false,
+    "ip": "105.235.136.72",
+    "last_ip": "105.235.136.72",
+    "created_at": "2026-10-19T00:20:48.394Z",
+    "last_login": "2026-10-19T00:20:48.394Z",
+    "watch_credit_seconds": 1200,
+    "welcome_seen": false
   }
 ]
