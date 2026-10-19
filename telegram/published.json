@@ -907,6 +907,27 @@
       "file_ref_sd": null,
       "published_at_hd": "2026-10-16T21:07:04.608Z",
       "telegram_msg_id": 190
+    },
+    {
+      "id": "491087",
+      "episode_num": 43,
+      "title": "La Villa des Cœurs Brisés (2015) - S11E43 - Episode 43",
+      "published_at": "2026-10-19T19:09:11.839Z",
+      "hd_published": true,
+      "sd_published": false,
+      "telegram_msg_id_hd": 193,
+      "telegram_msg_id_sd": null,
+      "file_ref_hd": {
+        "id": "5958299617392075205",
+        "access_hash": "-4000789866040828383",
+        "file_reference": "BgAAAAEIDwTcAAAAwWrWatek7SbFlcX4TLGE+8j4p+sb",
+        "mime_type": "video/mp4",
+        "size": 928469844,
+        "dc_id": 4
+      },
+      "file_ref_sd": null,
+      "published_at_hd": "2026-10-19T19:09:11.839Z",
+      "telegram_msg_id": 193
     }
   ],
   "series_9066_s9": [
