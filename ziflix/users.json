@@ -32228,5 +32228,35 @@
     "last_login": "2026-10-19T12:54:11.957Z",
     "watch_credit_seconds": 1200,
     "welcome_seen": false
+  },
+  {
+    "id": "u_1792416595704_801d0b07",
+    "username": "Faty fall",
+    "password_hash": "1c47f61f1e668aff82983ecd50c1350d4113d14661455f678c73545b409cc783fa2a1a6906e571e5cfa85c403be40bb6d565ad625acd20427d09e8b61602c477",
+    "salt": "d6cbc53509966fdda4ef5eb089464b8b",
+    "avatar": "assets/avatars/avatar-1.svg",
+    "role": "user",
+    "banned": false,
+    "ip": "154.124.135.123",
+    "last_ip": "154.124.135.123",
+    "created_at": "2026-10-19T13:29:55.704Z",
+    "last_login": "2026-10-19T13:29:55.704Z",
+    "watch_credit_seconds": 1200,
+    "welcome_seen": false
+  },
+  {
+    "id": "u_1792417557001_1d42bf32",
+    "username": "cjhfgujkij",
+    "password_hash": "b513c3f9f4ed4dab580ec5b749f6b49b6233bf70d541282bdfde74c74c32ec107a9e8695ddb305f13d12b2d4171c42e7938ebc843e97e5c2a8979c95d25f5974",
+    "salt": "47cbd7ebddabe29c07c1b722f4cddfa9",
+    "avatar": "assets/avatars/avatar-1.svg",
+    "role": "user",
+    "banned": false,
+    "ip": "2a01:cb06:8015:6a22:0:61:5674:4c01",
+    "last_ip": "2a01:cb06:8015:6a22:0:61:5674:4c01",
+    "created_at": "2026-10-19T13:45:57.001Z",
+    "last_login": "2026-10-19T13:45:57.001Z",
+    "watch_credit_seconds": 1200,
+    "welcome_seen": false
   }
 ]
