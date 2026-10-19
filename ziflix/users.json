@@ -5408,7 +5408,7 @@
     "role": "user",
     "banned": false,
     "created_at": "2026-09-15T23:32:22.776Z",
-    "last_login": "2026-09-25T19:20:13.027Z",
+    "last_login": "2026-10-19T16:29:03.698Z",
     "ip": "91.134.82.246",
     "last_ip": "184.148.146.198"
   },
@@ -32271,6 +32271,21 @@
     "last_ip": "102.244.221.57",
     "created_at": "2026-10-19T14:41:34.437Z",
     "last_login": "2026-10-19T14:41:34.437Z",
+    "watch_credit_seconds": 1200,
+    "welcome_seen": false
+  },
+  {
+    "id": "u_1792428222165_f7438f54",
+    "username": "Doraaaa",
+    "password_hash": "b377d835df3fb874e35eab61199f5030427d60d0c8a52afc371de4ba92cc555ea8621f14e8d20dadf7798c8f3ea901009b13af6f217a7363389b8a6c976a9207",
+    "salt": "39f3683c91f087b9cb19590f1160e7bb",
+    "avatar": "assets/avatars/avatar-3.svg",
+    "role": "user",
+    "banned": false,
+    "ip": "160.154.219.254",
+    "last_ip": "160.154.219.254",
+    "created_at": "2026-10-19T16:43:42.165Z",
+    "last_login": "2026-10-19T16:43:42.165Z",
     "watch_credit_seconds": 1200,
     "welcome_seen": false
   }
