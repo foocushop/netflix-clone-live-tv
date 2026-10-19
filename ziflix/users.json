@@ -32063,5 +32063,35 @@
     "last_login": "2026-10-19T00:20:48.394Z",
     "watch_credit_seconds": 1200,
     "welcome_seen": false
+  },
+  {
+    "id": "u_1792370120976_d104fe5d",
+    "username": "Merve99",
+    "password_hash": "e6683ad8f0df3abddabe7169fdf118a5465fe70a7b950e6a14849e60e52a184b0f17ee4b38274270eb7573e1e940b56f242c6fa2f08c0ec54dc8a2ae3f695d59",
+    "salt": "0347c6830e63fdf109e1df648be83cfa",
+    "avatar": "assets/avatars/avatar-1.svg",
+    "role": "user",
+    "banned": false,
+    "ip": "2a01:cb0c:55d:ba00:d0f8:2dcf:fd8d:16fc",
+    "last_ip": "2a01:cb0c:55d:ba00:d0f8:2dcf:fd8d:16fc",
+    "created_at": "2026-10-19T00:35:20.976Z",
+    "last_login": "2026-10-19T00:35:20.976Z",
+    "watch_credit_seconds": 1200,
+    "welcome_seen": false
+  },
+  {
+    "id": "u_1792372437916_fcb439d0",
+    "username": "Cylia123",
+    "password_hash": "49330f94344a84e1db16f3ac52c1fa99300641191544afa286845ce03677d4cc15a6e4f494e06d5b413fcf2019caed7276d549ea96908f573f65fc52892e7639",
+    "salt": "f1297a04f87a29cbf12afa85ecffae2e",
+    "avatar": "assets/avatars/avatar-1.svg",
+    "role": "user",
+    "banned": false,
+    "ip": "154.246.98.193",
+    "last_ip": "154.246.98.193",
+    "created_at": "2026-10-19T01:13:57.916Z",
+    "last_login": "2026-10-19T01:13:57.917Z",
+    "watch_credit_seconds": 1200,
+    "welcome_seen": false
   }
 ]
