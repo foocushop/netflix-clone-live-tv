@@ -32093,5 +32093,20 @@
     "last_login": "2026-10-19T01:13:57.917Z",
     "watch_credit_seconds": 1200,
     "welcome_seen": false
+  },
+  {
+    "id": "u_1792376468320_eae76977",
+    "username": "Zzxvibe",
+    "password_hash": "8a73fdce30ea36fd04ca13cd4c24f874fc7319158f57620a87539b2da0065a019bbb6dbebab2835d96c7e6e2fa7c6dea1a1508157efe4d53df6c6cb0800dda46",
+    "salt": "b898bbc7890e3bccd66486e6b2efba4a",
+    "avatar": "assets/avatars/avatar-1.svg",
+    "role": "user",
+    "banned": false,
+    "ip": "174.89.80.171",
+    "last_ip": "174.89.80.171",
+    "created_at": "2026-10-19T02:21:08.320Z",
+    "last_login": "2026-10-19T02:21:08.320Z",
+    "watch_credit_seconds": 1200,
+    "welcome_seen": false
   }
 ]
