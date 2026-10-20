@@ -32492,5 +32492,20 @@
     "last_login": "2026-10-20T01:18:16.006Z",
     "watch_credit_seconds": 1200,
     "welcome_seen": false
+  },
+  {
+    "id": "u_1792498032047_46618702",
+    "username": "reineestherass02",
+    "password_hash": "62193ecbc65aa46c7506cca2a4b282db0b446f3c447c13e95c13237973e0f4d52c0917ee61e1913997d1af10999f86adf679dd6f8b442b3e28629650915c6ab0",
+    "salt": "36a53e7286ac2e9b565c385948f3347c",
+    "avatar": "assets/avatars/avatar-1.svg",
+    "role": "user",
+    "banned": false,
+    "ip": "2c0f:4c40:d2f:ce63:2936:80f5:f6ba:9bc6",
+    "last_ip": "2c0f:4c40:d2f:ce63:2936:80f5:f6ba:9bc6",
+    "created_at": "2026-10-20T12:07:12.047Z",
+    "last_login": "2026-10-20T12:07:12.047Z",
+    "watch_credit_seconds": 1200,
+    "welcome_seen": false
   }
 ]

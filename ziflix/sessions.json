@@ -8086,5 +8086,13 @@
     "role": "user",
     "avatar": "assets/avatars/avatar-1.svg",
     "expires_at": 1795085797351
+  },
+  {
+    "token": "80ccb705238ef401c6681d3800294c32fa4bbba6ce668ad23dd6cc9a3281e4d9",
+    "user_id": "u_1792498032047_46618702",
+    "username": "reineestherass02",
+    "role": "user",
+    "avatar": "assets/avatars/avatar-1.svg",
+    "expires_at": 1795090032069
   }
 ]
