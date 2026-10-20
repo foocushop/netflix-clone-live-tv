@@ -8046,5 +8046,13 @@
     "role": "user",
     "avatar": "assets/avatars/avatar-7.svg",
     "expires_at": 1795041354953
+  },
+  {
+    "token": "076e005ac8ae6b9748f884098b7d1fd21c08d9bd5c1d9ca21f8839924a3bfa91",
+    "user_id": "u_1792454142512_56da68b5",
+    "username": "Cinefil69",
+    "role": "user",
+    "avatar": "assets/avatars/avatar-1.svg",
+    "expires_at": 1795046142537
   }
 ]
