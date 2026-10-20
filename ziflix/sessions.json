@@ -8014,5 +8014,13 @@
     "role": "user",
     "avatar": "assets/avatars/avatar-3.svg",
     "expires_at": 1795109511347
+  },
+  {
+    "token": "d213af78a4f2ee5d0a53ffe99a977eaae173fbfacbb36de3c45ad578fbbe5a12",
+    "user_id": "u_1792521732123_1ab3d23a",
+    "username": "Lezooigo",
+    "role": "user",
+    "avatar": "assets/avatars/avatar-1.svg",
+    "expires_at": 1795113732152
   }
 ]
