@@ -8070,5 +8070,13 @@
     "role": "user",
     "avatar": "assets/avatars/avatar-1.svg",
     "expires_at": 1795060573399
+  },
+  {
+    "token": "8010853f8c1895b1187ec5c27a41939cd9e09d3f0acc8b3befa396cf0d6f1f54",
+    "user_id": "u_1789506261091_a58195d6",
+    "username": "leaticiangello83@gmail.com",
+    "role": "user",
+    "avatar": "assets/avatars/avatar-1.svg",
+    "expires_at": 1795078524428
   }
 ]
