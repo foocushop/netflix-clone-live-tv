@@ -8054,5 +8054,13 @@
     "role": "user",
     "avatar": "assets/avatars/avatar-1.svg",
     "expires_at": 1795046142537
+  },
+  {
+    "token": "f936f01daaf20385ec09b377c735e8a30a4607d98e34a3ffc4c4e53bf9c53b7e",
+    "user_id": "u_1792459096006_4d9462b0",
+    "username": "Adri",
+    "role": "user",
+    "avatar": "assets/avatars/avatar-1.svg",
+    "expires_at": 1795051096030
   }
 ]
