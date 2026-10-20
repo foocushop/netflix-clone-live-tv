@@ -8,9 +8,9 @@
     "role": "admin",
     "banned": false,
     "created_at": "2026-09-12T00:18:32.081Z",
-    "last_login": "2026-10-19T21:25:17.743Z",
+    "last_login": "2026-10-20T19:27:01.486Z",
     "is_premium": true,
-    "last_ip": "2001:4278:26:9644:340f:32f1:90c4:d88e",
+    "last_ip": "2001:4278:26:9644:cca8:1331:2a01:1a80",
     "ip": "2001:4278:19:1293:c4e1:d8d8:aa15:a9fc"
   },
   {
@@ -7249,9 +7249,9 @@
     "role": "user",
     "banned": false,
     "ip": "23.162.152.28",
-    "last_ip": "154.124.229.249",
+    "last_ip": "41.214.40.189",
     "created_at": "2026-09-19T10:33:29.759Z",
-    "last_login": "2026-09-19T19:14:01.420Z"
+    "last_login": "2026-10-20T19:15:56.142Z"
   },
   {
     "id": "u_1789814463308_6c06d9a3",
@@ -7979,7 +7979,7 @@
     "ip": "2a0d:e487:69f:e83:3090:cc10:3e9:6d94",
     "last_ip": "2a0d:e487:65e:af25:d454:8579:714d:ed45",
     "created_at": "2026-09-23T17:56:55.844Z",
-    "last_login": "2026-10-20T17:31:51.323Z"
+    "last_login": "2026-10-20T19:10:41.508Z"
   },
   {
     "id": "u_1790187834994_8ed99933",
@@ -32662,6 +32662,81 @@
     "last_ip": "2a01:cb0c:194:aa00:9830:ba09:3ab4:adc2",
     "created_at": "2026-10-20T18:42:12.123Z",
     "last_login": "2026-10-20T18:42:12.123Z",
+    "watch_credit_seconds": 1200,
+    "welcome_seen": false
+  },
+  {
+    "id": "u_1792523142565_f24f05d7",
+    "username": "Greg",
+    "password_hash": "441eb8dbc43990161b90856712dd79afdd4bb771570009291975df7a9f4eac612a4e3d0f9758ec7322ddf11cad8fcadc01bb6dd8a8c14584a0063c35c5856008",
+    "salt": "3dc020c72fe4c2a0400285440cce6d67",
+    "avatar": "assets/avatars/avatar-1.svg",
+    "role": "user",
+    "banned": false,
+    "ip": "2a01:e0a:b3a:e0:81a7:ce54:9f2:583",
+    "last_ip": "2a01:e0a:b3a:e0:81a7:ce54:9f2:583",
+    "created_at": "2026-10-20T19:05:42.566Z",
+    "last_login": "2026-10-20T19:05:42.566Z",
+    "watch_credit_seconds": 1200,
+    "welcome_seen": false
+  },
+  {
+    "id": "u_1792524279288_69755883",
+    "username": "Kira naww",
+    "password_hash": "180846111ea5922a8c91717f6019db65961a3c390d09b37555b6a874d94b0cec6216bfa2eb36cc557b64756035463f0c89baa7cb0f821135253e05be644091a2",
+    "salt": "5643c89e770f52b9ec3d7cd9bfe546c9",
+    "avatar": "assets/avatars/avatar-1.svg",
+    "role": "user",
+    "banned": false,
+    "ip": "41.82.180.98",
+    "last_ip": "41.82.180.98",
+    "created_at": "2026-10-20T19:24:39.288Z",
+    "last_login": "2026-10-20T19:24:39.289Z",
+    "watch_credit_seconds": 1200,
+    "welcome_seen": false
+  },
+  {
+    "id": "u_1792524821986_e9ce61f2",
+    "username": "Viscabarça19",
+    "password_hash": "86ea92d03eaf4947a337a493e85f5b9b2b92e411f2ae375843c4aead0e214e2e7cafb751f41719b3b99bb2171cffd22af5ed262f9766c7d9beeea156433abb78",
+    "salt": "18f22e347d7abde8bbc63b44cfe0d7ac",
+    "avatar": "assets/avatars/avatar-7.svg",
+    "role": "user",
+    "banned": false,
+    "ip": "2a01:e0a:b3a:e0:a890:ba33:d64:6ef",
+    "last_ip": "2a01:e0a:b3a:e0:a890:ba33:d64:6ef",
+    "created_at": "2026-10-20T19:33:41.986Z",
+    "last_login": "2026-10-20T19:33:41.986Z",
+    "watch_credit_seconds": 1200,
+    "welcome_seen": false
+  },
+  {
+    "id": "u_1792525427087_bdba896d",
+    "username": "Mami",
+    "password_hash": "bd7aeeae47820d8a9a8270a37b1d5eddd45d33edb7c2efd3f5894bdd29cc87644bd7877ff8b331cabcab5a1190c0b71f53db857beb4e527ffa6d2fdcbd5cd8d0",
+    "salt": "9e1ff70e6f348a69bd1840899c426ac7",
+    "avatar": "assets/avatars/avatar-4.svg",
+    "role": "user",
+    "banned": false,
+    "ip": "38.109.228.106",
+    "last_ip": "38.109.228.106",
+    "created_at": "2026-10-20T19:43:47.087Z",
+    "last_login": "2026-10-20T19:43:47.087Z",
+    "watch_credit_seconds": 1200,
+    "welcome_seen": false
+  },
+  {
+    "id": "u_1792525495143_f35b2211",
+    "username": "faruq",
+    "password_hash": "6255713dfe5606d7d0ef5648355223835c48cd36118fb4065905b169542d52ea658d83ca01158e8a5b62afdf2344f4f9ee4e6ff2e8e4754809c3098d0b4d0bd0",
+    "salt": "1643b45da689f843a9eeba70e60a6271",
+    "avatar": "assets/avatars/avatar-1.svg",
+    "role": "user",
+    "banned": false,
+    "ip": "2a01:e0a:fd9:a5b0:9f95:a1c0:f895:696c",
+    "last_ip": "2a01:e0a:fd9:a5b0:9f95:a1c0:f895:696c",
+    "created_at": "2026-10-20T19:44:55.143Z",
+    "last_login": "2026-10-20T19:44:55.143Z",
     "watch_credit_seconds": 1200,
     "welcome_seen": false
   }
