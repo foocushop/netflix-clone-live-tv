@@ -8062,5 +8062,13 @@
     "role": "user",
     "avatar": "assets/avatars/avatar-1.svg",
     "expires_at": 1795051096030
+  },
+  {
+    "token": "c7ad208f4feb97c06429ee9ab89c6ce8cc7a9da4c99f39d2809726fdea95ac5e",
+    "user_id": "u_1792376468320_eae76977",
+    "username": "Zzxvibe",
+    "role": "user",
+    "avatar": "assets/avatars/avatar-1.svg",
+    "expires_at": 1795060573399
   }
 ]
