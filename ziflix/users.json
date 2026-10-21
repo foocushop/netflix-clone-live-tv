@@ -7977,9 +7977,9 @@
     "role": "user",
     "banned": false,
     "ip": "2a0d:e487:69f:e83:3090:cc10:3e9:6d94",
-    "last_ip": "2a0d:e487:65e:af25:d454:8579:714d:ed45",
+    "last_ip": "2a0d:e487:6be:d4b2:604f:87e3:5a6f:33c1",
     "created_at": "2026-09-23T17:56:55.844Z",
-    "last_login": "2026-10-20T19:10:41.508Z"
+    "last_login": "2026-10-21T08:52:18.275Z"
   },
   {
     "id": "u_1790187834994_8ed99933",
@@ -32298,9 +32298,9 @@
     "role": "user",
     "banned": false,
     "ip": "102.202.111.9",
-    "last_ip": "102.202.111.9",
+    "last_ip": "102.202.111.43",
     "created_at": "2026-10-19T18:34:16.821Z",
-    "last_login": "2026-10-19T18:34:16.821Z",
+    "last_login": "2026-10-21T07:57:09.425Z",
     "watch_credit_seconds": 1200,
     "welcome_seen": false
   },
@@ -32880,5 +32880,20 @@
     "last_login": "2026-10-20T21:57:01.045Z",
     "ip": "2a02:8424:a6e0:fb01:78bb:d858:9864:cd89",
     "last_ip": "2a02:8424:a6e0:fb01:78bb:d858:9864:cd89"
+  },
+  {
+    "id": "u_1792569572837_62c02e5d",
+    "username": "Homer",
+    "password_hash": "615a5e3ebb3355213e03bf915b07158e05d8f67126ef65748f2cd76f1b038f0f27b84c9e4acb91767d2e441d6abe9f340c276dd9f4af7d6a1d2a1f8d09740076",
+    "salt": "7c9ac821c6cd5e97d516ba82a30646ee",
+    "avatar": "assets/avatars/avatar-1.svg",
+    "role": "user",
+    "banned": false,
+    "ip": "2001:1708:a83:7500:a9f5:4564:6118:4dd9",
+    "last_ip": "2001:1708:a83:7500:a9f5:4564:6118:4dd9",
+    "created_at": "2026-10-21T07:59:32.837Z",
+    "last_login": "2026-10-21T07:59:32.837Z",
+    "watch_credit_seconds": 1200,
+    "welcome_seen": false
   }
 ]
