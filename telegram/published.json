@@ -1780,6 +1780,27 @@
       "file_ref_sd": null,
       "published_at_hd": "2026-10-20T22:51:11.468Z",
       "telegram_msg_id": 196
+    },
+    {
+      "id": "491368",
+      "episode_num": 33,
+      "title": "Les Apprentis Aventuriers (2016) - S09E33 - ep 33",
+      "published_at": "2026-10-21T21:05:14.570Z",
+      "hd_published": true,
+      "sd_published": false,
+      "telegram_msg_id_hd": 198,
+      "telegram_msg_id_sd": null,
+      "file_ref_hd": {
+        "id": "5965376581034582719",
+        "access_hash": "3014270272091376881",
+        "file_reference": "BgAAAAEIDwTcAAAAxmrZKQr3tZCA5DluvaUFcSZgInX+",
+        "mime_type": "video/mp4",
+        "size": 1566666277,
+        "dc_id": 4
+      },
+      "file_ref_sd": null,
+      "published_at_hd": "2026-10-21T21:05:14.570Z",
+      "telegram_msg_id": 198
     }
   ],
   "series_test_s1": [

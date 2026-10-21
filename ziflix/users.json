@@ -7236,9 +7236,9 @@
     "role": "user",
     "banned": false,
     "ip": "2001:42c0:8150:5800:b5c8:4385:2b50:e584",
-    "last_ip": "2001:42c0:8137:b500:44ad:750:d684:d6dd",
+    "last_ip": "2001:42c0:8149:6300:8d58:3524:ed41:15a",
     "created_at": "2026-09-19T09:05:59.273Z",
-    "last_login": "2026-10-18T00:21:46.911Z"
+    "last_login": "2026-10-21T21:28:42.663Z"
   },
   {
     "id": "u_1789814009759_e079c487",
@@ -33013,6 +33013,21 @@
     "last_ip": "91.134.35.71",
     "created_at": "2026-10-21T20:17:23.686Z",
     "last_login": "2026-10-21T20:17:23.686Z",
+    "watch_credit_seconds": 1200,
+    "welcome_seen": false
+  },
+  {
+    "id": "u_1792618548644_a4f49684",
+    "username": "Huabjbh",
+    "password_hash": "fc0a11bcb7da787aaeac9c8b4117998254d0a564a7a2b5663a6d4595648b52d767fde63e27fb1b849d42cec6fad315fe4ff7b43cb88e8cc6ae2cb92ffafbbc2d",
+    "salt": "70a6417f4b3b92781a6e0a70d33df103",
+    "avatar": "assets/avatars/avatar-1.svg",
+    "role": "user",
+    "banned": false,
+    "ip": "2c0e:6040:361:2ab8:869:d0f8:99a4:2ed2",
+    "last_ip": "2c0e:6040:361:2ab8:869:d0f8:99a4:2ed2",
+    "created_at": "2026-10-21T21:35:48.644Z",
+    "last_login": "2026-10-21T21:35:48.644Z",
     "watch_credit_seconds": 1200,
     "welcome_seen": false
   }
