@@ -8070,5 +8070,13 @@
     "role": "admin",
     "avatar": "assets/avatars/avatar-1.svg",
     "expires_at": 1795137477764
+  },
+  {
+    "token": "5d214407f02067376ea3eb8b96d2bf220f0ad1c3ac3372c069ef267029f39d38",
+    "user_id": "u_1789458201541_f764c32b",
+    "username": "Gerbi",
+    "role": "user",
+    "avatar": "assets/avatars/avatar-1.svg",
+    "expires_at": 1795155040203
   }
 ]
