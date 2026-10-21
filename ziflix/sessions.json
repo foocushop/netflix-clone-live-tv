@@ -8102,5 +8102,13 @@
     "role": "user",
     "avatar": "assets/avatars/avatar-3.svg",
     "expires_at": 1795164974569
+  },
+  {
+    "token": "ac1b02d70ed62f10f4507ac421b15613ba4110a9c75aa38990e0162c0fcd31a5",
+    "user_id": "u_1792583595325_26956124",
+    "username": "Sami",
+    "role": "user",
+    "avatar": "assets/avatars/avatar-2.svg",
+    "expires_at": 1795175595348
   }
 ]
