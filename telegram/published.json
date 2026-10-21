@@ -949,6 +949,27 @@
       "file_ref_sd": null,
       "published_at_hd": "2026-10-20T22:23:12.288Z",
       "telegram_msg_id": 195
+    },
+    {
+      "id": "491369",
+      "episode_num": 45,
+      "title": "La Villa des Cœurs Brisés (2015) - S11E45 - Episode 45",
+      "published_at": "2026-10-21T19:13:51.025Z",
+      "hd_published": true,
+      "sd_published": false,
+      "telegram_msg_id_hd": 197,
+      "telegram_msg_id_sd": null,
+      "file_ref_hd": {
+        "id": "5965376581034582661",
+        "access_hash": "-3119702977683493704",
+        "file_reference": "BgAAAAEIDwTcAAAAxWrZDu7IyYzMyriGn+K88sG8gpku",
+        "mime_type": "video/mp4",
+        "size": 792687981,
+        "dc_id": 4
+      },
+      "file_ref_sd": null,
+      "published_at_hd": "2026-10-21T19:13:51.025Z",
+      "telegram_msg_id": 197
     }
   ],
   "series_9066_s9": [
