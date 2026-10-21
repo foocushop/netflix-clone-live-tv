@@ -8110,5 +8110,13 @@
     "role": "user",
     "avatar": "assets/avatars/avatar-2.svg",
     "expires_at": 1795175595348
+  },
+  {
+    "token": "bb8ee07a840cfac6b1c0642a4f2725f2429477f20a755b45bea33bc035814f47",
+    "user_id": "u_1792370120976_d104fe5d",
+    "username": "Merve99",
+    "role": "user",
+    "avatar": "assets/avatars/avatar-1.svg",
+    "expires_at": 1795177485420
   }
 ]
