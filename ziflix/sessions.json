@@ -8039,5 +8039,13 @@
     "role": "user",
     "avatar": "assets/avatars/avatar-3.svg",
     "expires_at": 1795260243123
+  },
+  {
+    "token": "91b590bc871114c800dda949ee513ce00bcc031f319d3093bbe5d49dbaca5b8b",
+    "user_id": "u_1792673280843_54af9d3a",
+    "username": "Gabou",
+    "role": "user",
+    "avatar": "assets/avatars/avatar-1.svg",
+    "expires_at": 1795265280863
   }
 ]
