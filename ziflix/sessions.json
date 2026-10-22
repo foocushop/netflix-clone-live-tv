@@ -8127,5 +8127,13 @@
     "role": "user",
     "avatar": "assets/avatars/avatar-1.svg",
     "expires_at": 1795301339835
+  },
+  {
+    "token": "2cee5307db37698d09327a64472d1ddbccb696ddcceb71c1746a5acf8ec517b1",
+    "user_id": "u_1792711097502_4ac1d69a",
+    "username": "Jenni.nys",
+    "role": "user",
+    "avatar": "assets/avatars/avatar-9.svg",
+    "expires_at": 1795303097527
   }
 ]

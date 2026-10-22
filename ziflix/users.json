@@ -33322,5 +33322,20 @@
     "last_login": "2026-10-22T22:44:31.326Z",
     "watch_credit_seconds": 1200,
     "welcome_seen": false
+  },
+  {
+    "id": "u_1792711097502_4ac1d69a",
+    "username": "Jenni.nys",
+    "password_hash": "8a3c59849604bdf585bf47121013929cbb622b3383ca7180413817b0ee33ce9226457c9cbf92cd3f68025f0f089720395fffcd421470c38a2c7aeaaec62da05a",
+    "salt": "829b8ed33ed61d17a946b97de997f302",
+    "avatar": "assets/avatars/avatar-9.svg",
+    "role": "user",
+    "banned": false,
+    "ip": "79.127.139.225",
+    "last_ip": "79.127.139.225",
+    "created_at": "2026-10-22T23:18:17.502Z",
+    "last_login": "2026-10-22T23:18:17.502Z",
+    "watch_credit_seconds": 1200,
+    "welcome_seen": false
   }
 ]
