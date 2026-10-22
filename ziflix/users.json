@@ -7236,9 +7236,9 @@
     "role": "user",
     "banned": false,
     "ip": "2001:42c0:8150:5800:b5c8:4385:2b50:e584",
-    "last_ip": "2001:42c0:8149:6300:8d58:3524:ed41:15a",
+    "last_ip": "41.73.104.59",
     "created_at": "2026-09-19T09:05:59.273Z",
-    "last_login": "2026-10-21T21:28:42.663Z"
+    "last_login": "2026-10-22T22:48:59.815Z"
   },
   {
     "id": "u_1789814009759_e079c487",
@@ -33305,6 +33305,21 @@
     "last_ip": "2a01:e0a:ebc:9ca0:d93a:2acb:77ff:ec3e",
     "created_at": "2026-10-22T21:03:45.934Z",
     "last_login": "2026-10-22T21:03:45.934Z",
+    "watch_credit_seconds": 1200,
+    "welcome_seen": false
+  },
+  {
+    "id": "u_1792709071326_625cf0db",
+    "username": "Juliossp",
+    "password_hash": "d9d48c24af9bb3631e4d77e7dc1032eced5df2e7ce6dda037e4d49070c702b6b98a0f78cfca140e622e237121564793660549b2338e960c07eb2ad673d3eb882",
+    "salt": "a7e41f17bb6d3fbb8b0b16a34f8dacf0",
+    "avatar": "assets/avatars/avatar-10.svg",
+    "role": "user",
+    "banned": false,
+    "ip": "2a02:8428:935b:3701:6913:c060:eddb:a1b7",
+    "last_ip": "2a02:8428:935b:3701:6913:c060:eddb:a1b7",
+    "created_at": "2026-10-22T22:44:31.326Z",
+    "last_login": "2026-10-22T22:44:31.326Z",
     "watch_credit_seconds": 1200,
     "welcome_seen": false
   }
