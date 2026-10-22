@@ -8087,5 +8087,13 @@
     "role": "user",
     "avatar": "assets/avatars/avatar-1.svg",
     "expires_at": 1795215161770
+  },
+  {
+    "token": "187f5bc3746143b2fe34851d6f2695d1bc10ddbe3656d20443d709f0edb5c897",
+    "user_id": "u_1792449354926_6228cea9",
+    "username": "adou laurine",
+    "role": "user",
+    "avatar": "assets/avatars/avatar-7.svg",
+    "expires_at": 1795221675431
   }
 ]
