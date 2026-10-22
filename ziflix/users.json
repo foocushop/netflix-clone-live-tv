@@ -33159,5 +33159,20 @@
     "last_login": "2026-10-22T02:40:05.591Z",
     "watch_credit_seconds": 1200,
     "welcome_seen": false
+  },
+  {
+    "id": "u_1792665555744_55cdf723",
+    "username": "renjyken261291@gmail.com",
+    "password_hash": "dcd959b3127f68027b300d6080a9c54bf7eed659a5c492eedd5223716949d99a160ea864b853028487cfc0927c55bdbe23401577d7f49c09a9be986eb6ca227d",
+    "salt": "947605e0774e37d23aabaf5182d6915f",
+    "avatar": "assets/avatars/avatar-1.svg",
+    "role": "user",
+    "banned": false,
+    "ip": "154.120.142.118",
+    "last_ip": "154.120.142.118",
+    "created_at": "2026-10-22T10:39:15.744Z",
+    "last_login": "2026-10-22T10:39:15.744Z",
+    "watch_credit_seconds": 1200,
+    "welcome_seen": false
   }
 ]
