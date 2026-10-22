@@ -970,6 +970,27 @@
       "file_ref_sd": null,
       "published_at_hd": "2026-10-21T19:13:51.025Z",
       "telegram_msg_id": 197
+    },
+    {
+      "id": "491725",
+      "episode_num": 46,
+      "title": "La Villa des Cœurs Brisés (2015) - S11E46",
+      "published_at": "2026-10-22T21:17:11.383Z",
+      "hd_published": true,
+      "sd_published": false,
+      "telegram_msg_id_hd": 199,
+      "telegram_msg_id_sd": null,
+      "file_ref_hd": {
+        "id": "5969880180661952388",
+        "access_hash": "-3283273639957805170",
+        "file_reference": "BgAAAAEIDwTcAAAAx2rafVd/LB2a4dBM82Qp4ntSWpKw",
+        "mime_type": "video/mp4",
+        "size": 1634597792,
+        "dc_id": 4
+      },
+      "file_ref_sd": null,
+      "published_at_hd": "2026-10-22T21:17:11.383Z",
+      "telegram_msg_id": 199
     }
   ],
   "series_9066_s9": [
