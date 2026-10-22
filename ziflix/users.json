@@ -7979,7 +7979,7 @@
     "ip": "2a0d:e487:69f:e83:3090:cc10:3e9:6d94",
     "last_ip": "2a0d:e487:65e:9e90:f979:838c:ba60:9ebe",
     "created_at": "2026-09-23T17:56:55.844Z",
-    "last_login": "2026-10-22T08:29:50.634Z"
+    "last_login": "2026-10-22T11:24:03.101Z"
   },
   {
     "id": "u_1790187834994_8ed99933",
@@ -31640,7 +31640,7 @@
     "ip": "81.49.12.119",
     "last_ip": "81.49.12.119",
     "created_at": "2026-10-18T10:22:01.886Z",
-    "last_login": "2026-10-20T10:56:37.262Z",
+    "last_login": "2026-10-22T11:10:05.163Z",
     "watch_credit_seconds": 1200,
     "welcome_seen": false
   },
@@ -33172,6 +33172,49 @@
     "last_ip": "154.120.142.118",
     "created_at": "2026-10-22T10:39:15.744Z",
     "last_login": "2026-10-22T10:39:15.744Z",
+    "watch_credit_seconds": 1200,
+    "welcome_seen": false
+  },
+  {
+    "id": "tg_2081248669",
+    "telegram_id": "2081248669",
+    "username": "Maya",
+    "first_name": "Maya",
+    "last_name": "",
+    "avatar": "https://t.me/i/userpic/320/cNjeXYfV95xuvd4yWe5dgq-RF2vHYD33ee0mV8iZw9Y.svg",
+    "role": "user",
+    "banned": false,
+    "created_at": "2026-10-22T05:15:43.469Z",
+    "last_login": "2026-10-22T05:15:43.469Z",
+    "ip": "185.153.85.167",
+    "last_ip": "185.153.85.167"
+  },
+  {
+    "id": "tg_2095773241",
+    "telegram_id": "2095773241",
+    "username": "natty",
+    "first_name": "natty",
+    "last_name": "oppy",
+    "avatar": "https://t.me/i/userpic/320/zjdzesI2s5SynrfPDgrsKiuy44DBQccOTTo7O_MNUhg.svg",
+    "role": "user",
+    "banned": false,
+    "created_at": "2026-10-22T07:24:34.039Z",
+    "last_login": "2026-10-22T07:24:34.039Z",
+    "ip": "178.51.61.138",
+    "last_ip": "178.51.61.138"
+  },
+  {
+    "id": "u_1792667820975_71421260",
+    "username": "Miss belfie",
+    "password_hash": "53ef354c3b6b92caced41109026f0907b694adc83a430cc2955868aa854e3163a50fda5fb0937efe1bda14a5c513895a38a93bbe7b06b5109be78131b2783415",
+    "salt": "397bfbbb69798bb3af3ccd86d60c33ac",
+    "avatar": "assets/avatars/avatar-1.svg",
+    "role": "user",
+    "banned": false,
+    "ip": "154.116.98.91",
+    "last_ip": "154.116.98.91",
+    "created_at": "2026-10-22T11:17:00.975Z",
+    "last_login": "2026-10-22T11:17:00.975Z",
     "watch_credit_seconds": 1200,
     "welcome_seen": false
   }
