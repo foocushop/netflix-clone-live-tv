@@ -8,70 +8,6 @@
     "expires_at": 1794578725792
   },
   {
-    "token": "6a9029f799beab4135bf8b99e7eb058fa4f9f5383bc759bfe5c194cade9f1be6",
-    "user_id": "u_1789256931627_3275ccc1",
-    "username": "Meriemh",
-    "role": "user",
-    "avatar": "assets/avatars/avatar-3.svg",
-    "expires_at": 1792623343606
-  },
-  {
-    "token": "f2616993fd38980a3998a1ee8fcc5c48db2233fe549ff71374c9d3288393dfee",
-    "user_id": "u_1789288489620_888cfe67",
-    "username": "Nino",
-    "role": "user",
-    "avatar": "assets/avatars/avatar-5.svg",
-    "expires_at": 1792623892623
-  },
-  {
-    "token": "826119fa71f0ce180c25e3f1e4070ffb597bbb39693612dea4c8c72440bfd24a",
-    "user_id": "u_1789288489620_888cfe67",
-    "username": "Nino",
-    "role": "user",
-    "avatar": "assets/avatars/avatar-5.svg",
-    "expires_at": 1792624042413
-  },
-  {
-    "token": "5b8b171aa2024070fee6a1c1d22c480034755493971397a88890703a62bc5b4b",
-    "user_id": "u_1790032627099_d7f56c9a",
-    "username": "Gobelean",
-    "role": "user",
-    "avatar": "assets/avatars/avatar-4.svg",
-    "expires_at": 1792624627107
-  },
-  {
-    "token": "66c11f718f108dbe1892525c0fe73a662d9cac51ace74700e054ffc978ef7fc0",
-    "user_id": "u_1790034346493_fd5a9aca",
-    "username": "clara1510",
-    "role": "user",
-    "avatar": "assets/avatars/avatar-4.svg",
-    "expires_at": 1792626346500
-  },
-  {
-    "token": "8939ace16255ffd51c7fe53446cff6f751435f409dd61e02fae9dd3da68d50cf",
-    "user_id": "u_1789674389938_6e62202c",
-    "username": "Maronne",
-    "role": "user",
-    "avatar": "assets/avatars/avatar-1.svg",
-    "expires_at": 1792626571991
-  },
-  {
-    "token": "8d8f8e2967db595d9d8e395866d94326c62ecc0f4cf66c008a6d8f149acecad2",
-    "user_id": "u_1790035883510_c31e3274",
-    "username": "nuevebaby",
-    "role": "user",
-    "avatar": "assets/avatars/avatar-1.svg",
-    "expires_at": 1792627883516
-  },
-  {
-    "token": "d87154a8fca5041e1283a9f7fb136979c8a9e37722ac7127343ac928795197f8",
-    "user_id": "u_1789488612541_ea52c574",
-    "username": "Nono",
-    "role": "user",
-    "avatar": "assets/avatars/avatar-1.svg",
-    "expires_at": 1792628621496
-  },
-  {
     "token": "f0cd005099e2545f3d112e4774cb7832f68dd02d5218586994196ef68bc64493",
     "user_id": "u_1790045119155_de4526d3",
     "username": "khadija",
@@ -8103,5 +8039,13 @@
     "role": "user",
     "avatar": "assets/avatars/avatar-9.svg",
     "expires_at": 1795224061575
+  },
+  {
+    "token": "f0cf40b0fb96516b6d3550941e3c8720ad492a1d388d14c817572092bc3a18e8",
+    "user_id": "u_1792636805591_c23c5bc5",
+    "username": "Skinny",
+    "role": "user",
+    "avatar": "assets/avatars/avatar-9.svg",
+    "expires_at": 1795228805614
   }
 ]
