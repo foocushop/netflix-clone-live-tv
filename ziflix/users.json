@@ -7979,7 +7979,7 @@
     "ip": "2a0d:e487:69f:e83:3090:cc10:3e9:6d94",
     "last_ip": "2a0d:e487:6be:8262:34a7:40e1:71ac:9f7b",
     "created_at": "2026-09-23T17:56:55.844Z",
-    "last_login": "2026-10-22T16:47:52.050Z"
+    "last_login": "2026-10-22T17:34:31.679Z"
   },
   {
     "id": "u_1790187834994_8ed99933",
@@ -33260,6 +33260,21 @@
     "last_ip": "2001:4278:12:4e13:312f:8148:7652:f753",
     "created_at": "2026-10-22T15:19:24.487Z",
     "last_login": "2026-10-22T15:19:24.487Z",
+    "watch_credit_seconds": 1200,
+    "welcome_seen": false
+  },
+  {
+    "id": "u_1792690412506_f06dcfd7",
+    "username": "Soso01",
+    "password_hash": "b93f845ffd044c0f7db50014b89d2289785550b052c0c156371856e0979db5a46ccea42489d5eb09fd08b08150e1290b20d43b430263fd265c30ae79df997cb3",
+    "salt": "0ffee1a4ab674585cf377fe546ee6830",
+    "avatar": "assets/avatars/avatar-10.svg",
+    "role": "user",
+    "banned": false,
+    "ip": "41.141.95.73",
+    "last_ip": "41.141.95.73",
+    "created_at": "2026-10-22T17:33:32.506Z",
+    "last_login": "2026-10-22T17:33:32.506Z",
     "watch_credit_seconds": 1200,
     "welcome_seen": false
   }
