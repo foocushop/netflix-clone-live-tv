@@ -8063,5 +8063,21 @@
     "role": "user",
     "avatar": "assets/avatars/avatar-1.svg",
     "expires_at": 1795351348665
+  },
+  {
+    "token": "20d0fb604845d296afa059bd504a677458c9ddd7f0dae7513d34251d67d2208f",
+    "user_id": "u_1792760762750_5a707aa1",
+    "username": "Beni",
+    "role": "user",
+    "avatar": "assets/avatars/avatar-1.svg",
+    "expires_at": 1795352762771
+  },
+  {
+    "token": "6fe4369032fc52c3826745c044356c887d96d76336ab5a6c6115bf1b6737e0ba",
+    "user_id": "u_1792289236252_c0de923e",
+    "username": "lebantou237@gmail.com",
+    "role": "user",
+    "avatar": "assets/avatars/avatar-2.svg",
+    "expires_at": 1795353090955
   }
 ]
