@@ -33382,5 +33382,20 @@
     "last_login": "2026-10-23T08:37:13.040Z",
     "watch_credit_seconds": 1200,
     "welcome_seen": false
+  },
+  {
+    "id": "u_1792746884820_1385939c",
+    "username": "Zeynab bane",
+    "password_hash": "137ab30c6667cf7f2234b1d343d433d3d9f6942640e428645fecbc28f72ab2ccf2a2e9c1239fca24314538d100bd8414f8a89a6419f2fa07944b2e1692291387",
+    "salt": "0eb2c0584c04180ffaa8e799393a8c51",
+    "avatar": "assets/avatars/avatar-1.svg",
+    "role": "user",
+    "banned": false,
+    "ip": "2001:4278:17:354b:5513:ac7c:b054:388c",
+    "last_ip": "2001:4278:17:354b:5513:ac7c:b054:388c",
+    "created_at": "2026-10-23T09:14:44.820Z",
+    "last_login": "2026-10-23T09:14:44.820Z",
+    "watch_credit_seconds": 1200,
+    "welcome_seen": false
   }
 ]
