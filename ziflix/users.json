@@ -33337,5 +33337,20 @@
     "last_login": "2026-10-22T23:18:17.502Z",
     "watch_credit_seconds": 1200,
     "welcome_seen": false
+  },
+  {
+    "id": "u_1792740785263_6d05f04c",
+    "username": "Tetsu",
+    "password_hash": "8c8c91c19fcba3eb4b08699b1450d05220797015a4fea90192062bd4194b65b059cf62bf28e31c8ad067805b458aa2925058181abf08a1b829a02bcdc5629db5",
+    "salt": "e4ab65b0ca44c9b4770a472e4143cce8",
+    "avatar": "assets/avatars/avatar-1.svg",
+    "role": "user",
+    "banned": false,
+    "ip": "2a01:e0a:b2b:b190:4d2c:747a:f4e6:cbd9",
+    "last_ip": "2a01:e0a:b2b:b190:4d2c:747a:f4e6:cbd9",
+    "created_at": "2026-10-23T07:33:05.263Z",
+    "last_login": "2026-10-23T07:33:05.263Z",
+    "watch_credit_seconds": 1200,
+    "welcome_seen": false
   }
 ]
