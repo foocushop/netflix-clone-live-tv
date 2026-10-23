@@ -3457,9 +3457,9 @@
     "role": "user",
     "banned": false,
     "created_at": "2026-09-14T23:44:15.130Z",
-    "last_login": "2026-09-14T23:44:15.130Z",
+    "last_login": "2026-10-23T23:46:32.840Z",
     "ip": "154.124.52.142",
-    "last_ip": "154.124.52.142"
+    "last_ip": "154.125.140.233"
   },
   {
     "id": "u_1789433447603_38be4f0a",
@@ -9138,9 +9138,9 @@
     "role": "user",
     "banned": false,
     "ip": "2001:861:e3d8:510:44ff:6179:1af7:504d",
-    "last_ip": "2001:861:e3d8:510:295b:4d21:df07:bfec",
+    "last_ip": "2a0d:e487:419e:1234:85ff:2203:dc2d:c38a",
     "created_at": "2026-09-24T20:37:44.480Z",
-    "last_login": "2026-09-26T20:04:20.504Z",
+    "last_login": "2026-10-23T23:28:19.817Z",
     "watch_credit_seconds": 1200,
     "welcome_seen": false
   },
@@ -33470,6 +33470,21 @@
     "last_ip": "2a01:e0a:1235:f240:9970:eeca:2506:6761",
     "created_at": "2026-10-23T22:24:05.103Z",
     "last_login": "2026-10-23T22:24:05.103Z",
+    "watch_credit_seconds": 1200,
+    "welcome_seen": false
+  },
+  {
+    "id": "u_1792799368328_04b627d2",
+    "username": "greenkom6@gmail.com",
+    "password_hash": "0bd4e2c576531a977b3712613f5504960df2767bb9cb61f34577fffdb610a0f8ab83aee2569d063542113d85abb864a776cc9605b9538992146e7916b636f358",
+    "salt": "c6e4a8e17e225d7166e304d45a6954dc",
+    "avatar": "assets/avatars/avatar-9.svg",
+    "role": "user",
+    "banned": false,
+    "ip": "105.100.190.61",
+    "last_ip": "105.100.190.61",
+    "created_at": "2026-10-23T23:49:28.328Z",
+    "last_login": "2026-10-23T23:49:28.328Z",
     "watch_credit_seconds": 1200,
     "welcome_seen": false
   }
