@@ -33352,5 +33352,35 @@
     "last_login": "2026-10-23T07:33:05.263Z",
     "watch_credit_seconds": 1200,
     "welcome_seen": false
+  },
+  {
+    "id": "u_1792742212093_ef899700",
+    "username": "miramira",
+    "password_hash": "42e2d3df6ab59a1fd5880a1203ed4075f9039e902fc40fc49797dd34243445574c9c26cfd854806ac3f46edd282550a7d35b9fb9379a15bdd2f0bfb38cb9072a",
+    "salt": "1f4adb614fe4a6dc15b08c92bda41ca1",
+    "avatar": "assets/avatars/avatar-9.svg",
+    "role": "user",
+    "banned": false,
+    "ip": "41.231.61.130",
+    "last_ip": "41.231.61.130",
+    "created_at": "2026-10-23T07:56:52.093Z",
+    "last_login": "2026-10-23T07:56:52.093Z",
+    "watch_credit_seconds": 1200,
+    "welcome_seen": false
+  },
+  {
+    "id": "u_1792744633040_5b82a739",
+    "username": "Leadrianomin3@gmail.com",
+    "password_hash": "7e85b4a3a8d8328940ebb01dfebd63d09e30528b91cbc00d50dd80cb61211706078a62a7229a66ae1bd3a7cf0924bab170d2452aea6640c9bdcdf064a5e0ea40",
+    "salt": "40a0f7db260932ca16fe487e05c5bf03",
+    "avatar": "assets/avatars/avatar-1.svg",
+    "role": "user",
+    "banned": false,
+    "ip": "105.235.147.18",
+    "last_ip": "105.235.147.18",
+    "created_at": "2026-10-23T08:37:13.040Z",
+    "last_login": "2026-10-23T08:37:13.040Z",
+    "watch_credit_seconds": 1200,
+    "welcome_seen": false
   }
 ]
