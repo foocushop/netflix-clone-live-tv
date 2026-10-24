@@ -33527,9 +33527,9 @@
     "role": "user",
     "banned": false,
     "ip": "2001:42d8:4c4d:6400:9450:750d:3205:2ffa",
-    "last_ip": "2001:42d8:4c4d:6400:9450:750d:3205:2ffa",
+    "last_ip": "102.209.220.214",
     "created_at": "2026-10-24T16:07:11.604Z",
-    "last_login": "2026-10-24T16:07:11.604Z",
+    "last_login": "2026-10-24T18:27:44.265Z",
     "watch_credit_seconds": 1200,
     "welcome_seen": false
   },
@@ -33545,6 +33545,21 @@
     "last_ip": "2001:4278:21:9dcd:24fc:c39d:5acb:155e",
     "created_at": "2026-10-24T16:27:02.329Z",
     "last_login": "2026-10-24T16:27:02.329Z",
+    "watch_credit_seconds": 1200,
+    "welcome_seen": false
+  },
+  {
+    "id": "u_1792866507158_1b8c3560",
+    "username": "avotobevi",
+    "password_hash": "c63dcfce696f0c1c04b199b46ce026d6c6024f3159ddf8801591c1f05d62ef289011cf8b74b151fc5bf25b59df436ade2c1121948622daf8c557df62f2ba1ab2",
+    "salt": "5ced3a5b1f42e045ca416f30b1da11ac",
+    "avatar": "assets/avatars/avatar-1.svg",
+    "role": "user",
+    "banned": false,
+    "ip": "197.149.242.114",
+    "last_ip": "197.149.242.114",
+    "created_at": "2026-10-24T18:28:27.158Z",
+    "last_login": "2026-10-24T18:28:27.158Z",
     "watch_credit_seconds": 1200,
     "welcome_seen": false
   }
