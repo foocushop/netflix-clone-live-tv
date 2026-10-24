@@ -8255,5 +8255,13 @@
     "role": "user",
     "avatar": "assets/avatars/avatar-1.svg",
     "expires_at": 1795451222351
+  },
+  {
+    "token": "319a3e2bbcbd74ff8c37dce5fed2797bfb030dd4af08e7e0572f16eb7661e69f",
+    "user_id": "u_1789378056753_5e147350",
+    "username": "Ness69",
+    "role": "user",
+    "avatar": "assets/avatars/avatar-7.svg",
+    "expires_at": 1795453130138
   }
 ]
