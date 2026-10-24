@@ -3912,7 +3912,7 @@
     "role": "user",
     "banned": false,
     "created_at": "2026-09-15T15:12:31.189Z",
-    "last_login": "2026-09-19T00:20:33.767Z",
+    "last_login": "2026-10-24T22:12:25.609Z",
     "ip": "174.88.44.36",
     "last_ip": "174.88.44.36"
   },
@@ -33720,5 +33720,19 @@
     "last_login": "2026-10-24T13:36:57.808Z",
     "ip": "41.83.172.50",
     "last_ip": "41.83.172.50"
+  },
+  {
+    "id": "tg_1387862466",
+    "telegram_id": "1387862466",
+    "username": "Nathalie_2466",
+    "first_name": "Nathalie",
+    "last_name": "Logo",
+    "avatar": "https://t.me/i/userpic/320/ytS-LV0t9_aP73Z-tylgGg7l2Q-MovnwjFyutG9zq7Q.svg",
+    "role": "user",
+    "banned": false,
+    "created_at": "2026-10-24T21:30:07.199Z",
+    "last_login": "2026-10-24T21:31:26.326Z",
+    "ip": "41.90.173.47",
+    "last_ip": "41.90.173.47"
   }
 ]
