@@ -8231,5 +8231,13 @@
     "role": "user",
     "avatar": "assets/avatars/avatar-1.svg",
     "expires_at": 1795422626133
+  },
+  {
+    "token": "602a78c1a7719aeb1f9b9d5ce5bcc2233237a7f15bb124e956c8e3096adbb91b",
+    "user_id": "u_1790776224203_469d5908",
+    "username": "FOZD9A",
+    "role": "user",
+    "avatar": "assets/avatars/avatar-3.svg",
+    "expires_at": 1795427576403
   }
 ]
