@@ -33734,5 +33734,20 @@
     "last_login": "2026-10-24T21:31:26.326Z",
     "ip": "41.90.173.47",
     "last_ip": "41.90.173.47"
+  },
+  {
+    "id": "u_1792886701906_5b8d227c",
+    "username": "ben asta",
+    "password_hash": "216f8495ff48998c33ce1bec6b81e7468101e868353dff7ac350d547a10860e41ed525732e7132e70936c3f2df132a494d34f5d3794f0f6f3c55e534b5d269a9",
+    "salt": "bd3c15b10802a39e284576574f91d2cc",
+    "avatar": "assets/avatars/avatar-1.svg",
+    "role": "user",
+    "banned": false,
+    "ip": "2c0f:4c40:d2f:d17e:a97:cee3:e50:b4e2",
+    "last_ip": "2c0f:4c40:d2f:d17e:a97:cee3:e50:b4e2",
+    "created_at": "2026-10-25T00:05:01.906Z",
+    "last_login": "2026-10-25T00:05:01.906Z",
+    "watch_credit_seconds": 1200,
+    "welcome_seen": false
   }
 ]
