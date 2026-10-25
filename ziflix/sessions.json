@@ -6935,5 +6935,13 @@
     "role": "user",
     "avatar": "assets/avatars/avatar-3.svg",
     "expires_at": 1795518685890
+  },
+  {
+    "token": "de4244a9223720b6ec72d7edda7fcc95ed996072dcd6ef3b988ef35c49df3ee1",
+    "user_id": "u_1792932405470_f01fea18",
+    "username": "Momo46",
+    "role": "user",
+    "avatar": "assets/avatars/avatar-1.svg",
+    "expires_at": 1795524405490
   }
 ]
