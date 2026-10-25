@@ -7979,7 +7979,7 @@
     "ip": "2a0d:e487:69f:e83:3090:cc10:3e9:6d94",
     "last_ip": "2a0d:e487:6be:d454:d8af:7df3:2639:a7aa",
     "created_at": "2026-09-23T17:56:55.844Z",
-    "last_login": "2026-10-25T13:04:22.531Z"
+    "last_login": "2026-10-25T16:14:33.392Z"
   },
   {
     "id": "u_1790187834994_8ed99933",
@@ -33777,6 +33777,21 @@
     "last_ip": "2a02:8440:e503:f30:ad3c:6e2c:3ad3:1486",
     "created_at": "2026-10-25T12:46:45.470Z",
     "last_login": "2026-10-25T12:46:45.470Z",
+    "watch_credit_seconds": 1200,
+    "welcome_seen": false
+  },
+  {
+    "id": "u_1792945512615_e8a4e4a9",
+    "username": "Nana25",
+    "password_hash": "74f2e32cfb20bf189c95b68c44619736b73f297734d2fcd276e282cbf5e7300f306034ef82f3f44537b070721a34223896bb6c6b02f7fb0b6dba4f2fdeb70149",
+    "salt": "4a6c8e820dafe14e526126e9e783a4c3",
+    "avatar": "assets/avatars/avatar-1.svg",
+    "role": "user",
+    "banned": false,
+    "ip": "2a01:e0a:f20:eaf0:7c4d:8183:5dea:58be",
+    "last_ip": "2a01:e0a:f20:eaf0:7c4d:8183:5dea:58be",
+    "created_at": "2026-10-25T16:25:12.615Z",
+    "last_login": "2026-10-25T16:25:12.615Z",
     "watch_credit_seconds": 1200,
     "welcome_seen": false
   }
