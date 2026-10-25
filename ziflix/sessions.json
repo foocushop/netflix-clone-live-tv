@@ -744,14 +744,6 @@
     "expires_at": 1792958584275
   },
   {
-    "token": "6a93e28efddc780301cb7ea2f7a334f405b61a9d13f0177aaead7e1ed2cc8d90",
-    "user_id": "u_1790366786308_787fb0ee",
-    "username": "Loyce, lolo",
-    "role": "user",
-    "avatar": "assets/avatars/avatar-1.svg",
-    "expires_at": 1792958786315
-  },
-  {
     "token": "52f7ad842cf0a14cdf926440d41b565317fec48d73c0204d77e9c84706988fa4",
     "user_id": "u_1790366865672_f04a25a1",
     "username": "Myaar",
@@ -7007,5 +6999,13 @@
     "role": "user",
     "avatar": "assets/avatars/avatar-1.svg",
     "expires_at": 1795552969337
+  },
+  {
+    "token": "65c233df225c2bcc2e936d307dddb3d45370858705354c02403b11c873de7ef9",
+    "user_id": "u_1792964216475_d668e09c",
+    "username": "Miel",
+    "role": "user",
+    "avatar": "assets/avatars/avatar-1.svg",
+    "expires_at": 1795556216504
   }
 ]
