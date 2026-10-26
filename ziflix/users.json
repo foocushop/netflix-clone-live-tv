@@ -3249,9 +3249,9 @@
     "role": "user",
     "banned": false,
     "created_at": "2026-09-14T19:45:21.902Z",
-    "last_login": "2026-09-17T19:32:26.976Z",
+    "last_login": "2026-10-26T22:01:16.579Z",
     "ip": "2a01:cc00:c663:7d01:10a7:88c:6116:db0",
-    "last_ip": "2a01:cc00:c663:7d01:10a7:88c:6116:db0"
+    "last_ip": "2a01:cc00:c647:2c00:60c4:f37e:47a4:33b2"
   },
   {
     "id": "u_1789415977586_97ad7965",
@@ -9138,9 +9138,9 @@
     "role": "user",
     "banned": false,
     "ip": "2001:861:e3d8:510:44ff:6179:1af7:504d",
-    "last_ip": "2a0d:e487:419e:1234:85ff:2203:dc2d:c38a",
+    "last_ip": "2001:861:e3d8:510:8184:a82d:633f:35bf",
     "created_at": "2026-09-24T20:37:44.480Z",
-    "last_login": "2026-10-23T23:28:19.817Z",
+    "last_login": "2026-10-26T22:37:51.850Z",
     "watch_credit_seconds": 1200,
     "welcome_seen": false
   },
@@ -33879,7 +33879,7 @@
     "ip": "196.127.12.59",
     "last_ip": "196.127.12.59",
     "created_at": "2026-10-25T23:30:00.625Z",
-    "last_login": "2026-10-26T01:12:38.531Z",
+    "last_login": "2026-10-26T22:08:47.869Z",
     "watch_credit_seconds": 1200,
     "welcome_seen": false
   },
@@ -33955,6 +33955,21 @@
     "last_ip": "2a02:8440:a505:84c8::bb94:63f0",
     "created_at": "2026-10-26T21:08:58.740Z",
     "last_login": "2026-10-26T21:08:58.740Z",
+    "watch_credit_seconds": 1200,
+    "welcome_seen": false
+  },
+  {
+    "id": "u_1793052396635_a22c9c81",
+    "username": "Kadybagayoko",
+    "password_hash": "230904cc9ad9b1fd07f654a8b57540ca11b1c637a834efdb98ec744d35bb3ec45679de431cc2ba32aeb8d2e9c5d71a972fbd12b11f50a6e343f37166620e0198",
+    "salt": "26353d4333ffeb8b1db9d0b544c299c4",
+    "avatar": "assets/avatars/avatar-1.svg",
+    "role": "user",
+    "banned": false,
+    "ip": "41.221.187.140",
+    "last_ip": "41.221.187.140",
+    "created_at": "2026-10-26T22:06:36.636Z",
+    "last_login": "2026-10-26T22:06:36.636Z",
     "watch_credit_seconds": 1200,
     "welcome_seen": false
   }
