@@ -34017,5 +34017,35 @@
     "last_login": "2026-10-27T12:41:42.856Z",
     "watch_credit_seconds": 1200,
     "welcome_seen": false
+  },
+  {
+    "id": "u_1793109974919_f3328e56",
+    "username": "Nelyaeva2026",
+    "password_hash": "e9852a250fa909808f428a9c1b24347c0d02b3027d6074348a5ad16e96685c67b532760e26d5b6e6253a38eb466f156d49e160a187eafcead01940d1754c79d3",
+    "salt": "008ac0af310fc4b44795350632bd7f99",
+    "avatar": "assets/avatars/avatar-1.svg",
+    "role": "user",
+    "banned": false,
+    "ip": "142.170.126.255",
+    "last_ip": "142.170.126.255",
+    "created_at": "2026-10-27T14:06:14.919Z",
+    "last_login": "2026-10-27T14:06:14.919Z",
+    "watch_credit_seconds": 1200,
+    "welcome_seen": false
+  },
+  {
+    "id": "u_1793112851423_07ce20f6",
+    "username": "fbhgjjhf",
+    "password_hash": "d2d2625c568e73e1b404947c64901242245bbdc5ea0d4fb19c6d127391c365d6a2c7d02c5c2cceb7e318806ba408a27c9e74addd6ddaf832dbe90fd2200e84b6",
+    "salt": "911b181fe888aac1bb3b048008b89719",
+    "avatar": "assets/avatars/avatar-1.svg",
+    "role": "user",
+    "banned": false,
+    "ip": "2a01:cb08:82df:8600:7cfd:35ea:bd0e:c9fe",
+    "last_ip": "2a01:cb08:82df:8600:7cfd:35ea:bd0e:c9fe",
+    "created_at": "2026-10-27T14:54:11.423Z",
+    "last_login": "2026-10-27T14:54:11.423Z",
+    "watch_credit_seconds": 1200,
+    "welcome_seen": false
   }
 ]
