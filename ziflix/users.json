@@ -34002,5 +34002,20 @@
     "last_login": "2026-10-27T11:30:38.099Z",
     "watch_credit_seconds": 1200,
     "welcome_seen": false
+  },
+  {
+    "id": "u_1793104902856_11e831b3",
+    "username": "Brandy",
+    "password_hash": "823a20b8c821411b82f2f134e2424300c11b4bf20f48ba4f7da5b49e28f212a5d6da4b8403419d6c62aee20ff7c30d9b15a3a6a33e8ddf741733917168cd2a30",
+    "salt": "0909e5415cd71208f8dcd14032cc82b2",
+    "avatar": "assets/avatars/avatar-1.svg",
+    "role": "user",
+    "banned": false,
+    "ip": "160.113.0.133",
+    "last_ip": "160.113.0.133",
+    "created_at": "2026-10-27T12:41:42.856Z",
+    "last_login": "2026-10-27T12:41:42.856Z",
+    "watch_credit_seconds": 1200,
+    "welcome_seen": false
   }
 ]
