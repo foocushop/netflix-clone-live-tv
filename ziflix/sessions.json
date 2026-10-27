@@ -6079,5 +6079,13 @@
     "role": "user",
     "avatar": "assets/avatars/avatar-1.svg",
     "expires_at": 1795704851509
+  },
+  {
+    "token": "63b528db0839014ead302feb50603ed31bbd2c36e1c8a435191b8fe8b03f18c0",
+    "user_id": "u_1789939832889_0362a6f0",
+    "username": "vie",
+    "role": "user",
+    "avatar": "assets/avatars/avatar-1.svg",
+    "expires_at": 1795710996849
   }
 ]
