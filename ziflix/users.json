@@ -33894,7 +33894,7 @@
     "ip": "2001:4278:22:42c1:2c9c:e346:b88b:4c90",
     "last_ip": "2001:4278:20:1fb:c4a1:f1de:491b:4b61",
     "created_at": "2026-10-26T15:03:20.962Z",
-    "last_login": "2026-10-27T10:56:02.830Z",
+    "last_login": "2026-10-27T11:53:01.208Z",
     "watch_credit_seconds": 1200,
     "welcome_seen": false
   },
@@ -33985,6 +33985,21 @@
     "last_ip": "77.136.66.230",
     "created_at": "2026-10-27T03:14:40.756Z",
     "last_login": "2026-10-27T03:14:40.756Z",
+    "watch_credit_seconds": 1200,
+    "welcome_seen": false
+  },
+  {
+    "id": "u_1793100638099_6d74f7d3",
+    "username": "juju_22",
+    "password_hash": "a41660161bcaa83467faf6c0b769e42571b4536d8946f68e6ab5fe3f2881dcde97d0048a3a7bf0ac65810de9e49f10ba0fcf315b900ed45bfa824c3957bbd5fd",
+    "salt": "badd5f56146f1a72fe3cd68189f0f664",
+    "avatar": "assets/avatars/avatar-3.svg",
+    "role": "user",
+    "banned": false,
+    "ip": "2a02:a03f:c274:8601:f8d0:2ba5:9cfa:4fae",
+    "last_ip": "2a02:a03f:c274:8601:f8d0:2ba5:9cfa:4fae",
+    "created_at": "2026-10-27T11:30:38.099Z",
+    "last_login": "2026-10-27T11:30:38.099Z",
     "watch_credit_seconds": 1200,
     "welcome_seen": false
   }
