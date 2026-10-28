@@ -5839,5 +5839,13 @@
     "role": "user",
     "avatar": "assets/avatars/avatar-1.svg",
     "expires_at": 1795776593509
+  },
+  {
+    "token": "8252b75019f9b06d10105844ddd3d609904277559e4c24e635af64e7e09db90c",
+    "user_id": "u_1793027000962_d02138df",
+    "username": "Dija23",
+    "role": "user",
+    "avatar": "assets/avatars/avatar-1.svg",
+    "expires_at": 1795784521869
   }
 ]
