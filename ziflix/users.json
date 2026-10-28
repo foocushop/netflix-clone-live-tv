@@ -5317,9 +5317,9 @@
     "role": "user",
     "banned": false,
     "created_at": "2026-09-15T21:18:07.184Z",
-    "last_login": "2026-10-20T15:39:18.519Z",
+    "last_login": "2026-10-28T21:41:05.954Z",
     "ip": "154.124.197.68",
-    "last_ip": "2a09:bac3:5534:432::6b:d0"
+    "last_ip": "2a09:bac2:5531:1c82::2d7:121"
   },
   {
     "id": "u_1789508249336_c04a00a4",
@@ -7977,9 +7977,9 @@
     "role": "user",
     "banned": false,
     "ip": "2a0d:e487:69f:e83:3090:cc10:3e9:6d94",
-    "last_ip": "2a0d:e487:6be:d454:d8af:7df3:2639:a7aa",
+    "last_ip": "2a0d:e487:6ee:68bf:fd0d:9841:550:bf2c",
     "created_at": "2026-09-23T17:56:55.844Z",
-    "last_login": "2026-10-25T22:33:40.936Z"
+    "last_login": "2026-10-28T21:00:44.200Z"
   },
   {
     "id": "u_1790187834994_8ed99933",
@@ -33892,9 +33892,9 @@
     "role": "user",
     "banned": false,
     "ip": "2001:4278:22:42c1:2c9c:e346:b88b:4c90",
-    "last_ip": "2001:4278:20:2b56:9141:de1e:d6d5:a551",
+    "last_ip": "2001:4278:20:2b56:f0f2:af81:48cc:c79d",
     "created_at": "2026-10-26T15:03:20.962Z",
-    "last_login": "2026-10-28T20:31:55.221Z",
+    "last_login": "2026-10-28T21:47:50.872Z",
     "watch_credit_seconds": 1200,
     "welcome_seen": false
   },
@@ -34075,6 +34075,21 @@
     "last_ip": "2a01:cb08:82c8:1900:7cfd:35ea:bd0e:c9fe",
     "created_at": "2026-10-28T15:31:37.331Z",
     "last_login": "2026-10-28T15:31:37.331Z",
+    "watch_credit_seconds": 1200,
+    "welcome_seen": false
+  },
+  {
+    "id": "u_1793222165423_e3cec389",
+    "username": "petit corps",
+    "password_hash": "868a0b6349d53f5d668964f79e482ca5ac72966515e2622d8091ec35ef36f69de0632e704f55c89de9b9e5ab2c18452ed227e7c1aa3ed823423b381baf72d9c0",
+    "salt": "ef57aa40bcbe616bdd56494854afdc1e",
+    "avatar": "assets/avatars/avatar-8.svg",
+    "role": "user",
+    "banned": false,
+    "ip": "102.207.1.87",
+    "last_ip": "102.207.1.87",
+    "created_at": "2026-10-28T21:16:05.423Z",
+    "last_login": "2026-10-28T21:16:05.423Z",
     "watch_credit_seconds": 1200,
     "welcome_seen": false
   }
