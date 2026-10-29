@@ -5991,5 +5991,13 @@
     "role": "user",
     "avatar": "assets/avatars/avatar-1.svg",
     "expires_at": 1795861023060
+  },
+  {
+    "token": "f6fb776cc08f366bdac4a7b6586161d79546204749d588ad7143021cc614c75d",
+    "user_id": "u_1789429455130_c8eaba65",
+    "username": "Safia",
+    "role": "user",
+    "avatar": "assets/avatars/avatar-1.svg",
+    "expires_at": 1795869956367
   }
 ]
