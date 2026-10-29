@@ -34107,5 +34107,20 @@
     "last_login": "2026-10-28T22:56:32.879Z",
     "watch_credit_seconds": 1200,
     "welcome_seen": false
+  },
+  {
+    "id": "u_1793240530471_a210fb20",
+    "username": "Tah kand",
+    "password_hash": "0805fe9ad8eb8da0c1976eb9785c533ede790224f90ac7c8b727825d1ca063b68f9e81b6dfdf1132dc097cdba3f2eaacb1962058793b3c462ffe15455cd10b4b",
+    "salt": "cb2beaef3346f358b39da8cdbb984026",
+    "avatar": "assets/avatars/avatar-1.svg",
+    "role": "user",
+    "banned": false,
+    "ip": "160.179.47.148",
+    "last_ip": "160.179.47.148",
+    "created_at": "2026-10-29T02:22:10.471Z",
+    "last_login": "2026-10-29T02:22:10.471Z",
+    "watch_credit_seconds": 1200,
+    "welcome_seen": false
   }
 ]
