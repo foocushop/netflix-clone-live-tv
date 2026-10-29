@@ -5983,5 +5983,13 @@
     "role": "user",
     "avatar": "assets/avatars/avatar-6.svg",
     "expires_at": 1795857060275
+  },
+  {
+    "token": "f960115ea429167924431b3c1496600396bd9bea0a70e472b90592d785423c3f",
+    "user_id": "u_1793269022974_7525d9c3",
+    "username": "Mariak09",
+    "role": "user",
+    "avatar": "assets/avatars/avatar-1.svg",
+    "expires_at": 1795861023060
   }
 ]
