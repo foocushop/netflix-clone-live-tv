@@ -33894,7 +33894,7 @@
     "ip": "2001:4278:22:42c1:2c9c:e346:b88b:4c90",
     "last_ip": "2001:4278:23:cfe:8c21:4f58:8ffd:2962",
     "created_at": "2026-10-26T15:03:20.962Z",
-    "last_login": "2026-10-29T18:05:52.941Z",
+    "last_login": "2026-10-29T21:07:48.264Z",
     "watch_credit_seconds": 1200,
     "welcome_seen": false
   },
@@ -34150,6 +34150,21 @@
     "last_ip": "41.221.189.101",
     "created_at": "2026-10-29T10:17:02.974Z",
     "last_login": "2026-10-29T10:17:02.974Z",
+    "watch_credit_seconds": 1200,
+    "welcome_seen": false
+  },
+  {
+    "id": "u_1793310321714_a0f7474e",
+    "username": "DIPPER",
+    "password_hash": "a55f4000b80f1d292278156545d43a67ab75c6013322d162d6619ec99170c0cff5d78371a9de53ea6b7f53af028f0ea28cdaca38804cdd31f0068c1d0ae43eb1",
+    "salt": "29c0ca4e12a80cef31db6d5bd8c6b387",
+    "avatar": "assets/avatars/avatar-4.svg",
+    "role": "user",
+    "banned": false,
+    "ip": "105.159.234.50",
+    "last_ip": "105.159.234.50",
+    "created_at": "2026-10-29T21:45:21.714Z",
+    "last_login": "2026-10-29T21:45:21.714Z",
     "watch_credit_seconds": 1200,
     "welcome_seen": false
   }
