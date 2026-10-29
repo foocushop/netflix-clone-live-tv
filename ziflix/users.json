@@ -34122,5 +34122,20 @@
     "last_login": "2026-10-29T02:22:10.471Z",
     "watch_credit_seconds": 1200,
     "welcome_seen": false
+  },
+  {
+    "id": "u_1793265060250_9a0c0fd4",
+    "username": "noush",
+    "password_hash": "9f68e66ddac1a5c372b3ae9ac2436efa4b8c86bb129808150dd16667fe6eb82dec2fdd4440a977fff766094d16159377446f9c2bb7ffdfc197aee4f82d7335ad",
+    "salt": "b290ab794d53d47d2944228d1070906f",
+    "avatar": "assets/avatars/avatar-6.svg",
+    "role": "user",
+    "banned": false,
+    "ip": "162.19.240.226",
+    "last_ip": "162.19.240.226",
+    "created_at": "2026-10-29T09:11:00.250Z",
+    "last_login": "2026-10-29T09:11:00.250Z",
+    "watch_credit_seconds": 1200,
+    "welcome_seen": false
   }
 ]
