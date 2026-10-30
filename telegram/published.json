@@ -1075,6 +1075,27 @@
       "file_ref_sd": null,
       "published_at_hd": "2026-10-29T05:46:01.642Z",
       "telegram_msg_id": 206
+    },
+    {
+      "id": "493079",
+      "episode_num": 51,
+      "title": "La Villa des Cœurs Brisés (2015) - S11E51 - Episode 51",
+      "published_at": "2026-10-30T06:15:06.522Z",
+      "hd_published": true,
+      "sd_published": false,
+      "telegram_msg_id_hd": 208,
+      "telegram_msg_id_sd": null,
+      "file_ref_hd": {
+        "id": "5990329413311405275",
+        "access_hash": "944814604612328824",
+        "file_reference": "BgAAAAEIDwTcAAAA0GrkNeq3l8A0dDui5paM5rhW1qa3",
+        "mime_type": "video/mp4",
+        "size": 1234907762,
+        "dc_id": 4
+      },
+      "file_ref_sd": null,
+      "published_at_hd": "2026-10-30T06:15:06.522Z",
+      "telegram_msg_id": 208
     }
   ],
   "series_9066_s9": [
@@ -1990,6 +2011,27 @@
       "file_ref_sd": null,
       "published_at_hd": "2026-10-29T05:50:18.721Z",
       "telegram_msg_id": 207
+    },
+    {
+      "id": "493078",
+      "episode_num": 38,
+      "title": "Les Apprentis Aventuriers (2016) - S09E38 - Épisode 38",
+      "published_at": "2026-10-30T06:20:35.853Z",
+      "hd_published": true,
+      "sd_published": false,
+      "telegram_msg_id_hd": 209,
+      "telegram_msg_id_sd": null,
+      "file_ref_hd": {
+        "id": "5992581213125090989",
+        "access_hash": "5319892815608859553",
+        "file_reference": "BgAAAAEIDwTcAAAA0WrkNzODQfe0ZmrDThGztJaV52um",
+        "mime_type": "video/mp4",
+        "size": 1693168749,
+        "dc_id": 4
+      },
+      "file_ref_sd": null,
+      "published_at_hd": "2026-10-30T06:20:35.853Z",
+      "telegram_msg_id": 209
     }
   ],
   "series_test_s1": [
