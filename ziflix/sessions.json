@@ -5391,5 +5391,13 @@
     "role": "user",
     "avatar": "assets/avatars/avatar-8.svg",
     "expires_at": 1795955189130
+  },
+  {
+    "token": "6c700125310e824ee8b61d589fe6af817fe7088cd31bc1ed0454d72a19b8b648",
+    "user_id": "u_1789485151189_7931ff80",
+    "username": "cici06",
+    "role": "user",
+    "avatar": "assets/avatars/avatar-1.svg",
+    "expires_at": 1795968195652
   }
 ]
