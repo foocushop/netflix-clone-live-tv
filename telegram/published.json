@@ -1096,6 +1096,27 @@
       "file_ref_sd": null,
       "published_at_hd": "2026-10-30T06:15:06.522Z",
       "telegram_msg_id": 208
+    },
+    {
+      "id": "493152",
+      "episode_num": 52,
+      "title": "La Villa des Cœurs Brisés (2015) - S11E52 - Episode 52",
+      "published_at": "2026-10-30T20:54:25.599Z",
+      "hd_published": true,
+      "sd_published": false,
+      "telegram_msg_id_hd": 210,
+      "telegram_msg_id_sd": null,
+      "file_ref_hd": {
+        "id": "5992380565137923999",
+        "access_hash": "1730298844352611238",
+        "file_reference": "BgAAAAEIDwTcAAAA0mrlBAGlxLb2++Kcn3/jzE/N+Goh",
+        "mime_type": "video/mp4",
+        "size": 1677139899,
+        "dc_id": 4
+      },
+      "file_ref_sd": null,
+      "published_at_hd": "2026-10-30T20:54:25.599Z",
+      "telegram_msg_id": 210
     }
   ],
   "series_9066_s9": [
