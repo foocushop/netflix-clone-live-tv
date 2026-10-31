@@ -34505,5 +34505,20 @@
     "last_login": "2026-10-31T02:50:37.835Z",
     "watch_credit_seconds": 1200,
     "welcome_seen": false
+  },
+  {
+    "id": "u_1793417601717_91ccb24a",
+    "username": "Slar",
+    "password_hash": "a130895f759b3f9635e46a66da48097696077005ae49e121505611f7859ed64e9c9d8624b54b8b809e9ead8899e962fbeac5a78c1fa6cd21f36a2cbee69a4e4f",
+    "salt": "3685235b6bc3cf64628842d36147c826",
+    "avatar": "assets/avatars/avatar-1.svg",
+    "role": "user",
+    "banned": false,
+    "ip": "2001:4278:14:a94:fd58:7252:1bfe:723",
+    "last_ip": "2001:4278:14:a94:fd58:7252:1bfe:723",
+    "created_at": "2026-10-31T03:33:21.717Z",
+    "last_login": "2026-10-31T03:33:21.717Z",
+    "watch_credit_seconds": 1200,
+    "welcome_seen": false
   }
 ]
