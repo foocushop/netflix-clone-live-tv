@@ -3795,9 +3795,9 @@
     "role": "user",
     "banned": false,
     "created_at": "2026-09-15T11:49:46.099Z",
-    "last_login": "2026-10-24T20:58:07.988Z",
+    "last_login": "2026-10-31T12:43:03.475Z",
     "ip": "167.17.64.193",
-    "last_ip": "2001:4278:23:a33b:f8d0:8909:d2e2:2447"
+    "last_ip": "2001:4278:1f:8d2a:c8a:7f3:4e00:8ac9"
   },
   {
     "id": "u_1789473983090_1572b072",
@@ -34132,9 +34132,9 @@
     "role": "user",
     "banned": false,
     "ip": "162.19.240.226",
-    "last_ip": "162.19.240.226",
+    "last_ip": "41.214.38.4",
     "created_at": "2026-10-29T09:11:00.250Z",
-    "last_login": "2026-10-29T09:11:00.250Z",
+    "last_login": "2026-10-31T12:34:57.040Z",
     "watch_credit_seconds": 1200,
     "welcome_seen": false
   },
@@ -34518,6 +34518,21 @@
     "last_ip": "2001:4278:14:a94:fd58:7252:1bfe:723",
     "created_at": "2026-10-31T03:33:21.717Z",
     "last_login": "2026-10-31T03:33:21.717Z",
+    "watch_credit_seconds": 1200,
+    "welcome_seen": false
+  },
+  {
+    "id": "u_1793449703900_2545cd95",
+    "username": "Ebnz",
+    "password_hash": "2cda4c5a844b4c6a7cd74dc44cc77fa614efafdbbb89e781c399254e436fc3022bd61312467b392b58f007d9a4a064e6117f6c493f9a1b7182d2b791a437f33c",
+    "salt": "4550ef5ef43f1219ba775c81e530843a",
+    "avatar": "assets/avatars/avatar-1.svg",
+    "role": "user",
+    "banned": false,
+    "ip": "2a01:cb00:8743:9a00:8942:5e7a:e2d1:e2c2",
+    "last_ip": "2a01:cb00:8743:9a00:8942:5e7a:e2d1:e2c2",
+    "created_at": "2026-10-31T12:28:23.900Z",
+    "last_login": "2026-10-31T12:28:23.900Z",
     "watch_credit_seconds": 1200,
     "welcome_seen": false
   }
