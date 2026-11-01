@@ -33894,7 +33894,7 @@
     "ip": "2001:4278:22:42c1:2c9c:e346:b88b:4c90",
     "last_ip": "2001:4278:20:14bf:520:3865:c7a9:ed4",
     "created_at": "2026-10-26T15:03:20.962Z",
-    "last_login": "2026-11-01T20:53:07.581Z",
+    "last_login": "2026-11-01T23:05:56.808Z",
     "watch_credit_seconds": 1200,
     "welcome_seen": false
   },
@@ -34623,6 +34623,21 @@
     "last_ip": "2001:4278:15:e023:6568:d2b0:f477:c684",
     "created_at": "2026-11-01T20:46:40.158Z",
     "last_login": "2026-11-01T20:46:40.158Z",
+    "watch_credit_seconds": 1200,
+    "welcome_seen": false
+  },
+  {
+    "id": "u_1793576245661_f5f174a9",
+    "username": "Fabi20",
+    "password_hash": "321b4ead35571e4096e07257fd35f3ef42221534026c1e56be5ae643c8e47d424d88487d3b901526fa3a005ce4deed6bafe783a603795f8c7ade0bcc8f20b7f8",
+    "salt": "6514bec86801491cb3a315212aec229b",
+    "avatar": "assets/avatars/avatar-3.svg",
+    "role": "user",
+    "banned": false,
+    "ip": "41.83.199.246",
+    "last_ip": "41.83.199.246",
+    "created_at": "2026-11-01T23:37:25.661Z",
+    "last_login": "2026-11-01T23:37:25.661Z",
     "watch_credit_seconds": 1200,
     "welcome_seen": false
   }
