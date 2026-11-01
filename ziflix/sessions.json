@@ -3785,14 +3785,6 @@
     "expires_at": 1795128908268
   },
   {
-    "token": "6935ae875d170904fe6500d45f31085b1434c027c4c88f306ba61d95fac9744e",
-    "user_id": "u_admin",
-    "username": "admin",
-    "role": "admin",
-    "avatar": "assets/avatars/avatar-1.svg",
-    "expires_at": 1795137477764
-  },
-  {
     "token": "5d214407f02067376ea3eb8b96d2bf220f0ad1c3ac3372c069ef267029f39d38",
     "user_id": "u_1789458201541_f764c32b",
     "username": "Gerbi",
@@ -5687,5 +5679,13 @@
     "role": "user",
     "avatar": "assets/avatars/avatar-1.svg",
     "expires_at": 1796088389345
+  },
+  {
+    "token": "255472c77440d03d3e4b5496c4ad8df6a904b1c2cf698e7974ce34caba07f350",
+    "user_id": "u_admin",
+    "username": "admin",
+    "role": "admin",
+    "avatar": "assets/avatars/avatar-1.svg",
+    "expires_at": 1796090231873
   }
 ]
