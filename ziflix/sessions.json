@@ -8,31 +8,6 @@
     "expires_at": 1794578725792
   },
   {
-    "token": "d070e740ee294eee0e16e97ba937d681202c22cc77a26abb8442bcbb873a18dc",
-    "user_id": "u_1790969988249_134dcb67",
-    "username": "Doudouzo",
-    "role": "vip",
-    "avatar": "assets/avatars/avatar-1.svg",
-    "expires_at": 1793561988270,
-    "is_vip": true
-  },
-  {
-    "token": "7244d4716873d48a604c2e6f4cc53569dcb8546fd84c82dc78776834d1ed265a",
-    "user_id": "u_1789458869824_e5248185",
-    "username": "Lilith",
-    "role": "user",
-    "avatar": "assets/avatars/avatar-9.svg",
-    "expires_at": 1793563834816
-  },
-  {
-    "token": "03f1c783aefa3d0b7c1f2e261354c08453ce370b3ee7e257c3399ec9b9e2913c",
-    "user_id": "u_1789458869824_e5248185",
-    "username": "Lilith",
-    "role": "user",
-    "avatar": "assets/avatars/avatar-9.svg",
-    "expires_at": 1793564818147
-  },
-  {
     "token": "f1a58ed46a06b7260a4646dece817e06b6ff961bb4986986bff6447377086e79",
     "user_id": "u_1789808759273_1549d8d4",
     "username": "Sirantousylla",
@@ -5119,5 +5094,37 @@
     "role": "user",
     "avatar": "assets/avatars/avatar-3.svg",
     "expires_at": 1796154169966
+  },
+  {
+    "token": "a531d95fd886d7e6bf28032b703810726eb2d78f5e998ef6314191e5b0d02225",
+    "user_id": "u_1789485151189_7931ff80",
+    "username": "cici06",
+    "role": "user",
+    "avatar": "assets/avatars/avatar-1.svg",
+    "expires_at": 1796155508025
+  },
+  {
+    "token": "98082ca10486caf2668402626f15ed3f97d361087c6f9444946cb2ea8cec7438",
+    "user_id": "u_1793027000962_d02138df",
+    "username": "Dija23",
+    "role": "user",
+    "avatar": "assets/avatars/avatar-1.svg",
+    "expires_at": 1796157063947
+  },
+  {
+    "token": "a01cae3534ab4ba63c3ebac2265a9db82b892c6a637ffb227688177f4ad64a44",
+    "user_id": "u_1793566000158_dd59ecf3",
+    "username": "dgdhsdjb",
+    "role": "user",
+    "avatar": "assets/avatars/avatar-1.svg",
+    "expires_at": 1796158000208
+  },
+  {
+    "token": "c283dcf9c70b8fdb936eb50e2fd9d290d0a09b3c20e1e7f02407b57dc96f2927",
+    "user_id": "u_1793027000962_d02138df",
+    "username": "Dija23",
+    "role": "user",
+    "avatar": "assets/avatars/avatar-1.svg",
+    "expires_at": 1796158387636
   }
 ]
