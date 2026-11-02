@@ -33527,9 +33527,9 @@
     "role": "user",
     "banned": false,
     "ip": "2001:42d8:4c4d:6400:9450:750d:3205:2ffa",
-    "last_ip": "102.209.220.214",
+    "last_ip": "2001:42d8:4c4d:6400:78db:cd16:df04:bdb9",
     "created_at": "2026-10-24T16:07:11.604Z",
-    "last_login": "2026-10-24T18:27:44.265Z",
+    "last_login": "2026-11-02T19:31:44.798Z",
     "watch_credit_seconds": 1200,
     "welcome_seen": false
   },
@@ -34684,6 +34684,21 @@
     "last_ip": "154.240.121.1",
     "created_at": "2026-11-02T16:20:27.791Z",
     "last_login": "2026-11-02T16:20:27.791Z",
+    "watch_credit_seconds": 1200,
+    "welcome_seen": false
+  },
+  {
+    "id": "u_1793647350484_b5855f1d",
+    "username": "michou",
+    "password_hash": "a21a63868763d2489d2787dfa32edebc9d86704aebd9958ccbaa64ba3da46a48227fc2243d00dd1aefc2ff067afbd1e92ab804edd6727526adf359e2d9f2a167",
+    "salt": "03c1722d6d397962e77e8af85c890bc6",
+    "avatar": "assets/avatars/avatar-4.svg",
+    "role": "user",
+    "banned": false,
+    "ip": "41.83.31.90",
+    "last_ip": "41.83.31.90",
+    "created_at": "2026-11-02T19:22:30.484Z",
+    "last_login": "2026-11-02T19:22:30.484Z",
     "watch_credit_seconds": 1200,
     "welcome_seen": false
   }
