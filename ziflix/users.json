@@ -34701,5 +34701,20 @@
     "last_login": "2026-11-02T19:22:30.484Z",
     "watch_credit_seconds": 1200,
     "welcome_seen": false
+  },
+  {
+    "id": "u_1793669090998_8933bc9b",
+    "username": "tvnvstvs",
+    "password_hash": "26ed8b569e76205e18aae0c496308c2fa23f89f7a8a88f0c44bb08b00676245b7b8acc35ed8bab4d7615aadd231860ef1310bdd388a94ff67db87d6cfd7764f2",
+    "salt": "1fc6c84f1087dbe71f5c69ed0ff3733e",
+    "avatar": "assets/avatars/avatar-1.svg",
+    "role": "user",
+    "banned": false,
+    "ip": "102.209.222.92",
+    "last_ip": "102.209.222.92",
+    "created_at": "2026-11-03T01:24:50.998Z",
+    "last_login": "2026-11-03T01:24:50.998Z",
+    "watch_credit_seconds": 1200,
+    "welcome_seen": false
   }
 ]

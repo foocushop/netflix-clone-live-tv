@@ -5215,5 +5215,13 @@
     "role": "user",
     "avatar": "assets/avatars/avatar-1.svg",
     "expires_at": 1796256535553
+  },
+  {
+    "token": "37a73cc73ecc56ca5e277a8140d97978690a128c4f57ef8b6a4d89f4bd01ed41",
+    "user_id": "u_1793669090998_8933bc9b",
+    "username": "tvnvstvs",
+    "role": "user",
+    "avatar": "assets/avatars/avatar-1.svg",
+    "expires_at": 1796261091021
   }
 ]
