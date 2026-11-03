@@ -1138,6 +1138,27 @@
       "file_ref_sd": null,
       "published_at_hd": "2026-11-03T09:51:28.953Z",
       "telegram_msg_id": 211
+    },
+    {
+      "id": "494115",
+      "episode_num": 54,
+      "title": "La Villa des Cœurs Brisés (2015) - S11E54 - Episode 54",
+      "published_at": "2026-11-03T21:39:08.332Z",
+      "hd_published": true,
+      "sd_published": false,
+      "telegram_msg_id_hd": 213,
+      "telegram_msg_id_sd": null,
+      "file_ref_hd": {
+        "id": "6005759804876790823",
+        "access_hash": "94081648207792115",
+        "file_reference": "BgAAAAEIDwTcAAAA1WrqVHwa7AGJG0g1uAZT320Hl/iE",
+        "mime_type": "video/mp4",
+        "size": 1055615427,
+        "dc_id": 4
+      },
+      "file_ref_sd": null,
+      "published_at_hd": "2026-11-03T21:39:08.332Z",
+      "telegram_msg_id": 213
     }
   ],
   "series_9066_s9": [
