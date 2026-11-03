@@ -2116,6 +2116,27 @@
       "file_ref_sd": null,
       "published_at_hd": "2026-11-03T10:08:18.780Z",
       "telegram_msg_id": 212
+    },
+    {
+      "id": "494116",
+      "episode_num": 40,
+      "title": "Les Apprentis Aventuriers (2016) - S09E40 - Épisode 40",
+      "published_at": "2026-11-03T23:09:50.497Z",
+      "hd_published": true,
+      "sd_published": false,
+      "telegram_msg_id_hd": 214,
+      "telegram_msg_id_sd": null,
+      "file_ref_hd": {
+        "id": "6005759804876790828",
+        "access_hash": "7821851403832255673",
+        "file_reference": "BgAAAAEIDwTcAAAA1mrqab6jmktrfJwF9+os5CFoWOFD",
+        "mime_type": "video/mp4",
+        "size": 1640091305,
+        "dc_id": 4
+      },
+      "file_ref_sd": null,
+      "published_at_hd": "2026-11-03T23:09:50.498Z",
+      "telegram_msg_id": 214
     }
   ],
   "series_test_s1": [
