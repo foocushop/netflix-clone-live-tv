@@ -5271,5 +5271,13 @@
     "role": "user",
     "avatar": "assets/avatars/avatar-8.svg",
     "expires_at": 1796300176899
+  },
+  {
+    "token": "14e7d97a05701635ae1440d67ea100bdb950426e96239185c020db5bc2de1f25",
+    "user_id": "u_1789504038405_3aa4b548",
+    "username": "davidgboko786@gmail.com",
+    "role": "user",
+    "avatar": "assets/avatars/avatar-1.svg",
+    "expires_at": 1796303220659
   }
 ]
