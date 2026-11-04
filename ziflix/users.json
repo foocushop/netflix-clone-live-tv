@@ -33894,7 +33894,7 @@
     "ip": "2001:4278:22:42c1:2c9c:e346:b88b:4c90",
     "last_ip": "2001:4278:23:a83d:75a7:ff6d:c49:9891",
     "created_at": "2026-10-26T15:03:20.962Z",
-    "last_login": "2026-11-04T10:42:09.114Z",
+    "last_login": "2026-11-04T11:31:32.387Z",
     "watch_credit_seconds": 1200,
     "welcome_seen": false
   },
@@ -34834,6 +34834,36 @@
     "last_ip": "2c0f:4c40:d2f:bbbb:7888:a116:af9b:ca09",
     "created_at": "2026-11-03T23:37:30.842Z",
     "last_login": "2026-11-03T23:40:55.785Z",
+    "watch_credit_seconds": 1200,
+    "welcome_seen": false
+  },
+  {
+    "id": "u_1793792318280_9d51c416",
+    "username": "ggjjcxx CBN njg",
+    "password_hash": "89fdacf0a7bbbe455e2cb0c36021a63efb7732ae518db7b908ebc4794f3b3f383ed4ac9deb5f854a7c4495d3db7140fa4f8db13a98a278652a291854afd90dea",
+    "salt": "9a7ad35ffdb4506cadd84686db054385",
+    "avatar": "assets/avatars/avatar-1.svg",
+    "role": "user",
+    "banned": false,
+    "ip": "2a01:cb08:82cf:aa00:d63:b0fa:4745:5dfd",
+    "last_ip": "2a01:cb08:82cf:aa00:d63:b0fa:4745:5dfd",
+    "created_at": "2026-11-04T11:38:38.280Z",
+    "last_login": "2026-11-04T11:38:38.280Z",
+    "watch_credit_seconds": 1200,
+    "welcome_seen": false
+  },
+  {
+    "id": "u_1793792495386_23ad32c2",
+    "username": "frjhdhjkgg",
+    "password_hash": "e3ca31387d6e53756742371ea7f6cc19b0c7329b5d8e2aece640a2251498e855e4dc0621fb087f254304a3f449b094cd507202f6a87114548eb70a99f59c0946",
+    "salt": "98c9749ca7f3f42436adef546e82abc7",
+    "avatar": "assets/avatars/avatar-1.svg",
+    "role": "user",
+    "banned": false,
+    "ip": "2a01:cb08:82cf:aa00:d63:b0fa:4745:5dfd",
+    "last_ip": "2a01:cb08:82cf:aa00:d63:b0fa:4745:5dfd",
+    "created_at": "2026-11-04T11:41:35.386Z",
+    "last_login": "2026-11-04T11:41:35.386Z",
     "watch_credit_seconds": 1200,
     "welcome_seen": false
   }
