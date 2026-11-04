@@ -5415,5 +5415,13 @@
     "role": "user",
     "avatar": "assets/avatars/avatar-1.svg",
     "expires_at": 1796397971377
+  },
+  {
+    "token": "93e63239efed8523ad0a50328bc44c549aaa4734946a58f913c6f479e8e3bcf0",
+    "user_id": "u_1793809886290_9dedb0f4",
+    "username": "danybzh35",
+    "role": "user",
+    "avatar": "assets/avatars/avatar-3.svg",
+    "expires_at": 1796401886320
   }
 ]
