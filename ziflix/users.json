@@ -34881,5 +34881,20 @@
     "last_login": "2026-11-04T12:34:30.455Z",
     "watch_credit_seconds": 1200,
     "welcome_seen": false
+  },
+  {
+    "id": "u_1793805971355_de4e0558",
+    "username": "Cinehpone",
+    "password_hash": "79d530c645b1b549a35972f572fef759bf0bfcafae2cb0fb868c88d16b044d4dae9b92e0901b044f06297c3ad0088e2af8d7bc6ecbf709b92b403c0773df7322",
+    "salt": "468b74a8a2c6394bb3decce346d51a13",
+    "avatar": "assets/avatars/avatar-1.svg",
+    "role": "user",
+    "banned": false,
+    "ip": "176.159.239.75",
+    "last_ip": "176.159.239.75",
+    "created_at": "2026-11-04T15:26:11.355Z",
+    "last_login": "2026-11-04T15:26:11.355Z",
+    "watch_credit_seconds": 1200,
+    "welcome_seen": false
   }
 ]
