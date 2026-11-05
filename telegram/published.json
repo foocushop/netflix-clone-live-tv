@@ -2158,6 +2158,27 @@
       "file_ref_sd": null,
       "published_at_hd": "2026-11-03T23:09:50.498Z",
       "telegram_msg_id": 214
+    },
+    {
+      "id": "494270",
+      "episode_num": 41,
+      "title": "Les Apprentis Aventuriers (2016) - S09E41 - Épisode 41",
+      "published_at": "2026-11-05T13:46:53.669Z",
+      "hd_published": true,
+      "sd_published": false,
+      "telegram_msg_id_hd": 216,
+      "telegram_msg_id_sd": null,
+      "file_ref_hd": {
+        "id": "6010265702311665352",
+        "access_hash": "-5336725914064550061",
+        "file_reference": "BgAAAAEIDwTcAAAA2GrsiM1Lj/KriQ+Bg9JoZuvAcZiw",
+        "mime_type": "video/mp4",
+        "size": 1719736667,
+        "dc_id": 4
+      },
+      "file_ref_sd": null,
+      "published_at_hd": "2026-11-05T13:46:53.669Z",
+      "telegram_msg_id": 216
     }
   ],
   "series_test_s1": [
