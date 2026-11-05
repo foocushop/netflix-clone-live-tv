@@ -34956,5 +34956,20 @@
     "last_login": "2026-11-04T22:43:40.670Z",
     "watch_credit_seconds": 1200,
     "welcome_seen": false
+  },
+  {
+    "id": "u_1793895269765_747e6990",
+    "username": "Divine ruth",
+    "password_hash": "f4384ac51799f00a1e937e6e9eeeea98bf573bfaca8daaed757fa452a62660eb3a5bbb05abef9acfb6d40fc8550e6e2bd1d1cfe9c3ac9e46facef5c0576656df",
+    "salt": "531e77936841c303ce39a97222b22732",
+    "avatar": "assets/avatars/avatar-1.svg",
+    "role": "user",
+    "banned": false,
+    "ip": "2c0f:e00:580:d300:5b1:b01e:95a2:ba4d",
+    "last_ip": "2c0f:e00:580:d300:5b1:b01e:95a2:ba4d",
+    "created_at": "2026-11-05T16:14:29.765Z",
+    "last_login": "2026-11-05T16:14:29.765Z",
+    "watch_credit_seconds": 1200,
+    "welcome_seen": false
   }
 ]
