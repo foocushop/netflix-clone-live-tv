@@ -5527,5 +5527,13 @@
     "role": "user",
     "avatar": "assets/avatars/avatar-1.svg",
     "expires_at": 1796515808502
+  },
+  {
+    "token": "6cef064aceb6f4d28fd0f71fcf5a68b6ef4481349850e42d2d5d543a23168a33",
+    "user_id": "u_1793955091384_944db5ca",
+    "username": "Haley1221",
+    "role": "user",
+    "avatar": "assets/avatars/avatar-9.svg",
+    "expires_at": 1796547091437
   }
 ]

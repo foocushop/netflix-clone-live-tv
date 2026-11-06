@@ -2200,6 +2200,27 @@
       "file_ref_sd": null,
       "published_at_hd": "2026-11-05T13:46:53.669Z",
       "telegram_msg_id": 216
+    },
+    {
+      "id": "494508",
+      "episode_num": 42,
+      "title": "Les Apprentis Aventuriers (2016) - S09E42 - Épisode 42",
+      "published_at": "2026-11-06T09:39:10.333Z",
+      "hd_published": true,
+      "sd_published": false,
+      "telegram_msg_id_hd": 218,
+      "telegram_msg_id_sd": null,
+      "file_ref_hd": {
+        "id": "6012318988736929874",
+        "access_hash": "-7055773133416755241",
+        "file_reference": "BgAAAAEIDwTcAAAA2mrtoD7n4B6EMqqMskLf4IKBEVq0",
+        "mime_type": "video/mp4",
+        "size": 1665137660,
+        "dc_id": 4
+      },
+      "file_ref_sd": null,
+      "published_at_hd": "2026-11-06T09:39:10.333Z",
+      "telegram_msg_id": 218
     }
   ],
   "series_test_s1": [
