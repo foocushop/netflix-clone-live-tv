@@ -9243,9 +9243,9 @@
     "role": "user",
     "banned": false,
     "ip": "2001:4958:3dba:6e01:d558:1411:b894:4202",
-    "last_ip": "2001:4958:3dba:6e01:d558:1411:b894:4202",
+    "last_ip": "2001:4958:3c81:c01:ed1f:a041:c1cf:b397",
     "created_at": "2026-09-24T20:56:49.805Z",
-    "last_login": "2026-09-24T20:56:49.805Z",
+    "last_login": "2026-11-06T21:52:20.969Z",
     "watch_credit_seconds": 1200,
     "welcome_seen": false
   },
@@ -34726,9 +34726,9 @@
     "role": "user",
     "banned": false,
     "ip": "160.155.248.12",
-    "last_ip": "2001:42d8:3914:b000:ac1a:a187:310d:319d",
+    "last_ip": "102.209.222.92",
     "created_at": "2026-11-03T11:25:43.530Z",
-    "last_login": "2026-11-06T16:02:00.984Z",
+    "last_login": "2026-11-06T21:57:25.356Z",
     "watch_credit_seconds": 1200,
     "welcome_seen": false
   },
