@@ -5559,5 +5559,13 @@
     "role": "user",
     "avatar": "assets/avatars/avatar-1.svg",
     "expires_at": 1796560115753
+  },
+  {
+    "token": "3dfe83761f03981c510a81268ce298174bd6e4e33c50f199383e738e9823c338",
+    "user_id": "u_1789636144472_d96c871e",
+    "username": "briearidja2023@gmail.com",
+    "role": "user",
+    "avatar": "assets/avatars/avatar-1.svg",
+    "expires_at": 1796571066947
   }
 ]
