@@ -48,14 +48,6 @@
     "expires_at": 1793981962840
   },
   {
-    "token": "5c327686bcb14b62ffebbc84193269957b694a6256671369ecfb75ef9ca7cc03",
-    "user_id": "u_1791397483066_3c5047db",
-    "username": "Mane",
-    "role": "user",
-    "avatar": "assets/avatars/avatar-1.svg",
-    "expires_at": 1793989483085
-  },
-  {
     "token": "88c37d92ef0fc4601b5b88d59b7e2d0f5d8fbbbcea1eb39bfa2754a081d9af01",
     "user_id": "u_1789458869824_e5248185",
     "username": "Lilith",
@@ -5615,5 +5607,21 @@
     "role": "user",
     "avatar": "assets/avatars/avatar-1.svg",
     "expires_at": 1796594245462
+  },
+  {
+    "token": "f41d194b92f2358073ebaffe6582fd0899638b66321370917653985042df4905",
+    "user_id": "u_1790186215844_f87b8d03",
+    "username": "Dbdyaz",
+    "role": "user",
+    "avatar": "assets/avatars/avatar-3.svg",
+    "expires_at": 1796597307674
+  },
+  {
+    "token": "3294edfebccd630bc389f1540c1a7000b0d80b8fa34b36b74bf6f8fb86422aef",
+    "user_id": "u_1789808759273_1549d8d4",
+    "username": "Sirantousylla",
+    "role": "user",
+    "avatar": "assets/avatars/avatar-1.svg",
+    "expires_at": 1796598974346
   }
 ]
