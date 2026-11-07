@@ -5687,5 +5687,13 @@
     "role": "user",
     "avatar": "assets/avatars/avatar-7.svg",
     "expires_at": 1796636791884
+  },
+  {
+    "token": "555a730c27df623f10c0dcb28390d4f8b130943c88a4155a291804e3658b3a87",
+    "user_id": "u_1794048313116_a35acbdc",
+    "username": "dorzilerickson123@gmail.com",
+    "role": "user",
+    "avatar": "assets/avatars/avatar-1.svg",
+    "expires_at": 1796640313137
   }
 ]
