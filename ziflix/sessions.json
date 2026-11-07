@@ -5775,5 +5775,13 @@
     "role": "user",
     "avatar": "assets/avatars/avatar-3.svg",
     "expires_at": 1796679280727
+  },
+  {
+    "token": "de8fe7928407827bb3625f8260f3b62fe65dae21e8b704c7d62a9689ee6e0c4a",
+    "user_id": "u_1794089813064_7ccedaf7",
+    "username": "Lola_6164",
+    "role": "user",
+    "avatar": "assets/avatars/avatar-1.svg",
+    "expires_at": 1796681813088
   }
 ]
