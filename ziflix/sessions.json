@@ -5711,5 +5711,13 @@
     "role": "user",
     "avatar": "assets/avatars/avatar-3.svg",
     "expires_at": 1796649117139
+  },
+  {
+    "token": "80033a8e51da945db1ae8c11ba91a97f5733ca8dd32faffa4cf65529e3e0a3fe",
+    "user_id": "u_1793705143530_baf7eede",
+    "username": "Astrogirl16",
+    "role": "user",
+    "avatar": "assets/avatars/avatar-1.svg",
+    "expires_at": 1796651714639
   }
 ]
