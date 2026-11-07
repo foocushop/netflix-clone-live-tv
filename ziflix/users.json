@@ -35046,5 +35046,20 @@
     "last_login": "2026-11-07T10:45:13.116Z",
     "watch_credit_seconds": 1200,
     "welcome_seen": false
+  },
+  {
+    "id": "u_1794070733335_fd6e5c60",
+    "username": "moally",
+    "password_hash": "21aeab0fd314404375a49d19c3ee247598332c5287de079e2452aeb9368541d2a7a50f39b326bbd4224c3acdd7aed6c1efb555f4905b207beb35864d5f44c1e1",
+    "salt": "7dfedc534501a0dfdb2ff608edd0ae22",
+    "avatar": "assets/avatars/avatar-1.svg",
+    "role": "user",
+    "banned": false,
+    "ip": "2600:382:5981:4634:64ce:9e4e:f340:9526",
+    "last_ip": "2600:382:5981:4634:64ce:9e4e:f340:9526",
+    "created_at": "2026-11-07T16:58:53.335Z",
+    "last_login": "2026-11-07T16:58:53.335Z",
+    "watch_credit_seconds": 1200,
+    "welcome_seen": false
   }
 ]

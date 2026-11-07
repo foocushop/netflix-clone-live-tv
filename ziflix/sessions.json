@@ -5735,5 +5735,13 @@
     "role": "user",
     "avatar": "assets/avatars/avatar-9.svg",
     "expires_at": 1796661797541
+  },
+  {
+    "token": "269dec99746800f7aac215e901875f6400350ba747ad881aa2f07bca6ba9a28f",
+    "user_id": "u_1794070733335_fd6e5c60",
+    "username": "moally",
+    "role": "user",
+    "avatar": "assets/avatars/avatar-1.svg",
+    "expires_at": 1796662733357
   }
 ]
