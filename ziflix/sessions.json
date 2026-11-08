@@ -5895,5 +5895,13 @@
     "role": "user",
     "avatar": "assets/avatars/avatar-1.svg",
     "expires_at": 1796741345412
+  },
+  {
+    "token": "75207da37720da0c763f37c9c09fe834611855506897aee8e0072122c0e7de31",
+    "user_id": "u_1794152986185_fcdff312",
+    "username": "Frid",
+    "role": "user",
+    "avatar": "assets/avatars/avatar-1.svg",
+    "expires_at": 1796744986208
   }
 ]
