@@ -33892,9 +33892,9 @@
     "role": "user",
     "banned": false,
     "ip": "2001:4278:22:42c1:2c9c:e346:b88b:4c90",
-    "last_ip": "2001:4278:14:3f93:ddc:ce78:5546:fd6f",
+    "last_ip": "2001:4278:14:3f93:58cb:b0a1:dbd1:9104",
     "created_at": "2026-10-26T15:03:20.962Z",
-    "last_login": "2026-11-08T19:16:27.726Z",
+    "last_login": "2026-11-08T20:35:59.091Z",
     "watch_credit_seconds": 1200,
     "welcome_seen": false
   },
@@ -35209,6 +35209,21 @@
     "last_ip": "2a01:cb08:82cf:aa00:dd15:61be:f905:3f5",
     "created_at": "2026-11-08T18:44:55.176Z",
     "last_login": "2026-11-08T18:44:55.178Z",
+    "watch_credit_seconds": 1200,
+    "welcome_seen": false
+  },
+  {
+    "id": "u_1794169228514_62091756",
+    "username": "Didi2306",
+    "password_hash": "bbfe4e863a5fe6e4bd04a0d8eea939025c24de5283dbb0f1b3e85dadf1a496da940d944c130e81f19ebd28b2f5e9cf7099caf98e2db2ae9425a2f6bd225e2030",
+    "salt": "d96768848af4d4b2ee5ae0cf635fca9a",
+    "avatar": "assets/avatars/avatar-1.svg",
+    "role": "user",
+    "banned": false,
+    "ip": "139.47.117.142",
+    "last_ip": "139.47.117.142",
+    "created_at": "2026-11-08T20:20:28.514Z",
+    "last_login": "2026-11-08T20:20:28.514Z",
     "watch_credit_seconds": 1200,
     "welcome_seen": false
   }
