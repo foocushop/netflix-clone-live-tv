@@ -35121,5 +35121,20 @@
     "last_login": "2026-11-08T03:22:08.688Z",
     "watch_credit_seconds": 1200,
     "welcome_seen": false
+  },
+  {
+    "id": "u_1794113660753_230c1cc3",
+    "username": "Oupa",
+    "password_hash": "573e8d1facc4304ed7bc6bda22ab40dbe87670e17c818bb2a52439c521a44c1aa59d09dfddb779ac69be5f4a5071b69e095b9ea985f6d933bd7d2b4a53e581d0",
+    "salt": "f242ffb69a322c5e20c551e996fd23ca",
+    "avatar": "assets/avatars/avatar-1.svg",
+    "role": "user",
+    "banned": false,
+    "ip": "41.208.191.105",
+    "last_ip": "41.208.191.105",
+    "created_at": "2026-11-08T04:54:20.753Z",
+    "last_login": "2026-11-08T04:54:20.753Z",
+    "watch_credit_seconds": 1200,
+    "welcome_seen": false
   }
 ]

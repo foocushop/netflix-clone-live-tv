@@ -5791,5 +5791,13 @@
     "role": "user",
     "avatar": "assets/avatars/avatar-1.svg",
     "expires_at": 1796700128720
+  },
+  {
+    "token": "d259e98d6bbc2f91192199993f2fb06bba9da72118e8a03ca64dfedbf96304d2",
+    "user_id": "u_1794113660753_230c1cc3",
+    "username": "Oupa",
+    "role": "user",
+    "avatar": "assets/avatars/avatar-1.svg",
+    "expires_at": 1796705660828
   }
 ]
