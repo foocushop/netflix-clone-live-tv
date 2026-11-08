@@ -35166,5 +35166,20 @@
     "last_login": "2026-11-08T12:15:54.067Z",
     "watch_credit_seconds": 1200,
     "welcome_seen": false
+  },
+  {
+    "id": "u_1794149345382_22179cad",
+    "username": "Aziz13",
+    "password_hash": "6debd048110dc833258d6d5f2c2042058a27e58c05b9c5f00bdd0f982ba48bc1deaede7a10ad51692858e55316e8b1634625c7a6e265c7b14d27d2d474892e55",
+    "salt": "bd6966e21eaf0b6efc9bf6d90a344a71",
+    "avatar": "assets/avatars/avatar-1.svg",
+    "role": "user",
+    "banned": false,
+    "ip": "2001:4278:22:ce56:45b2:4176:e7ef:d8c9",
+    "last_ip": "2001:4278:22:ce56:45b2:4176:e7ef:d8c9",
+    "created_at": "2026-11-08T14:49:05.382Z",
+    "last_login": "2026-11-08T14:49:05.382Z",
+    "watch_credit_seconds": 1200,
+    "welcome_seen": false
   }
 ]
