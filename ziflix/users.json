@@ -33894,7 +33894,7 @@
     "ip": "2001:4278:22:42c1:2c9c:e346:b88b:4c90",
     "last_ip": "2001:4278:14:3f93:a5bd:87ad:e1e9:43c3",
     "created_at": "2026-10-26T15:03:20.962Z",
-    "last_login": "2026-11-08T11:43:39.445Z",
+    "last_login": "2026-11-08T12:20:41.053Z",
     "watch_credit_seconds": 1200,
     "welcome_seen": false
   },
@@ -35149,6 +35149,21 @@
     "last_ip": "2a0d:e487:42f:2d79:5040:2e9a:47ba:7f8d",
     "created_at": "2026-11-08T09:05:28.977Z",
     "last_login": "2026-11-08T09:05:28.977Z",
+    "watch_credit_seconds": 1200,
+    "welcome_seen": false
+  },
+  {
+    "id": "u_1794140154067_bb6540b0",
+    "username": "andex",
+    "password_hash": "e0f49f956fad245af4994d607d60c557eb9f45042cc2d58af10ce20556002d329633ee4db68d7f9c50ba2c581d6223887dc2f392292bea2b6b02d7bd08fd1bd2",
+    "salt": "2c2e96b5c08c6915deeff12b475dfbbe",
+    "avatar": "assets/avatars/avatar-1.svg",
+    "role": "user",
+    "banned": false,
+    "ip": "129.0.60.56",
+    "last_ip": "129.0.60.56",
+    "created_at": "2026-11-08T12:15:54.067Z",
+    "last_login": "2026-11-08T12:15:54.067Z",
     "watch_credit_seconds": 1200,
     "welcome_seen": false
   }
