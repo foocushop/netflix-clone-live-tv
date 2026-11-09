@@ -35226,5 +35226,35 @@
     "last_login": "2026-11-08T20:20:28.514Z",
     "watch_credit_seconds": 1200,
     "welcome_seen": false
+  },
+  {
+    "id": "u_1794252086534_fc457128",
+    "username": "lololila",
+    "password_hash": "fd229e1a33075b27ca4bd9e2ace124731bea92130389ca73f643e8d86237a2784c547f0ada1e1f01d4b0e3cd3f21811049377681ccc10859a3634b3f19dfb923",
+    "salt": "3318ae9f03be3dfbf0ced39db789494c",
+    "avatar": "assets/avatars/avatar-1.svg",
+    "role": "user",
+    "banned": false,
+    "ip": "154.245.211.4",
+    "last_ip": "154.245.211.4",
+    "created_at": "2026-11-09T19:21:26.534Z",
+    "last_login": "2026-11-09T19:21:26.534Z",
+    "watch_credit_seconds": 1200,
+    "welcome_seen": false
+  },
+  {
+    "id": "u_1794253073772_e80feb43",
+    "username": "sonish",
+    "password_hash": "f8842f33af79aedb67bfc30f17647c722597b3a941d42e08dc065ee6ff522a20e7782f4bd1d9efb7a7b75cae3f1cf9861ba2d071ffdb9140fd47b6076f243b07",
+    "salt": "e51cd98830123d01ea246433a318ef76",
+    "avatar": "assets/avatars/avatar-4.svg",
+    "role": "user",
+    "banned": false,
+    "ip": "197.202.236.9",
+    "last_ip": "197.202.236.9",
+    "created_at": "2026-11-09T19:37:53.772Z",
+    "last_login": "2026-11-09T19:37:53.772Z",
+    "watch_credit_seconds": 1200,
+    "welcome_seen": false
   }
 ]
