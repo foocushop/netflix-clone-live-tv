@@ -31640,7 +31640,7 @@
     "ip": "81.49.12.119",
     "last_ip": "81.49.12.119",
     "created_at": "2026-10-18T10:22:01.886Z",
-    "last_login": "2026-11-08T10:18:15.603Z",
+    "last_login": "2026-11-10T11:19:23.014Z",
     "watch_credit_seconds": 1200,
     "welcome_seen": false
   },
@@ -35359,6 +35359,21 @@
     "last_ip": "213.139.10.139",
     "created_at": "2026-11-09T23:52:14.277Z",
     "last_login": "2026-11-10T09:50:57.412Z",
+    "watch_credit_seconds": 1200,
+    "welcome_seen": false
+  },
+  {
+    "id": "u_1794311256387_64c57a81",
+    "username": "Claudia1004",
+    "password_hash": "322fc80c094ea170b132ab7075e224bd1ee1ac505c7a7a7722af895ddb8157530294818beab81916fda41bc7497ef476befc38189824e0af17664ef05d4dd226",
+    "salt": "bbb0e9f3a95ebb2f1d6a056d49f3256e",
+    "avatar": "assets/avatars/avatar-1.svg",
+    "role": "user",
+    "banned": false,
+    "ip": "2a01:cb14:1c6c:f600:d95d:ad48:75ff:5b7e",
+    "last_ip": "2a01:cb14:1c6c:f600:d95d:ad48:75ff:5b7e",
+    "created_at": "2026-11-10T11:47:36.387Z",
+    "last_login": "2026-11-10T11:47:36.387Z",
     "watch_credit_seconds": 1200,
     "welcome_seen": false
   }
