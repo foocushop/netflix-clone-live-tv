@@ -33894,7 +33894,7 @@
     "ip": "2001:4278:22:42c1:2c9c:e346:b88b:4c90",
     "last_ip": "2001:4278:14:3f93:41a1:d7e9:bdb:5b6a",
     "created_at": "2026-10-26T15:03:20.962Z",
-    "last_login": "2026-11-10T21:05:45.243Z",
+    "last_login": "2026-11-10T23:00:48.281Z",
     "watch_credit_seconds": 1200,
     "welcome_seen": false
   },
@@ -35524,6 +35524,21 @@
     "last_ip": "2a01:cb08:82cf:aa00:d9b5:613a:bbab:7562",
     "created_at": "2026-11-10T18:19:19.971Z",
     "last_login": "2026-11-10T18:19:19.971Z",
+    "watch_credit_seconds": 1200,
+    "welcome_seen": false
+  },
+  {
+    "id": "u_1794351209623_6f9fe454",
+    "username": "ayna",
+    "password_hash": "15be1081b86b66c10725473da4518acaf0a72c48735e1caa8bc9048fa036abe44b8b41dc12de637d56dcecb84cd35ac4f04378f0196ab9bb8dfe712f4bb3167c",
+    "salt": "3434b45a0dfd43b5ad6fafb72e32a9dc",
+    "avatar": "assets/avatars/avatar-1.svg",
+    "role": "user",
+    "banned": false,
+    "ip": "154.248.161.19",
+    "last_ip": "154.248.161.19",
+    "created_at": "2026-11-10T22:53:29.623Z",
+    "last_login": "2026-11-10T22:53:29.623Z",
     "watch_credit_seconds": 1200,
     "welcome_seen": false
   }
