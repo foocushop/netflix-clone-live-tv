@@ -3951,7 +3951,7 @@
     "role": "user",
     "banned": false,
     "created_at": "2026-09-15T15:15:47.669Z",
-    "last_login": "2026-11-09T22:47:06.562Z",
+    "last_login": "2026-11-09T23:58:10.035Z",
     "ip": "196.168.116.116",
     "last_ip": "102.212.94.36"
   },
@@ -7236,9 +7236,9 @@
     "role": "user",
     "banned": false,
     "ip": "2001:42c0:8150:5800:b5c8:4385:2b50:e584",
-    "last_ip": "2001:42c0:81be:b400:25b9:97d3:6b80:53a1",
+    "last_ip": "2001:42c0:812e:9200:6d82:d131:6a94:d42b",
     "created_at": "2026-09-19T09:05:59.273Z",
-    "last_login": "2026-11-08T23:02:37.317Z"
+    "last_login": "2026-11-10T00:19:37.256Z"
   },
   {
     "id": "u_1789814009759_e079c487",
@@ -35329,6 +35329,36 @@
     "last_ip": "2a01:e0a:9a3:c700:7cd9:dcfe:9595:357e",
     "created_at": "2026-11-09T23:02:38.231Z",
     "last_login": "2026-11-09T23:02:38.231Z",
+    "watch_credit_seconds": 1200,
+    "welcome_seen": false
+  },
+  {
+    "id": "u_1794268149241_1fc66e1d",
+    "username": "la'li",
+    "password_hash": "b4ef6a4a9c64f8c1ee33791da1d0060ae9cc1c4af5a60f7f1a52701a19f3ec2eaec959337463e6d207493a87d38fa69d46ff6608a1b25ff71e6d4f62934198f1",
+    "salt": "ba8470ae26e8f8c5ce79e846826ade96",
+    "avatar": "assets/avatars/avatar-1.svg",
+    "role": "user",
+    "banned": false,
+    "ip": "146.70.166.147",
+    "last_ip": "146.70.166.147",
+    "created_at": "2026-11-09T23:49:09.241Z",
+    "last_login": "2026-11-09T23:49:09.241Z",
+    "watch_credit_seconds": 1200,
+    "welcome_seen": false
+  },
+  {
+    "id": "u_1794268334277_181a105d",
+    "username": "loukas",
+    "password_hash": "b266b2fe8cefbdb61193a4831463d9834d5108abd2988f595a24f62fab668e80a61a0f50fc0f6de0c7839e18d41db5f2bcf6d44ee038eb6dbac2b66104def441",
+    "salt": "e424f5be20bd2d6af86d9aa93a5d92a9",
+    "avatar": "assets/avatars/avatar-1.svg",
+    "role": "user",
+    "banned": false,
+    "ip": "146.70.166.147",
+    "last_ip": "104.36.50.21",
+    "created_at": "2026-11-09T23:52:14.277Z",
+    "last_login": "2026-11-10T00:15:23.113Z",
     "watch_credit_seconds": 1200,
     "welcome_seen": false
   }
