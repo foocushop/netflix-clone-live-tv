@@ -280,14 +280,6 @@
     "expires_at": 1794211758173
   },
   {
-    "token": "d6c3dbc79294157f6295dcf1c9dcbb84d87751890db0c3a07e88728b31216c6b",
-    "user_id": "u_1791620542550_87cd0c6c",
-    "username": "Liliane",
-    "role": "user",
-    "avatar": "assets/avatars/avatar-1.svg",
-    "expires_at": 1794212542580
-  },
-  {
     "token": "faf05c2be0e0cc9b621db25afce2fbfff8289e0890e6251c6fd866015a3e9715",
     "user_id": "u_1789485347669_b4aaedab",
     "username": "Lauryyy82miss",
@@ -6431,5 +6423,21 @@
     "role": "user",
     "avatar": "assets/avatars/avatar-1.svg",
     "expires_at": 1796904168934
+  },
+  {
+    "token": "ece99aa964792f8bdcea920af0d898d16308e7a1b104d8301e7ee0d856e53c91",
+    "user_id": "u_1790002616066_872f15d4",
+    "username": "kiwi",
+    "role": "user",
+    "avatar": "assets/avatars/avatar-9.svg",
+    "expires_at": 1796907066685
+  },
+  {
+    "token": "3f424ca441cea89cebdaf4112b56b1eec5d685ea480f7a3e1b08b9bc08d5e9bf",
+    "user_id": "u_1794315215025_b7eeb33d",
+    "username": "Fife",
+    "role": "user",
+    "avatar": "assets/avatars/avatar-1.svg",
+    "expires_at": 1796907215054
   }
 ]
