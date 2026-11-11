@@ -35556,5 +35556,20 @@
     "last_login": "2026-11-11T00:16:48.979Z",
     "watch_credit_seconds": 1200,
     "welcome_seen": false
+  },
+  {
+    "id": "u_1794370664882_528329b1",
+    "username": "Wesly, Surin09",
+    "password_hash": "76c726c4e8639336203c5de8861d7e4d72a84be800a48d3ddd4df1946c4997615cb7153ba0cab284323c7b05077ad44fbdd324cc6bb014d4f8b9981a6a56c121",
+    "salt": "490f6992831aefd30f09e59941d9f05a",
+    "avatar": "assets/avatars/avatar-1.svg",
+    "role": "user",
+    "banned": false,
+    "ip": "190.115.155.72",
+    "last_ip": "190.115.155.72",
+    "created_at": "2026-11-11T04:17:44.885Z",
+    "last_login": "2026-11-11T04:17:44.886Z",
+    "watch_credit_seconds": 1200,
+    "welcome_seen": false
   }
 ]
