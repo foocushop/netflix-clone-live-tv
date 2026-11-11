@@ -6791,5 +6791,13 @@
     "role": "user",
     "avatar": "assets/avatars/avatar-1.svg",
     "expires_at": 1796985827207
+  },
+  {
+    "token": "d7d7be10838d1f01c6cb195efc10e96236809e319df4ab42f6935f4fc262a5f6",
+    "user_id": "u_1790186215844_f87b8d03",
+    "username": "Dbdyaz",
+    "role": "user",
+    "avatar": "assets/avatars/avatar-3.svg",
+    "expires_at": 1796990249006
   }
 ]
