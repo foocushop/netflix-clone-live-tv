@@ -35571,5 +35571,35 @@
     "last_login": "2026-11-11T04:17:44.886Z",
     "watch_credit_seconds": 1200,
     "welcome_seen": false
+  },
+  {
+    "id": "u_1794422032602_fd042e5c",
+    "username": "Anna_Diouf",
+    "password_hash": "ec577d1d6a0cdbf62467ff06f319ba851d8bac5ddf1e5e92b733bfd3d71425bdc058b91eeeb3970690e4d8c8dbece2848b6d35205dbfb6640891ca33bc035fc8",
+    "salt": "335f46c11bcbcd607b31c159ef59b04f",
+    "avatar": "assets/avatars/avatar-8.svg",
+    "role": "user",
+    "banned": false,
+    "ip": "154.125.196.220",
+    "last_ip": "154.125.196.220",
+    "created_at": "2026-11-11T18:33:52.602Z",
+    "last_login": "2026-11-11T18:33:52.602Z",
+    "watch_credit_seconds": 1200,
+    "welcome_seen": false
+  },
+  {
+    "id": "u_1794423289262_83a2180e",
+    "username": "frjnchj",
+    "password_hash": "8f2843bd028853308071118d149551d1d0eb377983ff046a85bc15b30173c9567fb45908a7836a1b2b840f7b1fadc2207de26d83417a1f2a634ca312ed016861",
+    "salt": "f1539f02728befe3cd381d42fbe8184f",
+    "avatar": "assets/avatars/avatar-1.svg",
+    "role": "user",
+    "banned": false,
+    "ip": "2a01:cb08:82df:8600:d9b5:613a:bbab:7562",
+    "last_ip": "2a01:cb08:82df:8600:d9b5:613a:bbab:7562",
+    "created_at": "2026-11-11T18:54:49.262Z",
+    "last_login": "2026-11-11T18:54:49.262Z",
+    "watch_credit_seconds": 1200,
+    "welcome_seen": false
   }
 ]
