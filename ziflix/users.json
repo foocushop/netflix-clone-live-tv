@@ -33892,9 +33892,9 @@
     "role": "user",
     "banned": false,
     "ip": "2001:4278:22:42c1:2c9c:e346:b88b:4c90",
-    "last_ip": "41.214.49.21",
+    "last_ip": "2001:4278:14:3f93:4c0f:f141:712b:d363",
     "created_at": "2026-10-26T15:03:20.962Z",
-    "last_login": "2026-11-12T17:28:29.265Z",
+    "last_login": "2026-11-12T20:06:55.246Z",
     "watch_credit_seconds": 1200,
     "welcome_seen": false
   },
@@ -35614,6 +35614,21 @@
     "last_ip": "102.160.172.4",
     "created_at": "2026-11-12T09:05:36.910Z",
     "last_login": "2026-11-12T09:05:36.910Z",
+    "watch_credit_seconds": 1200,
+    "welcome_seen": false
+  },
+  {
+    "id": "u_1794512749493_fc4e8377",
+    "username": "barb",
+    "password_hash": "f19660d5d52febe08ab781f10c490d4ce242c77cdc363764cae47065d0be54f66c367da7f4a511589b66db69e5572dda2d3850e9b542f6efa02b23514f88390c",
+    "salt": "703028f54d6cddd8635b474224d9c2cd",
+    "avatar": "assets/avatars/avatar-4.svg",
+    "role": "user",
+    "banned": false,
+    "ip": "41.214.40.189",
+    "last_ip": "41.214.40.189",
+    "created_at": "2026-11-12T19:45:49.493Z",
+    "last_login": "2026-11-12T19:45:49.493Z",
     "watch_credit_seconds": 1200,
     "welcome_seen": false
   }
