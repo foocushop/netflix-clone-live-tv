@@ -1285,6 +1285,27 @@
       "file_ref_sd": null,
       "published_at_hd": "2026-11-11T21:39:08.683Z",
       "telegram_msg_id": 225
+    },
+    {
+      "id": "495378",
+      "episode_num": 61,
+      "title": "La Villa des Cœurs Brisés (2015) - S11E61 - Épisode 61",
+      "published_at": "2026-11-12T21:38:04.617Z",
+      "hd_published": true,
+      "sd_published": false,
+      "telegram_msg_id_hd": 227,
+      "telegram_msg_id_sd": null,
+      "file_ref_hd": {
+        "id": "6030577964159082687",
+        "access_hash": "-2509571405578496077",
+        "file_reference": "BgAAAAEIDwTcAAAA42r2MbxcslFM3Wmp0qMxxHaBhYZ6",
+        "mime_type": "video/mp4",
+        "size": 957947060,
+        "dc_id": 4
+      },
+      "file_ref_sd": null,
+      "published_at_hd": "2026-11-12T21:38:04.617Z",
+      "telegram_msg_id": 227
     }
   ],
   "series_9066_s9": [
