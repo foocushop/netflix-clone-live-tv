@@ -6991,5 +6991,13 @@
     "role": "user",
     "avatar": "assets/avatars/avatar-1.svg",
     "expires_at": 1797046814078
+  },
+  {
+    "token": "c55ed546ec293a13e5a9a405d2075965c2d7266ec0f5c897014420cf56ab70a8",
+    "user_id": "u_1794474336910_075bd8f6",
+    "username": "mauriceanielle4@gmail.com",
+    "role": "user",
+    "avatar": "assets/avatars/avatar-1.svg",
+    "expires_at": 1797066336936
   }
 ]

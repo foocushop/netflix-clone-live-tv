@@ -2347,6 +2347,27 @@
       "file_ref_sd": null,
       "published_at_hd": "2026-11-10T21:58:30.113Z",
       "telegram_msg_id": 224
+    },
+    {
+      "id": "495255",
+      "episode_num": 45,
+      "title": "Les Apprentis Aventuriers (2016) - S09E45 - Épisode 45",
+      "published_at": "2026-11-12T08:31:23.613Z",
+      "hd_published": true,
+      "sd_published": false,
+      "telegram_msg_id_hd": 226,
+      "telegram_msg_id_sd": null,
+      "file_ref_hd": {
+        "id": "6028326164345397626",
+        "access_hash": "-9201448735949262752",
+        "file_reference": "BgAAAAEIDwTcAAAA4mr1eVuO5UL1Rh1mXPz8g/h3jolZ",
+        "mime_type": "video/mp4",
+        "size": 1687197379,
+        "dc_id": 4
+      },
+      "file_ref_sd": null,
+      "published_at_hd": "2026-11-12T08:31:23.613Z",
+      "telegram_msg_id": 226
     }
   ],
   "series_test_s1": [
