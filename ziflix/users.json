@@ -3795,9 +3795,9 @@
     "role": "user",
     "banned": false,
     "created_at": "2026-09-15T11:49:46.099Z",
-    "last_login": "2026-11-13T04:15:01.191Z",
+    "last_login": "2026-11-13T12:13:58.991Z",
     "ip": "167.17.64.193",
-    "last_ip": "2001:4278:20:13:55:bb5d:bf92:5cf5"
+    "last_ip": "2001:4278:20:13:a0b7:d4ec:ef17:2b3c"
   },
   {
     "id": "u_1789473983090_1572b072",
@@ -35644,6 +35644,21 @@
     "last_ip": "2a01:e0e:1004:f7d9:292d:3311:fbc4:15da",
     "created_at": "2026-11-13T00:38:39.256Z",
     "last_login": "2026-11-13T00:38:39.256Z",
+    "watch_credit_seconds": 1200,
+    "welcome_seen": false
+  },
+  {
+    "id": "u_1794573941088_d1400f96",
+    "username": "Lauralaboss",
+    "password_hash": "ee4df005ecfba9a1d5f3c3033222462e749f2aaa4e232c325a342afc60e73ead9ef8f3ac303a23f291b9813479d1f0c9c80b206ba22e66cc740ec6c3196dfb25",
+    "salt": "94b226328481f8d792252e30eec7746d",
+    "avatar": "assets/avatars/avatar-1.svg",
+    "role": "user",
+    "banned": false,
+    "ip": "2a0d:e487:116f:6985:18c7:d926:191a:ac28",
+    "last_ip": "2a0d:e487:116f:6985:18c7:d926:191a:ac28",
+    "created_at": "2026-11-13T12:45:41.088Z",
+    "last_login": "2026-11-13T12:45:41.088Z",
     "watch_credit_seconds": 1200,
     "welcome_seen": false
   }
