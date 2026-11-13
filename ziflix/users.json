@@ -3951,9 +3951,9 @@
     "role": "user",
     "banned": false,
     "created_at": "2026-09-15T15:15:47.669Z",
-    "last_login": "2026-11-12T20:20:50.716Z",
+    "last_login": "2026-11-13T20:51:55.176Z",
     "ip": "196.168.116.116",
-    "last_ip": "196.169.22.183"
+    "last_ip": "102.212.94.44"
   },
   {
     "id": "u_1789485497175_51adfaa6",
@@ -7977,9 +7977,9 @@
     "role": "user",
     "banned": false,
     "ip": "2a0d:e487:69f:e83:3090:cc10:3e9:6d94",
-    "last_ip": "2a0d:e487:21be:9f96:e5b5:e400:4cc1:cba3",
+    "last_ip": "2a0d:e487:21ae:959b:3002:3ebb:fe90:79ea",
     "created_at": "2026-09-23T17:56:55.844Z",
-    "last_login": "2026-11-13T12:05:21.921Z"
+    "last_login": "2026-11-13T20:30:30.408Z"
   },
   {
     "id": "u_1790187834994_8ed99933",
@@ -35689,6 +35689,21 @@
     "last_ip": "154.244.66.49",
     "created_at": "2026-11-13T18:03:55.755Z",
     "last_login": "2026-11-13T18:03:55.755Z",
+    "watch_credit_seconds": 1200,
+    "welcome_seen": false
+  },
+  {
+    "id": "u_1794601218606_83f89e8f",
+    "username": "xyxodaneg",
+    "password_hash": "5e3b4c83730c943fc2a629b6270dc8025457cbf8ff9dcbc17069cd487c8ec68a462beaa6abf68d2bbbf93796289c6cfcb909686cf814b371e5a0c496fff5db7f",
+    "salt": "eae500828c23a46440b57ab6d03e8313",
+    "avatar": "assets/avatars/avatar-1.svg",
+    "role": "user",
+    "banned": false,
+    "ip": "158.220.127.216",
+    "last_ip": "158.220.127.216",
+    "created_at": "2026-11-13T20:20:18.606Z",
+    "last_login": "2026-11-13T20:20:18.606Z",
     "watch_credit_seconds": 1200,
     "welcome_seen": false
   }
