@@ -33892,9 +33892,9 @@
     "role": "user",
     "banned": false,
     "ip": "2001:4278:22:42c1:2c9c:e346:b88b:4c90",
-    "last_ip": "2001:4278:14:3f93:587a:2082:a828:8ea8",
+    "last_ip": "2001:4278:14:3f93:246c:894f:e565:4b72",
     "created_at": "2026-10-26T15:03:20.962Z",
-    "last_login": "2026-11-13T10:09:29.542Z",
+    "last_login": "2026-11-13T16:49:01.252Z",
     "watch_credit_seconds": 1200,
     "welcome_seen": false
   },
@@ -35659,6 +35659,21 @@
     "last_ip": "2a0d:e487:116f:6985:18c7:d926:191a:ac28",
     "created_at": "2026-11-13T12:45:41.088Z",
     "last_login": "2026-11-13T12:45:41.088Z",
+    "watch_credit_seconds": 1200,
+    "welcome_seen": false
+  },
+  {
+    "id": "u_1794587900472_5fb3abb7",
+    "username": "fhgfhji",
+    "password_hash": "304afb990c0f39269577e049439be0a932209b162590d637b4f6b07de7b43ec83feb1b5d0f54c8593970bff0944dc6844dc1d93f714e5e427953a69f84b5c458",
+    "salt": "99eb8318f02d24d070acf66b95783d7f",
+    "avatar": "assets/avatars/avatar-1.svg",
+    "role": "user",
+    "banned": false,
+    "ip": "2a01:cb08:82cf:aa00:d9b5:613a:bbab:7562",
+    "last_ip": "2a01:cb08:82cf:aa00:d9b5:613a:bbab:7562",
+    "created_at": "2026-11-13T16:38:20.472Z",
+    "last_login": "2026-11-13T16:38:20.472Z",
     "watch_credit_seconds": 1200,
     "welcome_seen": false
   }
