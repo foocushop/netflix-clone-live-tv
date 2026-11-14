@@ -35736,5 +35736,20 @@
     "last_login": "2026-11-14T02:47:16.046Z",
     "watch_credit_seconds": 1200,
     "welcome_seen": false
+  },
+  {
+    "id": "u_1794652953066_83b87142",
+    "username": "Laurakk",
+    "password_hash": "565949db233405205c07080581a68be0c812e906b436d0580af90b83cd2fa6fd687af046cc63ce5573c4b68d41c944e4385270086c314fb796d3e97836fb8cb9",
+    "salt": "2441aa4acdac0e7d40973612746e7850",
+    "avatar": "assets/avatars/avatar-1.svg",
+    "role": "user",
+    "banned": false,
+    "ip": "2a0d:e487:159f:a472:60c3:bbea:b43b:39a0",
+    "last_ip": "2a0d:e487:159f:a472:60c3:bbea:b43b:39a0",
+    "created_at": "2026-11-14T10:42:33.066Z",
+    "last_login": "2026-11-14T10:42:33.066Z",
+    "watch_credit_seconds": 1200,
+    "welcome_seen": false
   }
 ]
