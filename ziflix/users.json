@@ -35751,5 +35751,20 @@
     "last_login": "2026-11-14T10:42:33.066Z",
     "watch_credit_seconds": 1200,
     "welcome_seen": false
+  },
+  {
+    "id": "u_1794662624063_96cfcf50",
+    "username": "lulu2321",
+    "password_hash": "a9194cd8b062e51476bcb2c5c7bf315fd4d9b7061ca7969a913cdf9c8990844c6674ba21b4e4a66938c7798144d0a85274e89c46d6c40a96444dd429b9c1109a",
+    "salt": "c11b3b082fdbee8473e5ead7a52a11fa",
+    "avatar": "assets/avatars/avatar-2.svg",
+    "role": "user",
+    "banned": false,
+    "ip": "2a01:cb18:a4:5b00:adce:fa:f2ed:4328",
+    "last_ip": "2a01:cb18:a4:5b00:adce:fa:f2ed:4328",
+    "created_at": "2026-11-14T13:23:44.063Z",
+    "last_login": "2026-11-14T13:23:44.063Z",
+    "watch_credit_seconds": 1200,
+    "welcome_seen": false
   }
 ]
