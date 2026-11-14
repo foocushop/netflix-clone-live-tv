@@ -35766,5 +35766,20 @@
     "last_login": "2026-11-14T13:23:44.063Z",
     "watch_credit_seconds": 1200,
     "welcome_seen": false
+  },
+  {
+    "id": "u_1794671925548_35b12444",
+    "username": "F. Diango",
+    "password_hash": "0e9afa56af1f2e837f073e5e8617691d7ad48d2045a5842745af12324fd4c680cd500173371fee652f372f33b93d739973bb98a2b4f86cb23bd49df703ff2988",
+    "salt": "bba4daf0aa62d4695dfeb9c3f6d262b8",
+    "avatar": "assets/avatars/avatar-1.svg",
+    "role": "user",
+    "banned": false,
+    "ip": "88.224.54.162",
+    "last_ip": "88.224.54.162",
+    "created_at": "2026-11-14T15:58:45.548Z",
+    "last_login": "2026-11-14T15:58:45.548Z",
+    "watch_credit_seconds": 1200,
+    "welcome_seen": false
   }
 ]

@@ -6767,5 +6767,13 @@
     "role": "user",
     "avatar": "assets/avatars/avatar-1.svg",
     "expires_at": 1797258616789
+  },
+  {
+    "token": "5b46d492d1e472e9e2cd48e41af293e4419dcf9f90033507e2d504c37c2ea1cf",
+    "user_id": "u_1794671925548_35b12444",
+    "username": "F. Diango",
+    "role": "user",
+    "avatar": "assets/avatars/avatar-1.svg",
+    "expires_at": 1797263925573
   }
 ]
