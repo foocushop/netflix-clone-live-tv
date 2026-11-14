@@ -7431,5 +7431,13 @@
     "role": "user",
     "avatar": "assets/avatars/avatar-1.svg",
     "expires_at": 1797216436075
+  },
+  {
+    "token": "9a964bea722177c215203314d8a5c8adb1354199b5ce412d7555ab56c4ff9e95",
+    "user_id": "u_1789472986099_40e26629",
+    "username": "Yascactus03",
+    "role": "user",
+    "avatar": "assets/avatars/avatar-7.svg",
+    "expires_at": 1797220369292
   }
 ]
