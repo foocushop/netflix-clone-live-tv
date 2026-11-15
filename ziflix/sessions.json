@@ -6775,5 +6775,13 @@
     "role": "user",
     "avatar": "assets/avatars/avatar-3.svg",
     "expires_at": 1797366339290
+  },
+  {
+    "token": "bd2461e605a13c14f48c55cc69d5f15bfce3d89afefa3040c884d18c7da1b9d3",
+    "user_id": "u_1794778922331_3936110a",
+    "username": "bruno12233@gmail.com",
+    "role": "user",
+    "avatar": "assets/avatars/avatar-1.svg",
+    "expires_at": 1797370922357
   }
 ]
