@@ -35868,7 +35868,22 @@
     "ip": "2a01:cb1c:1aee:e800:5c8b:5ea0:f14a:7008",
     "last_ip": "2a01:cb1c:1aee:e800:5c8b:5ea0:f14a:7008",
     "created_at": "2026-11-15T17:48:14.941Z",
-    "last_login": "2026-11-15T18:06:24.979Z",
+    "last_login": "2026-11-15T19:56:40.455Z",
+    "watch_credit_seconds": 1200,
+    "welcome_seen": false
+  },
+  {
+    "id": "u_1794772543989_45f7daef",
+    "username": "zayzay",
+    "password_hash": "f8a00f476f65028e5a03b0a29776a005975376a4c98dd5e5f0c9d41f1e5de6e2c4a3b696fa57646e0022373b7e28215cc7337c3ff2ea93a01a4d74c6242a6f81",
+    "salt": "2710f179074dc6872d770b14ae5e24ea",
+    "avatar": "assets/avatars/avatar-1.svg",
+    "role": "user",
+    "banned": false,
+    "ip": "107.171.229.97",
+    "last_ip": "107.171.229.97",
+    "created_at": "2026-11-15T19:55:43.989Z",
+    "last_login": "2026-11-15T19:55:43.990Z",
     "watch_credit_seconds": 1200,
     "welcome_seen": false
   }
