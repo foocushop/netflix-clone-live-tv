@@ -6719,5 +6719,13 @@
     "role": "user",
     "avatar": "assets/avatars/avatar-1.svg",
     "expires_at": 1797348678340
+  },
+  {
+    "token": "91b98b56aafe09d1ff457b21a1188e40783a917c1c536672310fc1262d5199c7",
+    "user_id": "u_1794764894940_e5c85466",
+    "username": "Lindou",
+    "role": "user",
+    "avatar": "assets/avatars/avatar-1.svg",
+    "expires_at": 1797356894972
   }
 ]

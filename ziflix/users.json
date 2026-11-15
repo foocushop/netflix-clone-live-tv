@@ -35856,5 +35856,20 @@
     "last_login": "2026-11-15T13:08:28.659Z",
     "watch_credit_seconds": 1200,
     "welcome_seen": false
+  },
+  {
+    "id": "u_1794764894940_e5c85466",
+    "username": "Lindou",
+    "password_hash": "3340fceaf4669d4480d8eaf0204b0d2ce59683342f385f97ab5c81e3c3304335ba19ab6ebef12a4e804b7b3cf0a0fcb15a218b34c402abfe5c0e7ee952553d6f",
+    "salt": "cb7344efa589e12df5a4fe34fd09fbdd",
+    "avatar": "assets/avatars/avatar-1.svg",
+    "role": "user",
+    "banned": false,
+    "ip": "2a01:cb1c:1aee:e800:5c8b:5ea0:f14a:7008",
+    "last_ip": "2a01:cb1c:1aee:e800:5c8b:5ea0:f14a:7008",
+    "created_at": "2026-11-15T17:48:14.941Z",
+    "last_login": "2026-11-15T17:48:14.941Z",
+    "watch_credit_seconds": 1200,
+    "welcome_seen": false
   }
 ]
