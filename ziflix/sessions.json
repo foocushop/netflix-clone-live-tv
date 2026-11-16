@@ -120,14 +120,6 @@
     "expires_at": 1794779279791
   },
   {
-    "token": "6728cef9d4c8f1657597643e64484a86520bc8395e3fa87f7ee7a80336a115ad",
-    "user_id": "u_1792191108013_6e33e3a6",
-    "username": "aymae@gmail.com",
-    "role": "user",
-    "avatar": "assets/avatars/avatar-3.svg",
-    "expires_at": 1794783108108
-  },
-  {
     "token": "af36ad24c8fe1ccd93a70d89b17173e91bf1fa98ff6ecc5b496ed357b980025e",
     "user_id": "u_1789247223438_693636dc",
     "username": "Freddy",
@@ -6815,5 +6807,13 @@
     "role": "user",
     "avatar": "assets/avatars/avatar-3.svg",
     "expires_at": 1797375504581
+  },
+  {
+    "token": "22e5aef91c227eec6403a4a66d7dc8e39cadd39a07033e0508b603170152bf84",
+    "user_id": "u_1794785739891_ed923588",
+    "username": "danielladupont1987@gmail.com",
+    "role": "user",
+    "avatar": "assets/avatars/avatar-1.svg",
+    "expires_at": 1797377739912
   }
 ]
