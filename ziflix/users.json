@@ -36006,5 +36006,20 @@
     "last_login": "2026-11-16T20:40:12.003Z",
     "watch_credit_seconds": 1200,
     "welcome_seen": false
+  },
+  {
+    "id": "u_1794869996174_18e2fde2",
+    "username": "Haha",
+    "password_hash": "fa1babf705bb243c6bf57606ce072fc1c125eade5ddb4b1432241ebc4123a803b7282f8f50c62763afa89e965fdbea0a54ab7c20fbe965cf952ec7424e076545",
+    "salt": "6690b4c9333cb828eeab247887bce05f",
+    "avatar": "assets/avatars/avatar-1.svg",
+    "role": "user",
+    "banned": false,
+    "ip": "196.127.12.59",
+    "last_ip": "196.127.12.59",
+    "created_at": "2026-11-16T22:59:56.176Z",
+    "last_login": "2026-11-16T22:59:56.176Z",
+    "watch_credit_seconds": 1200,
+    "welcome_seen": false
   }
 ]
