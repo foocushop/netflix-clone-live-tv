@@ -6903,5 +6903,13 @@
     "role": "user",
     "avatar": "assets/avatars/avatar-4.svg",
     "expires_at": 1797425774352
+  },
+  {
+    "token": "71683a06606cf0f10a73591a019510dddf4c2a216965f65117773d37ae431fca",
+    "user_id": "u_1790374219430_c8412cf4",
+    "username": "afrapasse",
+    "role": "user",
+    "avatar": "assets/avatars/avatar-3.svg",
+    "expires_at": 1797433183864
   }
 ]
