@@ -7613,9 +7613,9 @@
     "role": "user",
     "banned": false,
     "ip": "2a02:8440:9500:1b98:dc77:a78e:4b6f:11d4",
-    "last_ip": "2a02:8440:9508:230:3896:4ceb:ef30:190c",
+    "last_ip": "2a02:8434:da13:1c01:ad2f:768b:f5d1:44dc",
     "created_at": "2026-09-22T00:11:23.510Z",
-    "last_login": "2026-11-12T16:24:11.778Z"
+    "last_login": "2026-11-16T04:30:58.966Z"
   },
   {
     "id": "u_1790045119155_de4526d3",
@@ -35944,6 +35944,21 @@
     "last_ip": "41.83.60.31",
     "created_at": "2026-11-16T02:16:56.113Z",
     "last_login": "2026-11-16T02:16:56.113Z",
+    "watch_credit_seconds": 1200,
+    "welcome_seen": false
+  },
+  {
+    "id": "u_1794804307756_1c99c125",
+    "username": "Boumtele",
+    "password_hash": "c27792387e01a1de075a1f237f51e682f1954d710c95041d9c82df9f7b63056c15f29fd9f668f8a77e5c502a0815a9bf1470edb3800a6b13ce6d78791a9ab28a",
+    "salt": "8bcb440f688db67eeacfb02fba0e0509",
+    "avatar": "assets/avatars/avatar-1.svg",
+    "role": "user",
+    "banned": false,
+    "ip": "41.83.160.51",
+    "last_ip": "41.83.160.51",
+    "created_at": "2026-11-16T04:45:07.756Z",
+    "last_login": "2026-11-16T04:45:07.756Z",
     "watch_credit_seconds": 1200,
     "welcome_seen": false
   }
