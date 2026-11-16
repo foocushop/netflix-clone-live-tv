@@ -44,8 +44,22 @@
     "name": "Frenchie Shore",
     "emoji": "📺",
     "template": "<b>{titre}</b> {emoji} Saison {saison}\n\nÉpisode {episode}",
-    "channel_id": "-1002615244456",
-    "enabled": true
+    "channel_id": "-1004430169308",
+    "enabled": true,
+    "photo": "/var/www/telegram-reality-publisher/assets/shows/series_4115_s3.jpg",
+    "source_priority": "xtream"
+  },
+  {
+    "id": "series_4115_s1",
+    "series_id": 4115,
+    "season": 1,
+    "name": "Frenchie Shore",
+    "emoji": "📺",
+    "template": "<b>{titre}</b> {emoji} Saison {saison}\n\nÉpisode {episode}",
+    "channel_id": "-1004430169308",
+    "enabled": true,
+    "source_priority": "xtream",
+    "photo": "/var/www/telegram-reality-publisher/assets/shows/series_4115_s1.jpg"
   },
   {
     "id": "series_4115_s2",
@@ -54,8 +68,9 @@
     "name": "Frenchie Shore",
     "emoji": "📺",
     "template": "<b>{titre}</b> {emoji} Saison {saison}\n\nÉpisode {episode}",
-    "channel_id": "-1002615244456",
+    "channel_id": "-1004430169308",
     "enabled": true,
-    "source_priority": "xtream"
+    "source_priority": "xtream",
+    "photo": "/var/www/telegram-reality-publisher/assets/shows/series_4115_s2.jpg"
   }
 ]

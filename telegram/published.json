@@ -2618,216 +2618,428 @@
       "telegram_msg_id": 182
     }
   ],
+  "series_4115_s1": [
+    {
+      "id": "290675",
+      "episode_num": 6,
+      "title": "Frenchie Shore - S01E06 - Le cul entre deux chaises",
+      "published_at": "2026-11-16T23:17:54.174Z",
+      "hd_published": true,
+      "sd_published": false,
+      "telegram_msg_id_hd": 230,
+      "telegram_msg_id_sd": null,
+      "file_ref_hd": {
+        "id": "6044203107955515778",
+        "access_hash": "3701477590285561818",
+        "file_reference": "BgAAAAEIDwTcAAAA5mr7jyJlqQ+/44AEHTAO0LvT2FOo",
+        "mime_type": "video/mp4",
+        "size": 503688138,
+        "dc_id": 4
+      },
+      "file_ref_sd": null,
+      "published_at_hd": "2026-11-16T23:17:54.174Z",
+      "telegram_msg_id": 230
+    },
+    {
+      "id": "290670",
+      "episode_num": 1,
+      "title": "Frenchie Shore - S01E01 - Bienvenue sur la Frenchie Shore",
+      "published_at": "2026-11-16T23:20:13.907Z",
+      "hd_published": true,
+      "sd_published": false,
+      "telegram_msg_id_hd": 231,
+      "telegram_msg_id_sd": null,
+      "file_ref_hd": {
+        "id": "6044203107955515779",
+        "access_hash": "6075124393903610947",
+        "file_reference": "BgAAAAEIDwTcAAAA52r7j61JycNeaIFedzeWOfFBRFON",
+        "mime_type": "video/mp4",
+        "size": 490848170,
+        "dc_id": 4
+      },
+      "file_ref_sd": null,
+      "published_at_hd": "2026-11-16T23:20:13.907Z",
+      "telegram_msg_id": 231
+    },
+    {
+      "id": "290671",
+      "episode_num": 2,
+      "title": "Frenchie Shore - S01E02 - Dérapages non contrôlés",
+      "published_at": "2026-11-16T23:22:06.939Z",
+      "hd_published": true,
+      "sd_published": false,
+      "telegram_msg_id_hd": 232,
+      "telegram_msg_id_sd": null,
+      "file_ref_hd": {
+        "id": "6044203107955515780",
+        "access_hash": "8776899893779749465",
+        "file_reference": "BgAAAAEIDwTcAAAA6Gr7kB5LEr7MFKpBTNCPgybXgdCr",
+        "mime_type": "video/mp4",
+        "size": 488873718,
+        "dc_id": 4
+      },
+      "file_ref_sd": null,
+      "published_at_hd": "2026-11-16T23:22:06.939Z",
+      "telegram_msg_id": 232
+    },
+    {
+      "id": "290672",
+      "episode_num": 3,
+      "title": "Frenchie Shore - S01E03 - L'art De Ruiner Ses Vacances En 3 Leçons.",
+      "published_at": "2026-11-16T23:23:38.780Z",
+      "hd_published": true,
+      "sd_published": false,
+      "telegram_msg_id_hd": 233,
+      "telegram_msg_id_sd": null,
+      "file_ref_hd": {
+        "id": "6044203107955515781",
+        "access_hash": "-3512465620724688702",
+        "file_reference": "BgAAAAEIDwTcAAAA6Wr7kHqsVf430QVHHtbBHQBHvI5S",
+        "mime_type": "video/mp4",
+        "size": 487223287,
+        "dc_id": 4
+      },
+      "file_ref_sd": null,
+      "published_at_hd": "2026-11-16T23:23:38.780Z",
+      "telegram_msg_id": 233
+    },
+    {
+      "id": "290673",
+      "episode_num": 4,
+      "title": "Frenchie Shore - S01E04 - Tous les Frenchies ont leur place sur la Frenchie Shore",
+      "published_at": "2026-11-16T23:25:20.104Z",
+      "hd_published": true,
+      "sd_published": false,
+      "telegram_msg_id_hd": 234,
+      "telegram_msg_id_sd": null,
+      "file_ref_hd": {
+        "id": "6044203107955515782",
+        "access_hash": "4794487352210522646",
+        "file_reference": "BgAAAAEIDwTcAAAA6mr7kN+r/EyFMW8TIH1I0zTL9GZL",
+        "mime_type": "video/mp4",
+        "size": 505149808,
+        "dc_id": 4
+      },
+      "file_ref_sd": null,
+      "published_at_hd": "2026-11-16T23:25:20.104Z",
+      "telegram_msg_id": 234
+    },
+    {
+      "id": "290674",
+      "episode_num": 5,
+      "title": "Frenchie Shore - S01E05 - Suis moi je te fuis...",
+      "published_at": "2026-11-16T23:27:02.399Z",
+      "hd_published": true,
+      "sd_published": false,
+      "telegram_msg_id_hd": 235,
+      "telegram_msg_id_sd": null,
+      "file_ref_hd": {
+        "id": "6044203107955515783",
+        "access_hash": "7786166893319666043",
+        "file_reference": "BgAAAAEIDwTcAAAA62r7kUa+D3lyg7BIE+eENIXMq/yj",
+        "mime_type": "video/mp4",
+        "size": 487455215,
+        "dc_id": 4
+      },
+      "file_ref_sd": null,
+      "published_at_hd": "2026-11-16T23:27:02.399Z",
+      "telegram_msg_id": 235
+    },
+    {
+      "id": "290676",
+      "episode_num": 7,
+      "title": "Frenchie Shore - S01E07 - Épisode 7",
+      "published_at": "2026-11-16T23:28:52.701Z",
+      "hd_published": true,
+      "sd_published": false,
+      "telegram_msg_id_hd": 236,
+      "telegram_msg_id_sd": null,
+      "file_ref_hd": {
+        "id": "6044203107955515784",
+        "access_hash": "-5423800751726989557",
+        "file_reference": "BgAAAAEIDwTcAAAA7Gr7kbSxprUmJ4f7GUsFCqGRf8DI",
+        "mime_type": "video/mp4",
+        "size": 515218941,
+        "dc_id": 4
+      },
+      "file_ref_sd": null,
+      "published_at_hd": "2026-11-16T23:28:52.701Z",
+      "telegram_msg_id": 236
+    },
+    {
+      "id": "290677",
+      "episode_num": 8,
+      "title": "Frenchie Shore - S01E08 - Épisode 8",
+      "published_at": "2026-11-16T23:31:02.959Z",
+      "hd_published": true,
+      "sd_published": false,
+      "telegram_msg_id_hd": 237,
+      "telegram_msg_id_sd": null,
+      "file_ref_hd": {
+        "id": "6044203107955515785",
+        "access_hash": "5644104612210620445",
+        "file_reference": "BgAAAAEIDwTcAAAA7Wr7kjZo9iKVX00BkEfph6xF0hsq",
+        "mime_type": "video/mp4",
+        "size": 522165069,
+        "dc_id": 4
+      },
+      "file_ref_sd": null,
+      "published_at_hd": "2026-11-16T23:31:02.959Z",
+      "telegram_msg_id": 237
+    },
+    {
+      "id": "290678",
+      "episode_num": 9,
+      "title": "Frenchie Shore - S01E09 - Épisode 9",
+      "published_at": "2026-11-16T23:33:05.967Z",
+      "hd_published": true,
+      "sd_published": false,
+      "telegram_msg_id_hd": 238,
+      "telegram_msg_id_sd": null,
+      "file_ref_hd": {
+        "id": "6044203107955515786",
+        "access_hash": "-5279330209442588316",
+        "file_reference": "BgAAAAEIDwTcAAAA7mr7krFCQoLfRMVhNHL5gMjq24t9",
+        "mime_type": "video/mp4",
+        "size": 490495347,
+        "dc_id": 4
+      },
+      "file_ref_sd": null,
+      "published_at_hd": "2026-11-16T23:33:05.967Z",
+      "telegram_msg_id": 238
+    },
+    {
+      "id": "356376",
+      "episode_num": 10,
+      "title": "Frenchie Shore - S01E10 - C'est la fin",
+      "published_at": "2026-11-16T23:34:49.006Z",
+      "hd_published": true,
+      "sd_published": false,
+      "telegram_msg_id_hd": 239,
+      "telegram_msg_id_sd": null,
+      "file_ref_hd": {
+        "id": "6044203107955515787",
+        "access_hash": "-2862037526388189303",
+        "file_reference": "BgAAAAEIDwTcAAAA72r7kxim1dfp3redAjoACr6LTVEz",
+        "mime_type": "video/mp4",
+        "size": 503894544,
+        "dc_id": 4
+      },
+      "file_ref_sd": null,
+      "published_at_hd": "2026-11-16T23:34:49.006Z",
+      "telegram_msg_id": 239
+    }
+  ],
   "series_4115_s2": [
     {
       "id": "356377",
       "episode_num": 1,
       "title": "Frenchie Shore - S02E01 - Guess who’s back ??",
-      "published_at": "2026-11-16T22:47:55.164Z",
+      "published_at": "2026-11-16T23:36:23.541Z",
       "hd_published": true,
       "sd_published": false,
-      "telegram_msg_id_hd": 336,
+      "telegram_msg_id_hd": 240,
       "telegram_msg_id_sd": null,
       "file_ref_hd": {
-        "id": "6044319209511460669",
-        "access_hash": "-5464856316498690965",
-        "file_reference": "BgAAAACb4XaoAAABUGr7iBqDZoOdAMx7tSwNoe+Ra3i9",
+        "id": "6044203107955515788",
+        "access_hash": "-5632453078262428374",
+        "file_reference": "BgAAAAEIDwTcAAAA8Gr7k3dBR1HkXaU3FtF31abViaKc",
         "mime_type": "video/mp4",
         "size": 482656239,
         "dc_id": 4
       },
       "file_ref_sd": null,
-      "published_at_hd": "2026-11-16T22:47:55.164Z",
-      "telegram_msg_id": 336
+      "published_at_hd": "2026-11-16T23:36:23.541Z",
+      "telegram_msg_id": 240
     },
     {
       "id": "356378",
       "episode_num": 2,
       "title": "Frenchie Shore - S02E02 - Embrouilles, drague et larmes !",
-      "published_at": "2026-11-16T22:49:37.517Z",
+      "published_at": "2026-11-16T23:38:00.562Z",
       "hd_published": true,
       "sd_published": false,
-      "telegram_msg_id_hd": 338,
+      "telegram_msg_id_hd": 241,
       "telegram_msg_id_sd": null,
       "file_ref_hd": {
-        "id": "6044319209511460670",
-        "access_hash": "6880546108559442576",
-        "file_reference": "BgAAAACb4XaoAAABUmr7iIFp3HI8Ba/znCcWNeFPCtiJ",
+        "id": "6044203107955515789",
+        "access_hash": "4362315638668024478",
+        "file_reference": "BgAAAAEIDwTcAAAA8Wr7k9i6HCYfe8bZA0bvNZULtlNC",
         "mime_type": "video/mp4",
         "size": 419109733,
         "dc_id": 4
       },
       "file_ref_sd": null,
-      "published_at_hd": "2026-11-16T22:49:37.517Z",
-      "telegram_msg_id": 338
+      "published_at_hd": "2026-11-16T23:38:00.562Z",
+      "telegram_msg_id": 241
     },
     {
       "id": "356379",
       "episode_num": 3,
       "title": "Frenchie Shore - S02E03 - Club et pool party, l'été est lancé !",
-      "published_at": "2026-11-16T22:51:23.303Z",
+      "published_at": "2026-11-16T23:39:16.811Z",
       "hd_published": true,
       "sd_published": false,
-      "telegram_msg_id_hd": 340,
+      "telegram_msg_id_hd": 242,
       "telegram_msg_id_sd": null,
       "file_ref_hd": {
-        "id": "6044319209511460671",
-        "access_hash": "8656055616801070476",
-        "file_reference": "BgAAAACb4XaoAAABVGr7iOuIRxiYXyz3SMvHiUhOHWZt",
+        "id": "6044203107955515790",
+        "access_hash": "5461149647645345064",
+        "file_reference": "BgAAAAEIDwTcAAAA8mr7lCSnsGEvLObO4v1g9mQ0K1xg",
         "mime_type": "video/mp4",
         "size": 415998094,
         "dc_id": 4
       },
       "file_ref_sd": null,
-      "published_at_hd": "2026-11-16T22:51:23.303Z",
-      "telegram_msg_id": 340
+      "published_at_hd": "2026-11-16T23:39:16.811Z",
+      "telegram_msg_id": 242
     },
     {
       "id": "356380",
       "episode_num": 4,
       "title": "Frenchie Shore - S02E04 - La villa est sur le point d'exploser...",
-      "published_at": "2026-11-16T22:52:52.302Z",
+      "published_at": "2026-11-16T23:40:37.550Z",
       "hd_published": true,
       "sd_published": false,
-      "telegram_msg_id_hd": 342,
+      "telegram_msg_id_hd": 243,
       "telegram_msg_id_sd": null,
       "file_ref_hd": {
-        "id": "6044319209511460672",
-        "access_hash": "3917559264591505417",
-        "file_reference": "BgAAAACb4XaoAAABVmr7iUSksnrnd1/GFjliUgGm7sqh",
+        "id": "6044203107955515791",
+        "access_hash": "315801567285922503",
+        "file_reference": "BgAAAAEIDwTcAAAA82r7lHUHNBQl8mcRYDONxXPKQAP3",
         "mime_type": "video/mp4",
         "size": 398543000,
         "dc_id": 4
       },
       "file_ref_sd": null,
-      "published_at_hd": "2026-11-16T22:52:52.302Z",
-      "telegram_msg_id": 342
+      "published_at_hd": "2026-11-16T23:40:37.550Z",
+      "telegram_msg_id": 243
     },
     {
       "id": "356381",
       "episode_num": 5,
       "title": "Frenchie Shore - S02E05 - Un Frenchie nous quitte…",
-      "published_at": "2026-11-16T22:54:40.801Z",
+      "published_at": "2026-11-16T23:41:54.704Z",
       "hd_published": true,
       "sd_published": false,
-      "telegram_msg_id_hd": 344,
+      "telegram_msg_id_hd": 244,
       "telegram_msg_id_sd": null,
       "file_ref_hd": {
-        "id": "6044319209511460673",
-        "access_hash": "198571938499146974",
-        "file_reference": "BgAAAACb4XaoAAABWGr7ibDC7im0E/u9nuxoBqqu8iG6",
+        "id": "6044203107955515792",
+        "access_hash": "925060074629241",
+        "file_reference": "BgAAAAEIDwTcAAAA9Gr7lMIg2mHQMwtVB7ZDc+Xc1F9z",
         "mime_type": "video/mp4",
         "size": 381510577,
         "dc_id": 4
       },
       "file_ref_sd": null,
-      "published_at_hd": "2026-11-16T22:54:40.801Z",
-      "telegram_msg_id": 344
+      "published_at_hd": "2026-11-16T23:41:54.704Z",
+      "telegram_msg_id": 244
     },
     {
       "id": "356382",
       "episode_num": 6,
       "title": "Frenchie Shore - S02E06 - No Nico, no party !",
-      "published_at": "2026-11-16T22:56:07.781Z",
+      "published_at": "2026-11-16T23:43:27.472Z",
       "hd_published": true,
       "sd_published": false,
-      "telegram_msg_id_hd": 346,
+      "telegram_msg_id_hd": 245,
       "telegram_msg_id_sd": null,
       "file_ref_hd": {
-        "id": "6044319209511460674",
-        "access_hash": "2320177948992063896",
-        "file_reference": "BgAAAACb4XaoAAABWmr7igdDWZyYJ2GMZJczJT2GC+b6",
+        "id": "6044203107955515793",
+        "access_hash": "4806561513478426652",
+        "file_reference": "BgAAAAEIDwTcAAAA9Wr7lR9fd6gbDjvh+inKO6q5QQvy",
         "mime_type": "video/mp4",
         "size": 398052991,
         "dc_id": 4
       },
       "file_ref_sd": null,
-      "published_at_hd": "2026-11-16T22:56:07.781Z",
-      "telegram_msg_id": 346
+      "published_at_hd": "2026-11-16T23:43:27.472Z",
+      "telegram_msg_id": 245
     },
     {
       "id": "356383",
       "episode_num": 7,
       "title": "Frenchie Shore - S02E07 - Fantasmes, confessions et invitée surprise !",
-      "published_at": "2026-11-16T22:57:35.277Z",
+      "published_at": "2026-11-16T23:44:42.475Z",
       "hd_published": true,
       "sd_published": false,
-      "telegram_msg_id_hd": 348,
+      "telegram_msg_id_hd": 246,
       "telegram_msg_id_sd": null,
       "file_ref_hd": {
-        "id": "6044319209511460675",
-        "access_hash": "7013410650670879235",
-        "file_reference": "BgAAAACb4XaoAAABXGr7il/yAII+qNR1CD+yhQQBJFCJ",
+        "id": "6044203107955515794",
+        "access_hash": "-777282932269195933",
+        "file_reference": "BgAAAAEIDwTcAAAA9mr7lWrmhSOH0lK2R6wu44DklZRe",
         "mime_type": "video/mp4",
         "size": 397890865,
         "dc_id": 4
       },
       "file_ref_sd": null,
-      "published_at_hd": "2026-11-16T22:57:35.277Z",
-      "telegram_msg_id": 348
+      "published_at_hd": "2026-11-16T23:44:42.475Z",
+      "telegram_msg_id": 246
     },
     {
       "id": "356384",
       "episode_num": 8,
       "title": "Frenchie Shore - S02E08 - Règlements de comptes !",
-      "published_at": "2026-11-16T22:58:54.202Z",
+      "published_at": "2026-11-16T23:46:13.732Z",
       "hd_published": true,
       "sd_published": false,
-      "telegram_msg_id_hd": 350,
+      "telegram_msg_id_hd": 247,
       "telegram_msg_id_sd": null,
       "file_ref_hd": {
-        "id": "6044319209511460676",
-        "access_hash": "2315511283453649750",
-        "file_reference": "BgAAAACb4XaoAAABXmr7iq6UZESjTO8CUvbN67qoqfqV",
+        "id": "6044203107955515795",
+        "access_hash": "7406188134579716317",
+        "file_reference": "BgAAAAEIDwTcAAAA92r7lcW+pqTHzIIVNhphMmuhL4lm",
         "mime_type": "video/mp4",
         "size": 375846128,
         "dc_id": 4
       },
       "file_ref_sd": null,
-      "published_at_hd": "2026-11-16T22:58:54.202Z",
-      "telegram_msg_id": 350
+      "published_at_hd": "2026-11-16T23:46:13.732Z",
+      "telegram_msg_id": 247
     },
     {
       "id": "356385",
       "episode_num": 9,
       "title": "Frenchie Shore - S02E09 - La frenchie Shore party !",
-      "published_at": "2026-11-16T23:00:26.495Z",
+      "published_at": "2026-11-16T23:47:23.484Z",
       "hd_published": true,
       "sd_published": false,
-      "telegram_msg_id_hd": 352,
+      "telegram_msg_id_hd": 248,
       "telegram_msg_id_sd": null,
       "file_ref_hd": {
-        "id": "6044319209511460677",
-        "access_hash": "4258845523210226755",
-        "file_reference": "BgAAAACb4XaoAAABYGr7iwrv5r97eNruqhv4UCbDnHot",
+        "id": "6044203107955515796",
+        "access_hash": "-9000451167482689563",
+        "file_reference": "BgAAAAEIDwTcAAAA+Gr7lguNAmYvCBfeUiEylTvD+kwV",
         "mime_type": "video/mp4",
         "size": 378427935,
         "dc_id": 4
       },
       "file_ref_sd": null,
-      "published_at_hd": "2026-11-16T23:00:26.495Z",
-      "telegram_msg_id": 352
+      "published_at_hd": "2026-11-16T23:47:23.484Z",
+      "telegram_msg_id": 248
     },
     {
       "id": "356386",
       "episode_num": 10,
       "title": "Frenchie Shore - S02E10 - This is the end …",
-      "published_at": "2026-11-16T23:01:57.530Z",
+      "published_at": "2026-11-16T23:49:12.639Z",
       "hd_published": true,
       "sd_published": false,
-      "telegram_msg_id_hd": 354,
+      "telegram_msg_id_hd": 249,
       "telegram_msg_id_sd": null,
       "file_ref_hd": {
-        "id": "6044319209511460678",
-        "access_hash": "-4128011190307490637",
-        "file_reference": "BgAAAACb4XaoAAABYmr7i2UQkFFtXXD1E1Hr7cH8IVJp",
+        "id": "6044203107955515797",
+        "access_hash": "-1578934360977984947",
+        "file_reference": "BgAAAAEIDwTcAAAA+Wr7lng1TaDf5L519W0AUHsSWdZF",
         "mime_type": "video/mp4",
         "size": 424941432,
         "dc_id": 4
       },
       "file_ref_sd": null,
-      "published_at_hd": "2026-11-16T23:01:57.530Z",
-      "telegram_msg_id": 354
+      "published_at_hd": "2026-11-16T23:49:12.639Z",
+      "telegram_msg_id": 249
     }
   ]
 }
