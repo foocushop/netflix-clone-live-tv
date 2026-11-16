@@ -36,5 +36,15 @@
     "template": "<b>{titre}</b> {emoji} Saison {saison}\n\nÉpisode {episode}",
     "channel_id": "-1004430169308",
     "enabled": true
+  },
+  {
+    "id": "series_4115_s3",
+    "series_id": 4115,
+    "season": 3,
+    "name": "Frenchie Shore",
+    "emoji": "📺",
+    "template": "<b>{titre}</b> {emoji} Saison {saison}\n\nÉpisode {episode}",
+    "channel_id": "-1002615244456",
+    "enabled": true
   }
 ]
