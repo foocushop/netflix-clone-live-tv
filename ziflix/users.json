@@ -5317,9 +5317,9 @@
     "role": "user",
     "banned": false,
     "created_at": "2026-09-15T21:18:07.184Z",
-    "last_login": "2026-11-13T15:29:28.995Z",
+    "last_login": "2026-11-16T16:44:09.035Z",
     "ip": "154.124.197.68",
-    "last_ip": "2a09:bac3:5534:26c8::3dd:69"
+    "last_ip": "2a09:bac2:5535:26c8::3dd:6e"
   },
   {
     "id": "u_1789508249336_c04a00a4",
@@ -7979,7 +7979,7 @@
     "ip": "2a0d:e487:69f:e83:3090:cc10:3e9:6d94",
     "last_ip": "2a0d:e487:222e:b734:75c4:a18e:4774:7912",
     "created_at": "2026-09-23T17:56:55.844Z",
-    "last_login": "2026-11-16T11:59:07.435Z"
+    "last_login": "2026-11-16T16:06:19.784Z"
   },
   {
     "id": "u_1790187834994_8ed99933",
@@ -35974,6 +35974,21 @@
     "last_ip": "2001:4278:22:6923:a090:e0dd:f647:f9a1",
     "created_at": "2026-11-16T15:10:40.225Z",
     "last_login": "2026-11-16T15:10:40.225Z",
+    "watch_credit_seconds": 1200,
+    "welcome_seen": false
+  },
+  {
+    "id": "u_1794847223761_91412199",
+    "username": "Mey",
+    "password_hash": "6d708ad703ff0d3cc1aea9c7f2c78cc1fd42e736d3df1f3d2ba8735e66580886bbc5eb2d2dc58cd0cae9eb0e65c2f5085f069b2c38a99ab12babed8e5b926fbb",
+    "salt": "a9026c3431f2bf5a534ada45c2258d88",
+    "avatar": "assets/avatars/avatar-1.svg",
+    "role": "user",
+    "banned": false,
+    "ip": "84.74.132.166",
+    "last_ip": "84.74.132.166",
+    "created_at": "2026-11-16T16:40:23.761Z",
+    "last_login": "2026-11-16T16:40:23.761Z",
     "watch_credit_seconds": 1200,
     "welcome_seen": false
   }
