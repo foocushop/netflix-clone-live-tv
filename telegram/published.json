@@ -1348,6 +1348,27 @@
       "file_ref_sd": null,
       "published_at_hd": "2026-11-17T13:21:33.643Z",
       "telegram_msg_id": 250
+    },
+    {
+      "id": "496205",
+      "episode_num": 64,
+      "title": "La Villa des Cœurs Brisés (2015) - S11E64 - Épisode 64",
+      "published_at": "2026-11-17T19:48:17.672Z",
+      "hd_published": true,
+      "sd_published": false,
+      "telegram_msg_id_hd": 252,
+      "telegram_msg_id_sd": null,
+      "file_ref_hd": {
+        "id": "6046454907769200807",
+        "access_hash": "5832932318983416770",
+        "file_reference": "BgAAAAEIDwTcAAAA/Gr8r4EMVgZ3kzXlR2i++Ea3c0yg",
+        "mime_type": "video/mp4",
+        "size": 1017052174,
+        "dc_id": 4
+      },
+      "file_ref_sd": null,
+      "published_at_hd": "2026-11-17T19:48:17.672Z",
+      "telegram_msg_id": 252
     }
   ],
   "series_9066_s9": [
