@@ -33894,7 +33894,7 @@
     "ip": "2001:4278:22:42c1:2c9c:e346:b88b:4c90",
     "last_ip": "2001:4278:14:e08e:2506:8356:d6ad:eac1",
     "created_at": "2026-10-26T15:03:20.962Z",
-    "last_login": "2026-11-17T20:23:19.402Z",
+    "last_login": "2026-11-17T21:05:55.109Z",
     "watch_credit_seconds": 1200,
     "welcome_seen": false
   },
@@ -36018,7 +36018,7 @@
     "ip": "196.127.12.59",
     "last_ip": "196.127.12.59",
     "created_at": "2026-11-16T22:59:56.176Z",
-    "last_login": "2026-11-16T23:11:05.949Z",
+    "last_login": "2026-11-17T21:25:48.134Z",
     "watch_credit_seconds": 1200,
     "welcome_seen": false
   },
@@ -36034,6 +36034,21 @@
     "last_ip": "2001:861:3490:68d0:edb8:398c:9458:2c1a",
     "created_at": "2026-11-17T19:30:36.355Z",
     "last_login": "2026-11-17T19:30:36.355Z",
+    "watch_credit_seconds": 1200,
+    "welcome_seen": false
+  },
+  {
+    "id": "u_1794949874103_6cb5def0",
+    "username": "yoyo",
+    "password_hash": "a0a57020e05167c522f98fd78efeba830c6819446f0f9177756ed47f74a81774af7fde38fa083dd937118c47d91145498e544d49aff74d29f8fd840576bf77ae",
+    "salt": "526cf4883ca01ef1c3bed2cb7b3b75b3",
+    "avatar": "assets/avatars/avatar-8.svg",
+    "role": "user",
+    "banned": false,
+    "ip": "2c0f:f698:c13e:3e20:54f6:1dff:fee1:d0f5",
+    "last_ip": "2c0f:f698:c13e:3e20:54f6:1dff:fee1:d0f5",
+    "created_at": "2026-11-17T21:11:14.103Z",
+    "last_login": "2026-11-17T21:11:14.103Z",
     "watch_credit_seconds": 1200,
     "welcome_seen": false
   }
