@@ -1327,6 +1327,27 @@
       "file_ref_sd": null,
       "published_at_hd": "2026-11-13T22:13:04.678Z",
       "telegram_msg_id": 228
+    },
+    {
+      "id": "496139",
+      "episode_num": 63,
+      "title": "La Villa des Cœurs Brisés (2015) - S11E63 - Épisode 63",
+      "published_at": "2026-11-17T13:21:33.643Z",
+      "hd_published": true,
+      "sd_published": false,
+      "telegram_msg_id_hd": 250,
+      "telegram_msg_id_sd": null,
+      "file_ref_hd": {
+        "id": "6046454907769200535",
+        "access_hash": "-301601842826592898",
+        "file_reference": "BgAAAAEIDwTcAAAA+mr8VN0Tunryque6f9jkJ7ArG054",
+        "mime_type": "video/mp4",
+        "size": 508539773,
+        "dc_id": 4
+      },
+      "file_ref_sd": null,
+      "published_at_hd": "2026-11-17T13:21:33.643Z",
+      "telegram_msg_id": 250
     }
   ],
   "series_9066_s9": [
@@ -2431,6 +2452,27 @@
       "file_ref_sd": null,
       "published_at_hd": "2026-11-13T22:23:18.959Z",
       "telegram_msg_id": 229
+    },
+    {
+      "id": "496138",
+      "episode_num": 47,
+      "title": "Les Apprentis Aventuriers (2016) - S09E47 - Épisode 47",
+      "published_at": "2026-11-17T13:23:03.016Z",
+      "hd_published": true,
+      "sd_published": false,
+      "telegram_msg_id_hd": 251,
+      "telegram_msg_id_sd": null,
+      "file_ref_hd": {
+        "id": "6046454907769200543",
+        "access_hash": "-4051570361202474143",
+        "file_reference": "BgAAAAEIDwTcAAAA+2r8VTbK/eFlFVAzx4vmEy7QUE0y",
+        "mime_type": "video/mp4",
+        "size": 523500806,
+        "dc_id": 4
+      },
+      "file_ref_sd": null,
+      "published_at_hd": "2026-11-17T13:23:03.016Z",
+      "telegram_msg_id": 251
     }
   ],
   "series_test_s1": [
