@@ -2494,6 +2494,27 @@
       "file_ref_sd": null,
       "published_at_hd": "2026-11-17T13:23:03.016Z",
       "telegram_msg_id": 251
+    },
+    {
+      "id": "496207",
+      "episode_num": 48,
+      "title": "Les Apprentis Aventuriers (2016) - S09E48 - Épisode 48",
+      "published_at": "2026-11-17T19:50:27.599Z",
+      "hd_published": true,
+      "sd_published": false,
+      "telegram_msg_id_hd": 253,
+      "telegram_msg_id_sd": null,
+      "file_ref_hd": {
+        "id": "6046454907769200813",
+        "access_hash": "809293415208088694",
+        "file_reference": "BgAAAAEIDwTcAAAA/Wr8sANks6YCdceL1cNWqe9z8+QH",
+        "mime_type": "video/mp4",
+        "size": 520824397,
+        "dc_id": 4
+      },
+      "file_ref_sd": null,
+      "published_at_hd": "2026-11-17T19:50:27.599Z",
+      "telegram_msg_id": 253
     }
   ],
   "series_test_s1": [
