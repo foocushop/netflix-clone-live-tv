@@ -6863,5 +6863,13 @@
     "role": "user",
     "avatar": "assets/avatars/avatar-1.svg",
     "expires_at": 1797546930390
+  },
+  {
+    "token": "0d02eddc1974f3e663ebc931c7b0a370e36153376acf939465034fd3ac4f802b",
+    "user_id": "u_1794963196105_5ccd4605",
+    "username": "Kevs3",
+    "role": "user",
+    "avatar": "assets/avatars/avatar-1.svg",
+    "expires_at": 1797555196185
   }
 ]

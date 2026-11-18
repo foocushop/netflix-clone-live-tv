@@ -36051,5 +36051,20 @@
     "last_login": "2026-11-17T21:11:14.103Z",
     "watch_credit_seconds": 1200,
     "welcome_seen": false
+  },
+  {
+    "id": "u_1794963196105_5ccd4605",
+    "username": "Kevs3",
+    "password_hash": "bc9bd35e42bc871604e8cd683a66838b0de0c14dab45592d01520c099d270d3567fd38690fcf94a8ea4f90029954513c04149e7d3e47aed0d8de2fc3f755cfb0",
+    "salt": "b5d24901a24a6adadec36eae538b301c",
+    "avatar": "assets/avatars/avatar-1.svg",
+    "role": "user",
+    "banned": false,
+    "ip": "165.210.39.192",
+    "last_ip": "165.210.39.192",
+    "created_at": "2026-11-18T00:53:16.105Z",
+    "last_login": "2026-11-18T00:53:16.105Z",
+    "watch_credit_seconds": 1200,
+    "welcome_seen": false
   }
 ]
