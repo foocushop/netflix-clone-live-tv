@@ -36111,5 +36111,20 @@
     "last_login": "2026-11-18T14:40:09.344Z",
     "watch_credit_seconds": 1200,
     "welcome_seen": false
+  },
+  {
+    "id": "u_1795021282475_f2a11334",
+    "username": "Noham0712",
+    "password_hash": "2811ad7004ac428e0a1003f609fe0dd04c3923b33f605ef723eafbe065bb89d506bcc614232b735b5a06973aa097c37cbf3634caba1c52706ca6ff366dc090a3",
+    "salt": "a4ca16fab5d0017d8fb8d5e8a79489f4",
+    "avatar": "assets/avatars/avatar-1.svg",
+    "role": "user",
+    "banned": false,
+    "ip": "2001:861:3f0c:5010:3123:9bf9:5fd2:581",
+    "last_ip": "2001:861:3f0c:5010:3123:9bf9:5fd2:581",
+    "created_at": "2026-11-18T17:01:22.475Z",
+    "last_login": "2026-11-18T17:01:22.475Z",
+    "watch_credit_seconds": 1200,
+    "welcome_seen": false
   }
 ]
