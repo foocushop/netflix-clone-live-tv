@@ -6871,5 +6871,13 @@
     "role": "user",
     "avatar": "assets/avatars/avatar-1.svg",
     "expires_at": 1797555196185
+  },
+  {
+    "token": "f5ccd2394445a641fbb6440832e643b2fcd2b4fc51f644ece5b3f87ce966086e",
+    "user_id": "u_1794869996174_18e2fde2",
+    "username": "Haha",
+    "role": "user",
+    "avatar": "assets/avatars/avatar-1.svg",
+    "expires_at": 1797558911087
   }
 ]
