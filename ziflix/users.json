@@ -3951,9 +3951,9 @@
     "role": "user",
     "banned": false,
     "created_at": "2026-09-15T15:15:47.669Z",
-    "last_login": "2026-11-16T20:44:24.968Z",
+    "last_login": "2026-11-18T09:55:42.238Z",
     "ip": "196.168.116.116",
-    "last_ip": "196.168.198.173"
+    "last_ip": "41.78.139.222"
   },
   {
     "id": "u_1789485497175_51adfaa6",
@@ -36064,6 +36064,21 @@
     "last_ip": "165.210.39.192",
     "created_at": "2026-11-18T00:53:16.105Z",
     "last_login": "2026-11-18T00:53:16.105Z",
+    "watch_credit_seconds": 1200,
+    "welcome_seen": false
+  },
+  {
+    "id": "u_1794996146406_0fb7ce43",
+    "username": "Banakin243",
+    "password_hash": "b05a9c652941877ecf08165ff7acde4e6dfa5846f503b34aa6a0f861991e23bf57c720c16a2de25ea79f985c220d1333285e30e86a92c904ecbe718981c84f9c",
+    "salt": "af0c8273be6d146e22ecb39576707120",
+    "avatar": "assets/avatars/avatar-1.svg",
+    "role": "user",
+    "banned": false,
+    "ip": "2a01:cb04:dda:2300:ad63:f5c8:8360:ea42",
+    "last_ip": "2a01:cb04:dda:2300:ad63:f5c8:8360:ea42",
+    "created_at": "2026-11-18T10:02:26.406Z",
+    "last_login": "2026-11-18T10:02:26.406Z",
     "watch_credit_seconds": 1200,
     "welcome_seen": false
   }
