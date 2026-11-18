@@ -36081,5 +36081,35 @@
     "last_login": "2026-11-18T10:02:26.406Z",
     "watch_credit_seconds": 1200,
     "welcome_seen": false
+  },
+  {
+    "id": "u_1795003887963_4c9ef66c",
+    "username": "omarggfh",
+    "password_hash": "4ebcd0cfcbe0a18a49f406b6ee83aba8cf3c9380bd8626d05f5be089f8ac7aea23cc925274ef7236ba7544ddc1378807657d2c4f178077cc3a3f497ef0807f41",
+    "salt": "31608e379495a59096bd017f50277d23",
+    "avatar": "assets/avatars/avatar-1.svg",
+    "role": "user",
+    "banned": false,
+    "ip": "105.158.17.191",
+    "last_ip": "105.158.17.191",
+    "created_at": "2026-11-18T12:11:27.963Z",
+    "last_login": "2026-11-18T12:11:27.963Z",
+    "watch_credit_seconds": 1200,
+    "welcome_seen": false
+  },
+  {
+    "id": "u_1795005311260_b944b700",
+    "username": "Nohamz0712@gmail.com",
+    "password_hash": "7daa08f9e5f0f33a345fc3590c61e6ec3e61e2ae07b88d257c0afa4f99076c2dd54df224305322ca1e9570f0a325ac753c775400eddd287515af2669d5808bfa",
+    "salt": "c00a63bc872277d0c54b80985e46738d",
+    "avatar": "assets/avatars/avatar-1.svg",
+    "role": "user",
+    "banned": false,
+    "ip": "2001:861:3f0c:5010:d45b:9f11:dac2:7598",
+    "last_ip": "2001:861:3f0c:5010:d45b:9f11:dac2:7598",
+    "created_at": "2026-11-18T12:35:11.260Z",
+    "last_login": "2026-11-18T12:35:11.260Z",
+    "watch_credit_seconds": 1200,
+    "welcome_seen": false
   }
 ]
