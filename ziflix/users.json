@@ -2573,9 +2573,9 @@
     "role": "user",
     "banned": false,
     "created_at": "2026-09-14T10:12:54.102Z",
-    "last_login": "2026-11-19T13:50:06.257Z",
+    "last_login": "2026-11-19T21:38:36.824Z",
     "ip": "2a01:e0a:863:3ce0:6454:5ea3:56fc:4f26",
-    "last_ip": "2a09:bac5:34db:28aa::40d:5e"
+    "last_ip": "2a02:26f7:c9d0:651a:0:d000:0:a"
   },
   {
     "id": "u_1789381726100_14a67e02",
@@ -3626,7 +3626,7 @@
     "role": "user",
     "banned": false,
     "created_at": "2026-09-15T07:43:21.541Z",
-    "last_login": "2026-11-19T20:19:52.652Z",
+    "last_login": "2026-11-19T20:51:02.095Z",
     "ip": "169.159.211.140",
     "last_ip": "2c0f:e00:6dc:f500:cc28:708:cd2d:2b2d"
   },
@@ -36259,6 +36259,36 @@
     "last_ip": "2a02:842a:ea03:1a01:ad6f:bec6:fd99:ae2",
     "created_at": "2026-11-19T17:26:53.892Z",
     "last_login": "2026-11-19T17:26:53.892Z",
+    "watch_credit_seconds": 1200,
+    "welcome_seen": false
+  },
+  {
+    "id": "u_1795121761605_fee92763",
+    "username": "Nandy28",
+    "password_hash": "dc711f98f4b2e93d36489f5eb6a4b9b2a50d3498c4337b382582bf8cbe89765c44c9895618a3fd0ebb4671814cf0925c116b6804ca8622f1389f6eaa2fcbe5fa",
+    "salt": "ba7feff7b6809dd1c9d4ee6b77c2de39",
+    "avatar": "assets/avatars/avatar-1.svg",
+    "role": "user",
+    "banned": false,
+    "ip": "2001:4278:15:7c7c:58b:81c4:2043:1530",
+    "last_ip": "2001:4278:15:7c7c:58b:81c4:2043:1530",
+    "created_at": "2026-11-19T20:56:01.605Z",
+    "last_login": "2026-11-19T20:56:01.605Z",
+    "watch_credit_seconds": 1200,
+    "welcome_seen": false
+  },
+  {
+    "id": "u_1795122239352_e7f0c724",
+    "username": "Jodiak59",
+    "password_hash": "d32ba3fbcce25f2130fc67466b1a3b01556e8fbf81d71c3f9f3a075000df70eaab46868b9a6f23849e4b0cac59b846f3fadbe5190de4590d074b92fd00c8016f",
+    "salt": "05aa1c0cb866b5ef374c7f2c8dd40933",
+    "avatar": "assets/avatars/avatar-2.svg",
+    "role": "user",
+    "banned": false,
+    "ip": "2a01:cb04:dda:2300:fd25:776f:dfcc:629f",
+    "last_ip": "2a01:cb04:dda:2300:fd25:776f:dfcc:629f",
+    "created_at": "2026-11-19T21:03:59.352Z",
+    "last_login": "2026-11-19T21:03:59.352Z",
     "watch_credit_seconds": 1200,
     "welcome_seen": false
   }
