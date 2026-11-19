@@ -7039,5 +7039,13 @@
     "role": "user",
     "avatar": "assets/avatars/avatar-1.svg",
     "expires_at": 1797698689818
+  },
+  {
+    "token": "b1a485253eef58684ae9715be05f6c0a2e3c03c3b1830f963c644d18d2b8deb3",
+    "user_id": "u_1795109213892_a1b5b9cf",
+    "username": "mariemich",
+    "role": "user",
+    "avatar": "assets/avatars/avatar-6.svg",
+    "expires_at": 1797701213916
   }
 ]

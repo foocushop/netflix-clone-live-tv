@@ -36246,5 +36246,20 @@
     "last_login": "2026-11-19T16:44:49.790Z",
     "watch_credit_seconds": 1200,
     "welcome_seen": false
+  },
+  {
+    "id": "u_1795109213892_a1b5b9cf",
+    "username": "mariemich",
+    "password_hash": "fcb4ef8655fd47f116efcfedf0f7487de8ed6916377ea71af89751fcfc4fa58eb55ace0c684dee2b520973df3b00b026922a4e4b035cf73225fa9390019d53ef",
+    "salt": "5bb401ba002c65f5782fea5eb28df72e",
+    "avatar": "assets/avatars/avatar-6.svg",
+    "role": "user",
+    "banned": false,
+    "ip": "2a02:842a:ea03:1a01:ad6f:bec6:fd99:ae2",
+    "last_ip": "2a02:842a:ea03:1a01:ad6f:bec6:fd99:ae2",
+    "created_at": "2026-11-19T17:26:53.892Z",
+    "last_login": "2026-11-19T17:26:53.892Z",
+    "watch_credit_seconds": 1200,
+    "welcome_seen": false
   }
 ]
