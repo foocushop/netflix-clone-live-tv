@@ -36156,5 +36156,20 @@
     "last_login": "2026-11-18T21:18:25.129Z",
     "watch_credit_seconds": 1200,
     "welcome_seen": false
+  },
+  {
+    "id": "u_1795067210490_03d8efb9",
+    "username": "toutou",
+    "password_hash": "3e75eadc2e0f6a540f65f4745cf461fcbbead2b8a6771f06fc41e0d73f5b121a93642f7b09b3f4b47b73c252fd53a77a1a85ac6f222ea10a9e17ac020bc9f59f",
+    "salt": "7d3b404afecb8f3b05904eff4317df47",
+    "avatar": "assets/avatars/avatar-1.svg",
+    "role": "user",
+    "banned": false,
+    "ip": "2a0d:e487:147e:8f49:f1ce:3076:f552:9e8f",
+    "last_ip": "2a0d:e487:147e:8f49:f1ce:3076:f552:9e8f",
+    "created_at": "2026-11-19T05:46:50.491Z",
+    "last_login": "2026-11-19T05:46:50.491Z",
+    "watch_credit_seconds": 1200,
+    "welcome_seen": false
   }
 ]
