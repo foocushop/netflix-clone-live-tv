@@ -3951,9 +3951,9 @@
     "role": "user",
     "banned": false,
     "created_at": "2026-09-15T15:15:47.669Z",
-    "last_login": "2026-11-19T20:21:04.724Z",
+    "last_login": "2026-11-19T22:20:32.884Z",
     "ip": "196.168.116.116",
-    "last_ip": "41.78.138.53"
+    "last_ip": "196.169.23.169"
   },
   {
     "id": "u_1789485497175_51adfaa6",
@@ -8042,7 +8042,7 @@
     "role": "user",
     "banned": false,
     "ip": "2a02:1811:341d:3400:e0f8:2516:bb8:158a",
-    "last_ip": "2a02:1811:341d:3400:bd32:835c:daee:c693",
+    "last_ip": "2a02:1811:341d:3400:44aa:b291:96a7:2635",
     "created_at": "2026-09-23T23:43:31.505Z",
     "last_login": "2026-10-30T22:38:26.462Z"
   },
@@ -36289,6 +36289,21 @@
     "last_ip": "2a01:cb04:dda:2300:fd25:776f:dfcc:629f",
     "created_at": "2026-11-19T21:03:59.352Z",
     "last_login": "2026-11-19T21:03:59.352Z",
+    "watch_credit_seconds": 1200,
+    "welcome_seen": false
+  },
+  {
+    "id": "u_1795127952083_0edd6c3b",
+    "username": "Ted08",
+    "password_hash": "bd749f88b36500bf60d9e06958daa15363fa75cec460dcc8ecc4d33a7b7441b640d13ede5d22a52b0e7e05e58f9f684cd5b5f7f34619c6f5783c337b96f6e0b4",
+    "salt": "69c9859bedfb463d4b5efec5c972dd3c",
+    "avatar": "assets/avatars/avatar-1.svg",
+    "role": "user",
+    "banned": false,
+    "ip": "197.214.238.63",
+    "last_ip": "197.214.238.63",
+    "created_at": "2026-11-19T22:39:12.083Z",
+    "last_login": "2026-11-19T22:39:12.083Z",
     "watch_credit_seconds": 1200,
     "welcome_seen": false
   }
