@@ -36186,5 +36186,20 @@
     "last_login": "2026-11-19T08:54:12.281Z",
     "watch_credit_seconds": 1200,
     "welcome_seen": false
+  },
+  {
+    "id": "u_1795095763689_9c7e9798",
+    "username": "ben1603",
+    "password_hash": "97e2fd42eb22429fefed5c767c71e371e44831b329c5f47288c2e5466895d8a8230bcd93bd3e5e94281b27806b35b25e10129751a94f1a07833bb492d050f7e3",
+    "salt": "afcbdefe9e6a6682d01bd6ea03d21f95",
+    "avatar": "assets/avatars/avatar-1.svg",
+    "role": "user",
+    "banned": false,
+    "ip": "2a02:8440:4581:fec7:c5f3:3f1:f2f6:ee4",
+    "last_ip": "2a02:8440:4581:fec7:c5f3:3f1:f2f6:ee4",
+    "created_at": "2026-11-19T13:42:43.689Z",
+    "last_login": "2026-11-19T13:42:43.689Z",
+    "watch_credit_seconds": 1200,
+    "welcome_seen": false
   }
 ]

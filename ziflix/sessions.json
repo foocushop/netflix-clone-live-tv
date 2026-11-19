@@ -6999,5 +6999,13 @@
     "role": "user",
     "avatar": "assets/avatars/avatar-10.svg",
     "expires_at": 1797681987187
+  },
+  {
+    "token": "bbebe60e70b4fb84457f4aa6f0659072371a19acb8bb52e78df40dac31a4ae37",
+    "user_id": "u_1795095763689_9c7e9798",
+    "username": "ben1603",
+    "role": "user",
+    "avatar": "assets/avatars/avatar-1.svg",
+    "expires_at": 1797687763718
   }
 ]
