@@ -7031,5 +7031,13 @@
     "role": "user",
     "avatar": "assets/avatars/avatar-1.svg",
     "expires_at": 1797692433558
+  },
+  {
+    "token": "2baf940ae810f52f30aac9e83bc11731a1c3701782cffca87a47da645182882b",
+    "user_id": "u_1795106689790_2081598d",
+    "username": "taku333",
+    "role": "user",
+    "avatar": "assets/avatars/avatar-1.svg",
+    "expires_at": 1797698689818
   }
 ]
