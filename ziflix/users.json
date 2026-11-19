@@ -36171,5 +36171,20 @@
     "last_login": "2026-11-19T05:46:50.491Z",
     "watch_credit_seconds": 1200,
     "welcome_seen": false
+  },
+  {
+    "id": "u_1795078452281_10590ec7",
+    "username": "Gdjdhvegs",
+    "password_hash": "10cc73d7688279ce88132700c30ca54257d2cc367fa180165091ffb8337387c3c851bee9e103c3cab3cb924d4551bed6bbbea914b935d5d2f28127f481edd4da",
+    "salt": "25025612b1c71516f527be9108b2d570",
+    "avatar": "assets/avatars/avatar-1.svg",
+    "role": "user",
+    "banned": false,
+    "ip": "41.216.86.44",
+    "last_ip": "41.216.86.44",
+    "created_at": "2026-11-19T08:54:12.281Z",
+    "last_login": "2026-11-19T08:54:12.281Z",
+    "watch_credit_seconds": 1200,
+    "welcome_seen": false
   }
 ]
