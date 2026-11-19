@@ -1390,6 +1390,27 @@
       "file_ref_sd": null,
       "published_at_hd": "2026-11-18T20:27:46.606Z",
       "telegram_msg_id": 254
+    },
+    {
+      "id": "496359",
+      "episode_num": 66,
+      "title": "La Villa des Cœurs Brisés (2015) - S11E66 - Épisode 66",
+      "published_at": "2026-11-19T20:09:48.632Z",
+      "hd_published": true,
+      "sd_published": false,
+      "telegram_msg_id_hd": 256,
+      "telegram_msg_id_sd": null,
+      "file_ref_hd": {
+        "id": "6050908810329990789",
+        "access_hash": "4723714471996749673",
+        "file_reference": "BgAAAAEIDwTcAAABAGr/V4yAKXEMBXtKxHUh6f/fs8TD",
+        "mime_type": "video/mp4",
+        "size": 960913964,
+        "dc_id": 4
+      },
+      "file_ref_sd": null,
+      "published_at_hd": "2026-11-19T20:09:48.632Z",
+      "telegram_msg_id": 256
     }
   ],
   "series_9066_s9": [
