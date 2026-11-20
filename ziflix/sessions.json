@@ -6031,5 +6031,13 @@
     "role": "user",
     "avatar": "assets/avatars/avatar-9.svg",
     "expires_at": 1797799595722
+  },
+  {
+    "token": "019cb65bd9917f270b19dc664872b69683525290a10ff12422a06ffdd23077b2",
+    "user_id": "u_1795208215659_8f12c7f7",
+    "username": "coco 45",
+    "role": "user",
+    "avatar": "assets/avatars/avatar-8.svg",
+    "expires_at": 1797800215783
   }
 ]
