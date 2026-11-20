@@ -1411,6 +1411,27 @@
       "file_ref_sd": null,
       "published_at_hd": "2026-11-19T20:09:48.632Z",
       "telegram_msg_id": 256
+    },
+    {
+      "id": "496602",
+      "episode_num": 67,
+      "title": "La Villa des Cœurs Brisés (2015) - S11E67 - Épisode 67",
+      "published_at": "2026-11-20T19:51:28.361Z",
+      "hd_published": true,
+      "sd_published": false,
+      "telegram_msg_id_hd": 259,
+      "telegram_msg_id_sd": null,
+      "file_ref_hd": {
+        "id": "5764930233991963292",
+        "access_hash": "-2271855707726783345",
+        "file_reference": "BgAAAAEIDwTcAAABA2sApMDoLMULDRDAWKG/TOzEVmtn",
+        "mime_type": "video/mp4",
+        "size": 632548451,
+        "dc_id": 4
+      },
+      "file_ref_sd": null,
+      "published_at_hd": "2026-11-20T19:51:28.361Z",
+      "telegram_msg_id": 259
     }
   ],
   "series_9066_s9": [
