@@ -2578,6 +2578,27 @@
       "file_ref_sd": null,
       "published_at_hd": "2026-11-18T20:29:48.817Z",
       "telegram_msg_id": 255
+    },
+    {
+      "id": "496405",
+      "episode_num": 50,
+      "title": "Les Apprentis Aventuriers (2016) - S09E50 - Épisode 50",
+      "published_at": "2026-11-20T06:42:48.436Z",
+      "hd_published": true,
+      "sd_published": false,
+      "telegram_msg_id_hd": 258,
+      "telegram_msg_id_sd": null,
+      "file_ref_hd": {
+        "id": "5764930233991962895",
+        "access_hash": "-4237816073058221635",
+        "file_reference": "BgAAAAEIDwTcAAABAmr/6/fSJdQVA9VqSPCK/WAfRcCu",
+        "mime_type": "video/mp4",
+        "size": 536850130,
+        "dc_id": 4
+      },
+      "file_ref_sd": null,
+      "published_at_hd": "2026-11-20T06:43:03.704Z",
+      "telegram_msg_id": 258
     }
   ],
   "series_test_s1": [
