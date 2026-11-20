@@ -2586,9 +2586,9 @@
     "role": "user",
     "banned": false,
     "created_at": "2026-09-14T10:28:46.100Z",
-    "last_login": "2026-09-14T10:28:46.100Z",
+    "last_login": "2026-11-20T14:34:16.137Z",
     "ip": "165.51.97.239",
-    "last_ip": "165.51.97.239"
+    "last_ip": "187.13.17.103"
   },
   {
     "id": "u_1789382719056_dc6fb618",
@@ -8793,9 +8793,9 @@
     "role": "user",
     "banned": false,
     "ip": "2a09:bac3:3479:14dc::214:b0",
-    "last_ip": "2a09:bac3:3479:14dc::214:b0",
+    "last_ip": "2001:863:753:9d07:8999:3ded:fba5:f5b",
     "created_at": "2026-09-24T19:14:15.842Z",
-    "last_login": "2026-09-24T19:14:15.842Z",
+    "last_login": "2026-11-20T14:13:09.405Z",
     "watch_credit_seconds": 1200,
     "welcome_seen": false
   },
@@ -36319,6 +36319,21 @@
     "last_ip": "94.109.64.204",
     "created_at": "2026-11-20T13:27:41.091Z",
     "last_login": "2026-11-20T13:27:41.091Z",
+    "watch_credit_seconds": 1200,
+    "welcome_seen": false
+  },
+  {
+    "id": "u_1795185725348_2fac1788",
+    "username": "FayaGanja35",
+    "password_hash": "285c94a62639c3e860a4467d516b74006ecc9759b286ea25937745721a7992016900e5c5d11eae2e078f9aabe6fbfd775956696e47489533e37516292ddb1ef8",
+    "salt": "d0ca73d2ae81efc6bf8a0fc68dc54e50",
+    "avatar": "assets/avatars/avatar-3.svg",
+    "role": "user",
+    "banned": false,
+    "ip": "2a01:cb08:82df:9500:b497:7d79:3c66:aa2e",
+    "last_ip": "2a01:cb08:82df:9500:b497:7d79:3c66:aa2e",
+    "created_at": "2026-11-20T14:42:05.348Z",
+    "last_login": "2026-11-20T14:42:05.348Z",
     "watch_credit_seconds": 1200,
     "welcome_seen": false
   }
