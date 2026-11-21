@@ -6183,5 +6183,13 @@
     "role": "user",
     "avatar": "assets/avatars/avatar-1.svg",
     "expires_at": 1797882110863
+  },
+  {
+    "token": "939c4ff86f50cb18042c8d8e325afe9eb35e77249c47c0e599a180adc606459b",
+    "user_id": "u_1795291535258_da3755d8",
+    "username": "Andreattttoo",
+    "role": "user",
+    "avatar": "assets/avatars/avatar-1.svg",
+    "expires_at": 1797883535441
   }
 ]
