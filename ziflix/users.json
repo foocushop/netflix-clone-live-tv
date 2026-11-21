@@ -37349,5 +37349,35 @@
     "last_login": "2026-11-21T15:35:10.649Z",
     "watch_credit_seconds": 1200,
     "welcome_seen": false
+  },
+  {
+    "id": "u_1795277699857_f91b00d3",
+    "username": "Coca cherry",
+    "password_hash": "9f3e19f6c3448003c1dd15a57c394736343ab402711a1ea79afaf579231018c57f56330f9ea463eb0bcf6bd9f39e7b1d7241f8958be0ec9d7fd5872de0ce49c5",
+    "salt": "d1a4d814adc674f10290f32f4cbd2774",
+    "avatar": "assets/avatars/avatar-1.svg",
+    "role": "user",
+    "banned": false,
+    "ip": "2001:861:38c0:95e0:2c94:1e92:38a7:bb20",
+    "last_ip": "2001:861:38c0:95e0:2c94:1e92:38a7:bb20",
+    "created_at": "2026-11-21T16:14:59.857Z",
+    "last_login": "2026-11-21T16:14:59.857Z",
+    "watch_credit_seconds": 1200,
+    "welcome_seen": false
+  },
+  {
+    "id": "u_1795278548915_bb6d0c7c",
+    "username": "Alex1812",
+    "password_hash": "11744d251be9aaeffbabfad05b2a6a545775105c38aa17249259d9bc9c1aeb05ab02840f2357909aab9ecbb01ad57e18fa6b79ff610b02705c79384cc442aa93",
+    "salt": "2bb7a4775829d537eef8608b75746e2a",
+    "avatar": "assets/avatars/avatar-1.svg",
+    "role": "user",
+    "banned": false,
+    "ip": "140.180.240.227",
+    "last_ip": "140.180.240.227",
+    "created_at": "2026-11-21T16:29:08.915Z",
+    "last_login": "2026-11-21T16:29:08.915Z",
+    "watch_credit_seconds": 1200,
+    "welcome_seen": false
   }
 ]
