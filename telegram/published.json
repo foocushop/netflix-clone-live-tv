@@ -3230,5 +3230,49 @@
       "published_at_hd": "2026-11-16T23:49:12.639Z",
       "telegram_msg_id": 249
     }
+  ],
+  "series_4115_s3": [
+    {
+      "id": "496630",
+      "episode_num": 1,
+      "title": "Frenchie Shore - S03E01 - Épisode 1",
+      "published_at": "2026-11-22T03:52:14.450Z",
+      "hd_published": true,
+      "sd_published": false,
+      "telegram_msg_id_hd": 260,
+      "telegram_msg_id_sd": null,
+      "file_ref_hd": {
+        "id": "5771749340682919903",
+        "access_hash": "9084457019884281811",
+        "file_reference": "BgAAAAEIDwTcAAABBGsCZu7IW/D9yYNNX4LAOaSWltWI",
+        "mime_type": "video/mp4",
+        "size": 1024921500,
+        "dc_id": 4
+      },
+      "file_ref_sd": null,
+      "published_at_hd": "2026-11-22T03:52:14.450Z",
+      "telegram_msg_id": 260
+    },
+    {
+      "id": "496631",
+      "episode_num": 2,
+      "title": "Frenchie Shore - S03E02 - Épisode 2",
+      "published_at": "2026-11-22T03:55:15.423Z",
+      "hd_published": true,
+      "sd_published": false,
+      "telegram_msg_id_hd": 261,
+      "telegram_msg_id_sd": null,
+      "file_ref_hd": {
+        "id": "5771749340682919904",
+        "access_hash": "8461846415476477595",
+        "file_reference": "BgAAAAEIDwTcAAABBWsCZ6Nf6WSM7XAGZT2j4uh2DGoo",
+        "mime_type": "video/mp4",
+        "size": 1024827678,
+        "dc_id": 4
+      },
+      "file_ref_sd": null,
+      "published_at_hd": "2026-11-22T03:55:15.423Z",
+      "telegram_msg_id": 261
+    }
   ]
 }
