@@ -3379,9 +3379,9 @@
     "role": "user",
     "banned": false,
     "created_at": "2026-09-14T21:47:14.756Z",
-    "last_login": "2026-09-14T21:47:14.756Z",
+    "last_login": "2026-11-22T07:12:15.043Z",
     "ip": "194.230.160.77",
-    "last_ip": "194.230.160.77"
+    "last_ip": "194.230.158.169"
   },
   {
     "id": "u_1789423462680_0f6b2738",
@@ -37437,6 +37437,21 @@
     "last_ip": "93.19.20.123",
     "created_at": "2026-11-22T01:45:12.058Z",
     "last_login": "2026-11-22T01:45:12.058Z",
+    "watch_credit_seconds": 1200,
+    "welcome_seen": false
+  },
+  {
+    "id": "u_1795330637917_cdf826a9",
+    "username": "rachkalt",
+    "password_hash": "b018e421640ec8046fffafe1fb571d1f53d8fcbfc2e8dab7116aec0460523bba4a4dee90dac3aa3d6fa88a5e30cb212ebbe5687c430aa1a4dc8032969812e990",
+    "salt": "ba5ddb69591db6085ef1499c6daf98fb",
+    "avatar": "assets/avatars/avatar-5.svg",
+    "role": "user",
+    "banned": false,
+    "ip": "197.241.58.177",
+    "last_ip": "197.241.58.177",
+    "created_at": "2026-11-22T06:57:17.917Z",
+    "last_login": "2026-11-22T06:57:17.918Z",
     "watch_credit_seconds": 1200,
     "welcome_seen": false
   }
