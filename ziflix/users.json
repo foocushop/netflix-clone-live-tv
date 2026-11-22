@@ -36018,7 +36018,7 @@
     "ip": "196.127.12.59",
     "last_ip": "196.127.12.59",
     "created_at": "2026-11-16T22:59:56.176Z",
-    "last_login": "2026-11-21T14:02:38.537Z",
+    "last_login": "2026-11-22T00:23:56.238Z",
     "watch_credit_seconds": 1200,
     "welcome_seen": false
   },
@@ -37407,6 +37407,21 @@
     "last_ip": "102.164.188.214",
     "created_at": "2026-11-21T22:36:00.174Z",
     "last_login": "2026-11-21T22:36:00.174Z",
+    "watch_credit_seconds": 1200,
+    "welcome_seen": false
+  },
+  {
+    "id": "u_1795306830448_5ad1b0c9",
+    "username": "Félix Faure",
+    "password_hash": "cb8a168712a6af7e945cea302375cc3ce2aa34a3feee6428fa117f8fb0f65a3d55d6b08c9e50469a557b5172db46f740d37dc0c478442d1cfbbe9ff831eae894",
+    "salt": "be040d4c917518d188799dbbe4b99644",
+    "avatar": "assets/avatars/avatar-1.svg",
+    "role": "user",
+    "banned": false,
+    "ip": "102.212.190.55",
+    "last_ip": "102.212.190.55",
+    "created_at": "2026-11-22T00:20:30.448Z",
+    "last_login": "2026-11-22T00:20:30.448Z",
     "watch_credit_seconds": 1200,
     "welcome_seen": false
   }
