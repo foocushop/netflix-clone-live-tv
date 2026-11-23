@@ -37499,5 +37499,20 @@
     "last_login": "2026-11-22T22:11:50.950Z",
     "watch_credit_seconds": 1200,
     "welcome_seen": false
+  },
+  {
+    "id": "u_1795399408336_51477d5f",
+    "username": "louiswilton89@gmail.com",
+    "password_hash": "13eb09db48e591978e43d5c69e413699a132fe97f5214650490cd09bd3eebd369b8b30da36da8a3d8a028a6f77076fb3a10a7450654dd8013e8669537e8c145b",
+    "salt": "a4f2eb83c3f3aff0eb89e005ff811995",
+    "avatar": "assets/avatars/avatar-1.svg",
+    "role": "user",
+    "banned": false,
+    "ip": "200.113.241.110",
+    "last_ip": "200.113.241.110",
+    "created_at": "2026-11-23T02:03:28.336Z",
+    "last_login": "2026-11-23T02:03:28.336Z",
+    "watch_credit_seconds": 1200,
+    "welcome_seen": false
   }
 ]
