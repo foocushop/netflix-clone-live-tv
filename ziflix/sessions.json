@@ -6127,5 +6127,13 @@
     "role": "user",
     "avatar": "assets/avatars/avatar-1.svg",
     "expires_at": 1798038951772
+  },
+  {
+    "token": "98be538129dabb0f1c8f8e151555f6c005f64cd7b3ac540d57ef551ecfdfb6dd",
+    "user_id": "u_1789417514420_828d103f",
+    "username": "sgu94",
+    "role": "user",
+    "avatar": "assets/avatars/avatar-1.svg",
+    "expires_at": 1798047213369
   }
 ]
