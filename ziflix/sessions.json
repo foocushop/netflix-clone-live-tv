@@ -6111,5 +6111,13 @@
     "role": "user",
     "avatar": "assets/avatars/avatar-1.svg",
     "expires_at": 1798029748460
+  },
+  {
+    "token": "d58b6ae688b3d30659a7fb51803ec98ec7d06a577acdd61e96e313964698f37a",
+    "user_id": "u_1794323577316_fc433df4",
+    "username": "jugé",
+    "role": "user",
+    "avatar": "assets/avatars/avatar-10.svg",
+    "expires_at": 1798036997989
   }
 ]
