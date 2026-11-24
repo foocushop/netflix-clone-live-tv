@@ -32028,9 +32028,9 @@
     "role": "user",
     "banned": false,
     "ip": "2001:4278:23:f1d3:d982:73ba:588:7dff",
-    "last_ip": "2001:4278:20:9f39:50ab:ce43:2c32:6fe1",
+    "last_ip": "2001:4278:21:56c7:3451:4bb1:a12c:3c0a",
     "created_at": "2026-10-18T22:30:20.002Z",
-    "last_login": "2026-10-18T22:41:35.977Z",
+    "last_login": "2026-11-24T00:11:57.012Z",
     "watch_credit_seconds": 1200,
     "welcome_seen": false
   },

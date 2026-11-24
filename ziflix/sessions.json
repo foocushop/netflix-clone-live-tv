@@ -6159,5 +6159,13 @@
     "role": "admin",
     "avatar": "assets/avatars/avatar-1.svg",
     "expires_at": 1798067181486
+  },
+  {
+    "token": "e0b4c8f63b4a24ffd2bd55ecb3ef3edfcf4da9ad188a7e7edc0565a4fb1dbb7e",
+    "user_id": "u_1792362620002_aeb58731",
+    "username": "desiresall2003@iclaud.com",
+    "role": "user",
+    "avatar": "assets/avatars/avatar-4.svg",
+    "expires_at": 1798071117154
   }
 ]
