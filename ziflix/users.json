@@ -37785,5 +37785,35 @@
     "last_login": "2026-11-25T01:07:15.552Z",
     "watch_credit_seconds": 1200,
     "welcome_seen": false
+  },
+  {
+    "id": "u_1795603054872_86a036c6",
+    "username": "elsaylb",
+    "password_hash": "ea50e1ffe11ac27efe60b7a2c1948cbf2fe22e94fa0bf4c488a983c90644940827fab494d8dab62fdebecaf6c130b012791321a104edce2dbc0520be1a7d4a32",
+    "salt": "dcb3cc5fae70df3b61b962622c383843",
+    "avatar": "assets/avatars/avatar-2.svg",
+    "role": "user",
+    "banned": false,
+    "ip": "2001:861:3253:a890:edb5:a235:8535:defb",
+    "last_ip": "2001:861:3253:a890:edb5:a235:8535:defb",
+    "created_at": "2026-11-25T10:37:34.872Z",
+    "last_login": "2026-11-25T10:37:34.872Z",
+    "watch_credit_seconds": 1200,
+    "welcome_seen": false
+  },
+  {
+    "id": "u_1795604606466_0a6ba353",
+    "username": "Momo78",
+    "password_hash": "4fd5a0f716211138a85c571a787eb0330f22fc26985e5be3119ae634e35395c8907beef71c67a1e139a5d7c8697b8fdc0ae8ed96c7a14930d7cb2b088eacc9dc",
+    "salt": "32d6e8ffa11a7527ffba2c832436f6d7",
+    "avatar": "assets/avatars/avatar-1.svg",
+    "role": "user",
+    "banned": false,
+    "ip": "213.139.10.134",
+    "last_ip": "213.139.10.134",
+    "created_at": "2026-11-25T11:03:26.466Z",
+    "last_login": "2026-11-25T11:03:26.466Z",
+    "watch_credit_seconds": 1200,
+    "welcome_seen": false
   }
 ]
