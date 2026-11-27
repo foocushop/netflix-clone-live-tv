@@ -2767,6 +2767,27 @@
       "file_ref_sd": null,
       "published_at_hd": "2026-11-25T20:02:09.984Z",
       "telegram_msg_id": 267
+    },
+    {
+      "id": "498092",
+      "episode_num": 54,
+      "title": "Les Apprentis Aventuriers (2016) - S09E54 - Épisode 54",
+      "published_at": "2026-11-27T14:33:55.263Z",
+      "hd_published": true,
+      "sd_published": false,
+      "telegram_msg_id_hd": 269,
+      "telegram_msg_id_sd": null,
+      "file_ref_hd": {
+        "id": "5785385080163673357",
+        "access_hash": "-308094157282383812",
+        "file_reference": "BgAAAAEIDwTcAAABDWsJlNMhPRiKMbb6VFAWY5r8obph",
+        "mime_type": "video/mp4",
+        "size": 749791028,
+        "dc_id": 4
+      },
+      "file_ref_sd": null,
+      "published_at_hd": "2026-11-27T14:33:55.263Z",
+      "telegram_msg_id": 269
     }
   ],
   "series_test_s1": [
